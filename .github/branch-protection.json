@@ -5,7 +5,14 @@
     "strict": true,
     "contexts": [],
     "contexts_url": "https://api.github.com/repos/DitmarF/funkspace-app/branches/main/protection/required_status_checks/contexts",
-    "checks": []
+    "checks": [
+      {
+        "context": "ci"
+      },
+      {
+        "context": "playwright"
+      }
+    ]
   },
   "required_pull_request_reviews": {
     "url": "https://api.github.com/repos/DitmarF/funkspace-app/branches/main/protection/required_pull_request_reviews",
@@ -22,11 +29,25 @@
     "url": "https://api.github.com/repos/DitmarF/funkspace-app/branches/main/protection/enforce_admins",
     "enabled": false
   },
-  "required_linear_history": { "enabled": true },
-  "allow_force_pushes": { "enabled": false },
-  "allow_deletions": { "enabled": false },
-  "block_creations": { "enabled": false },
-  "required_conversation_resolution": { "enabled": false },
-  "lock_branch": { "enabled": false },
-  "allow_fork_syncing": { "enabled": false }
+  "required_linear_history": {
+    "enabled": true
+  },
+  "allow_force_pushes": {
+    "enabled": false
+  },
+  "allow_deletions": {
+    "enabled": false
+  },
+  "block_creations": {
+    "enabled": false
+  },
+  "required_conversation_resolution": {
+    "enabled": false
+  },
+  "lock_branch": {
+    "enabled": false
+  },
+  "allow_fork_syncing": {
+    "enabled": false
+  }
 }
