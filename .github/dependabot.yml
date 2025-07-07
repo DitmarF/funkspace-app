@@ -1,0 +1,73 @@
+version: 2
+updates:
+  # Root workspace – manages the pnpm lockfile and shared dev‑deps
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "UTC"
+    labels: ["npm-deps"]
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Frontend workspace — Next.js app
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "UTC"
+    labels: ["npm-deps"]
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Backend workspace — future API or utilities
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "UTC"
+    labels: ["npm-deps"]
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Common workspace — shared TS helpers
+  - package-ecosystem: "npm"
+    directory: "/common"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "UTC"
+    labels: ["npm-deps"]
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions version bumps for all workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:00"
+      timezone: "UTC"
+    labels: ["actions-deps"]
+    rebase-strategy: "auto"
+    open-pull-requests-limit: 10
