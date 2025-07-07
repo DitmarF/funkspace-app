@@ -18,13 +18,17 @@ export default defineConfig({
     setupFiles: "./vitest.setup.ts",
     css: true,
     coverage: {
-      /** switch from deprecated 'c8' to the built-in engine */
+      enabled: true,
       provider: "v8",
+      include: ["src/**/*.{ts,tsx}"],
       reporter: ["text", "html"],
-      lines: 80,
-      functions: 80,
-      branches: 80,
-      statements: 80,
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+        perFile: false,
+      },
     },
   },
 });
