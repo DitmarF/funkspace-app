@@ -18,7 +18,7 @@
     "e2e": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
     "e2e:ui": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --ui",
     "e2e:report": "playwright show-report",
-    "postinstall": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium --with-deps",
+    "postinstall": "if [ \"$VERCEL\" != \"1\" ]; then cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium --with-deps; fi",
     "build": "pnpm -F frontend build"
   },
   "devDependencies": {

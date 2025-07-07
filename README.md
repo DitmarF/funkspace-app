@@ -22,7 +22,8 @@ pnpm coverage
 ## Playwright browser downloads
 
 End-to-end tests use Playwright with only the Chromium browser. The `postinstall`
-script installs this browser under `node_modules` so it can be cached in CI:
+script installs this browser under `node_modules` so it can be cached in CI. On
+Vercel the installation is skipped automatically:
 
 ```bash
 pnpm install
