@@ -1,29 +1,30 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react-swc';
-import { resolve } from 'path';
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react-swc";
+import { resolve } from "node:path";
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
-      react: resolve(__dirname, 'frontend/node_modules/react'),
-      'react-dom': resolve(__dirname, 'frontend/node_modules/react-dom')
-    }
+      "@": resolve(__dirname, "src"),
+      react: resolve(__dirname, "frontend/node_modules/react"),
+      "react-dom": resolve(__dirname, "frontend/node_modules/react-dom"),
+    },
   },
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    setupFiles: './vitest.setup.ts',
+    setupFiles: "./vitest.setup.ts",
     css: true,
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html'],
+      /** switch from deprecated 'c8' to the built-in engine */
+      provider: "v8",
+      reporter: ["text", "html"],
       lines: 80,
       functions: 80,
       branches: 80,
-      statements: 80
-    }
-  }
+      statements: 80,
+    },
+  },
 });
