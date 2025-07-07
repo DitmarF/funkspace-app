@@ -18,7 +18,7 @@ export default defineConfig({
     setupFiles: './vitest.setup.ts',
     css: true,
     coverage: {
-      provider: 'c8',
+      provider: 'v8',
       reporter: ['text', 'html'],
       lines: 80,
       functions: 80,
