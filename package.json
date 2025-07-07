@@ -15,10 +15,10 @@
     "test": "vitest run",
     "coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "e2e": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
-    "e2e:ui": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test --ui",
+    "e2e": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
+    "e2e:ui": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --ui",
     "e2e:report": "playwright show-report",
-    "postinstall": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium --with-deps"
+    "postinstall": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium --with-deps"
   },
   "devDependencies": {
     "@playwright/test": "^1.53.2",
@@ -35,6 +35,7 @@
     "eslint-plugin-prettier": "^5.5.1",
     "jsdom": "^26.1.0",
     "prettier": "^3.6.2",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "cross-env": "^7.0.3"
   }
 }
