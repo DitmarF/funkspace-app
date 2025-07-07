@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "echo 'Ready in 1ms'",
+    "dev": "next dev -p 3000",
     "build": "echo 'Compiled successfully'",
     "start": "echo 'started server on'",
     "lint": "echo 'lint ok'"
