@@ -30,6 +30,6 @@ export default defineConfig({
         perFile: false,
       },
     },
-    exclude: [...configDefaults.exclude, 'e2e/**'],
+    exclude: [...configDefaults.exclude, "e2e/**"],
   },
 });
