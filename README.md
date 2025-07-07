@@ -18,4 +18,3 @@ Generate a coverage report (used in CI):
 ```bash
 pnpm coverage
 ```
-
