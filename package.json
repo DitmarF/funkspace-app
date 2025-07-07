@@ -15,10 +15,10 @@
     "test": "vitest run",
     "coverage": "vitest run --coverage",
     "test:watch": "vitest",
-    "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui",
+    "e2e": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
+    "e2e:ui": "PLAYWRIGHT_BROWSERS_PATH=0 playwright test --ui",
     "e2e:report": "playwright show-report",
-    "postinstall": "playwright install --with-deps"
+    "postinstall": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium --with-deps"
   },
   "devDependencies": {
     "@playwright/test": "^1.53.2",
