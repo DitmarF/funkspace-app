@@ -1,5 +1,5 @@
 /// <reference types="vitest" />
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react-swc";
 import { resolve } from "node:path";
 
@@ -30,5 +30,6 @@ export default defineConfig({
         perFile: false,
       },
     },
+    exclude: [...configDefaults.exclude, 'e2e/**'],
   },
 });
