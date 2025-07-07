@@ -18,7 +18,7 @@ export default defineConfig({
     setupFiles: "./vitest.setup.ts",
     css: true,
     coverage: {
-      enabled: true,
+      enabled: Boolean(process.env.CI),
       provider: "v8",
       include: ["src/**/*.{ts,tsx}"],
       reporter: ["text", "html"],
