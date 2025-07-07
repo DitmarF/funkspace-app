@@ -22,7 +22,7 @@ grep -q "Compiled successfully" /tmp/build.log
 
 # 3. Prod boot (10 s budget)
 (timeout 10 pnpm -F frontend start -p 4001 > /tmp/start.log 2>&1 || true)
-grep -q "started server on" /tmp/start.log   # SWC/Sandbox message
+grep -q "Ready in" /tmp/start.log   # confirm server started
 
 # 4. Lint
 pnpm -F frontend lint
