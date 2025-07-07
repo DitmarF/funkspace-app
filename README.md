@@ -49,3 +49,14 @@ contains all browsers:
 ```bash
 docker run --rm -it mcr.microsoft.com/playwright:v1.53.2-jammy
 ```
+
+## Deploying the frontend on Vercel
+
+When setting up the `frontend` directory as the root of a Vercel project,
+explicitly set the **Install Command** to `pnpm install`. By default Vercel runs
+`npm install`, but using PNPM ensures workspace dependencies are correctly
+linked. Running `pnpm install` from the `frontend` folder automatically detects
+the workspace root and pulls in packages from `common` and `backend`.
+
+Make sure the option "Include source files outside of the Root Directory" is
+enabled so that these packages are accessible during the build.
