@@ -1,3 +1,15 @@
-e2e
-__tests__
-*.log
+# Ignore test sources and specs
+**/*.test.ts?(x)
+__tests__/
+e2e/
+playwright/**
+
+# Ignore storybook and coverage artefacts
+.storybook/
+coverage/
+
+# Ignore local documentation and markdown content
+*.md
+
+# Optional – Vitest raw output
+.vitest/
