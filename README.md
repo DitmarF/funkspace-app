@@ -1,7 +1,7 @@
-# FunkSpace: GitHub + Slack bot
+# FunkSpace: GitHub bot
 
 - This is a monorepo with a Next.js frontend 🚀
-- The backend is a Slack-compatible API built in Next.js 🚀
+- The backend is a static JSON-based clean architecture built in Next.js, with plans to integrate MongoDB 🚀
 
 # FunkSpace App
 
