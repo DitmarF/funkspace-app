@@ -1,3 +1,9 @@
 {
-  "makefile.configureOnOpen": false
+  "makefile.configureOnOpen": false,
+  "codex.model": "o3",
+  "codex.stream": false,
+  "codex.temperature": 0.1,
+  "codex.maxTokens": 1024,
+  // true = apply edits in-place with diff mode
+  "codex.applyOnSave": false
 }
