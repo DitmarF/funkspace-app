@@ -2,7 +2,7 @@ Great — I’ll write a beginner-friendly `CONTRIBUTING.md` styled like the fea
 
 # Contributing to FunkSpace
 
-*Guide for new contributors (junior developers)*
+_Guide for new contributors (junior developers)_
 
 ## 0. Prerequisites & Setup
 
@@ -19,7 +19,7 @@ Before you start, make sure you have the following tools installed:
 
 ## 1. Branching Strategy (Trunk-Based Git Flow)
 
-We use a **trunk-based development** workflow: the `main` branch is the stable trunk where all changes get merged. **Never commit directly to** `main`. Instead, always create a *feature branch* for your work and use Pull Requests to merge into `main`. This keeps `main` history linear and clean.
+We use a **trunk-based development** workflow: the `main` branch is the stable trunk where all changes get merged. **Never commit directly to** `main`. Instead, always create a _feature branch_ for your work and use Pull Requests to merge into `main`. This keeps `main` history linear and clean.
 
 1. **Update main:** Before starting work, always synchronize your local `main` with the remote. For example:
 
@@ -63,11 +63,11 @@ We use a **trunk-based development** workflow: the `main` branch is the stable t
 
 Commit your work **early and often**. Small, frequent commits make it easier to review changes and find issues. Please follow the **Conventional Commits** style for your commit messages, as it helps with readability and automating release notes. For example:
 
-* **Features:** Use `feat: ...` prefix (e.g. `feat: add particle sandbox component`)
-* **Bug Fixes:** Use `fix: ...` prefix (e.g. `fix: null check in animation loop`)
-* **Documentation:** Use `docs: ...` for docs-only changes (e.g. `docs: update README installation section`)
+- **Features:** Use `feat: ...` prefix (e.g. `feat: add particle sandbox component`)
+- **Bug Fixes:** Use `fix: ...` prefix (e.g. `fix: null check in animation loop`)
+- **Documentation:** Use `docs: ...` for docs-only changes (e.g. `docs: update README installation section`)
 
-Other prefixes like `refactor:`, `chore:`, `test:` etc. can be used when appropriate. The scope part (in parentheses) is optional. Aim for a concise message in the imperative mood (what the commit *does*).
+Other prefixes like `refactor:`, `chore:`, `test:` etc. can be used when appropriate. The scope part (in parentheses) is optional. Aim for a concise message in the imperative mood (what the commit _does_).
 
 When committing, **sign off** your commits. We require signed commits in this repo (for DCO and security reasons). You can sign off by adding the `-s` flag to your commit command, which will add a "Signed-off-by" line. For example:
 
@@ -76,7 +76,7 @@ git add -p              # interactively stage changes
 git commit -s -m "feat: implement new animation engine"
 ```
 
-The `-s` flag will sign off the commit under your name. *(Make sure you’ve configured GPG or SSH key signing in Git so that your commits show as “Verified” on GitHub. If you haven’t, see the DevOps Playbook or GitHub docs for how to set up commit signing.)* Each commit should ideally pass the tests and linter—if a commit breaks the build or style checks, consider fixing it in that commit or squashing fixes before merging.
+The `-s` flag will sign off the commit under your name. _(Make sure you’ve configured GPG or SSH key signing in Git so that your commits show as “Verified” on GitHub. If you haven’t, see the DevOps Playbook or GitHub docs for how to set up commit signing.)_ Each commit should ideally pass the tests and linter—if a commit breaks the build or style checks, consider fixing it in that commit or squashing fixes before merging.
 
 ## 3. Keep Your Branch Updated (Rebase on `main`)
 
@@ -103,17 +103,16 @@ The first push with `-u` sets the upstream tracking. If you’ve rebased or rewr
 
 Now [open a Pull Request](https://docs.github.com/pull-requests) (PR) from your branch into the `main` branch. You can do this via the GitHub website or using the GitHub CLI (`gh pr create ...`). In the PR:
 
-* **Title:** Use a concise title that follows Conventional Commit style (e.g. start with `feat:`, `fix:` as appropriate). This will become the commit message when we squash-merge.
+- **Title:** Use a concise title that follows Conventional Commit style (e.g. start with `feat:`, `fix:` as appropriate). This will become the commit message when we squash-merge.
 
-* **Description:** Provide context about **Why** you made the change and **What** you did. Include any relevant details or screenshots. If possible, follow a structure like:
+- **Description:** Provide context about **Why** you made the change and **What** you did. Include any relevant details or screenshots. If possible, follow a structure like:
+  - **Why** – the problem or motivation for the change
+  - **What** – a summary of the solution
+  - **How** – key technical details or how to test the changes
 
-  * **Why** – the problem or motivation for the change
-  * **What** – a summary of the solution
-  * **How** – key technical details or how to test the changes
+- **Link issues:** If your change fixes an open issue, link it by number (e.g., _“Closes #123”_ will automatically close issue #123 when merged).
 
-* **Link issues:** If your change fixes an open issue, link it by number (e.g., *“Closes #123”* will automatically close issue #123 when merged).
-
-* **Labels and reviewers:** Add any relevant labels (e.g. `feature`, `bugfix`, `docs`) to the PR. Also, assign at least one reviewer (for example, a senior dev or maintainer) to start the code review process.
+- **Labels and reviewers:** Add any relevant labels (e.g. `feature`, `bugfix`, `docs`) to the PR. Also, assign at least one reviewer (for example, a senior dev or maintainer) to start the code review process.
 
 ## 5. Collaborate: CI Checks & Code Review
 
@@ -127,8 +126,8 @@ Throughout the review process, keep your branch up-to-date with `main` (rebasing
 
 After you’ve received approval from reviewers and all CI checks are passing, it’s time to merge your work into `main`. We enforce a linear history on `main`, so **do not use** the default “merge commit” option. Instead, choose **“Squash & Merge”** or **“Rebase & Merge”** for the Pull Request:
 
-* **Squash & Merge** – This is the default for feature branches with multiple WIP commits. It will combine all your commits into one neat commit on `main` (using the PR title and description for the commit message). This keeps the history clean.
-* **Rebase & Merge** – If your commits are already well-structured and you want to preserve them individually, you can rebase-merge (this fast-forwards `main` to include each of your commits without a merge commit). Ensure your branch was rebased on the latest `main` before doing this.
+- **Squash & Merge** – This is the default for feature branches with multiple WIP commits. It will combine all your commits into one neat commit on `main` (using the PR title and description for the commit message). This keeps the history clean.
+- **Rebase & Merge** – If your commits are already well-structured and you want to preserve them individually, you can rebase-merge (this fast-forwards `main` to include each of your commits without a merge commit). Ensure your branch was rebased on the latest `main` before doing this.
 
 > **Note:** The repository’s branch protection settings require all merges to be fast-forward (no merge commits), so only squash or rebase merges are allowed. Direct pushes to `main` are disabled.
 
@@ -154,9 +153,9 @@ You generally don’t need to do anything special for deployment – it’s all 
 
 ## 8. Further Resources
 
-* **Project README:** Be sure to read the [README.md](README.md) for instructions on setting up the project, running the app, and other useful scripts (`pnpm` commands, etc.). It contains additional context about the project structure and tools.
-* **DevOps Playbook:** Our team maintains a **DevOps Playbook** document that goes into deep technical detail about the project’s infrastructure and workflows. It covers things like ESLint/Prettier configuration, testing practices with Vitest and Playwright, the CI/CD setup with GitHub Actions, and the Vercel deployment process. If you’re interested or run into a tricky issue (like fixing a failing CI build or resolving a merge conflict), the Playbook is a great resource. (Ask a maintainer if you need access or look for `FunkSpace_DevOps_Playbook.md` in the repository.)
-* **Conventional Commits:** For more on the Conventional Commits format we use for messages, see the [Conventional Commits 1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/).
-* **Codex CLI:** Learn more about the OpenAI Codex CLI (our AI coding assistant) on its [GitHub page](https://github.com/openai/codex) if you’re curious how it works. It’s an optional tool, but we’ve found it helpful in accelerating development.
+- **Project README:** Be sure to read the [README.md](README.md) for instructions on setting up the project, running the app, and other useful scripts (`pnpm` commands, etc.). It contains additional context about the project structure and tools.
+- **DevOps Playbook:** Our team maintains a **DevOps Playbook** document that goes into deep technical detail about the project’s infrastructure and workflows. It covers things like ESLint/Prettier configuration, testing practices with Vitest and Playwright, the CI/CD setup with GitHub Actions, and the Vercel deployment process. If you’re interested or run into a tricky issue (like fixing a failing CI build or resolving a merge conflict), the Playbook is a great resource. (Ask a maintainer if you need access or look for `FunkSpace_DevOps_Playbook.md` in the repository.)
+- **Conventional Commits:** For more on the Conventional Commits format we use for messages, see the [Conventional Commits 1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/).
+- **Codex CLI:** Learn more about the OpenAI Codex CLI (our AI coding assistant) on its [GitHub page](https://github.com/openai/codex) if you’re curious how it works. It’s an optional tool, but we’ve found it helpful in accelerating development.
 
-**Thank you for contributing to FunkSpace!** 🎷 *By following these guidelines, you help us maintain a clean codebase and ship improvements faster. We’re excited to see your contributions. If you have any questions, don’t hesitate to reach out to the maintainers or open a discussion.*
+**Thank you for contributing to FunkSpace!** 🎷 _By following these guidelines, you help us maintain a clean codebase and ship improvements faster. We’re excited to see your contributions. If you have any questions, don’t hesitate to reach out to the maintainers or open a discussion._
