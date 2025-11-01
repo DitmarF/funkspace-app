@@ -9,8 +9,8 @@ export default function ThemeSwitcher() {
   const getInitialTheme = (): Theme => {
     if (typeof window === "undefined") return "dark";
     const saved = localStorage.getItem("theme") as Theme | null;
-    // If saved theme is "default" or empty, default to "dark"
-    if (saved && saved !== "default") return saved;
+    // Return saved theme if it exists (including "default" if user chose it)
+    if (saved) return saved;
     const current = document.documentElement.getAttribute(
       "data-theme",
     ) as Theme | null;
@@ -22,9 +22,9 @@ export default function ThemeSwitcher() {
 
   useEffect(() => {
     // Sync theme on mount - read from localStorage or default to "dark"
-    // If localStorage is empty or has "default", migrate to "dark"
+    // Only migrate empty/null values to "dark" (not "default" - respect user choice)
     let savedTheme = localStorage.getItem("theme") as Theme | null;
-    if (!savedTheme || savedTheme === "default") {
+    if (!savedTheme) {
       savedTheme = "dark";
       localStorage.setItem("theme", "dark");
     }

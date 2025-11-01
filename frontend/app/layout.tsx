@@ -22,8 +22,8 @@ export default function RootLayout({
             __html: `
               (function() {
                 let theme = localStorage.getItem('theme');
-                // If theme is empty or "default", migrate to "dark"
-                if (!theme || theme === 'default') {
+                // Only migrate empty/null values to "dark" (respect user's "default" choice)
+                if (!theme) {
                   theme = 'dark';
                   localStorage.setItem('theme', 'dark');
                 }
