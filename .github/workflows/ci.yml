@@ -16,6 +16,10 @@ jobs:
     name: Node ${{ matrix.node }} build
     steps:
       - uses: actions/checkout@v4
+      - name: Configure Git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -42,6 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Configure Git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
       - uses: pnpm/action-setup@v4
         with:
           version: 10
