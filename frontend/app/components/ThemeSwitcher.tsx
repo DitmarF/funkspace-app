@@ -11,7 +11,9 @@ export default function ThemeSwitcher() {
     const saved = localStorage.getItem("theme") as Theme | null;
     // If saved theme is "default" or empty, default to "dark"
     if (saved && saved !== "default") return saved;
-    const current = document.documentElement.getAttribute("data-theme") as Theme | null;
+    const current = document.documentElement.getAttribute(
+      "data-theme",
+    ) as Theme | null;
     if (current) return current;
     return "dark";
   };
