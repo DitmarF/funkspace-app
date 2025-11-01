@@ -5,11 +5,27 @@ import { useEffect, useState } from "react";
 type Theme = "default" | "dark" | "muted" | "dark-high-contrast";
 
 export default function ThemeSwitcher() {
-  const [currentTheme, setCurrentTheme] = useState<Theme>("default");
+  // Initialize state by reading from localStorage or document, default to "dark"
+  const getInitialTheme = (): Theme => {
+    if (typeof window === "undefined") return "dark";
+    const saved = localStorage.getItem("theme") as Theme | null;
+    // If saved theme is "default" or empty, default to "dark"
+    if (saved && saved !== "default") return saved;
+    const current = document.documentElement.getAttribute("data-theme") as Theme | null;
+    if (current) return current;
+    return "dark";
+  };
+
+  const [currentTheme, setCurrentTheme] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
-    // Get theme from localStorage or default to "default"
-    const savedTheme = (localStorage.getItem("theme") as Theme) || "default";
+    // Sync theme on mount - read from localStorage or default to "dark"
+    // If localStorage is empty or has "default", migrate to "dark"
+    let savedTheme = localStorage.getItem("theme") as Theme | null;
+    if (!savedTheme || savedTheme === "default") {
+      savedTheme = "dark";
+      localStorage.setItem("theme", "dark");
+    }
     setTheme(savedTheme);
   }, []);
 
