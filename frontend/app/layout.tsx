@@ -21,8 +21,15 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                const theme = localStorage.getItem('theme');
-                if (theme && theme !== 'default') {
+                let theme = localStorage.getItem('theme');
+                // Check if this is a first-time migration from "default" to "dark"
+                const hasMigrated = localStorage.getItem('theme-migrated');
+                if (!theme || (!hasMigrated && theme === 'default')) {
+                  theme = 'dark';
+                  localStorage.setItem('theme', 'dark');
+                  localStorage.setItem('theme-migrated', 'true');
+                }
+                if (theme !== 'default') {
                   document.documentElement.setAttribute('data-theme', theme);
                 }
               })();
