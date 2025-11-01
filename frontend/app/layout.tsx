@@ -22,10 +22,12 @@ export default function RootLayout({
             __html: `
               (function() {
                 let theme = localStorage.getItem('theme');
-                // Only migrate empty/null values to "dark" (respect user's "default" choice)
-                if (!theme) {
+                // Check if this is a first-time migration from "default" to "dark"
+                const hasMigrated = localStorage.getItem('theme-migrated');
+                if (!theme || (!hasMigrated && theme === 'default')) {
                   theme = 'dark';
                   localStorage.setItem('theme', 'dark');
+                  localStorage.setItem('theme-migrated', 'true');
                 }
                 if (theme !== 'default') {
                   document.documentElement.setAttribute('data-theme', theme);
