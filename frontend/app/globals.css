@@ -4,25 +4,18 @@
 
 @import "../../styles/tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--fs-color-surface-background);
+    color: var(--fs-color-content-primary);
+    font-family: Arial, Helvetica, sans-serif;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Theme variations are handled by data-theme attribute in tokens.css */
+  /* The tokens.css file defines color variables for:
+   * - :root (default theme)
+   * - [data-theme="dark"]
+   * - [data-theme="muted"]
+   * - [data-theme="dark-high-contrast"]
+   */
 }
