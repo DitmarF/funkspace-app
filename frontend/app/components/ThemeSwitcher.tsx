@@ -32,11 +32,11 @@ export default function ThemeSwitcher() {
     const currentDataTheme = document.documentElement.getAttribute(
       "data-theme",
     ) as Theme | null;
-    
+
     // Read from localStorage
     let savedTheme = localStorage.getItem("theme") as Theme | null;
     const hasMigrated = localStorage.getItem("theme-migrated");
-    
+
     // Migrate if needed
     if (!savedTheme) {
       savedTheme = "dark";
@@ -48,13 +48,13 @@ export default function ThemeSwitcher() {
       localStorage.setItem("theme", "dark");
       localStorage.setItem("theme-migrated", "true");
     }
-    
+
     // If script already set a theme, sync with it (don't reapply)
     if (currentDataTheme && currentDataTheme === savedTheme) {
       setCurrentTheme(savedTheme);
       return;
     }
-    
+
     // If script set a theme but localStorage is different, use script's value
     // (script ran first and applied migration)
     if (currentDataTheme && currentDataTheme !== savedTheme) {
@@ -62,7 +62,7 @@ export default function ThemeSwitcher() {
       localStorage.setItem("theme", currentDataTheme);
       return;
     }
-    
+
     // Otherwise, apply the theme from localStorage
     setTheme(savedTheme);
   }, [setTheme]);
