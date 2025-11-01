@@ -4,40 +4,40 @@
     "FS-Primitive-Colors": {
       "$type": "color",
       "color-red": {
-        "default": { "$value": "rgba(204,59,62,1)"},
-        "dark": { "$value": "rgba(204,104,106,1)"},
-        "muted": { "$value": "rgba(102,30,31,1)"},
-        "dark-high-contrast": { "$value": "rgba(255,130,132,1)"}
+        "default": { "$value": "rgba(204,59,62,1)" },
+        "dark": { "$value": "rgba(204,104,106,1)" },
+        "muted": { "$value": "rgba(102,30,31,1)" },
+        "dark-high-contrast": { "$value": "rgba(255,130,132,1)" }
       },
       "color-vermilion": {
-        "default": { "$value": "rgba(204,103,59,1)"},
-        "dark": { "$value": "rgba(204,134,104,1)"},
-        "muted": { "$value": "rgba(102,30,31,1)"},
-        "dark-high-contrast": { "$value": "rgba(255,168,130,1)"}
+        "default": { "$value": "rgba(204,103,59,1)" },
+        "dark": { "$value": "rgba(204,134,104,1)" },
+        "muted": { "$value": "rgba(102,30,31,1)" },
+        "dark-high-contrast": { "$value": "rgba(255,168,130,1)" }
       },
       "color-orange": {
-        "default": { "$value": "rgba(204,144,59,1)"},
-        "dark": { "$value": "rgba(204,162,104,1)"},
-        "muted": { "$value": "rgba(102,51,30,1)"},
-        "dark-high-contrast": { "$value": "rgba(255,203,130,1)"}
+        "default": { "$value": "rgba(204,144,59,1)" },
+        "dark": { "$value": "rgba(204,162,104,1)" },
+        "muted": { "$value": "rgba(102,51,30,1)" },
+        "dark-high-contrast": { "$value": "rgba(255,203,130,1)" }
       },
       "color-amber": {
-        "default": { "$value": "rgba(204,173,59,1)"},
-        "dark": { "$value": "rgba(204,182,104,1)"},
-        "muted": { "$value": "rgba(102,51,30,1)"},
-        "dark-high-contrast": { "$value": "rgba(255,228,130,1)"}
+        "default": { "$value": "rgba(204,173,59,1)" },
+        "dark": { "$value": "rgba(204,182,104,1)" },
+        "muted": { "$value": "rgba(102,51,30,1)" },
+        "dark-high-contrast": { "$value": "rgba(255,228,130,1)" }
       },
       "color-yellow": {
-        "default": { "$value": "rgba(204,202,59,1)"},
-        "dark": { "$value": "rgba(204,202,104,1)"},
-        "muted": { "$value": "rgba(102,72,30,1)"},
-        "dark-high-contrast": { "$value": "rgba(255,253,130,1)"}
+        "default": { "$value": "rgba(204,202,59,1)" },
+        "dark": { "$value": "rgba(204,202,104,1)" },
+        "muted": { "$value": "rgba(102,72,30,1)" },
+        "dark-high-contrast": { "$value": "rgba(255,253,130,1)" }
       },
       "color-green": {
-        "default": { "$value": "rgba(59,204,98,1)"},
-        "dark": { "$value": "rgba(59,204,98,1)"},
-        "muted": { "$value": "rgba(30,102,49,1)"},
-        "dark-high-contrast": { "$value": "rgba(74,255,122,1)"}
+        "default": { "$value": "rgba(59,204,98,1)" },
+        "dark": { "$value": "rgba(59,204,98,1)" },
+        "muted": { "$value": "rgba(30,102,49,1)" },
+        "dark-high-contrast": { "$value": "rgba(74,255,122,1)" }
       },
       "color-cyan": {
         "default": { "$value": "rgba(59,204,180,1)" },
