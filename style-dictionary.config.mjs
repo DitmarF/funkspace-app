@@ -7,7 +7,8 @@ const buildThemeBlock = (selector, tokens) => {
   const lines = tokens.map((token) => {
     const baseName = token.path[token.path.length - 2];
     // Use transformed value, fallback to original value if not transformed
-    const value = token.value !== undefined ? token.value : token.original?.$value;
+    const value =
+      token.value !== undefined ? token.value : token.original?.$value;
     return `  --fs-${baseName}: ${value};`;
   });
 
@@ -57,4 +58,3 @@ const config = {
 };
 
 export default config;
-
