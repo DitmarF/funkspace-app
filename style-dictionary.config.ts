@@ -1,5 +1,5 @@
-import StyleDictionary, { TransformedToken } from 'style-dictionary';
-import type { Config } from 'style-dictionary';
+import StyleDictionary, { TransformedToken } from "style-dictionary";
+import type { Config } from "style-dictionary";
 
 const getTokensByMode = (tokens: TransformedToken[], mode: string) =>
   tokens.filter((token) => token.path[token.path.length - 1] === mode);
@@ -10,42 +10,45 @@ const buildThemeBlock = (selector: string, tokens: TransformedToken[]) => {
     return `  --fs-${baseName}: ${token.value};`;
   });
 
-  const body = lines.join('\n');
-  const content = body ? `\n${body}\n` : '\n';
+  const body = lines.join("\n");
+  const content = body ? `\n${body}\n` : "\n";
 
   return `${selector} {${content}}\n\n`;
 };
 
 StyleDictionary.registerFormat({
-  name: 'css/variablesByTheme',
+  name: "css/variablesByTheme",
   formatter: ({ dictionary }) => {
-    const defaultTokens = getTokensByMode(dictionary.allTokens, 'default');
-    const darkTokens = getTokensByMode(dictionary.allTokens, 'dark');
-    const mutedTokens = getTokensByMode(dictionary.allTokens, 'muted');
+    const defaultTokens = getTokensByMode(dictionary.allTokens, "default");
+    const darkTokens = getTokensByMode(dictionary.allTokens, "dark");
+    const mutedTokens = getTokensByMode(dictionary.allTokens, "muted");
     const highContrastTokens = getTokensByMode(
       dictionary.allTokens,
-      'dark-high-contrast',
+      "dark-high-contrast",
     );
 
-    let output = buildThemeBlock(':root', defaultTokens);
+    let output = buildThemeBlock(":root", defaultTokens);
     output += buildThemeBlock('[data-theme="dark"]', darkTokens);
     output += buildThemeBlock('[data-theme="muted"]', mutedTokens);
-    output += buildThemeBlock('[data-theme="dark-high-contrast"]', highContrastTokens);
+    output += buildThemeBlock(
+      '[data-theme="dark-high-contrast"]',
+      highContrastTokens,
+    );
 
     return output.trimEnd();
   },
 });
 
 const config: Config = {
-  source: ['tokens/fs.tokens.json'],
+  source: ["tokens/fs.tokens.json"],
   platforms: {
     css: {
-      transformGroup: 'css',
-      buildPath: 'styles/',
+      transformGroup: "css",
+      buildPath: "styles/",
       files: [
         {
-          destination: 'tokens.css',
-          format: 'css/variablesByTheme',
+          destination: "tokens.css",
+          format: "css/variablesByTheme",
         },
       ],
     },
