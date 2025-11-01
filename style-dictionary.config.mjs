@@ -1,10 +1,9 @@
-import StyleDictionary, { TransformedToken } from "style-dictionary";
-import type { Config } from "style-dictionary";
+import StyleDictionary from "style-dictionary";
 
-const getTokensByMode = (tokens: TransformedToken[], mode: string) =>
+const getTokensByMode = (tokens, mode) =>
   tokens.filter((token) => token.path[token.path.length - 1] === mode);
 
-const buildThemeBlock = (selector: string, tokens: TransformedToken[]) => {
+const buildThemeBlock = (selector, tokens) => {
   const lines = tokens.map((token) => {
     const baseName = token.path[token.path.length - 2];
     // Use transformed value, fallback to original value if not transformed
@@ -41,7 +40,7 @@ StyleDictionary.registerFormat({
   },
 });
 
-const config: Config = {
+const config = {
   source: ["tokens/fs.tokens.json"],
   platforms: {
     css: {
@@ -58,3 +57,4 @@ const config: Config = {
 };
 
 export default config;
+

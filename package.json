@@ -20,7 +20,7 @@
     "e2e:report": "playwright show-report",
     "postinstall": "if [ \"$VERCEL\" != \"1\" ]; then cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium --with-deps; fi",
     "build": "pnpm -F frontend build",
-    "build:tokens": "style-dictionary build",
+    "build:tokens": "pnpm exec style-dictionary build --config style-dictionary.config.mjs",
     "format": "prettier --write ."
   },
   "devDependencies": {
@@ -40,6 +40,7 @@
     "jsdom": "^26.1.0",
     "prettier": "^3.6.2",
     "style-dictionary": "^5.1.1",
+    "tsx": "^4.20.6",
     "vitest": "^3.2.4"
   }
 }
