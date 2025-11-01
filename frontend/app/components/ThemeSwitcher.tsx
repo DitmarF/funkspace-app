@@ -15,13 +15,13 @@ export default function ThemeSwitcher() {
 
   const setTheme = (theme: Theme) => {
     const htmlElement = document.documentElement;
-    
+
     if (theme === "default") {
       htmlElement.removeAttribute("data-theme");
     } else {
       htmlElement.setAttribute("data-theme", theme);
     }
-    
+
     localStorage.setItem("theme", theme);
     setCurrentTheme(theme);
   };
@@ -46,10 +46,10 @@ export default function ThemeSwitcher() {
             font-medium 
             transition-colors 
             border ${
-            currentTheme === theme.value
-              ? "bg-fs-action-primary border-fs-action-primary text-fs-content-inverse"
-              : "bg-transparent text-fs-action-primary border-fs-action-primary hover:bg-fs-action-hover hover:text-fs-content-inverse hover:border-fs-action-hover"
-          }`}
+              currentTheme === theme.value
+                ? "bg-fs-action-primary border-fs-action-primary text-fs-content-inverse"
+                : "bg-transparent text-fs-action-primary border-fs-action-primary hover:bg-fs-action-hover hover:text-fs-content-inverse hover:border-fs-action-hover"
+            }`}
         >
           {theme.label}
         </button>
@@ -57,4 +57,3 @@ export default function ThemeSwitcher() {
     </div>
   );
 }
-
