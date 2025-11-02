@@ -21,16 +21,54 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                let theme = localStorage.getItem('theme');
-                // Check if this is a first-time migration from "default" to "dark"
-                const hasMigrated = localStorage.getItem('theme-migrated');
-                if (!theme || (!hasMigrated && theme === 'default')) {
-                  theme = 'dark';
-                  localStorage.setItem('theme', 'dark');
-                  localStorage.setItem('theme-migrated', 'true');
-                }
-                if (theme !== 'default') {
-                  document.documentElement.setAttribute('data-theme', theme);
+                try {
+                  var applyTheme = function(theme) {
+                    if (theme && theme !== 'default') {
+                      document.documentElement.setAttribute('data-theme', theme);
+                    } else {
+                      document.documentElement.removeAttribute('data-theme');
+                    }
+                  };
+
+                  var getSystemTheme = function() {
+                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                      return 'dark';
+                    }
+                    return 'default';
+                  };
+
+                  var storedTheme = localStorage.getItem('theme');
+
+                  if (!storedTheme) {
+                    storedTheme = 'system';
+                    localStorage.setItem('theme', 'system');
+                  }
+
+                  var prefersDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+                  var applyStoredTheme = function(theme) {
+                    if (theme === 'system') {
+                      applyTheme(getSystemTheme());
+                    } else {
+                      applyTheme(theme);
+                    }
+                  };
+
+                  applyStoredTheme(storedTheme);
+
+                  if (prefersDark) {
+                    var listener = function(event) {
+                      if (localStorage.getItem('theme') === 'system') {
+                        applyTheme(event.matches ? 'dark' : 'default');
+                      }
+                    };
+                    if (typeof prefersDark.addEventListener === 'function') {
+                      prefersDark.addEventListener('change', listener);
+                    } else if (typeof prefersDark.addListener === 'function') {
+                      prefersDark.addListener(listener);
+                    }
+                  }
+                } catch (error) {
+                  console.error('Theme initialization failed', error);
                 }
               })();
             `,
