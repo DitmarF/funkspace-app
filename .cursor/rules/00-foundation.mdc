@@ -1,0 +1,19 @@
+---
+description: "FunkSpace — Foundation & Guardrails"
+alwaysApply: true
+---
+
+## Stack & Principles
+- Next.js (App Router), React, TypeScript (strict), Tailwind; design tokens via Style Dictionary.
+- Priorities: Accessibility (a11y) → Performance → Maintainability → Polish.
+- Definition of Done: build ok, lint/type clean, tests green, no serious a11y issues, lightweight PR notes.
+
+## Conventions
+- Components live under `app/**` or `components/**`; colocate tests as `*.test.ts(x)`.
+- Use Tailwind tokens from `tailwind.config.*` (no inline styles). Prefer `<Image>` for images.
+- Respect dark mode and `prefers-reduced-motion`.
+
+## Performance & Security
+- Prefer server components; code-split client-only parts via dynamic import when appropriate.
+- Never expose secrets on client; validate & sanitize all inputs at boundaries.
+

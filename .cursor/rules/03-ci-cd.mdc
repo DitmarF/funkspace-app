@@ -1,0 +1,15 @@
+---
+description: "FunkSpace — CI/CD & Release"
+alwaysApply: false
+---
+
+## GitHub Actions
+- Jobs: lint → typecheck → unit tests → build; run e2e smoke on PRs.
+- Use node LTS; cache pnpm; fail on warnings for lint/types.
+
+## Vercel
+- No secrets in code; require env placeholders. Surface build logs on failure with actionable tips.
+
+## Outputs
+- Generate PR checklist (tests added/updated, a11y considered, perf impact).
+- Produce changelog-ready summaries when requested.
