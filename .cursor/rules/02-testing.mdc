@@ -1,0 +1,19 @@
+---
+description: "FunkSpace — Testing"
+globs: ["**/*.{test,spec}.ts", "**/*.{test,spec}.tsx", "e2e/**/*.ts"]
+alwaysApply: false
+---
+
+## Unit (Vitest)
+- Arrange/Act/Assert; cover happy path + edge cases (empty, nullish, boundary values).
+- Avoid network & time dependence; mock/stub IO; keep tests < 200ms each when possible.
+
+## Component tests
+- Use @testing-library/react selectors by role/text; assert accessible behavior.
+
+## E2E (Playwright)
+- Test core flows only (smoke + auth + publish/view); use stable selectors (data-testids).
+- Record traces/screenshots on failure; keep suites parallelizable.
+
+## Quality gates
+- Require CI to run lint, typecheck, unit, e2e smoke on PRs.

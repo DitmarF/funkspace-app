@@ -1,0 +1,20 @@
+---
+description: "FunkSpace — Frontend & UI Conventions"
+globs: ["components/**/*.tsx", "app/**/*.tsx"]
+alwaysApply: false
+---
+
+## Styling & Layout
+- Use Tailwind utility classes; follow mobile-first responsive patterns.
+- Use semantic colors & tokens from Tailwind theme; no hardcoded hex except in token files.
+- Provide focus states, visible labels, and ARIA where needed.
+
+## Components
+- Presentational vs Container: keep props serializable; derive minimal required state.
+- Use `<Image>` for media; include `alt`. Lazy-load below the fold.
+- Animations: respect `prefers-reduced-motion`; keep durations short; avoid layout thrash.
+
+## Patterns
+- Data fetching: prefer server components; if client, use hooks with suspense/placeholder.
+- Refs & accessibility: avoid `div` soup; use semantic roles & headings.
+
