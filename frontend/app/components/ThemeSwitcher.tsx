@@ -2,7 +2,17 @@
 
 import { useEffect, useState, useCallback } from "react";
 
-type Theme = "default" | "dark" | "muted" | "dark-high-contrast";
+type Theme = "default" | "dark" | "muted" | "dark-high-contrast" | "system";
+
+const isTheme = (value: string | null): value is Theme => {
+  return (
+    value === "default" ||
+    value === "dark" ||
+    value === "muted" ||
+    value === "dark-high-contrast" ||
+    value === "system"
+  );
+};
 
 export default function ThemeSwitcher() {
   // Do not assume an initial theme for button highlight to avoid visual flip.
@@ -10,10 +20,27 @@ export default function ThemeSwitcher() {
   const [currentTheme, setCurrentTheme] = useState<Theme | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
+  const resolveSystemTheme = useCallback((): Theme => {
+    if (
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
+      return "dark";
+    }
+    return "default";
+  }, []);
+
   const setTheme = useCallback((theme: Theme) => {
     const htmlElement = document.documentElement;
 
-    if (theme === "default") {
+    if (theme === "system") {
+      const systemTheme = resolveSystemTheme();
+      if (systemTheme === "default") {
+        htmlElement.removeAttribute("data-theme");
+      } else {
+        htmlElement.setAttribute("data-theme", systemTheme);
+      }
+    } else if (theme === "default") {
       htmlElement.removeAttribute("data-theme");
     } else {
       htmlElement.setAttribute("data-theme", theme);
@@ -21,53 +48,61 @@ export default function ThemeSwitcher() {
 
     localStorage.setItem("theme", theme);
     setCurrentTheme(theme);
-  }, []);
+  }, [resolveSystemTheme]);
 
   useEffect(() => {
     // Mark as mounted to prevent hydration mismatch
     setIsMounted(true);
 
-    // Read the current theme from the document element (set by layout script)
-    // This ensures we sync with what the script already applied
-    const currentDataTheme = document.documentElement.getAttribute(
-      "data-theme",
-    ) as Theme | null;
+    const storedTheme = localStorage.getItem("theme");
+    const initialTheme: Theme = isTheme(storedTheme) ? storedTheme : "system";
 
-    // Read from localStorage
-    let savedTheme = localStorage.getItem("theme") as Theme | null;
-    const hasMigrated = localStorage.getItem("theme-migrated");
-
-    // Migrate if needed
-    if (!savedTheme) {
-      savedTheme = "dark";
-      localStorage.setItem("theme", "dark");
-      localStorage.setItem("theme-migrated", "true");
-    } else if (!hasMigrated && savedTheme === "default") {
-      // One-time migration from "default" to "dark"
-      savedTheme = "dark";
-      localStorage.setItem("theme", "dark");
-      localStorage.setItem("theme-migrated", "true");
+    if (!isTheme(storedTheme)) {
+      localStorage.setItem("theme", "system");
     }
 
-    // If script already set a theme, sync with it (don't reapply)
-    if (currentDataTheme && currentDataTheme === savedTheme) {
-      setCurrentTheme(savedTheme);
-      return;
+    setCurrentTheme(initialTheme);
+    setTheme(initialTheme);
+
+    const mediaQuery =
+      typeof window.matchMedia === "function"
+        ? window.matchMedia("(prefers-color-scheme: dark)")
+        : null;
+    const handleSystemChange = () => {
+      if (localStorage.getItem("theme") === "system") {
+        setTheme("system");
+      }
+    };
+
+    if (
+      mediaQuery &&
+      typeof mediaQuery.addEventListener === "function"
+    ) {
+      mediaQuery.addEventListener("change", handleSystemChange);
+    } else if (
+      mediaQuery &&
+      typeof mediaQuery.addListener === "function"
+    ) {
+      mediaQuery.addListener(handleSystemChange);
     }
 
-    // If script set a theme but localStorage is different, use script's value
-    // (script ran first and applied migration)
-    if (currentDataTheme && currentDataTheme !== savedTheme) {
-      setCurrentTheme(currentDataTheme);
-      localStorage.setItem("theme", currentDataTheme);
-      return;
-    }
-
-    // Otherwise, apply the theme from localStorage
-    setTheme(savedTheme);
+    return () => {
+      if (
+        mediaQuery &&
+        typeof mediaQuery.removeEventListener === "function"
+      ) {
+        mediaQuery.removeEventListener("change", handleSystemChange);
+      } else if (
+        mediaQuery &&
+        typeof mediaQuery.removeListener === "function"
+      ) {
+        mediaQuery.removeListener(handleSystemChange);
+      }
+    };
   }, [setTheme]);
 
   const themes: { value: Theme; label: string }[] = [
+    { value: "system", label: "System" },
     { value: "default", label: "Default" },
     { value: "dark", label: "Dark" },
     { value: "muted", label: "Muted" },
