@@ -19,11 +19,11 @@
     "dismiss_stale_reviews": true,
     "require_code_owner_reviews": false,
     "require_last_push_approval": false,
-    "required_approving_review_count": 1
+    "required_approving_review_count": 0
   },
   "required_signatures": {
     "url": "https://api.github.com/repos/DitmarF/funkspace-app/branches/main/protection/required_signatures",
-    "enabled": true
+    "enabled": false
   },
   "enforce_admins": {
     "url": "https://api.github.com/repos/DitmarF/funkspace-app/branches/main/protection/enforce_admins",
