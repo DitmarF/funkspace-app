@@ -30,25 +30,28 @@ export default function ThemeSwitcher() {
     return "default";
   }, []);
 
-  const setTheme = useCallback((theme: Theme) => {
-    const htmlElement = document.documentElement;
+  const setTheme = useCallback(
+    (theme: Theme) => {
+      const htmlElement = document.documentElement;
 
-    if (theme === "system") {
-      const systemTheme = resolveSystemTheme();
-      if (systemTheme === "default") {
+      if (theme === "system") {
+        const systemTheme = resolveSystemTheme();
+        if (systemTheme === "default") {
+          htmlElement.removeAttribute("data-theme");
+        } else {
+          htmlElement.setAttribute("data-theme", systemTheme);
+        }
+      } else if (theme === "default") {
         htmlElement.removeAttribute("data-theme");
       } else {
-        htmlElement.setAttribute("data-theme", systemTheme);
+        htmlElement.setAttribute("data-theme", theme);
       }
-    } else if (theme === "default") {
-      htmlElement.removeAttribute("data-theme");
-    } else {
-      htmlElement.setAttribute("data-theme", theme);
-    }
 
-    localStorage.setItem("theme", theme);
-    setCurrentTheme(theme);
-  }, [resolveSystemTheme]);
+      localStorage.setItem("theme", theme);
+      setCurrentTheme(theme);
+    },
+    [resolveSystemTheme],
+  );
 
   useEffect(() => {
     // Mark as mounted to prevent hydration mismatch
@@ -74,23 +77,14 @@ export default function ThemeSwitcher() {
       }
     };
 
-    if (
-      mediaQuery &&
-      typeof mediaQuery.addEventListener === "function"
-    ) {
+    if (mediaQuery && typeof mediaQuery.addEventListener === "function") {
       mediaQuery.addEventListener("change", handleSystemChange);
-    } else if (
-      mediaQuery &&
-      typeof mediaQuery.addListener === "function"
-    ) {
+    } else if (mediaQuery && typeof mediaQuery.addListener === "function") {
       mediaQuery.addListener(handleSystemChange);
     }
 
     return () => {
-      if (
-        mediaQuery &&
-        typeof mediaQuery.removeEventListener === "function"
-      ) {
+      if (mediaQuery && typeof mediaQuery.removeEventListener === "function") {
         mediaQuery.removeEventListener("change", handleSystemChange);
       } else if (
         mediaQuery &&
