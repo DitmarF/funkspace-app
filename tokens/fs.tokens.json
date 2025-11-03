@@ -283,5 +283,53 @@
         }
       }
     }
+  },
+  "fs-spacing": {
+    "$type": "dimension",
+    "Spacing": {
+      "space-3xs": { "default": { "$value": "0.125rem" } },
+      "space-2xs": { "default": { "$value": "0.25rem" } },
+      "space-xs": { "default": { "$value": "0.5rem" } },
+      "space-sm": { "default": { "$value": "0.75rem" } },
+      "space-md": { "default": { "$value": "1rem" } },
+      "space-lg": { "default": { "$value": "1.5rem" } },
+      "space-xl": { "default": { "$value": "2rem" } },
+      "space-2xl": { "default": { "$value": "3rem" } },
+      "space-3xl": { "default": { "$value": "4rem" } }
+    }
+  },
+  "fs-typography": {
+    "$type": "typography",
+    "FontFamilies": {
+      "font-family-base": {
+        "default": {
+          "$value": "\"Inter\", \"Helvetica Neue\", Arial, sans-serif"
+        }
+      },
+      "font-family-mono": {
+        "default": { "$value": "\"JetBrains Mono\", \"SFMono-Regular\", monospace" }
+      }
+    },
+    "FontSizes": {
+      "$type": "dimension",
+      "font-size-xs": { "default": { "$value": "0.75rem" } },
+      "font-size-sm": { "default": { "$value": "0.875rem" } },
+      "font-size-md": { "default": { "$value": "1rem" } },
+      "font-size-lg": { "default": { "$value": "1.25rem" } },
+      "font-size-xl": { "default": { "$value": "1.5rem" } }
+    },
+    "FontWeights": {
+      "$type": "fontWeight",
+      "font-weight-regular": { "default": { "$value": "400" } },
+      "font-weight-medium": { "default": { "$value": "500" } },
+      "font-weight-semibold": { "default": { "$value": "600" } },
+      "font-weight-bold": { "default": { "$value": "700" } }
+    },
+    "LineHeights": {
+      "$type": "dimension",
+      "line-height-tight": { "default": { "$value": "1.2" } },
+      "line-height-normal": { "default": { "$value": "1.5" } },
+      "line-height-relaxed": { "default": { "$value": "1.75" } }
+    }
   }
 }

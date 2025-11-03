@@ -1,4 +1,6 @@
 :root {
+  /* @tokens Colors/Primitives */
+  /* @presenter Color */
   --fs-color-red: rgba(204,59,62,1);
   --fs-color-vermilion: rgba(204,103,59,1);
   --fs-color-orange: rgba(204,144,59,1);
@@ -20,31 +22,78 @@
   --fs-color-grey-dark-2: rgba(51,51,51,1);
   --fs-color-grey-dark-1: rgba(26,26,26,1);
   --fs-color-black: rgba(0,0,0,1);
+  /* @tokens Colors/Extended */
+  /* @presenter Color */
   --fs-color-chartreuse: rgba(112,204,59,1);
   --fs-color-indigo: rgba(59,71,204,1);
+  /* @tokens Colors/Surface */
+  /* @presenter Color */
   --fs-color-surface-background: rgba(230,230,230,1);
   --fs-color-surface-elevation-1: rgba(179,179,179,1);
   --fs-color-surface-elevation-2: rgba(77,77,77,1);
   --fs-color-surface-overlay: rgba(26,26,26,1);
+  /* @tokens Colors/Content */
+  /* @presenter Color */
   --fs-color-content-inverse: rgba(230,230,230,1);
   --fs-color-content-elevation-2: rgba(179,179,179,1);
   --fs-color-content-elevation-1: rgba(77,77,77,1);
   --fs-color-content-primary: rgba(26,26,26,1);
   --fs-color-content-disabled: rgba(128,128,128,1);
+  /* @tokens Colors/Actions */
+  /* @presenter Color */
   --fs-color-action-primary: rgba(59,71,204,1);
   --fs-color-action-hover: rgba(204,103,59,1);
   --fs-color-action-link: rgba(122,59,204,1);
   --fs-color-action-disabled: rgba(128,128,128,1);
+  /* @tokens Colors/Feedback */
+  /* @presenter Color */
   --fs-color-feedback-success: rgba(59,204,98,1);
   --fs-color-feedback-warning: rgba(204,202,59,1);
   --fs-color-feedback-error: rgba(204,59,62,1);
   --fs-color-feedback-info: rgba(59,71,204,1);
+  /* @tokens Borders */
+  /* @presenter Border */
   --fs-color-border-subtle: rgba(128,128,128,1);
   --fs-color-border-strong: rgba(51,51,51,1);
   --fs-color-border-focus: rgba(59,71,204,1);
+  /* @tokens Spacing Scale */
+  /* @presenter Spacing */
+  --fs-space-3xs: 0.125rem;
+  --fs-space-2xs: 0.25rem;
+  --fs-space-xs: 0.5rem;
+  --fs-space-sm: 0.75rem;
+  --fs-space-md: 1rem;
+  --fs-space-lg: 1.5rem;
+  --fs-space-xl: 2rem;
+  --fs-space-2xl: 3rem;
+  --fs-space-3xl: 4rem;
+  /* @tokens Typography/Families */
+  /* @presenter FontFamily */
+  --fs-font-family-base: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --fs-font-family-mono: "JetBrains Mono", "SFMono-Regular", monospace;
+  /* @tokens Typography/Sizes */
+  /* @presenter FontSize */
+  --fs-font-size-xs: 0.75rem;
+  --fs-font-size-sm: 0.875rem;
+  --fs-font-size-md: 1rem;
+  --fs-font-size-lg: 1.25rem;
+  --fs-font-size-xl: 1.5rem;
+  /* @tokens Typography/Weights */
+  /* @presenter FontWeight */
+  --fs-font-weight-regular: 400;
+  --fs-font-weight-medium: 500;
+  --fs-font-weight-semibold: 600;
+  --fs-font-weight-bold: 700;
+  /* @tokens Typography/Line Heights */
+  /* @presenter LineHeight */
+  --fs-line-height-tight: 1.2;
+  --fs-line-height-normal: 1.5;
+  --fs-line-height-relaxed: 1.75;
 }
 
 [data-theme="dark"] {
+  /* @tokens Colors/Primitives */
+  /* @presenter Color */
   --fs-color-red: rgba(204,104,106,1);
   --fs-color-vermilion: rgba(204,134,104,1);
   --fs-color-orange: rgba(204,162,104,1);
@@ -66,31 +115,45 @@
   --fs-color-grey-dark-2: rgba(204,204,204,1);
   --fs-color-grey-dark-1: rgba(230,230,230,1);
   --fs-color-black: rgba(255,255,255,1);
+  /* @tokens Colors/Extended */
+  /* @presenter Color */
   --fs-color-chartreuse: rgba(141,204,104,1);
   --fs-color-indigo: rgba(104,112,204,1);
+  /* @tokens Colors/Surface */
+  /* @presenter Color */
   --fs-color-surface-background: rgba(26,26,26,1);
   --fs-color-surface-elevation-1: rgba(77,77,77,1);
   --fs-color-surface-elevation-2: rgba(179,179,179,1);
   --fs-color-surface-overlay: rgba(230,230,230,1);
+  /* @tokens Colors/Content */
+  /* @presenter Color */
   --fs-color-content-inverse: rgba(26,26,26,1);
   --fs-color-content-elevation-2: rgba(77,77,77,1);
   --fs-color-content-elevation-1: rgba(179,179,179,1);
   --fs-color-content-primary: rgba(230,230,230,1);
   --fs-color-content-disabled: rgba(128,128,128,1);
+  /* @tokens Colors/Actions */
+  /* @presenter Color */
   --fs-color-action-primary: rgba(59,148,204,1);
   --fs-color-action-hover: rgba(204,134,104,1);
   --fs-color-action-link: rgba(147,104,204,1);
   --fs-color-action-disabled: rgba(128,128,128,1);
+  /* @tokens Colors/Feedback */
+  /* @presenter Color */
   --fs-color-feedback-success: rgba(59,204,98,1);
   --fs-color-feedback-warning: rgba(204,202,104,1);
   --fs-color-feedback-error: rgba(204,104,106,1);
   --fs-color-feedback-info: rgba(104,204,187,1);
+  /* @tokens Borders */
+  /* @presenter Border */
   --fs-color-border-subtle: rgba(128,128,128,1);
   --fs-color-border-strong: rgba(204,204,204,1);
   --fs-color-border-focus: rgba(59,148,204,1);
 }
 
 [data-theme="muted"] {
+  /* @tokens Colors/Primitives */
+  /* @presenter Color */
   --fs-color-red: rgba(102,30,31,1);
   --fs-color-vermilion: rgba(102,30,31,1);
   --fs-color-orange: rgba(102,51,30,1);
@@ -112,31 +175,45 @@
   --fs-color-grey-dark-2: rgba(0,0,0,1);
   --fs-color-grey-dark-1: rgba(0,0,0,1);
   --fs-color-black: rgba(0,0,0,1);
+  /* @tokens Colors/Extended */
+  /* @presenter Color */
   --fs-color-chartreuse: rgba(102,72,30,1);
   --fs-color-indigo: rgba(30,36,102,1);
+  /* @tokens Colors/Surface */
+  /* @presenter Color */
   --fs-color-surface-background: rgba(255,255,255,1);
   --fs-color-surface-elevation-1: rgba(255,255,255,1);
   --fs-color-surface-elevation-2: rgba(0,0,0,1);
   --fs-color-surface-overlay: rgba(0,0,0,1);
+  /* @tokens Colors/Content */
+  /* @presenter Color */
   --fs-color-content-inverse: rgba(255,255,255,1);
   --fs-color-content-elevation-2: rgba(255,255,255,1);
   --fs-color-content-elevation-1: rgba(0,0,0,1);
   --fs-color-content-primary: rgba(0,0,0,1);
   --fs-color-content-disabled: rgba(128,128,128,1);
+  /* @tokens Colors/Actions */
+  /* @presenter Color */
   --fs-color-action-primary: rgba(30,36,102,1);
   --fs-color-action-hover: rgba(102,51,30,1);
   --fs-color-action-link: rgba(61,30,102,1);
   --fs-color-action-disabled: rgba(128,128,128,1);
+  /* @tokens Colors/Feedback */
+  /* @presenter Color */
   --fs-color-feedback-success: rgba(30,102,49,1);
   --fs-color-feedback-warning: rgba(102,72,30,1);
   --fs-color-feedback-error: rgba(102,30,31,1);
   --fs-color-feedback-info: rgba(30,36,102,1);
+  /* @tokens Borders */
+  /* @presenter Border */
   --fs-color-border-subtle: rgba(128,128,128,1);
   --fs-color-border-strong: rgba(0,0,0,1);
   --fs-color-border-focus: rgba(30,36,102,1);
 }
 
 [data-theme="dark-high-contrast"] {
+  /* @tokens Colors/Primitives */
+  /* @presenter Color */
   --fs-color-red: rgba(255,130,132,1);
   --fs-color-vermilion: rgba(255,168,130,1);
   --fs-color-orange: rgba(255,203,130,1);
@@ -158,25 +235,37 @@
   --fs-color-grey-dark-2: rgba(255,255,255,1);
   --fs-color-grey-dark-1: rgba(255,255,255,1);
   --fs-color-black: rgba(255,255,255,1);
+  /* @tokens Colors/Extended */
+  /* @presenter Color */
   --fs-color-chartreuse: rgba(176,255,130,1);
   --fs-color-indigo: rgba(130,140,255,1);
+  /* @tokens Colors/Surface */
+  /* @presenter Color */
   --fs-color-surface-background: rgba(0,0,0,1);
   --fs-color-surface-elevation-1: rgba(0,0,0,1);
   --fs-color-surface-elevation-2: rgba(255,255,255,1);
   --fs-color-surface-overlay: rgba(255,255,255,1);
+  /* @tokens Colors/Content */
+  /* @presenter Color */
   --fs-color-content-inverse: rgba(0,0,0,1);
   --fs-color-content-elevation-2: rgba(0,0,0,1);
   --fs-color-content-elevation-1: rgba(255,255,255,1);
   --fs-color-content-primary: rgba(255,255,255,1);
   --fs-color-content-disabled: rgba(128,128,128,1);
+  /* @tokens Colors/Actions */
+  /* @presenter Color */
   --fs-color-action-primary: rgba(74,186,255,1);
   --fs-color-action-hover: rgba(255,168,130,1);
   --fs-color-action-link: rgba(184,130,255,1);
   --fs-color-action-disabled: rgba(128,128,128,1);
+  /* @tokens Colors/Feedback */
+  /* @presenter Color */
   --fs-color-feedback-success: rgba(74,255,122,1);
   --fs-color-feedback-warning: rgba(255,253,130,1);
   --fs-color-feedback-error: rgba(255,130,132,1);
   --fs-color-feedback-info: rgba(130,255,234,1);
+  /* @tokens Borders */
+  /* @presenter Border */
   --fs-color-border-subtle: rgba(128,128,128,1);
   --fs-color-border-strong: rgba(255,255,255,1);
   --fs-color-border-focus: rgba(74,186,255,1);
