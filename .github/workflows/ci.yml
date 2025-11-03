@@ -34,6 +34,13 @@ jobs:
       - run: pnpm lint
       - run: pnpm test --coverage
       - run: pnpm build
+      - run: pnpm storybook:build
+      - name: Upload Storybook build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static-${{ github.sha }}
+          path: frontend/storybook-static
       - name: Upload coverage
         uses: actions/upload-artifact@v4
         with:
