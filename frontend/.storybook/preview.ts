@@ -7,12 +7,12 @@ const preview: Preview = {
   decorators: [
     withThemeByDataAttribute({
       themes: {
-        Light: "",
-        Dark: "dark",
-        Muted: "muted",
-        "Dark High Contrast": "dark-high-contrast",
+        default: "",
+        dark: "dark",
+        muted: "muted",
+        highContrast: "dark-high-contrast",
       },
-      defaultTheme: "Light",
+      defaultTheme: "default",
       attributeName: "data-theme",
       parentSelector: "body",
     }),
