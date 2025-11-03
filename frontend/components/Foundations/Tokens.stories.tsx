@@ -6,8 +6,8 @@ const TokensDocPage = () => (
     <section className="space-y-3">
       <h1 className="text-2xl font-semibold">Design Tokens</h1>
       <p className="text-base text-[color:var(--fs-color-content-elevation-2)]">
-        Color, spacing, and typography primitives sourced from Style Dictionary. Updates propagate
-        here after running <code>pnpm build:tokens</code>.
+        Color, spacing, and typography primitives sourced from Style Dictionary.
+        Updates propagate here after running <code>pnpm build:tokens</code>.
       </p>
     </section>
 

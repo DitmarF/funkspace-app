@@ -6,7 +6,7 @@ module.exports = {
     "next",
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
-    "prettier"
+    "prettier",
   ],
   rules: {
     "no-console": "warn",

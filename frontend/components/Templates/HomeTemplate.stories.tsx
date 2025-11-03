@@ -30,7 +30,10 @@ const meta = {
       },
     ],
     footer: (
-      <Text size="sm" className="text-[color:var(--fs-color-content-elevation-2)]">
+      <Text
+        size="sm"
+        className="text-[color:var(--fs-color-content-elevation-2)]"
+      >
         Need help onboarding? Reach out to the FunkSpace design ops team.
       </Text>
     ),
