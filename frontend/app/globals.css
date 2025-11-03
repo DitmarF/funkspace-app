@@ -1,10 +1,10 @@
+@import "../../styles/tokens.css";
+
 /* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 /* stylelint-enable at-rule-no-unknown */
-
-@import "../../styles/tokens.css";
 
 @layer base {
   body {

@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "storybook": "storybook dev -p 6006",
-    "storybook:build": "storybook build"
+    "build:tokens": "pnpm --workspace-root build:tokens",
+    "storybook": "pnpm -F frontend build:tokens && storybook dev -p 6006",
+    "storybook:build": "pnpm -F frontend build:tokens && storybook build"
   },
   "dependencies": {
     "next": "15.3.5",

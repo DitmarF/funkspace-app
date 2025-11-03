@@ -1,31 +1,25 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { ComponentPropsWithoutRef, CSSProperties } from "react";
+import { ComponentPropsWithoutRef } from "react";
 
 type ButtonProps = ComponentPropsWithoutRef<"button"> & {
   tone?: "primary" | "neutral";
 };
 
-const toneStyles: Record<NonNullable<ButtonProps["tone"]>, CSSProperties> = {
-  primary: {
-    backgroundColor: "var(--fs-color-blue)",
-    color: "var(--fs-color-white)",
-  },
-  neutral: {
-    backgroundColor: "var(--fs-color-grey-bright-2)",
-    color: "var(--fs-color-grey-dark-4)",
-  },
+const toneClasses: Record<NonNullable<ButtonProps["tone"]>, string> = {
+  primary:
+    "bg-[color:var(--fs-color-blue)] text-[color:var(--fs-color-white)] focus-visible:outline-[color:var(--fs-color-blue)]",
+  neutral:
+    "bg-[color:var(--fs-color-grey-bright-2)] text-[color:var(--fs-color-grey-dark-4)] focus-visible:outline-[color:var(--fs-color-grey-dark-2)]",
 };
 
 const Button = ({
   tone = "primary",
-  style,
   className = "",
   ...props
 }: ButtonProps) => (
   <button
     type="button"
-    className={`inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--fs-color-blue)] ${className}`}
-    style={{ ...toneStyles[tone], ...style }}
+    className={`inline-flex items-center justify-center rounded-lg p-4 text-sm font-semibold shadow-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${toneClasses[tone]} ${className}`}
     {...props}
   />
 );
