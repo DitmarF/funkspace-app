@@ -1,62 +1,107 @@
-# FunkSpace: GitHub bot
+# FunkSpace
 
-- This is a monorepo with a Next.js frontend 🚀
-- The backend is a static JSON-based clean architecture built in Next.js, with plans to integrate MongoDB 🚀
+FunkSpace is a design-system-first web experience built as a PNPM workspace. The
+repo houses a Next.js 15 frontend, shared design tokens generated with
+Style Dictionary, Storybook documentation, Playwright end-to-end coverage, and a
+Vitest suite for shared utilities.
 
-# FunkSpace App
+The guiding principles for agents and contributors are captured in
+`AGENTS.md`: use strict TypeScript, React function components, Tailwind tokens,
+and optimize for accessibility and performance (respect dark mode and reduced
+motion).
 
-## Tests
+## Requirements
 
-Run unit tests without collecting coverage:
+- Node.js 22+
+- PNPM 10+
+
+## Install & run
 
 ```bash
-pnpm test
+pnpm install -r          # installs every workspace (frontend, backend, common)
+pnpm build:tokens        # optional: regenerate styles/tokens.css from tokens/fs.tokens.json
+pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 ```
 
-Generate a coverage report (used in CI):
+- Storybook: `pnpm storybook` (opens on http://localhost:6006).
+- Production build: `pnpm build` (compiles the frontend).
+
+## Project layout
+
+- `frontend/` – Next.js App Router UI, Tailwind themed with CSS variables from
+  `styles/tokens.css`, Storybook configuration, and component library (Base,
+  Controls, Modules, Layouts, Templates).
+- `src/` – shared UI primitives consumed by Vitest demos (e.g. `Hello`).
+- `tokens/` – source of truth for design tokens; build outputs to `styles/`.
+- `styles/` – generated CSS custom properties for default, dark, muted, and
+  high-contrast themes.
+- `e2e/` – Playwright tests; configuration lives in `playwright.config.ts`.
+- `__tests__/` – Vitest suites run with React Testing Library.
+- `backend/`, `common/` – stubs reserved for future API and shared domain code.
+- `scripts/` – automation helpers (e.g. GitHub branch protection script).
+
+### Theming
+
+Tokens are transformed into CSS variables for each theme. Frontend components
+consume the variables through Tailwind token utilities. The home page opts into
+server components by default; the `ThemeSwitcher` is a small client component
+that respects `system`, `default`, `dark`, `muted`, and high-contrast modes by
+persisting the choice in `localStorage` and reacting to system preference
+changes.
+
+## Testing & quality
 
 ```bash
-pnpm coverage
+pnpm lint           # Next.js lint + prettier --check
+pnpm test           # Vitest in CI mode
+pnpm test:watch     # Vitest watch mode
+pnpm coverage       # Vitest with V8 coverage thresholds (80% global)
+pnpm e2e            # Playwright end-to-end suite (Chromium only)
 ```
+
+Vitest is configured to reuse the frontend React installation and loads
+`vitest.setup.ts` for Testing Library matchers. Coverage thresholds are enforced
+only in CI but can be run locally via `pnpm coverage`.
 
 ## Playwright browser downloads
 
-End-to-end tests use Playwright with only the Chromium browser. The `postinstall`
-script installs this browser under `node_modules` so it can be cached in CI. On
-Vercel the installation is skipped automatically:
+The postinstall hook installs the Chromium browser under `node_modules` so CI
+caches can reuse the artifact. On Vercel, downloads are skipped automatically.
 
 ```bash
 pnpm install
 ```
 
-If Playwright downloads fail due to network restrictions, point the installer at
-an allow-listed mirror before running `pnpm install`:
+If downloads are blocked, direct the installer to an allow-listed mirror before
+installing dependencies:
 
 ```bash
 export PLAYWRIGHT_DOWNLOAD_HOST=https://playwright.azureedge.net
+pnpm install
 ```
 
-When running outside of CI, you can skip Firefox and WebKit downloads by
-installing only Chromium:
+To install only Chromium outside of CI:
 
 ```bash
 PLAYWRIGHT_BROWSERS_PATH=0 pnpm exec playwright install chromium --with-deps
 ```
 
-If downloads remain impossible, use the official Docker image which already
-contains all browsers:
+Or fall back to the official Docker image, which ships with browsers preloaded:
 
 ```bash
 docker run --rm -it mcr.microsoft.com/playwright:v1.53.2-jammy
 ```
 
-## Deploying the frontend on Vercel
+## Deployment
 
-When setting up the `frontend` directory as the root of a Vercel project,
-explicitly set the **Install Command** to `pnpm install`. By default Vercel runs
-`npm install`, but using PNPM ensures workspace dependencies are correctly
-linked. Running `pnpm install` from the `frontend` folder automatically detects
-the workspace root and pulls in packages from `common` and `backend`.
+Deploy the `frontend` workspace on Vercel. Set the install command to
+`pnpm install` so workspaces are linked correctly, and enable **Include source
+files outside of the Root Directory** to access shared packages. Builds run
+`pnpm build` from the workspace root.
 
-Make sure the option "Include source files outside of the Root Directory" is
-enabled so that these packages are accessible during the build.
+## Further reading
+
+- `CONTRIBUTING.md` – detailed workflow, branch strategy, and CI expectations.
+- `AGENTS.md` – quick reference for coding agents.
+- `frontend/README.md` – Create Next App defaults (superseded by this document
+  but kept for reference).
