@@ -6,11 +6,7 @@ const getAbsolutePath = (value: string): string =>
   dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
 
 const config: StorybookConfig = {
-  stories: [
-    "../stories/**/*.mdx",
-    "../stories/**/*.stories.@(js|jsx|ts|tsx)",
-    "../components/**/*.stories.@(js|jsx|ts|tsx)",
-  ],
+  stories: ["../components/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: [
     getAbsolutePath("@storybook/addon-docs"),
     getAbsolutePath("@storybook/addon-a11y"),
