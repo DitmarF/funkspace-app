@@ -6,3 +6,4 @@ frontend/storybook-static/
 coverage/
 playwright-report/
 test-results/
+styles/tokens.css
