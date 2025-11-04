@@ -1,2 +1,8 @@
 frontend/.next
 pnpm-lock.yaml
+.lighthouse/
+.lighthouseci/
+frontend/storybook-static/
+coverage/
+playwright-report/
+test-results/
