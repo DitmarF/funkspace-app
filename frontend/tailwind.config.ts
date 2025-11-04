@@ -8,6 +8,20 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: [
+          "var(--font-work-sans)",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+        ],
+        sans: [
+          "var(--font-space-grotesk)",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+        ],
+      },
       transitionDuration: {
         quick: "var(--fs-motion-duration-quick)",
         normal: "var(--fs-motion-duration-normal)",
