@@ -1,0 +1,3 @@
+# Ignore non-essential font artifacts
+static/
+.DS_Store
