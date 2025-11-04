@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 export const workSans = localFont({
   src: [
     {
-      path: "/fonts/work-sans/WorkSans-VariableFont_wght.woff2",
+      path: "../public/fonts/Work_Sans/WorkSans-VariableFont_wght.ttf",
       weight: "100 900",
       style: "normal",
     },
@@ -15,7 +15,7 @@ export const workSans = localFont({
 export const spaceGrotesk = localFont({
   src: [
     {
-      path: "/fonts/space-grotesk/SpaceGrotesk-VariableFont_wght.woff2",
+      path: "../public/fonts/Space_Grotesk/SpaceGrotesk-VariableFont_wght.ttf",
       weight: "300 700",
       style: "normal",
     },
