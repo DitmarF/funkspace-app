@@ -1,0 +1,35 @@
+{
+  "fs-motion": {
+    "$type": "other",
+    "Durations": {
+      "$type": "time",
+      "motion-duration-quick": { "default": { "$value": "120ms" } },
+      "motion-duration-normal": { "default": { "$value": "200ms" } },
+      "motion-duration-slow": { "default": { "$value": "320ms" } }
+    },
+    "Easings": {
+      "$type": "cubicBezier",
+      "motion-easing-linear": {
+        "default": { "$value": "cubic-bezier(0.0, 0.0, 1.0, 1.0)" }
+      },
+      "motion-easing-ease-out": {
+        "default": { "$value": "cubic-bezier(0.16, 1, 0.3, 1)" }
+      },
+      "motion-easing-ease-in-out": {
+        "default": { "$value": "cubic-bezier(0.4, 0, 0.2, 1)" }
+      }
+    },
+    "Springs": {
+      "$type": "other",
+      "motion-spring-soft": {
+        "default": { "$value": "stiffness(120) damping(18) mass(1)" }
+      },
+      "motion-spring-medium": {
+        "default": { "$value": "stiffness(170) damping(22) mass(1)" }
+      },
+      "motion-spring-strong": {
+        "default": { "$value": "stiffness(220) damping(28) mass(1)" }
+      }
+    }
+  }
+}

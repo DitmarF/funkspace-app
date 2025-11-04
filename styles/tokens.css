@@ -89,6 +89,15 @@
   --fs-line-height-tight: 1.2;
   --fs-line-height-normal: 1.5;
   --fs-line-height-relaxed: 1.75;
+  --fs-motion-duration-quick: 120ms;
+  --fs-motion-duration-normal: 200ms;
+  --fs-motion-duration-slow: 320ms;
+  --fs-motion-easing-linear: cubic-bezier(0, 0, 1, 1);
+  --fs-motion-easing-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --fs-motion-easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --fs-motion-spring-soft: stiffness(120) damping(18) mass(1);
+  --fs-motion-spring-medium: stiffness(170) damping(22) mass(1);
+  --fs-motion-spring-strong: stiffness(220) damping(28) mass(1);
 }
 
 [data-theme="dark"] {
