@@ -17,3 +17,7 @@ alwaysApply: true
 - Prefer server components; code-split client-only parts via dynamic import when appropriate.
 - Never expose secrets on client; validate & sanitize all inputs at boundaries.
 
+## QA Playbooks
+- Reuse `.cursor/commands/review-code.md` for pre-merge sanity sweeps (lint, tests, a11y, E2E).
+- Follow `.cursor/commands/write-tests.md` when adding or expanding automated coverage.
+

@@ -17,3 +17,4 @@ alwaysApply: false
 
 ## Quality gates
 - Require CI to run lint, typecheck, unit, e2e smoke on PRs.
+- Use `.cursor/commands/write-tests.md` for authoring guidance and `.cursor/commands/review-code.md` for final QA passes.
