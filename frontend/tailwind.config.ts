@@ -8,6 +8,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      transitionDuration: {
+        quick: "var(--fs-motion-duration-quick)",
+        normal: "var(--fs-motion-duration-normal)",
+        slow: "var(--fs-motion-duration-slow)",
+      },
+      transitionTimingFunction: {
+        linear: "var(--fs-motion-easing-linear)",
+        "ease-out": "var(--fs-motion-easing-ease-out)",
+        "ease-in-out": "var(--fs-motion-easing-ease-in-out)",
+      },
       colors: {
         // Primitive Colors
         "fs-red": "var(--fs-color-red)",

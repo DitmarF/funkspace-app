@@ -117,7 +117,7 @@ StyleDictionary.registerFormat({
 });
 
 const config = {
-  source: ["tokens/fs.tokens.json"],
+  source: ["tokens/fs.tokens.json", "tokens/fs.motion.tokens.json"],
   platforms: {
     css: {
       transformGroup: "css",
