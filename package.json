@@ -18,14 +18,21 @@
     "e2e": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
     "e2e:ui": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --ui",
     "e2e:report": "playwright show-report",
+    "e2e:smoke": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test e2e/home.a11y.spec.ts",
     "postinstall": "if [ \"$VERCEL\" != \"1\" ]; then cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium --with-deps; fi",
     "build": "pnpm -F frontend build",
     "build:tokens": "pnpm exec style-dictionary build --config style-dictionary.config.mjs",
     "format": "prettier --write .",
     "storybook": "pnpm --filter frontend run storybook",
-    "storybook:build": "pnpm --filter frontend run storybook:build"
+    "storybook:build": "pnpm --filter frontend run storybook:build",
+    "lhci:build": "pnpm build:tokens && pnpm -F frontend build",
+    "lhci:off": "pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.off.json",
+    "lhci:on": "pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.on.json",
+    "lhci:ci": "pnpm run lhci:off && pnpm run lhci:on"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.53.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
