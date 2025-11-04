@@ -10,8 +10,8 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["frontend/src/*"]
     }
   },
-  "include": ["src", "__tests__", "vitest.setup.ts"]
+  "include": ["frontend/src", "tests", "vitest.setup.ts"]
 }

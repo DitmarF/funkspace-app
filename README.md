@@ -30,13 +30,12 @@ pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 
 - `frontend/` – Next.js App Router UI, Tailwind themed with CSS variables from
   `styles/tokens.css`, Storybook configuration, and component library (Base,
-  Controls, Modules, Layouts, Templates).
-- `src/` – shared UI primitives consumed by Vitest demos (e.g. `Hello`).
+  Controls, Modules, Layouts, Templates) located in `frontend/src`.
 - `tokens/` – source of truth for design tokens; build outputs to `styles/`.
 - `styles/` – generated CSS custom properties for default, dark, muted, and
   high-contrast themes.
-- `e2e/` – Playwright tests; configuration lives in `playwright.config.ts`.
-- `__tests__/` – Vitest suites run with React Testing Library.
+- `tests/` – quality suites; `tests/unit` for Vitest with Testing Library and
+  `tests/e2e` for Playwright (configured by `playwright.config.ts`).
 - `backend/`, `common/` – stubs reserved for future API and shared domain code.
 - `scripts/` – automation helpers (e.g. GitHub branch protection script).
 

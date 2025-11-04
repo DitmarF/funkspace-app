@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": resolve(__dirname, "src"),
+      "@": resolve(__dirname, "frontend/src"),
       react: resolve(__dirname, "frontend/node_modules/react"),
       "react-dom": resolve(__dirname, "frontend/node_modules/react-dom"),
     },
@@ -20,7 +20,7 @@ export default defineConfig({
     coverage: {
       enabled: Boolean(process.env.CI),
       provider: "v8",
-      include: ["src/**/*.{ts,tsx}"],
+      include: ["frontend/src/**/*.{ts,tsx}"],
       reporter: ["text", "html"],
       thresholds: {
         lines: 80,
@@ -30,6 +30,6 @@ export default defineConfig({
         perFile: false,
       },
     },
-    exclude: [...configDefaults.exclude, "e2e/**"],
+    exclude: [...configDefaults.exclude, "tests/e2e/**"],
   },
 });
