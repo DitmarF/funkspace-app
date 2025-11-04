@@ -14,6 +14,14 @@
 - Document licensing (OFL 1.1) and keep notices in repo.
 - Ship with a smoke test proving **no third‑party requests** and **no cookies** on first load.
 
+## Scope
+
+- Implement local font delivery for Work Sans and Space Grotesk using `next/font/local`.
+- Ensure `@font-face` uses local WOFF2 sources only; no external font hosts.
+- Update Tailwind to expose `font-display` and `font-sans` families.
+- Provide `/typography` page for visual verification of weights.
+- Update Privacy to reflect font and tracking posture for first paint.
+
 ## Non‑Goals
 
 - No auto subsetting in this pass (optional later).
@@ -28,6 +36,7 @@
 - Playwright E2E confirms: 0 cookies after first navigation and 0 third‑party requests.
 - `THIRD_PARTY_NOTICES.md` and each family’s `OFL.txt` are present.
 - Privacy page states: _No cookies, self‑hosted fonts, no third‑party requests on first load._
+- Explicitly verified: **no third-party network on first paint**; **@font-face uses local WOFF2**; **licenses included**.
 
 ---
 
