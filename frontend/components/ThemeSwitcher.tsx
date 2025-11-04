@@ -117,8 +117,8 @@ export default function ThemeSwitcher() {
             transition-colors 
             border ${
               isMounted && currentTheme === theme.value
-                ? "bg-fs-action-primary border-fs-action-primary text-fs-white"
-                : "bg-transparent text-fs-action-primary border-fs-action-primary hover:bg-fs-action-hover hover:text-fs-white hover:border-fs-action-hover"
+                ? "bg-fs-action-primary border-fs-action-primary text-fs-black"
+                : "bg-transparent text-fs-action-primary border-fs-action-primary hover:bg-fs-action-hover hover:text-fs-black hover:border-fs-action-hover"
             }`}
         >
           {theme.label}
