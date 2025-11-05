@@ -3,12 +3,22 @@
     "$type": "other",
     "Durations": {
       "$type": "time",
+      "motion-duration-100": { "default": { "$value": "120ms" } },
+      "motion-duration-200": { "default": { "$value": "200ms" } },
+      "motion-duration-400": { "default": { "$value": "400ms" } },
+      "motion-duration-800": { "default": { "$value": "800ms" } },
       "motion-duration-quick": { "default": { "$value": "120ms" } },
       "motion-duration-normal": { "default": { "$value": "200ms" } },
       "motion-duration-slow": { "default": { "$value": "320ms" } }
     },
     "Easings": {
       "$type": "cubicBezier",
+      "motion-ease-standard": {
+        "default": { "$value": "cubic-bezier(0.2, 0, 0, 1)" }
+      },
+      "motion-ease-emph": {
+        "default": { "$value": "cubic-bezier(0.05, 0.7, 0.1, 1)" }
+      },
       "motion-easing-linear": {
         "default": { "$value": "cubic-bezier(0.0, 0.0, 1.0, 1.0)" }
       },

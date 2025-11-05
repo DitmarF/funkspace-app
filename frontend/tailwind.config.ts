@@ -23,11 +23,17 @@ const config: Config = {
         ],
       },
       transitionDuration: {
+        100: "var(--fs-motion-duration-100)",
+        200: "var(--fs-motion-duration-200)",
+        400: "var(--fs-motion-duration-400)",
+        800: "var(--fs-motion-duration-800)",
         quick: "var(--fs-motion-duration-quick)",
         normal: "var(--fs-motion-duration-normal)",
         slow: "var(--fs-motion-duration-slow)",
       },
       transitionTimingFunction: {
+        standard: "var(--fs-motion-ease-standard)",
+        emph: "var(--fs-motion-ease-emph)",
         linear: "var(--fs-motion-easing-linear)",
         "ease-out": "var(--fs-motion-easing-ease-out)",
         "ease-in-out": "var(--fs-motion-easing-ease-in-out)",

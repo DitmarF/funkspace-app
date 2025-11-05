@@ -89,9 +89,19 @@
   --fs-line-height-tight: 1.2;
   --fs-line-height-normal: 1.5;
   --fs-line-height-relaxed: 1.75;
+  /* @tokens Motion/Durations */
+  /* @presenter Duration */
+  --fs-motion-duration-100: 120ms;
+  --fs-motion-duration-200: 200ms;
+  --fs-motion-duration-400: 400ms;
+  --fs-motion-duration-800: 800ms;
   --fs-motion-duration-quick: 120ms;
   --fs-motion-duration-normal: 200ms;
   --fs-motion-duration-slow: 320ms;
+  /* @tokens Motion/Easings */
+  /* @presenter CubicBezier */
+  --fs-motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --fs-motion-ease-emph: cubic-bezier(0.05, 0.7, 0.1, 1);
   --fs-motion-easing-linear: cubic-bezier(0.0, 0.0, 1.0, 1.0);
   --fs-motion-easing-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --fs-motion-easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
