@@ -9,6 +9,18 @@ import { createRef } from "react";
 import { LogoMotion } from "./LogoMotion";
 import type { LogoMotionRef } from "./LogoMotion";
 
+// Type for the mock timeline instance
+type MockTimeline = {
+  play: ReturnType<typeof vi.fn>;
+  pause: ReturnType<typeof vi.fn>;
+  reverse: ReturnType<typeof vi.fn>;
+  seek: ReturnType<typeof vi.fn>;
+  setSpeed: ReturnType<typeof vi.fn>;
+  destroy: ReturnType<typeof vi.fn>;
+  duration: number;
+  time: number;
+};
+
 // Mock the AnimationTimeline to avoid needing actual SVG elements in tests
 vi.mock("@/utils/motion/timeline", () => ({
   AnimationTimeline: vi.fn().mockImplementation(() => ({
@@ -154,7 +166,7 @@ describe("LogoMotion", () => {
       const { AnimationTimeline } = await vi.importMock<{
         AnimationTimeline: ReturnType<typeof vi.fn>;
       }>("@/utils/motion/timeline");
-      const mockTimeline = {
+      const mockTimeline: MockTimeline = {
         play: vi.fn(),
         pause: vi.fn(),
         reverse: vi.fn(),
@@ -165,7 +177,9 @@ describe("LogoMotion", () => {
         time: 0,
       };
 
-      vi.mocked(AnimationTimeline).mockReturnValue(mockTimeline as any);
+      vi.mocked(AnimationTimeline).mockReturnValue(
+        mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
+      );
 
       render(<LogoMotion enabled={true} autoPlay={true} />);
 
@@ -178,7 +192,7 @@ describe("LogoMotion", () => {
       const { AnimationTimeline } = await vi.importMock<{
         AnimationTimeline: ReturnType<typeof vi.fn>;
       }>("@/utils/motion/timeline");
-      const mockTimeline = {
+      const mockTimeline: MockTimeline = {
         play: vi.fn(),
         pause: vi.fn(),
         reverse: vi.fn(),
@@ -189,7 +203,9 @@ describe("LogoMotion", () => {
         time: 0,
       };
 
-      vi.mocked(AnimationTimeline).mockReturnValue(mockTimeline as any);
+      vi.mocked(AnimationTimeline).mockReturnValue(
+        mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
+      );
 
       render(<LogoMotion enabled={true} autoPlay={false} />);
 
@@ -207,7 +223,7 @@ describe("LogoMotion", () => {
       const { AnimationTimeline } = await vi.importMock<{
         AnimationTimeline: ReturnType<typeof vi.fn>;
       }>("@/utils/motion/timeline");
-      const mockTimeline = {
+      const mockTimeline: MockTimeline = {
         play: vi.fn(),
         pause: vi.fn(),
         reverse: vi.fn(),
@@ -218,7 +234,9 @@ describe("LogoMotion", () => {
         time: 0,
       };
 
-      vi.mocked(AnimationTimeline).mockReturnValue(mockTimeline as any);
+      vi.mocked(AnimationTimeline).mockReturnValue(
+        mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
+      );
 
       const ref = createRef<LogoMotionRef>();
       render(<LogoMotion ref={ref} enabled={true} autoPlay={false} />);
@@ -251,7 +269,7 @@ describe("LogoMotion", () => {
       const { AnimationTimeline } = await vi.importMock<{
         AnimationTimeline: ReturnType<typeof vi.fn>;
       }>("@/utils/motion/timeline");
-      const mockTimeline = {
+      const mockTimeline: MockTimeline = {
         play: vi.fn(),
         pause: vi.fn(),
         reverse: vi.fn(),
@@ -262,7 +280,9 @@ describe("LogoMotion", () => {
         time: 0,
       };
 
-      vi.mocked(AnimationTimeline).mockReturnValue(mockTimeline as any);
+      vi.mocked(AnimationTimeline).mockReturnValue(
+        mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
+      );
 
       const { unmount } = render(<LogoMotion enabled={true} />);
 
