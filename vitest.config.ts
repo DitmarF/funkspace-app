@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": resolve(__dirname, "src"),
+      "@": resolve(__dirname, "frontend"),
       react: resolve(__dirname, "frontend/node_modules/react"),
       "react-dom": resolve(__dirname, "frontend/node_modules/react-dom"),
     },

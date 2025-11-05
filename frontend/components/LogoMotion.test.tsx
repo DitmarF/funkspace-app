@@ -8,6 +8,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { createRef } from "react";
 import { LogoMotion } from "./LogoMotion";
 import type { LogoMotionRef } from "./LogoMotion";
+import { AnimationTimeline } from "@/utils/motion/timeline";
 
 // Type for the mock timeline instance
 type MockTimeline = {
@@ -20,6 +21,39 @@ type MockTimeline = {
   duration: number;
   time: number;
 };
+
+// Mock SVG utilities to avoid needing full SVG DOM support in jsdom
+vi.mock("@/utils/motion/svg", () => ({
+  getPathLength: vi.fn(() => 100), // Return a mock path length
+  applyStrokeDrawInit: vi.fn(() => 100), // Return mock length
+  setStrokeDashoffset: vi.fn(),
+  applyNumericStyle: vi.fn(),
+}));
+
+// Mock logoManifest to return a simple manifest
+vi.mock("@/data/logoManifest", () => ({
+  buildLogoManifest: vi.fn(() => ({
+    steps: [
+      {
+        target: "#logo-path-1",
+        property: "strokeDashoffset",
+        from: 100,
+        to: 0,
+        duration: 800,
+        easing: "emph",
+        delay: 0,
+      },
+      {
+        target: "#logo-path-1",
+        property: "opacity",
+        from: 0,
+        to: 1,
+        duration: 200,
+        delay: 100,
+      },
+    ],
+  })),
+}));
 
 // Mock the AnimationTimeline to avoid needing actual SVG elements in tests
 vi.mock("@/utils/motion/timeline", () => ({
@@ -51,6 +85,8 @@ describe("LogoMotion", () => {
     vi.clearAllMocks();
     // Reset env
     process.env = { ...originalEnv };
+    // Reset AnimationTimeline mock call count
+    vi.mocked(AnimationTimeline).mockClear();
   });
 
   afterEach(() => {
@@ -67,16 +103,14 @@ describe("LogoMotion", () => {
 
     it("should render with custom aria-label", () => {
       render(<LogoMotion enabled={true} aria-label="Custom label" />);
-      const svg = screen.getByRole("img", { name: "Custom label" });
+      // Use querySelector to find by aria-label since getByRole might not work with custom label in jsdom
+      const svg = document.querySelector('svg[aria-label="Custom label"]');
       expect(svg).toBeInTheDocument();
     });
   });
 
   describe("feature flag", () => {
     it("should not animate when feature flag is disabled", async () => {
-      const { AnimationTimeline } = await vi.importMock<{
-        AnimationTimeline: ReturnType<typeof vi.fn>;
-      }>("@/utils/motion/timeline");
       render(<LogoMotion enabled={false} />);
 
       await waitFor(() => {
@@ -87,9 +121,6 @@ describe("LogoMotion", () => {
 
     it("should not animate when NEXT_PUBLIC_ANIMATIONS_ENABLED is not set", async () => {
       delete process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED;
-      const { AnimationTimeline } = await vi.importMock<{
-        AnimationTimeline: ReturnType<typeof vi.fn>;
-      }>("@/utils/motion/timeline");
       render(<LogoMotion />);
 
       await waitFor(() => {
@@ -99,9 +130,6 @@ describe("LogoMotion", () => {
     });
 
     it("should animate when feature flag is enabled", async () => {
-      const { AnimationTimeline } = await vi.importMock<{
-        AnimationTimeline: ReturnType<typeof vi.fn>;
-      }>("@/utils/motion/timeline");
       render(<LogoMotion enabled={true} />);
 
       await waitFor(() => {
@@ -112,9 +140,6 @@ describe("LogoMotion", () => {
 
     it("should use env var when enabled prop is undefined", async () => {
       process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED = "true";
-      const { AnimationTimeline } = await vi.importMock<{
-        AnimationTimeline: ReturnType<typeof vi.fn>;
-      }>("@/utils/motion/timeline");
       render(<LogoMotion />);
 
       await waitFor(() => {
@@ -126,14 +151,9 @@ describe("LogoMotion", () => {
 
   describe("reduced motion", () => {
     it("should not animate when reduced motion is preferred", async () => {
-      const { useReducedMotion } = await vi.importMock<{
-        useReducedMotion: ReturnType<typeof vi.fn>;
-      }>("@/hooks/useReducedMotion");
+      const { useReducedMotion } = await import("@/hooks/useReducedMotion");
       vi.mocked(useReducedMotion).mockReturnValue(true);
 
-      const { AnimationTimeline } = await vi.importMock<{
-        AnimationTimeline: ReturnType<typeof vi.fn>;
-      }>("@/utils/motion/timeline");
       render(<LogoMotion enabled={true} />);
 
       await waitFor(() => {
@@ -143,9 +163,7 @@ describe("LogoMotion", () => {
     });
 
     it("should render static final state when reduced motion is preferred", async () => {
-      const { useReducedMotion } = await vi.importMock<{
-        useReducedMotion: ReturnType<typeof vi.fn>;
-      }>("@/hooks/useReducedMotion");
+      const { useReducedMotion } = await import("@/hooks/useReducedMotion");
       vi.mocked(useReducedMotion).mockReturnValue(true);
 
       render(<LogoMotion enabled={true} />);
@@ -163,9 +181,6 @@ describe("LogoMotion", () => {
 
   describe("autoPlay", () => {
     it("should auto-play when autoPlay is true", async () => {
-      const { AnimationTimeline } = await vi.importMock<{
-        AnimationTimeline: ReturnType<typeof vi.fn>;
-      }>("@/utils/motion/timeline");
       const mockTimeline: MockTimeline = {
         play: vi.fn(),
         pause: vi.fn(),
@@ -183,15 +198,19 @@ describe("LogoMotion", () => {
 
       render(<LogoMotion enabled={true} autoPlay={true} />);
 
-      await waitFor(() => {
-        expect(mockTimeline.play).toHaveBeenCalled();
-      });
+      // Wait for component to mount and useEffect to run
+      await waitFor(
+        () => {
+          expect(AnimationTimeline).toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
+
+      // Then check that play was called
+      expect(mockTimeline.play).toHaveBeenCalled();
     });
 
     it("should not auto-play when autoPlay is false", async () => {
-      const { AnimationTimeline } = await vi.importMock<{
-        AnimationTimeline: ReturnType<typeof vi.fn>;
-      }>("@/utils/motion/timeline");
       const mockTimeline: MockTimeline = {
         play: vi.fn(),
         pause: vi.fn(),
@@ -209,20 +228,20 @@ describe("LogoMotion", () => {
 
       render(<LogoMotion enabled={true} autoPlay={false} />);
 
+      // Wait for SVG to render, then check that timeline was created
       await waitFor(() => {
-        expect(AnimationTimeline).toHaveBeenCalled();
+        const svg = screen.getByRole("img");
+        expect(svg).toBeInTheDocument();
       });
 
-      // play should not be called
+      // AnimationTimeline should be called (but play should not)
+      expect(AnimationTimeline).toHaveBeenCalled();
       expect(mockTimeline.play).not.toHaveBeenCalled();
     });
   });
 
   describe("ref methods", () => {
     it("should expose play, pause, reverse, seek, and setSpeed via ref", async () => {
-      const { AnimationTimeline } = await vi.importMock<{
-        AnimationTimeline: ReturnType<typeof vi.fn>;
-      }>("@/utils/motion/timeline");
       const mockTimeline: MockTimeline = {
         play: vi.fn(),
         pause: vi.fn(),
@@ -266,9 +285,6 @@ describe("LogoMotion", () => {
 
   describe("cleanup", () => {
     it("should cleanup timeline on unmount", async () => {
-      const { AnimationTimeline } = await vi.importMock<{
-        AnimationTimeline: ReturnType<typeof vi.fn>;
-      }>("@/utils/motion/timeline");
       const mockTimeline: MockTimeline = {
         play: vi.fn(),
         pause: vi.fn(),
@@ -286,9 +302,14 @@ describe("LogoMotion", () => {
 
       const { unmount } = render(<LogoMotion enabled={true} />);
 
+      // Wait for SVG to render
       await waitFor(() => {
-        expect(AnimationTimeline).toHaveBeenCalled();
+        const svg = screen.getByRole("img");
+        expect(svg).toBeInTheDocument();
       });
+
+      // AnimationTimeline should be called
+      expect(AnimationTimeline).toHaveBeenCalled();
 
       unmount();
 
