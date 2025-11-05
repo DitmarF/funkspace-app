@@ -40,6 +40,11 @@ const meta: Meta<typeof LogoMotion> = {
       control: { type: "number", min: 1, max: 10, step: 1 },
       description: "Number of logo paths to animate",
     },
+    startAtMs: {
+      control: { type: "number", min: 0, step: 50 },
+      description:
+        "Start animation at a specific time (ms) instead of beginning",
+    },
   },
 };
 
@@ -54,12 +59,36 @@ export const Default: Story = {
     autoPlay: true,
     speed: 1,
     pathCount: 3,
+    enabled: true,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Logo animation plays automatically. First 3 paths animate with staggered delays.",
+          "Logo animation plays automatically. First 3 paths animate with staggered delays. " +
+          "Component properly initializes timeline on mount and cleans up on unmount.",
+      },
+    },
+  },
+};
+
+/**
+ * Start at specific time - demonstrates startAtMs prop
+ */
+export const StartAtTime: Story = {
+  args: {
+    autoPlay: true,
+    speed: 1,
+    pathCount: 3,
+    enabled: true,
+    startAtMs: 500, // Start animation at 500ms (mid-animation)
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Demonstrates the startAtMs prop. Animation starts at 500ms instead of the beginning, " +
+          "allowing the logo to appear partially animated from the start.",
       },
     },
   },

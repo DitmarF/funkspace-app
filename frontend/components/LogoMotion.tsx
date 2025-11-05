@@ -20,6 +20,11 @@ export interface LogoMotionProps {
   speed?: number;
   pathCount?: number;
   /**
+   * Start animation at a specific time (ms) instead of beginning
+   * Useful for resuming from a saved position or starting mid-animation
+   */
+  startAtMs?: number;
+  /**
    * Override feature flag for testing/Storybook
    * If undefined, uses NEXT_PUBLIC_ANIMATIONS_ENABLED env var
    */
@@ -32,7 +37,13 @@ export interface LogoMotionProps {
  */
 export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
   function LogoMotion(
-    { autoPlay = true, speed = 1, pathCount = 3, enabled: enabledProp },
+    {
+      autoPlay = true,
+      speed = 1,
+      pathCount = 3,
+      startAtMs,
+      enabled: enabledProp,
+    },
     ref,
   ) {
     const svgRef = useRef<SVGSVGElement>(null);
@@ -97,8 +108,12 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       timelineRef.current = timeline;
       timeline.setSpeed(speed);
 
-      // Set initial state (time=0) before playing
-      timeline.seek(0);
+      // Set initial state: start at specified time or beginning (0)
+      // Clamp to valid timeline range [0, duration]
+      const initialTime = startAtMs
+        ? Math.max(0, Math.min(startAtMs, timeline.duration))
+        : 0;
+      timeline.seek(initialTime);
 
       if (autoPlay) {
         timeline.play();
@@ -108,7 +123,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
         timeline.pause();
         timeline.destroy();
       };
-    }, [enabled, reduced, autoPlay, speed, pathCount]);
+    }, [enabled, reduced, autoPlay, speed, pathCount, startAtMs]);
 
     useImperativeHandle(ref, () => ({
       play: () => timelineRef.current?.play(),

@@ -200,7 +200,7 @@ export class AnimationTimeline {
   private applyValue(target: string, property: string, value: number): void {
     // Get or cache element
     if (!this.elementCache.has(target)) {
-      const element = this.root.querySelector(target);
+      const element = this.root.querySelector(target) as SVGElement | null;
       this.elementCache.set(target, element);
     }
 
