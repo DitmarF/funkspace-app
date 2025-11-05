@@ -58,15 +58,15 @@ export const Default: Story = {
   args: {
     autoPlay: true,
     speed: 1,
-    pathCount: 3,
+    pathCount: 10,
     enabled: true,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Logo animation plays automatically. First 3 paths animate with staggered delays. " +
-          "Component properly initializes timeline on mount and cleans up on unmount.",
+          "Logo animation plays automatically. All 10 paths animate with staggered delays. " +
+          "Total duration: ~1880ms. Component properly initializes timeline on mount and cleans up on unmount.",
       },
     },
   },
@@ -79,15 +79,15 @@ export const StartAtTime: Story = {
   args: {
     autoPlay: true,
     speed: 1,
-    pathCount: 3,
+    pathCount: 10,
     enabled: true,
-    startAtMs: 500, // Start animation at 500ms (mid-animation)
+    startAtMs: 1000, // Start animation at 1000ms (mid-animation)
   },
   parameters: {
     docs: {
       description: {
         story:
-          "Demonstrates the startAtMs prop. Animation starts at 500ms instead of the beginning, " +
+          "Demonstrates the startAtMs prop. Animation starts at 1000ms instead of the beginning, " +
           "allowing the logo to appear partially animated from the start.",
       },
     },
@@ -110,7 +110,7 @@ function ControlsStory(
   const [isReversed, setIsReversed] = useState(args.reversed ?? false);
   const [currentTime, setCurrentTime] = useState(args.timeMs ?? 0);
   const [speed, setSpeed] = useState(args.speed ?? 1);
-  const estimatedDuration = 1500; // Estimated duration for 3 paths
+  const estimatedDuration = 1880; // Total duration for 10 paths: 1080ms delay + 800ms stroke = 1880ms
 
   // Sync playing state from args
   useEffect(() => {
@@ -301,7 +301,7 @@ function ControlsStory(
 export const Controls: Story = {
   args: {
     autoPlay: false,
-    pathCount: 3,
+    pathCount: 10,
     enabled: true,
     playing: false,
     reversed: false,
@@ -324,7 +324,7 @@ export const Controls: Story = {
       },
     },
     timeMs: {
-      control: { type: "number", min: 0, max: 1500, step: 10 },
+      control: { type: "number", min: 0, max: 1880, step: 10 },
       description: "Current timeline time in milliseconds (for scrubbing)",
       table: {
         type: { summary: "number" },
@@ -389,7 +389,7 @@ export const ReducedMotion: Story = {
   args: {
     autoPlay: true,
     speed: 1,
-    pathCount: 3,
+    pathCount: 10,
   },
   parameters: {
     docs: {
@@ -463,7 +463,7 @@ export const FeatureFlagToggle: Story = {
   args: {
     autoPlay: true,
     speed: 1,
-    pathCount: 3,
+    pathCount: 10,
     enabled: false, // Default to off (matches production default)
   },
   render: FeatureFlagToggleStory,
@@ -485,7 +485,7 @@ export const FeatureFlagOff: Story = {
   args: {
     autoPlay: true,
     speed: 1,
-    pathCount: 3,
+    pathCount: 10,
     enabled: false, // Explicitly disabled
   },
   parameters: {

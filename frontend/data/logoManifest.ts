@@ -10,14 +10,14 @@ import type { AnimationManifest, AnimationStep } from "@/utils/motion/types";
 import { getPathLength } from "@/utils/motion/svg";
 
 /**
- * Build animation manifest for first N paths with runtime path length resolution
+ * Build animation manifest for N paths with runtime path length resolution
  * @param root SVG root element
- * @param pathCount Number of paths to animate (default: 3)
+ * @param pathCount Number of paths to animate (default: 10 for full logo)
  * @returns Animation manifest with resolved path lengths
  */
 export function buildLogoManifest(
   root: SVGSVGElement,
-  pathCount: number = 3,
+  pathCount: number = 10,
 ): AnimationManifest {
   const steps: AnimationStep[] = [];
 
@@ -28,11 +28,13 @@ export function buildLogoManifest(
   const STAGGER_DELAY = 120; // Stagger between paths (ms)
   const FILL_DELAY_OFFSET = 100; // Fill starts 100ms after stroke begins
 
-  // Timing calculation for first 3 paths:
+  // Timing calculation for all 10 paths (staggered):
   // Path 1: stroke 0-800ms, fill 100-300ms → ends at 800ms
   // Path 2: stroke 120-920ms, fill 220-420ms → ends at 920ms
   // Path 3: stroke 240-1040ms, fill 340-540ms → ends at 1040ms
-  // Total duration: 1040ms (last path stroke completes)
+  // ...
+  // Path 10: stroke 1080-1880ms, fill 1180-1380ms → ends at 1880ms
+  // Total duration: 1880ms (last path stroke completes)
 
   for (let i = 1; i <= pathCount; i++) {
     const pathId = `#logo-path-${i}`;
@@ -81,9 +83,9 @@ export function buildLogoManifest(
 }
 
 /**
- * Default manifest builder (for first 3 paths)
+ * Default manifest builder (for all 10 paths)
  * This is a convenience function that can be called with an SVG root
  */
 export function getLogoManifest(root: SVGSVGElement): AnimationManifest {
-  return buildLogoManifest(root, 3);
+  return buildLogoManifest(root, 10);
 }

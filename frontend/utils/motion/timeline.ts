@@ -208,25 +208,23 @@ export class AnimationTimeline {
     if (!element) return;
 
     // Apply based on property type
+    // Check tagName for compatibility with jsdom (SVGPathElement not available in tests)
+    const tagName = element.tagName?.toLowerCase();
+
     if (property === "strokeDashoffset") {
       if (
-        element instanceof SVGPathElement ||
-        element instanceof SVGPolygonElement
+        tagName === "path" ||
+        tagName === "polygon" ||
+        tagName === "polyline"
       ) {
-        setStrokeDashoffset(element, value);
+        setStrokeDashoffset(
+          element as SVGPathElement | SVGPolygonElement,
+          value,
+        );
       }
     } else if (property === "opacity") {
       // For opacity, we can apply to any SVG element
-      if (
-        element instanceof SVGPathElement ||
-        element instanceof SVGPolygonElement
-      ) {
-        // For paths, we might want to animate fill-opacity instead
-        // But per spec, we animate the element's opacity
-        applyNumericStyle(element, "opacity", value);
-      } else {
-        applyNumericStyle(element, "opacity", value);
-      }
+      applyNumericStyle(element, "opacity", value);
     } else {
       // Fallback: apply as generic numeric style
       applyNumericStyle(element, property, value);

@@ -341,4 +341,385 @@ describe("AnimationTimeline", () => {
       timeline.pause();
     });
   });
+
+  describe("tween value calculations", () => {
+    beforeEach(() => {
+      // Create test elements
+      const path1 = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
+      path1.id = "test-path-1";
+      path1.setAttribute("d", "M 0,0 L 100,0");
+      mockSvg.appendChild(path1);
+
+      const path2 = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
+      path2.id = "test-path-2";
+      path2.setAttribute("d", "M 0,0 L 100,0");
+      mockSvg.appendChild(path2);
+    });
+
+    it("should calculate tween values at start time", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.seek(0);
+
+      const path1 = mockSvg.querySelector("#test-path-1") as SVGElement;
+      expect(path1).toBeTruthy();
+      // At time 0, first step should be at from value (0)
+      const opacity = path1.style.opacity;
+      expect(parseFloat(opacity || "0")).toBe(0);
+    });
+
+    it("should calculate tween values at mid time", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      // First step: 0-200ms, so at 100ms should be halfway (0.5)
+      timeline.seek(100);
+
+      const path1 = mockSvg.querySelector("#test-path-1") as SVGElement;
+      expect(path1).toBeTruthy();
+      // At 50% progress, opacity should be ~0.5 (with linear easing)
+      const opacity = parseFloat(path1.style.opacity || "0");
+      expect(opacity).toBeCloseTo(0.5, 1);
+    });
+
+    it("should calculate tween values at end time", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.seek(200); // End of first step
+
+      const path1 = mockSvg.querySelector("#test-path-1") as SVGElement;
+      expect(path1).toBeTruthy();
+      // At end, opacity should be at to value (1)
+      const opacity = parseFloat(path1.style.opacity || "0");
+      expect(opacity).toBeCloseTo(1, 1);
+    });
+
+    it("should handle tween before start (initial value)", () => {
+      const delayedManifest: AnimationManifest = {
+        steps: [
+          {
+            target: "#test-path-1",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            delay: 100, // Starts at 100ms
+          },
+        ],
+      };
+
+      const timeline = new AnimationTimeline(mockSvg, delayedManifest);
+      timeline.seek(50); // Before start
+
+      const path1 = mockSvg.querySelector("#test-path-1") as SVGElement;
+      // Should be at from value (0)
+      const opacity = parseFloat(path1.style.opacity || "0");
+      expect(opacity).toBe(0);
+    });
+
+    it("should handle tween after end (final value)", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.seek(500); // After all steps end
+
+      const path1 = mockSvg.querySelector("#test-path-1") as SVGElement;
+      const path2 = mockSvg.querySelector("#test-path-2") as SVGElement;
+      // Should be at final values (1 for both)
+      expect(parseFloat(path1.style.opacity || "0")).toBeCloseTo(1, 1);
+      expect(parseFloat(path2.style.opacity || "0")).toBeCloseTo(1, 1);
+    });
+  });
+
+  describe("overlapping delays", () => {
+    beforeEach(() => {
+      // Clear previous elements
+      mockSvg.innerHTML = "";
+
+      // Create test elements
+      const path1 = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
+      path1.id = "overlap-path-1";
+      path1.setAttribute("d", "M 0,0 L 100,0");
+      mockSvg.appendChild(path1);
+
+      const path2 = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
+      path2.id = "overlap-path-2";
+      path2.setAttribute("d", "M 0,0 L 100,0");
+      mockSvg.appendChild(path2);
+
+      const path3 = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
+      path3.id = "overlap-path-3";
+      path3.setAttribute("d", "M 0,0 L 100,0");
+      mockSvg.appendChild(path3);
+    });
+
+    it("should handle multiple tweens active simultaneously", () => {
+      const overlappingManifest: AnimationManifest = {
+        steps: [
+          {
+            target: "#overlap-path-1",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 300,
+            delay: 0,
+          },
+          {
+            target: "#overlap-path-2",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 300,
+            delay: 100, // Overlaps with first
+          },
+          {
+            target: "#overlap-path-3",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 300,
+            delay: 200, // Overlaps with both
+          },
+        ],
+      };
+
+      const timeline = new AnimationTimeline(mockSvg, overlappingManifest);
+
+      // At 150ms: path1 should be at ~50%, path2 at ~17%, path3 not started
+      timeline.seek(150);
+
+      const path1 = mockSvg.querySelector("#overlap-path-1");
+      const path2 = mockSvg.querySelector("#overlap-path-2");
+      const path3 = mockSvg.querySelector("#overlap-path-3");
+
+      expect(path1).toBeTruthy();
+      expect(path2).toBeTruthy();
+      expect(path3).toBeTruthy();
+    });
+
+    it("should handle fully overlapping tweens", () => {
+      const fullyOverlappingManifest: AnimationManifest = {
+        steps: [
+          {
+            target: "#overlap-path-1",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            delay: 0,
+          },
+          {
+            target: "#overlap-path-2",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            delay: 0, // Same start time
+          },
+        ],
+      };
+
+      const timeline = new AnimationTimeline(mockSvg, fullyOverlappingManifest);
+      timeline.seek(100); // Mid point
+
+      const path1 = mockSvg.querySelector("#overlap-path-1") as SVGElement;
+      const path2 = mockSvg.querySelector("#overlap-path-2") as SVGElement;
+      // Both should be at ~50%
+      expect(parseFloat(path1.style.opacity || "0")).toBeCloseTo(0.5, 1);
+      expect(parseFloat(path2.style.opacity || "0")).toBeCloseTo(0.5, 1);
+    });
+
+    it("should calculate duration correctly with overlapping steps", () => {
+      const overlappingManifest: AnimationManifest = {
+        steps: [
+          {
+            target: "#overlap-path-1",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            delay: 0,
+          },
+          {
+            target: "#overlap-path-2",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 300,
+            delay: 100, // Overlaps but ends later
+          },
+        ],
+      };
+
+      const timeline = new AnimationTimeline(mockSvg, overlappingManifest);
+      // Duration should be max(endTime) = 100 + 300 = 400
+      expect(timeline.duration).toBe(400);
+    });
+
+    it("should handle cascading delays (staggered)", () => {
+      const staggeredManifest: AnimationManifest = {
+        steps: [
+          {
+            target: "#overlap-path-1",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            delay: 0,
+          },
+          {
+            target: "#overlap-path-2",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            delay: 50, // Starts before first ends
+          },
+          {
+            target: "#overlap-path-3",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            delay: 100, // Starts before second ends
+          },
+        ],
+      };
+
+      const timeline = new AnimationTimeline(mockSvg, staggeredManifest);
+
+      // At 150ms:
+      // - path1: starts at 0ms, duration 200ms → 150ms elapsed of 200ms = 75% (0.75)
+      // - path2: starts at 50ms, duration 200ms → 100ms elapsed of 200ms = 50% (0.5)
+      // - path3: starts at 100ms, duration 200ms → 50ms elapsed of 200ms = 25% (0.25)
+      timeline.seek(150);
+
+      const path1 = mockSvg.querySelector("#overlap-path-1") as SVGElement;
+      const path2 = mockSvg.querySelector("#overlap-path-2") as SVGElement;
+      const path3 = mockSvg.querySelector("#overlap-path-3") as SVGElement;
+
+      expect(parseFloat(path1.style.opacity || "0")).toBeCloseTo(0.75, 1); // 75%
+      expect(parseFloat(path2.style.opacity || "0")).toBeCloseTo(0.5, 1); // 50%
+      expect(parseFloat(path3.style.opacity || "0")).toBeCloseTo(0.25, 1); // 25%
+    });
+  });
+
+  describe("easing application", () => {
+    beforeEach(() => {
+      // Create test elements with proper SVG namespace
+      const path1 = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      ) as SVGPathElement;
+      path1.id = "easing-path-1";
+      path1.setAttribute("d", "M 0,0 L 100,0");
+      mockSvg.appendChild(path1);
+    });
+
+    it("should apply linear easing correctly", () => {
+      const linearManifest: AnimationManifest = {
+        steps: [
+          {
+            target: "#easing-path-1",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            easing: "linear",
+          },
+        ],
+      };
+
+      const timeline = new AnimationTimeline(mockSvg, linearManifest);
+
+      // At 50% time (100ms), should be at 50% value (0.5) with linear
+      timeline.seek(100);
+
+      const path1 = mockSvg.querySelector("#easing-path-1") as SVGElement;
+      const opacity = parseFloat(path1.style.opacity || "0");
+      expect(opacity).toBeCloseTo(0.5, 1);
+    });
+
+    it("should apply standard easing correctly", () => {
+      const standardManifest: AnimationManifest = {
+        steps: [
+          {
+            target: "#easing-path-1",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            easing: "standard",
+          },
+        ],
+      };
+
+      const timeline = new AnimationTimeline(mockSvg, standardManifest);
+
+      // At 50% time, standard easing should give different value than linear
+      timeline.seek(100);
+
+      const path1 = mockSvg.querySelector("#easing-path-1") as SVGElement;
+      const opacity = parseFloat(path1.style.opacity || "0");
+      // Standard easing (ease-out) should be > 0.5 at 50% time
+      expect(opacity).toBeGreaterThan(0.5);
+      expect(opacity).toBeLessThan(1);
+    });
+
+    it("should apply emph easing correctly", () => {
+      const emphManifest: AnimationManifest = {
+        steps: [
+          {
+            target: "#easing-path-1",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            easing: "emph",
+          },
+        ],
+      };
+
+      const timeline = new AnimationTimeline(mockSvg, emphManifest);
+      timeline.seek(100);
+
+      const path1 = mockSvg.querySelector("#easing-path-1") as SVGElement;
+      const opacity = parseFloat(path1.style.opacity || "0");
+      // Emph easing should produce a different curve than linear
+      expect(opacity).toBeGreaterThan(0);
+      expect(opacity).toBeLessThan(1);
+    });
+
+    it("should default to linear when easing not specified", () => {
+      const noEasingManifest: AnimationManifest = {
+        steps: [
+          {
+            target: "#easing-path-1",
+            property: "opacity",
+            from: 0,
+            to: 1,
+            duration: 200,
+            // No easing specified
+          },
+        ],
+      };
+
+      const timeline = new AnimationTimeline(mockSvg, noEasingManifest);
+      timeline.seek(100);
+
+      const path1 = mockSvg.querySelector("#easing-path-1") as SVGElement;
+      const opacity = parseFloat(path1.style.opacity || "0");
+      // Should default to linear (0.5 at 50% time)
+      expect(opacity).toBeCloseTo(0.5, 1);
+    });
+  });
 });

@@ -40,7 +40,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
     {
       autoPlay = true,
       speed = 1,
-      pathCount = 3,
+      pathCount = 10,
       startAtMs,
       enabled: enabledProp,
     },
