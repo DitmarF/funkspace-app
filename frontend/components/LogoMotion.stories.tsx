@@ -13,11 +13,34 @@ const meta: Meta<typeof LogoMotion> = {
     docs: {
       description: {
         component:
-          "Animated FunkSpace logo with timeline-based stroke draw and fill fade. Respects reduced motion preferences.",
+          "Animated FunkSpace logo with timeline-based stroke draw and fill fade. Respects reduced motion preferences and feature flag.",
       },
     },
   },
   tags: ["autodocs"],
+  argTypes: {
+    enabled: {
+      control: { type: "boolean" },
+      description:
+        "Override feature flag for testing. In production, uses NEXT_PUBLIC_ANIMATIONS_ENABLED env var.",
+      table: {
+        type: { summary: "boolean | undefined" },
+        defaultValue: { summary: "undefined (uses env var)" },
+      },
+    },
+    autoPlay: {
+      control: { type: "boolean" },
+      description: "Whether to start animation automatically",
+    },
+    speed: {
+      control: { type: "number", min: 0, max: 3, step: 0.1 },
+      description: "Animation playback speed multiplier",
+    },
+    pathCount: {
+      control: { type: "number", min: 1, max: 10, step: 1 },
+      description: "Number of logo paths to animate",
+    },
+  },
 };
 
 export default meta;
@@ -198,10 +221,24 @@ function ReducedMotionStory(args: LogoMotionProps) {
       <div className="border rounded-lg p-4">
         <LogoMotion {...args} />
       </div>
-      <p className="text-sm text-gray-600 max-w-md">
-        To test reduced motion: Enable &quot;Reduce motion&quot; in your system
-        preferences, or use browser dev tools to simulate the preference.
-      </p>
+      <div className="space-y-2 text-sm text-gray-600 max-w-md">
+        <p>
+          To test reduced motion: Enable &quot;Reduce motion&quot; in your
+          system preferences, or use browser dev tools to simulate the
+          preference.
+        </p>
+        <p className="text-xs text-gray-500">
+          Reference:{" "}
+          <a
+            href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            MDN: prefers-reduced-motion
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
@@ -219,7 +256,9 @@ export const ReducedMotion: Story = {
     docs: {
       description: {
         story:
-          "When `prefers-reduced-motion: reduce` is active, the logo renders in its final static state immediately without animation.",
+          "When `prefers-reduced-motion: reduce` is active, the logo renders in its final static state immediately without animation. " +
+          "The component uses the `useReducedMotion()` hook to detect the user's preference via the CSS media query. " +
+          "See [MDN: prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion) for more information.",
       },
     },
     // Note: This story demonstrates the concept, but actual reduced motion
@@ -229,21 +268,76 @@ export const ReducedMotion: Story = {
 };
 
 /**
- * Feature flag off story component
+ * Feature flag toggle story component
  */
-function FeatureFlagOffStory(args: LogoMotionProps) {
+function FeatureFlagToggleStory(args: LogoMotionProps) {
+  const [enabled, setEnabled] = useState(args.enabled ?? false);
+
   return (
-    <div className="space-y-4 p-6">
+    <div className="space-y-4 p-6 max-w-2xl">
       <div className="border rounded-lg p-4">
-        <LogoMotion {...args} />
+        <LogoMotion {...args} enabled={enabled} />
       </div>
-      <p className="text-sm text-gray-600 max-w-md">
-        This story shows the static fallback. Set
-        `NEXT_PUBLIC_ANIMATIONS_ENABLED=true` to enable animations.
-      </p>
+
+      <div className="space-y-3">
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => setEnabled(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <span className="text-sm font-medium">
+              Enable Animations (Feature Flag)
+            </span>
+          </label>
+        </div>
+
+        <div className="p-3 bg-gray-50 rounded text-sm text-gray-700 space-y-1">
+          <p>
+            <strong>Current state:</strong>{" "}
+            {enabled ? (
+              <span className="text-green-600">Animations enabled</span>
+            ) : (
+              <span className="text-gray-600">Static fallback</span>
+            )}
+          </p>
+          <p className="text-xs text-gray-600">
+            In production, this is controlled by the{" "}
+            <code className="px-1 py-0.5 bg-gray-200 rounded text-xs">
+              NEXT_PUBLIC_ANIMATIONS_ENABLED
+            </code>{" "}
+            environment variable. Toggle the checkbox above to simulate
+            enabling/disabling the feature flag.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
+
+/**
+ * Feature flag toggle - demonstrates feature flag behavior
+ */
+export const FeatureFlagToggle: Story = {
+  args: {
+    autoPlay: true,
+    speed: 1,
+    pathCount: 3,
+    enabled: false, // Default to off (matches production default)
+  },
+  render: FeatureFlagToggleStory,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Interactive demonstration of the feature flag. Toggle the checkbox to switch between animated and static states. " +
+          "In production, this is controlled by the NEXT_PUBLIC_ANIMATIONS_ENABLED environment variable.",
+      },
+    },
+  },
+};
 
 /**
  * Feature flag off - demonstrates static fallback
@@ -253,14 +347,15 @@ export const FeatureFlagOff: Story = {
     autoPlay: true,
     speed: 1,
     pathCount: 3,
+    enabled: false, // Explicitly disabled
   },
   parameters: {
     docs: {
       description: {
         story:
-          "When `NEXT_PUBLIC_ANIMATIONS_ENABLED` is not set to 'true', the logo renders statically.",
+          "When the feature flag is disabled (or NEXT_PUBLIC_ANIMATIONS_ENABLED is not set to 'true'), " +
+          "the logo renders statically without any animation.",
       },
     },
   },
-  render: FeatureFlagOffStory,
 };

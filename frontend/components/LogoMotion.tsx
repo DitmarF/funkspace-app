@@ -5,6 +5,7 @@ import { AnimationTimeline } from "@/utils/motion/timeline";
 import { buildLogoManifest } from "@/data/logoManifest";
 import { FunkSpaceLogoInline } from "./FunkSpaceLogoInline";
 import { applyStrokeDrawInit } from "@/utils/motion/svg";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export interface LogoMotionRef {
   play(): void;
@@ -18,6 +19,11 @@ export interface LogoMotionProps {
   autoPlay?: boolean;
   speed?: number;
   pathCount?: number;
+  /**
+   * Override feature flag for testing/Storybook
+   * If undefined, uses NEXT_PUBLIC_ANIMATIONS_ENABLED env var
+   */
+  enabled?: boolean;
 }
 
 /**
@@ -25,17 +31,20 @@ export interface LogoMotionProps {
  * Uses AnimationTimeline to draw strokes and fade fills sequentially
  */
 export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
-  function LogoMotion({ autoPlay = true, speed = 1, pathCount = 3 }, ref) {
+  function LogoMotion(
+    { autoPlay = true, speed = 1, pathCount = 3, enabled: enabledProp },
+    ref,
+  ) {
     const svgRef = useRef<SVGSVGElement>(null);
     const timelineRef = useRef<AnimationTimeline | null>(null);
-    const reduced =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // Feature flag: defaults to false per spec
-    // In Storybook, we can override via story args
+    const reduced = useReducedMotion();
+    // Feature flag: use prop if provided, otherwise check env var
+    // In Storybook, we can override via story args for testing
     const enabled =
-      typeof window !== "undefined" &&
-      process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED === "true";
+      enabledProp !== undefined
+        ? enabledProp
+        : typeof window !== "undefined" &&
+          process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED === "true";
 
     useEffect(() => {
       if (!svgRef.current) return;
@@ -60,9 +69,10 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
         }
       }
 
-      // Check if animations should be enabled
+      // Early exit: Show static final state if animations disabled or reduced motion preferred
+      // This ensures no timeline is created and no animation loop starts
       if (!enabled || reduced) {
-        // Show static final state immediately
+        // Set final state immediately: stroke fully drawn, fill visible
         for (let i = 1; i <= pathCount; i++) {
           const pathId = `logo-path-${i}`;
           const element = svg.querySelector(`#${pathId}`) as
@@ -71,12 +81,12 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
             | null;
 
           if (element) {
-            // Set final state: stroke fully drawn, fill visible
+            // Final state: stroke fully drawn (offset = 0), opacity = 1
             element.style.strokeDashoffset = "0";
             element.style.opacity = "1";
           }
         }
-        return;
+        return; // Early exit - no timeline created
       }
 
       // Build manifest with runtime path lengths
