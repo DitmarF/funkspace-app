@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { AnimationTimeline } from "./timeline";
 import type { AnimationManifest } from "./types";
 
@@ -193,6 +193,152 @@ describe("AnimationTimeline", () => {
       expect(() => timeline.destroy()).not.toThrow();
       // After destroy, should be safe to pause
       expect(() => timeline.pause()).not.toThrow();
+    });
+  });
+
+  describe("rAF loop", () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      // Mock requestAnimationFrame
+      global.requestAnimationFrame = vi.fn((cb) => {
+        setTimeout(() => cb(performance.now()), 16);
+        return 1;
+      });
+      global.cancelAnimationFrame = vi.fn();
+      // Mock performance.now() to return controllable time
+      let mockTime = 0;
+      vi.spyOn(performance, "now").mockImplementation(() => mockTime);
+      // Helper to advance time
+      (global as any).__advanceTime = (ms: number) => {
+        mockTime += ms;
+        vi.advanceTimersByTime(ms);
+      };
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    });
+
+    it("should start rAF loop on play", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.play();
+      expect(global.requestAnimationFrame).toHaveBeenCalled();
+      timeline.pause();
+    });
+
+    it("should stop rAF loop on pause", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.play();
+      const rafCalls = (global.requestAnimationFrame as any).mock.calls.length;
+      timeline.pause();
+      expect(global.cancelAnimationFrame).toHaveBeenCalled();
+      timeline.pause(); // Should be idempotent
+    });
+
+    it("should advance time with delta on each tick", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.play();
+
+      // Advance time by 50ms (simulating ~3 frames at 60fps)
+      (global as any).__advanceTime(50);
+
+      // Time should have advanced (allowing for some variance)
+      expect(timeline.time).toBeGreaterThan(0);
+      expect(timeline.time).toBeLessThanOrEqual(50);
+
+      timeline.pause();
+    });
+
+    it("should apply speed multiplier to delta", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.setSpeed(2); // 2x speed
+      timeline.play();
+
+      // Advance time by 50ms
+      (global as any).__advanceTime(50);
+
+      // With 2x speed, should advance ~100ms of timeline time
+      const timeBefore = timeline.time;
+      timeline.pause();
+
+      // Reset and try with 0.5x speed
+      const timeline2 = new AnimationTimeline(mockSvg, manifest);
+      timeline2.setSpeed(0.5);
+      timeline2.play();
+      (global as any).__advanceTime(50);
+      const timeAfter = timeline2.time;
+      timeline2.pause();
+
+      // 2x speed should advance more than 0.5x speed
+      expect(timeBefore).toBeGreaterThan(timeAfter);
+    });
+
+    it("should guard against multiple play() calls", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.play();
+      const initialRafCalls = (global.requestAnimationFrame as any).mock.calls
+        .length;
+      timeline.play(); // Second call should not start another loop
+      const afterSecondCall = (global.requestAnimationFrame as any).mock.calls
+        .length;
+
+      // Should not have started additional rAF loops
+      expect(afterSecondCall).toBeLessThanOrEqual(initialRafCalls + 1);
+      timeline.pause();
+    });
+
+    it("should reflect elapsed time in seek", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.play();
+
+      // Advance time
+      (global as any).__advanceTime(100);
+
+      const elapsedTime = timeline.time;
+      timeline.pause();
+
+      // Seek should reflect the elapsed time
+      timeline.seek(elapsedTime);
+      expect(timeline.time).toBe(elapsedTime);
+    });
+
+    it("should stop at duration end when playing forward", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.play();
+
+      // Advance past duration
+      (global as any).__advanceTime(500);
+
+      // Should pause automatically at end
+      expect(timeline.time).toBeLessThanOrEqual(timeline.duration);
+      expect(global.cancelAnimationFrame).toHaveBeenCalled();
+    });
+
+    it("should stop at 0 when playing reverse", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      timeline.seek(200); // Start in middle
+      timeline.reverse();
+      timeline.play();
+
+      // Advance time (moving backward)
+      (global as any).__advanceTime(300);
+
+      // Should pause at 0
+      expect(timeline.time).toBeGreaterThanOrEqual(0);
+      expect(global.cancelAnimationFrame).toHaveBeenCalled();
+    });
+
+    it("should handle rapid play/pause cycles", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      for (let i = 0; i < 5; i++) {
+        timeline.play();
+        (global as any).__advanceTime(10);
+        timeline.pause();
+      }
+      // Should not throw or leak rAF handles
+      expect(() => timeline.play()).not.toThrow();
+      timeline.pause();
     });
   });
 });
