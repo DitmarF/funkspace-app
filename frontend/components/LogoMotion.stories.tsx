@@ -1,7 +1,7 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { LogoMotion, type LogoMotionRef } from "./LogoMotion";
 import type { LogoMotionProps } from "./LogoMotion";
 
@@ -95,17 +95,76 @@ export const StartAtTime: Story = {
 };
 
 /**
- * Controls component for interactive story
+ * Controls component for interactive story with Storybook args
  */
-function ControlsStory(args: LogoMotionProps) {
+function ControlsStory(
+  args: LogoMotionProps & {
+    playing?: boolean;
+    reversed?: boolean;
+    timeMs?: number;
+    speed?: number;
+  },
+) {
   const timelineRef = useRef<LogoMotionRef>(null);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [speed, setSpeed] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(args.playing ?? false);
+  const [isReversed, setIsReversed] = useState(args.reversed ?? false);
+  const [currentTime, setCurrentTime] = useState(args.timeMs ?? 0);
+  const [speed, setSpeed] = useState(args.speed ?? 1);
   const estimatedDuration = 1500; // Estimated duration for 3 paths
+
+  // Sync playing state from args
+  useEffect(() => {
+    if (args.playing !== undefined && args.playing !== isPlaying) {
+      if (args.playing) {
+        timelineRef.current?.play();
+        setIsPlaying(true);
+      } else {
+        timelineRef.current?.pause();
+        setIsPlaying(false);
+      }
+    }
+  }, [args.playing, isPlaying]);
+
+  // Sync reversed state from args
+  useEffect(() => {
+    if (args.reversed !== undefined && args.reversed !== isReversed) {
+      timelineRef.current?.reverse();
+      setIsReversed(args.reversed);
+    }
+  }, [args.reversed, isReversed]);
+
+  // Sync timeMs from args
+  useEffect(() => {
+    if (args.timeMs !== undefined && args.timeMs !== currentTime) {
+      timelineRef.current?.seek(args.timeMs);
+      setCurrentTime(args.timeMs);
+    }
+  }, [args.timeMs, currentTime]);
+
+  // Sync speed from args
+  useEffect(() => {
+    if (args.speed !== undefined && args.speed !== speed) {
+      timelineRef.current?.setSpeed(args.speed);
+      setSpeed(args.speed);
+    }
+  }, [args.speed, speed]);
+
+  // Poll timeline time for display (optional, for real-time feedback)
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      // Note: We can't read timeline.time directly, so we track state
+      // In a real implementation, you might expose a getTime() method
+    }, 16); // ~60fps
+
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   return (
     <div className="space-y-6 p-6 max-w-2xl">
-      <div className="border rounded-lg p-4">
+      {/* Logo display */}
+      <div className="border rounded-lg p-4 bg-white">
         <LogoMotion
           {...args}
           ref={timelineRef}
@@ -114,16 +173,20 @@ function ControlsStory(args: LogoMotionProps) {
         />
       </div>
 
-      <div className="space-y-4">
+      {/* Controls panel - minimal layout */}
+      <div className="space-y-4 border rounded-lg p-4 bg-gray-50">
         <h3 className="text-lg font-semibold">Timeline Controls</h3>
 
+        {/* Play/Pause/Reverse buttons - minimal panel */}
         <div className="flex gap-2 flex-wrap">
           <button
             type="button"
             onClick={() => {
               timelineRef.current?.play();
+              setIsPlaying(true);
             }}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            disabled={isPlaying}
           >
             Play
           </button>
@@ -131,8 +194,10 @@ function ControlsStory(args: LogoMotionProps) {
             type="button"
             onClick={() => {
               timelineRef.current?.pause();
+              setIsPlaying(false);
             }}
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+            disabled={!isPlaying}
           >
             Pause
           </button>
@@ -140,13 +205,15 @@ function ControlsStory(args: LogoMotionProps) {
             type="button"
             onClick={() => {
               timelineRef.current?.reverse();
+              setIsReversed(!isReversed);
             }}
             className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
           >
-            Reverse
+            Reverse {isReversed ? "→" : "←"}
           </button>
         </div>
 
+        {/* Speed control */}
         <div className="space-y-2">
           <label className="block text-sm font-medium">Speed: {speed}x</label>
           <input
@@ -196,6 +263,7 @@ function ControlsStory(args: LogoMotionProps) {
           </div>
         </div>
 
+        {/* Time scrubber */}
         <div className="space-y-2">
           <label className="block text-sm font-medium">
             Scrub: {currentTime.toFixed(0)}ms
@@ -228,14 +296,56 @@ function ControlsStory(args: LogoMotionProps) {
 
 /**
  * Story with interactive controls for play/pause/reverse/seek/speed
+ * Includes Storybook args that can be controlled via the Controls panel
  */
 export const Controls: Story = {
+  args: {
+    autoPlay: false,
+    pathCount: 3,
+    enabled: true,
+    playing: false,
+    reversed: false,
+    timeMs: 0,
+    speed: 1,
+  },
+  argTypes: {
+    playing: {
+      control: { type: "boolean" },
+      description: "Whether the animation is currently playing",
+      table: {
+        type: { summary: "boolean" },
+      },
+    },
+    reversed: {
+      control: { type: "boolean" },
+      description: "Whether the animation is playing in reverse",
+      table: {
+        type: { summary: "boolean" },
+      },
+    },
+    timeMs: {
+      control: { type: "number", min: 0, max: 1500, step: 10 },
+      description: "Current timeline time in milliseconds (for scrubbing)",
+      table: {
+        type: { summary: "number" },
+      },
+    },
+    speed: {
+      control: { type: "number", min: 0, max: 3, step: 0.1 },
+      description: "Animation playback speed multiplier",
+      table: {
+        type: { summary: "number" },
+      },
+    },
+  },
   render: ControlsStory,
   parameters: {
     docs: {
       description: {
         story:
-          "Interactive controls for play, pause, reverse, speed adjustment, and timeline scrubbing.",
+          "Interactive controls for play, pause, reverse, speed adjustment, and timeline scrubbing. " +
+          "Use the Controls panel to manipulate `playing`, `reversed`, `timeMs`, and `speed` args. " +
+          "Changes are immediately reflected in the animation.",
       },
     },
   },
