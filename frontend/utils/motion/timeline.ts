@@ -7,6 +7,8 @@
 
 import type { AnimationManifest } from "./types";
 import type { Direction, TimelineStep, Tween } from "./types";
+import { lerpWithEasing } from "./easing";
+import { setStrokeDashoffset, applyNumericStyle } from "./svg";
 
 export class AnimationTimeline {
   private root: SVGSVGElement;
@@ -18,6 +20,7 @@ export class AnimationTimeline {
   private isPlaying: boolean = false;
   private rafId: number | null = null;
   private lastFrameTime: number = 0;
+  private elementCache: Map<string, SVGElement | null> = new Map();
 
   constructor(root: SVGSVGElement, manifest: AnimationManifest) {
     this.root = root;
@@ -154,8 +157,80 @@ export class AnimationTimeline {
    * Update all active tweens based on current time
    */
   private update(): void {
-    // Implementation will be added in later tasks
-    // For now, just ensure the method exists
+    for (const step of this.steps) {
+      const { tween, target, property } = step;
+
+      // Check if tween is active at current time
+      const isActive =
+        this.currentTime >= tween.startTime &&
+        this.currentTime <= tween.endTime;
+
+      if (!isActive && this.currentTime < tween.startTime) {
+        // Before start: set to initial value
+        this.applyValue(target, property, tween.from);
+        continue;
+      }
+
+      if (!isActive && this.currentTime > tween.endTime) {
+        // After end: set to final value
+        this.applyValue(target, property, tween.to);
+        continue;
+      }
+
+      // Calculate progress [0, 1] within the tween duration
+      const elapsed = this.currentTime - tween.startTime;
+      const progress = tween.duration > 0 ? elapsed / tween.duration : 1;
+
+      // Apply easing and interpolate
+      const value = lerpWithEasing(
+        tween.from,
+        tween.to,
+        progress,
+        tween.easing,
+      );
+
+      // Apply to element
+      this.applyValue(target, property, value);
+    }
+  }
+
+  /**
+   * Apply a value to an SVG element's property
+   */
+  private applyValue(target: string, property: string, value: number): void {
+    // Get or cache element
+    if (!this.elementCache.has(target)) {
+      const element = this.root.querySelector(target);
+      this.elementCache.set(target, element);
+    }
+
+    const element = this.elementCache.get(target);
+    if (!element) return;
+
+    // Apply based on property type
+    if (property === "strokeDashoffset") {
+      if (
+        element instanceof SVGPathElement ||
+        element instanceof SVGPolygonElement
+      ) {
+        setStrokeDashoffset(element, value);
+      }
+    } else if (property === "opacity") {
+      // For opacity, we can apply to any SVG element
+      if (
+        element instanceof SVGPathElement ||
+        element instanceof SVGPolygonElement
+      ) {
+        // For paths, we might want to animate fill-opacity instead
+        // But per spec, we animate the element's opacity
+        applyNumericStyle(element, "opacity", value);
+      } else {
+        applyNumericStyle(element, "opacity", value);
+      }
+    } else {
+      // Fallback: apply as generic numeric style
+      applyNumericStyle(element, property, value);
+    }
   }
 
   /**
