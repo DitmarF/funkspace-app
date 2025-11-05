@@ -24,7 +24,10 @@ export function resolveSelector(
   try {
     return root.querySelector(selector);
   } catch (error) {
-    console.warn(`[Manifest] Invalid selector "${selector}":`, error);
+    // Only warn in development to avoid console noise in production
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`[Manifest] Invalid selector "${selector}":`, error);
+    }
     return null;
   }
 }
@@ -145,12 +148,14 @@ export function validateManifest(
     errors.push(...stepResult.errors);
   });
 
-  // Log warnings and errors
-  if (warnings.length > 0) {
-    console.warn("[Manifest] Validation warnings:", warnings);
-  }
-  if (errors.length > 0) {
-    console.error("[Manifest] Validation errors:", errors);
+  // Log warnings and errors (only in development)
+  if (process.env.NODE_ENV === "development") {
+    if (warnings.length > 0) {
+      console.warn("[Manifest] Validation warnings:", warnings);
+    }
+    if (errors.length > 0) {
+      console.error("[Manifest] Validation errors:", errors);
+    }
   }
 
   return {

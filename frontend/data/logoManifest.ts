@@ -10,6 +10,35 @@ import type { AnimationManifest, AnimationStep } from "@/utils/motion/types";
 import { getPathLength } from "@/utils/motion/svg";
 
 /**
+ * Get a CSS custom property value as a number (in milliseconds)
+ * @param propertyName CSS custom property name (e.g., "--fs-motion-duration-800")
+ * @param fallback Fallback value if property is not found
+ * @returns Value in milliseconds
+ */
+function getTokenDurationMs(propertyName: string, fallback: number): number {
+  if (typeof window === "undefined") return fallback;
+
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(propertyName)
+    .trim();
+
+  if (!value) return fallback;
+
+  // Parse "800ms" or "800" to milliseconds
+  const match = value.match(/^(\d+(?:\.\d+)?)/);
+  if (match) {
+    const num = parseFloat(match[1]);
+    // If value ends with "s", convert to ms
+    if (value.endsWith("s") && !value.endsWith("ms")) {
+      return num * 1000;
+    }
+    return num;
+  }
+
+  return fallback;
+}
+
+/**
  * Build animation manifest for N paths with runtime path length resolution
  * @param root SVG root element
  * @param pathCount Number of paths to animate (default: 10 for full logo)
@@ -22,9 +51,14 @@ export function buildLogoManifest(
   const steps: AnimationStep[] = [];
 
   // Animation timing constants (from motion tokens)
+  // Read from CSS variables at runtime to match design tokens
   // See: tokens/fs.motion.tokens.json
-  const STROKE_DURATION = 800; // duration-800 (800ms)
-  const FILL_DURATION = 200; // duration-200 (200ms)
+  const STROKE_DURATION = getTokenDurationMs(
+    "--fs-motion-duration-800",
+    800,
+  ); // duration-800 (800ms)
+  const FILL_DURATION = getTokenDurationMs("--fs-motion-duration-200", 200); // duration-200 (200ms)
+  // Stagger delay: 120ms (not a token, but could be made configurable)
   const STAGGER_DELAY = 120; // Stagger between paths (ms)
   const FILL_DELAY_OFFSET = 100; // Fill starts 100ms after stroke begins
 
@@ -44,7 +78,10 @@ export function buildLogoManifest(
       | null;
 
     if (!element) {
-      console.warn(`[LogoManifest] Path ${pathId} not found, skipping`);
+      // Only warn in development to avoid console noise in production
+      if (process.env.NODE_ENV === "development") {
+        console.warn(`[LogoManifest] Path ${pathId} not found, skipping`);
+      }
       continue;
     }
 
