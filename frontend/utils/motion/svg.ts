@@ -89,3 +89,70 @@ export function getStrokeDashoffset(
   }
   return parseFloat(offset) || 0;
 }
+
+/**
+ * Initialize fill opacity to 0 (hidden)
+ * @param element SVG path or polygon element
+ */
+export function applyFillOpacityInit(
+  element: SVGPathElement | SVGPolygonElement,
+): void {
+  element.style.fillOpacity = "0";
+}
+
+/**
+ * Set fill opacity value (for animation)
+ * @param element SVG path or polygon element
+ * @param opacity Opacity value [0, 1]
+ */
+export function setFillOpacity(
+  element: SVGPathElement | SVGPolygonElement,
+  opacity: number,
+): void {
+  const clamped = Math.max(0, Math.min(1, opacity));
+  element.style.fillOpacity = `${clamped}`;
+}
+
+/**
+ * Get current fill opacity value
+ * @param element SVG path or polygon element
+ * @returns Current fill opacity value [0, 1]
+ */
+export function getFillOpacity(
+  element: SVGPathElement | SVGPolygonElement,
+): number {
+  const opacity = element.style.fillOpacity;
+  if (!opacity || opacity === "none" || opacity === "") {
+    return 1; // Default is 1 if not set
+  }
+  const parsed = parseFloat(opacity);
+  return isNaN(parsed) ? 1 : parsed;
+}
+
+/**
+ * Apply a numeric style property to an SVG element
+ * @param element SVG element
+ * @param property CSS property name (e.g., 'opacity', 'fillOpacity', 'strokeDashoffset')
+ * @param value Numeric value
+ */
+export function applyNumericStyle(
+  element: SVGElement,
+  property: string,
+  value: number,
+): void {
+  (element.style as any)[property] = `${value}`;
+}
+
+/**
+ * Get a numeric style property from an SVG element
+ * @param element SVG element
+ * @param property CSS property name
+ * @returns Numeric value or 0 if not set
+ */
+export function getNumericStyle(element: SVGElement, property: string): number {
+  const value = (element.style as any)[property];
+  if (!value || value === "none") {
+    return 0;
+  }
+  return parseFloat(value) || 0;
+}

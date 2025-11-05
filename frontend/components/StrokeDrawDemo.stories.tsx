@@ -2,7 +2,12 @@
 
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState, useRef, useEffect } from "react";
-import { applyStrokeDrawInit, setStrokeDashoffset } from "@/utils/motion/svg";
+import {
+  applyStrokeDrawInit,
+  setStrokeDashoffset,
+  applyFillOpacityInit,
+  setFillOpacity,
+} from "@/utils/motion/svg";
 
 function StrokeDrawDemo() {
   const pathRef = useRef<SVGPathElement>(null);
@@ -12,6 +17,7 @@ function StrokeDrawDemo() {
   useEffect(() => {
     if (pathRef.current) {
       const length = applyStrokeDrawInit(pathRef.current);
+      applyFillOpacityInit(pathRef.current); // Initialize fill opacity to 0
       setTotalLength(length);
     }
   }, []);
@@ -19,11 +25,18 @@ function StrokeDrawDemo() {
   const handleToggle = () => {
     if (pathRef.current) {
       if (isDrawn) {
-        // Hide: set offset to total length
+        // Hide: set offset to total length, opacity to 0
         setStrokeDashoffset(pathRef.current, totalLength);
+        setFillOpacity(pathRef.current, 0);
       } else {
-        // Show: set offset to 0
+        // Show: set offset to 0 (stroke draws first)
         setStrokeDashoffset(pathRef.current, 0);
+        // Then fade in fill after stroke completes (simulated with delay)
+        setTimeout(() => {
+          if (pathRef.current) {
+            setFillOpacity(pathRef.current, 1);
+          }
+        }, 850); // 800ms stroke + 50ms delay
       }
       setIsDrawn(!isDrawn);
     }
@@ -32,11 +45,11 @@ function StrokeDrawDemo() {
   return (
     <div className="space-y-4 p-6">
       <div>
-        <h2 className="text-xl font-bold mb-2">SVG Stroke Draw Demo</h2>
+        <h2 className="text-xl font-bold mb-2">SVG Stroke Draw & Fill Demo</h2>
         <p className="text-sm text-gray-600 mb-4">
-          Demonstrates stroke draw animation using stroke-dasharray and
-          stroke-dashoffset. Click the button to animate from 100% offset
-          (hidden) to 0 (visible).
+          Demonstrates stroke draw animation followed by fill fade-in. Click the
+          button to animate: stroke draws first (dashoffset: 100% → 0), then
+          fill fades in (opacity: 0 → 1).
         </p>
         <div className="mb-4">
           <p className="text-sm">
@@ -54,7 +67,9 @@ function StrokeDrawDemo() {
         </button>
         <div className="text-sm text-gray-600">
           Status:{" "}
-          {isDrawn ? "Drawn (offset = 0)" : "Hidden (offset = total length)"}
+          {isDrawn
+            ? "Drawn (stroke visible, fill visible)"
+            : "Hidden (stroke hidden, fill hidden)"}
         </div>
       </div>
 
@@ -69,12 +84,12 @@ function StrokeDrawDemo() {
             ref={pathRef}
             id="demo-path"
             d="M 50 100 Q 150 20, 250 100 T 350 100"
-            fill="none"
+            fill="#000"
             stroke="#000"
             strokeWidth="4"
             style={{
               transition:
-                "stroke-dashoffset 800ms cubic-bezier(0.05, 0.7, 0.1, 1)",
+                "stroke-dashoffset 800ms cubic-bezier(0.05, 0.7, 0.1, 1), fill-opacity 200ms ease-out 850ms",
             }}
           />
         </svg>
@@ -92,11 +107,16 @@ function StrokeDrawDemo() {
             is hidden)
           </li>
           <li>
-            Animating <code>stroke-dashoffset</code> from total length → 0
-            reveals the path
+            <code>applyFillOpacityInit()</code> sets <code>fill-opacity</code>{" "}
+            to 0 (fill is hidden)
           </li>
           <li>
-            CSS transition handles the smooth animation (800ms, emph easing)
+            Stroke draws first: <code>stroke-dashoffset</code> animates from
+            total length → 0 (800ms, emph easing)
+          </li>
+          <li>
+            Fill fades in after stroke: <code>fill-opacity</code> animates from
+            0 → 1 (200ms, ease-out, 850ms delay)
           </li>
         </ol>
       </div>

@@ -4,6 +4,11 @@ import {
   applyStrokeDrawInit,
   setStrokeDashoffset,
   getStrokeDashoffset,
+  applyFillOpacityInit,
+  setFillOpacity,
+  getFillOpacity,
+  applyNumericStyle,
+  getNumericStyle,
 } from "./svg";
 
 describe("SVG stroke draw utilities", () => {
@@ -185,6 +190,107 @@ describe("SVG stroke draw utilities", () => {
       expect(length2).toBeGreaterThan(0);
       expect(getStrokeDashoffset(path)).toBeCloseTo(length1, 2);
       expect(getStrokeDashoffset(path2)).toBeCloseTo(length2, 2);
+    });
+  });
+
+  describe("fill opacity utilities", () => {
+    it("should initialize fill opacity to 0", () => {
+      applyFillOpacityInit(path);
+      expect(getFillOpacity(path)).toBe(0);
+    });
+
+    it("should set fill opacity value", () => {
+      setFillOpacity(path, 0.5);
+      expect(getFillOpacity(path)).toBe(0.5);
+    });
+
+    it("should clamp fill opacity to [0, 1]", () => {
+      setFillOpacity(path, -0.5);
+      expect(getFillOpacity(path)).toBe(0);
+
+      setFillOpacity(path, 1.5);
+      expect(getFillOpacity(path)).toBe(1);
+    });
+
+    it("should get current fill opacity", () => {
+      path.style.fillOpacity = "0.75";
+      expect(getFillOpacity(path)).toBe(0.75);
+    });
+
+    it("should return 1 as default if opacity not set", () => {
+      path.style.fillOpacity = "";
+      expect(getFillOpacity(path)).toBe(1);
+    });
+
+    it("should work with polygon elements", () => {
+      const polygon = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polygon",
+      );
+      polygon.setAttribute("points", "10,10 50,10 50,50 10,50");
+      svg.appendChild(polygon);
+
+      applyFillOpacityInit(polygon);
+      expect(getFillOpacity(polygon)).toBe(0);
+
+      setFillOpacity(polygon, 0.8);
+      expect(getFillOpacity(polygon)).toBe(0.8);
+    });
+  });
+
+  describe("numeric style utilities", () => {
+    it("should apply numeric style property", () => {
+      applyNumericStyle(path, "opacity", 0.5);
+      expect(getNumericStyle(path, "opacity")).toBe(0.5);
+    });
+
+    it("should apply strokeDashoffset via numeric style", () => {
+      applyNumericStyle(path, "strokeDashoffset", 100);
+      expect(getNumericStyle(path, "strokeDashoffset")).toBe(100);
+    });
+
+    it("should apply fillOpacity via numeric style", () => {
+      applyNumericStyle(path, "fillOpacity", 0.3);
+      expect(getNumericStyle(path, "fillOpacity")).toBe(0.3);
+    });
+
+    it("should return 0 for unset numeric style", () => {
+      path.style.opacity = "";
+      expect(getNumericStyle(path, "opacity")).toBe(0);
+    });
+  });
+
+  describe("T-07: Fill opacity animation flow", () => {
+    it("should initialize fill opacity to 0", () => {
+      applyFillOpacityInit(path);
+      expect(getFillOpacity(path)).toBe(0);
+    });
+
+    it("should animate fill opacity from 0 to 1", () => {
+      applyFillOpacityInit(path);
+      expect(getFillOpacity(path)).toBe(0);
+
+      setFillOpacity(path, 1);
+      expect(getFillOpacity(path)).toBe(1);
+    });
+
+    it("should work sequentially: stroke first, then fill", () => {
+      // Initialize both
+      const length = applyStrokeDrawInit(path);
+      applyFillOpacityInit(path);
+
+      // Stroke should be hidden, fill should be 0
+      expect(getStrokeDashoffset(path)).toBeCloseTo(length, 2);
+      expect(getFillOpacity(path)).toBe(0);
+
+      // Draw stroke (offset → 0)
+      setStrokeDashoffset(path, 0);
+      expect(getStrokeDashoffset(path)).toBe(0);
+      expect(getFillOpacity(path)).toBe(0); // Fill still hidden
+
+      // Then fade in fill
+      setFillOpacity(path, 1);
+      expect(getFillOpacity(path)).toBe(1);
     });
   });
 });
