@@ -53,10 +53,7 @@ export function buildLogoManifest(
   // Animation timing constants (from motion tokens)
   // Read from CSS variables at runtime to match design tokens
   // See: tokens/fs.motion.tokens.json
-  const STROKE_DURATION = getTokenDurationMs(
-    "--fs-motion-duration-800",
-    800,
-  ); // duration-800 (800ms)
+  const STROKE_DURATION = getTokenDurationMs("--fs-motion-duration-800", 800); // duration-800 (800ms)
   const FILL_DURATION = getTokenDurationMs("--fs-motion-duration-200", 200); // duration-200 (200ms)
   // Stagger delay: 120ms (not a token, but could be made configurable)
   const STAGGER_DELAY = 120; // Stagger between paths (ms)
