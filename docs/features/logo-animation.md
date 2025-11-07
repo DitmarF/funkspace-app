@@ -22,7 +22,7 @@ Create a timeline-based animation for the **FunkSpace** SVG logo in which the **
 
 ## 3) Assets & File Map (proposed)
 
-- **SVG**: `frontend/public/assets/FunkSpaceLogo.svg` (will be inlined for IDs)
+- **SVG**: `frontend/public/svg/fs/FunSpace_logo.svg` (will be inlined for IDs)
 - **Components**:
   - `frontend/components/FunkSpaceLogoInline.tsx` — inline SVG with stable IDs
   - `frontend/components/LogoMotion.tsx` — timeline + controls wrapper
