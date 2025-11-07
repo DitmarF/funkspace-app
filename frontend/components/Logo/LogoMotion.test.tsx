@@ -9,7 +9,7 @@ import { createRef } from "react";
 import { LogoMotion } from "./LogoMotion";
 import type { LogoMotionRef } from "./LogoMotion";
 import { AnimationTimeline } from "@/utils/motion/timeline";
-import { buildLogoManifest } from "@/data/logoManifest";
+import { buildLogoManifest } from "@/data/animations/logo";
 
 // Type for the mock timeline instance
 type MockTimeline = {
@@ -32,7 +32,7 @@ vi.mock("@/utils/motion/svg", () => ({
 }));
 
 // Mock logoManifest to return a simple manifest
-vi.mock("@/data/logoManifest", () => ({
+vi.mock("@/data/animations/logo", () => ({
   buildLogoManifest: vi.fn(() => ({
     steps: [
       {

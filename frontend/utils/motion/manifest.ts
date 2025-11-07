@@ -1,6 +1,9 @@
 /**
  * Manifest loader for animation timelines
  * Resolves selectors, validates manifest structure, and provides warnings
+ *
+ * NOTE: This is a generic utility for manifest validation/loading.
+ * Logo-specific manifest builder is in `data/animations/logo.ts`.
  */
 
 import type { AnimationManifest, AnimationStep } from "./types";

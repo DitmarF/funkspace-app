@@ -1,6 +1,6 @@
 "use client";
 
-import { LogoMotion } from "@/components/LogoMotion";
+import { LogoMotion } from "@/components/Logo/LogoMotion";
 
 /**
  * Test page for LogoMotion E2E tests

@@ -24,19 +24,19 @@ Create a timeline-based animation for the **FunkSpace** SVG logo in which the **
 
 - **SVG**: `frontend/public/svg/fs/FunSpace_logo.svg` (will be inlined for IDs)
 - **Components**:
-  - `frontend/components/FunkSpaceLogoInline.tsx` — inline SVG with stable IDs
-  - `frontend/components/LogoMotion.tsx` — timeline + controls wrapper
+  - `frontend/components/Logo/FunkSpaceLogoInline.tsx` — inline SVG with stable IDs
+  - `frontend/components/Logo/LogoMotion.tsx` — timeline + controls wrapper
 
 - **Engine**:
   - `frontend/utils/motion/timeline.ts` — `AnimationTimeline`, tweens, easing
   - `frontend/utils/motion/types.ts` — types for manifest/steps
   - `frontend/utils/motion/svg.ts` — helpers: path length, stroke-draw init
 
-- **Data**: `frontend/data/logoManifest.ts` — ordered steps for paths/fills
-- **Stories**: `frontend/components/LogoMotion.stories.tsx`
+- **Data**: `frontend/data/animations/logo.ts` — ordered steps for paths/fills
+- **Stories**: `frontend/components/Logo/LogoMotion.stories.tsx`
 - **Tests**:
   - Unit: `frontend/utils/motion/timeline.test.ts`
-  - Component: `frontend/components/LogoMotion.test.tsx`
+  - Component: `frontend/components/Logo/LogoMotion.test.tsx`
   - E2E: `frontend/e2e/logo-animation.spec.ts`
 
 ## 4) Design Tokens (motion)
@@ -174,7 +174,7 @@ class AnimationTimeline {
 "use client";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { AnimationTimeline } from "@/utils/motion/timeline";
-import { logoManifest } from "@/data/logoManifest";
+import { buildLogoManifest } from "@/data/animations/logo";
 import { FunkSpaceLogoInline } from "./FunkSpaceLogoInline";
 
 export interface LogoMotionRef {
@@ -284,7 +284,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
 > Scan `docs/features/logo-animation.md`. Propose a step‑by‑step plan. Then:
 >
 > 1. Create branch `feat/logo-animation`.
-> 2. Scaffold: `components/FunkSpaceLogoInline.tsx`, `components/LogoMotion.tsx`, `utils/motion/{timeline.ts,types.ts,svg.ts}`, `data/logoManifest.ts`.
+> 2. Scaffold: `components/Logo/FunkSpaceLogoInline.tsx`, `components/Logo/LogoMotion.tsx`, `utils/motion/{timeline.ts,types.ts,svg.ts}`, `data/animations/logo.ts`.
 > 3. Add motion tokens (durations/easings) + Tailwind entries; respect reduced‑motion.
 > 4. Write Vitest for timeline utils + Playwright smoke + axe.
 > 5. Ask before running commands; summarize diffs before applying.

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { FunkSpaceLogoInline } from "./FunkSpaceLogoInline";
 
 const meta = {
-  title: "Components/FunkSpaceLogoInline",
+  title: "Components/Logo/FunkSpaceLogoInline",
   component: FunkSpaceLogoInline,
   tags: ["autodocs"],
   parameters: {

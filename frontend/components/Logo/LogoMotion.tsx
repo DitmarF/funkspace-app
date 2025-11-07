@@ -9,7 +9,7 @@ import {
   type ComponentPropsWithoutRef,
 } from "react";
 import { AnimationTimeline } from "@/utils/motion/timeline";
-import { buildLogoManifest } from "@/data/logoManifest";
+import { buildLogoManifest } from "@/data/animations/logo";
 import { FunkSpaceLogoInline } from "./FunkSpaceLogoInline";
 import { applyStrokeDrawInit } from "@/utils/motion/svg";
 import { useReducedMotion } from "@/hooks/useReducedMotion";

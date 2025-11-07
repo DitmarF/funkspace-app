@@ -6,7 +6,7 @@ import { LogoMotion, type LogoMotionRef } from "./LogoMotion";
 import type { LogoMotionProps } from "./LogoMotion";
 
 const meta: Meta<typeof LogoMotion> = {
-  title: "Components/LogoMotion",
+  title: "Components/Logo/LogoMotion",
   component: LogoMotion,
   args: {
     enabled: true,
