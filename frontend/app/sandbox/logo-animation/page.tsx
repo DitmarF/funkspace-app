@@ -13,7 +13,13 @@ export default function LogoAnimationPage() {
         Logo Animation Test
       </h1>
       <div className="border rounded-lg p-8 bg-white">
-        <LogoMotion autoPlay={true} speed={1} pathCount={10} enabled={true} />
+        <LogoMotion
+          autoPlay={true}
+          speed={1}
+          pathCount={10}
+          enabled={true}
+          className="w-full max-w-2xl h-auto"
+        />
       </div>
     </main>
   );

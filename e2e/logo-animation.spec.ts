@@ -6,12 +6,27 @@ test.describe("Logo Animation", () => {
   test("animation completes and reaches final state with no serious a11y violations", async ({
     page,
   }) => {
-    // Navigate to logo animation test page
-    await page.goto("/sandbox/logo-animation");
+    // Navigate to logo animation test page and wait for network to be idle
+    await page.goto("/sandbox/logo-animation", { waitUntil: "networkidle" });
 
-    // Wait for SVG to be rendered
-    const svg = page.locator('svg[id="logo"]');
-    await expect(svg).toBeVisible();
+    // Wait for SVG to be rendered and have a computed size (indicating it's visible)
+    // SVGs without explicit width/height might be considered "hidden" by Playwright
+    // So we wait for the SVG to have a computed width > 0
+    await page.waitForFunction(
+      () => {
+        const svg = document.querySelector("svg#logo") as SVGSVGElement | null;
+        if (!svg) return false;
+        const rect = svg.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      },
+      { timeout: 10000 },
+    );
+
+    // Also wait for at least one path element to exist, indicating the SVG is fully rendered
+    await page.waitForSelector("svg#logo #logo-path-1", {
+      state: "attached",
+      timeout: 10000,
+    });
 
     // Wait for animation to complete
     // For 10 paths: stroke delay (1080ms) + stroke (800ms) = 1880ms total
