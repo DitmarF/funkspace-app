@@ -87,7 +87,8 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       }
 
       const setStaticState = () => {
-        for (let i = 1; i <= resolvedPathCount; i++) {
+        // Show all paths (including logoMark path 1)
+        for (let i = 1; i <= TOTAL_LOGO_PATHS; i++) {
           const element = svg.querySelector(`#logo-path-${i}`) as
             | SVGPathElement
             | SVGPolygonElement
@@ -102,8 +103,22 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       };
 
       const setAnimationStartState = () => {
-        for (let i = 1; i <= resolvedPathCount; i++) {
-          const element = svg.querySelector(`#logo-path-${i}`) as
+        // logoMark (path 1) is NOT animated - keep it visible
+        const logoMark = svg.querySelector(`#logo-path-1`) as
+          | SVGPathElement
+          | SVGPolygonElement
+          | null;
+        if (logoMark) {
+          logoMark.style.strokeDashoffset = "0";
+          logoMark.style.opacity = "1";
+          logoMark.style.fillOpacity = "1";
+        }
+
+        // Initialize letter paths (2-10) for animation
+        // Letter order: F(7), U(8), N(9), K(10), S(2), P(3), A(4), C(5), E(6)
+        const letterPaths = [7, 8, 9, 10, 2, 3, 4, 5, 6];
+        letterPaths.forEach((pathId) => {
+          const element = svg.querySelector(`#logo-path-${pathId}`) as
             | SVGPathElement
             | SVGPolygonElement
             | null;
@@ -113,7 +128,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
             element.style.opacity = "1";
             element.style.fillOpacity = "0";
           }
-        }
+        });
       };
 
       // Always ensure the logo is visible before deciding about animation
@@ -136,7 +151,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       try {
         setAnimationStartState();
 
-        const manifest = buildLogoManifest(svg, resolvedPathCount);
+        const manifest = buildLogoManifest(svg);
 
         if (!manifest.steps.length) {
           setStaticState();

@@ -1,9 +1,16 @@
 /**
  * Logo animation manifest
- * Defines the sequence of animations for the FunkSpace logo paths
+ * Defines the sequence of animations for the FunkSpace logo text
  *
- * To change animation order, modify the `delay` values in the steps.
- * No code changes needed - just update the manifest!
+ * Animation sequence:
+ * - logoMark (logo-path-1) is NOT animated
+ * - logoText is animated: "Funk" then "Space"
+ * - Each letter: stroke builds up completely, then fill opacity animates
+ * - Next letter starts 0.1s (100ms) after previous letter starts
+ * - No easing (linear animation)
+ *
+ * Letter order: F, U, N, K, S, P, A, C, E
+ * Path IDs: 7, 8, 9, 10, 2, 3, 4, 5, 6
  */
 
 import type { AnimationManifest, AnimationStep } from "@/utils/motion/types";
@@ -39,87 +46,84 @@ function getTokenDurationMs(propertyName: string, fallback: number): number {
 }
 
 /**
- * Build animation manifest for N paths with runtime path length resolution
+ * Build animation manifest for logo text letters
  * @param root SVG root element
- * @param pathCount Number of paths to animate (default: 10 for full logo)
- * @returns Animation manifest with resolved path lengths
+ * @returns Animation manifest with letter-by-letter animation sequence
  */
 export function buildLogoManifest(
   root: SVGSVGElement,
-  pathCount: number = 10,
+  pathCount?: number, // Ignored - we animate specific letter paths
 ): AnimationManifest {
   const steps: AnimationStep[] = [];
 
   // Animation timing constants (from motion tokens)
-  // Read from CSS variables at runtime to match design tokens
-  // See: tokens/fs.motion.tokens.json
   const STROKE_DURATION = getTokenDurationMs("--fs-motion-duration-800", 800); // duration-800 (800ms)
-  const FILL_DURATION = getTokenDurationMs("--fs-motion-duration-200", 200); // duration-200 (200ms)
-  // Stagger delay: 120ms (not a token, but could be made configurable)
-  const STAGGER_DELAY = 120; // Stagger between paths (ms)
-  const FILL_DELAY_OFFSET = 100; // Fill starts 100ms after stroke begins
+  const FILL_DURATION = getTokenDurationMs("--fs-motion-duration-400", 400); // duration-400 (400ms) - slower fill animation
+  const LETTER_STAGGER = 100; // Each letter starts 0.1s (100ms) after previous
 
-  // Timing calculation for all 10 paths (staggered):
-  // Path 1: stroke 0-800ms, fill 100-300ms → ends at 800ms
-  // Path 2: stroke 120-920ms, fill 220-420ms → ends at 920ms
-  // Path 3: stroke 240-1040ms, fill 340-540ms → ends at 1040ms
-  // ...
-  // Path 10: stroke 1080-1880ms, fill 1180-1380ms → ends at 1880ms
-  // Total duration: 1880ms (last path stroke completes)
+  // Letter order: F, U, N, K, S, P, A, C, E
+  // Path IDs: 7, 8, 9, 10, 2, 3, 4, 5, 6
+  const letterPaths = [7, 8, 9, 10, 2, 3, 4, 5, 6];
 
-  for (let i = 1; i <= pathCount; i++) {
-    const pathId = `#logo-path-${i}`;
-    const element = root.querySelector(pathId) as
+  // Animation timing:
+  // Each letter's stroke completes fully, then fill animates
+  // Next letter starts 0.1s after previous letter starts
+  // So: letter i stroke delay = (i-1) * LETTER_STAGGER
+  //     letter i fill delay = letter i stroke delay + STROKE_DURATION
+
+  letterPaths.forEach((pathId, index) => {
+    const pathSelector = `#logo-path-${pathId}`;
+    const element = root.querySelector(pathSelector) as
       | SVGPathElement
       | SVGPolygonElement
       | null;
 
     if (!element) {
-      // Only warn in development to avoid console noise in production
       if (process.env.NODE_ENV === "development") {
-        console.warn(`[LogoManifest] Path ${pathId} not found, skipping`);
+        console.warn(`[LogoManifest] Path ${pathSelector} not found, skipping`);
       }
-      continue;
+      return;
     }
 
     // Get actual path length at runtime
     const pathLength = getPathLength(element);
 
-    // Stroke draw delay: staggered for each path
-    const strokeDelay = (i - 1) * STAGGER_DELAY;
+    // Stroke delay: next letter starts 0.1s after previous
+    const strokeDelay = index * LETTER_STAGGER;
 
-    // Fill fade delay: starts after stroke begins
-    const fillDelay = strokeDelay + FILL_DELAY_OFFSET;
+    // Fill delay: starts after stroke completes
+    const fillDelay = strokeDelay + STROKE_DURATION;
 
-    // Path stroke draw animation
+    // Stroke draw animation (outline builds up completely, no easing)
     steps.push({
-      target: pathId,
+      target: pathSelector,
       property: "strokeDashoffset",
       from: pathLength,
       to: 0,
       duration: STROKE_DURATION,
-      easing: "emph",
+      easing: "linear",
       delay: strokeDelay,
     });
 
-    // Path fill fade animation
+    // Fill opacity animation (starts after stroke completes, no easing)
     steps.push({
-      target: pathId,
+      target: pathSelector,
       property: "fillOpacity",
       from: 0,
       to: 1,
       duration: FILL_DURATION,
+      easing: "linear",
       delay: fillDelay,
     });
-  }
+  });
 
   return { steps };
 }
 
 /**
- * Default manifest builder (for all 10 paths)
+ * Default manifest builder for logo text animation
  * This is a convenience function that can be called with an SVG root
  */
 export function getLogoManifest(root: SVGSVGElement): AnimationManifest {
-  return buildLogoManifest(root, 10);
+  return buildLogoManifest(root);
 }

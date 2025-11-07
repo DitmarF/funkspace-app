@@ -134,21 +134,40 @@ describe("LogoMotion", () => {
         expect(AnimationTimeline).toHaveBeenCalled();
       });
 
-      const path = svg.querySelector("#logo-path-1") as SVGPathElement | null;
-      expect(path).not.toBeNull();
-      expect(path?.style.opacity).toBe("1");
-      expect(path?.style.fillOpacity).toBe("0");
+      // logoMark (path 1) is NOT animated - should remain visible
+      const logoMark = svg.querySelector(
+        "#logo-path-1",
+      ) as SVGPathElement | null;
+      expect(logoMark).not.toBeNull();
+      expect(logoMark?.style.opacity).toBe("1");
+      expect(logoMark?.style.fillOpacity).toBe("1");
+
+      // Letter paths should be initialized for animation (fillOpacity 0)
+      const letterPath = svg.querySelector(
+        "#logo-path-7",
+      ) as SVGPathElement | null; // F
+      expect(letterPath).not.toBeNull();
+      expect(letterPath?.style.opacity).toBe("1");
+      expect(letterPath?.style.fillOpacity).toBe("0");
     });
 
-    it("should clamp the requested path count to the available logo paths", async () => {
-      render(<LogoMotion enabled={true} pathCount={42} autoPlay={false} />);
+    it("should animate only letter paths, not logoMark", async () => {
+      render(<LogoMotion enabled={true} autoPlay={false} />);
 
       await waitFor(() => {
         expect(buildLogoManifest).toHaveBeenCalled();
       });
 
-      const [[, resolvedCount]] = vi.mocked(buildLogoManifest).mock.calls;
-      expect(resolvedCount).toBe(10);
+      // buildLogoManifest is called without pathCount (it's ignored)
+      const [svgElement] = vi.mocked(buildLogoManifest).mock.calls[0];
+      expect(svgElement).toBeInstanceOf(SVGSVGElement);
+
+      // Verify logoMark is not animated (should be visible)
+      const svg = screen.getByRole("img");
+      const logoMark = svg.querySelector(
+        "#logo-path-1",
+      ) as SVGPathElement | null;
+      expect(logoMark?.style.fillOpacity).toBe("1");
     });
   });
 
