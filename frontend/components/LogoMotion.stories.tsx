@@ -105,6 +105,10 @@ function ControlsStory(args: LogoMotionProps) {
   const timelineRef = useRef<LogoMotionRef>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isReversed, setIsReversed] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [isScrubbing, setIsScrubbing] = useState(false);
+  const estimatedDuration = 1880; // ms
 
   const handlePlay = () => {
     const timeline = timelineRef.current;
@@ -125,6 +129,7 @@ function ControlsStory(args: LogoMotionProps) {
         setIsReversed(false);
       }
       timeline.seek(0);
+      setCurrentTime(0);
       timeline.play();
       setIsPlaying(true);
       console.log("[ControlsStory] Play clicked - animation started");
@@ -166,16 +171,18 @@ function ControlsStory(args: LogoMotionProps) {
       timeline.reverse();
       const newReversedState = !isReversed;
       setIsReversed(newReversedState);
-      
+
       // If animation is paused/done, start playing in the new direction
       if (!isPlaying) {
         // If going reverse, seek to end first, if forward, seek to beginning
         if (newReversedState) {
           // Playing backwards - start from end
-          timeline.seek(1880); // Estimated duration
+          timeline.seek(estimatedDuration);
+          setCurrentTime(estimatedDuration);
         } else {
           // Playing forwards - start from beginning
           timeline.seek(0);
+          setCurrentTime(0);
         }
         timeline.play();
         setIsPlaying(true);
@@ -184,26 +191,58 @@ function ControlsStory(args: LogoMotionProps) {
         );
       } else {
         // If already playing, just toggle direction (timeline handles this)
-        console.log("[ControlsStory] Reverse clicked - direction toggled while playing");
+        console.log(
+          "[ControlsStory] Reverse clicked - direction toggled while playing",
+        );
       }
     } catch (error) {
       console.error("[ControlsStory] Error calling reverse:", error);
     }
   };
 
+  // Update speed when it changes
+  useEffect(() => {
+    const timeline = timelineRef.current;
+    if (timeline && timeline.isReady?.()) {
+      timeline.setSpeed(speed);
+    }
+  }, [speed]);
+
+  // Track time progression when playing (but not when scrubbing)
+  useEffect(() => {
+    if (!isPlaying || isScrubbing) return;
+
+    const interval = setInterval(() => {
+      setCurrentTime((prev) => {
+        const increment = (speed * 16) / 1; // ~60fps, adjusted for speed
+        const newTime = isReversed
+          ? Math.max(0, prev - increment)
+          : Math.min(estimatedDuration, prev + increment);
+        return newTime;
+      });
+    }, 16); // ~60fps
+
+    return () => clearInterval(interval);
+  }, [isPlaying, isScrubbing, speed, isReversed, estimatedDuration]);
+
   // Detect when animation finishes (estimated duration: ~1880ms)
   useEffect(() => {
     if (!isPlaying) return;
 
-    const estimatedDuration = 1880; // ms
-    const timeout = setTimeout(() => {
-      // Animation should have finished by now
-      setIsPlaying(false);
-      console.log("[ControlsStory] Animation finished - Play button available");
-    }, estimatedDuration + 100); // Add small buffer
+    const timeout = setTimeout(
+      () => {
+        // Animation should have finished by now
+        setIsPlaying(false);
+        setCurrentTime(isReversed ? 0 : estimatedDuration);
+        console.log(
+          "[ControlsStory] Animation finished - Play button available",
+        );
+      },
+      estimatedDuration / speed + 100,
+    ); // Adjust for speed
 
     return () => clearTimeout(timeout);
-  }, [isPlaying]);
+  }, [isPlaying, isReversed, speed, estimatedDuration]);
 
   return (
     <div className="space-y-6 p-6 max-w-2xl">
@@ -213,13 +252,16 @@ function ControlsStory(args: LogoMotionProps) {
           {...args}
           ref={timelineRef}
           autoPlay={false}
+          speed={speed}
         />
       </div>
 
-      {/* Simple Controls - Play, Pause, and Reverse */}
-      <div className="border rounded-lg p-4 bg-gray-50">
-        <h3 className="text-lg font-semibold mb-4">Controls</h3>
-        <div className="flex gap-2">
+      {/* Controls - Play, Pause, Reverse, Speed, and Scrub */}
+      <div className="border rounded-lg p-4 bg-gray-50 space-y-4">
+        <h3 className="text-lg font-semibold">Timeline Controls</h3>
+
+        {/* Play/Pause/Reverse buttons */}
+        <div className="flex gap-2 flex-wrap">
           <button
             type="button"
             onClick={handlePlay}
@@ -243,6 +285,91 @@ function ControlsStory(args: LogoMotionProps) {
           >
             Reverse {isReversed ? "→" : "←"}
           </button>
+        </div>
+
+        {/* Speed control */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Speed: {speed}x</label>
+          <input
+            type="range"
+            min="0"
+            max="3"
+            step="0.1"
+            value={speed}
+            onChange={(e) => {
+              const newSpeed = parseFloat(e.target.value);
+              setSpeed(newSpeed);
+            }}
+            className="w-full"
+          />
+          <div className="flex gap-2 text-xs text-gray-600">
+            <button
+              type="button"
+              onClick={() => setSpeed(0.5)}
+              className={`px-2 py-1 border rounded hover:bg-gray-100 ${
+                speed === 0.5 ? "bg-gray-200" : ""
+              }`}
+            >
+              0.5×
+            </button>
+            <button
+              type="button"
+              onClick={() => setSpeed(1)}
+              className={`px-2 py-1 border rounded hover:bg-gray-100 ${
+                speed === 1 ? "bg-gray-200" : ""
+              }`}
+            >
+              1×
+            </button>
+            <button
+              type="button"
+              onClick={() => setSpeed(2)}
+              className={`px-2 py-1 border rounded hover:bg-gray-100 ${
+                speed === 2 ? "bg-gray-200" : ""
+              }`}
+            >
+              2×
+            </button>
+          </div>
+        </div>
+
+        {/* Time scrubber */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">
+            Scrub: {currentTime.toFixed(0)}ms
+          </label>
+          <input
+            type="range"
+            min="0"
+            max={estimatedDuration}
+            step="10"
+            value={currentTime}
+            onMouseDown={() => {
+              // User started scrubbing - pause animation
+              setIsScrubbing(true);
+              const timeline = timelineRef.current;
+              if (timeline && isPlaying) {
+                timeline.pause();
+                setIsPlaying(false);
+              }
+            }}
+            onMouseUp={() => {
+              // User finished scrubbing
+              setIsScrubbing(false);
+            }}
+            onChange={(e) => {
+              const time = parseInt(e.target.value);
+              setCurrentTime(time);
+              const timeline = timelineRef.current;
+              if (timeline && timeline.isReady?.()) {
+                timeline.seek(time);
+              }
+            }}
+            className="w-full"
+          />
+          <div className="text-xs text-gray-600">
+            Duration: ~{estimatedDuration.toFixed(0)}ms (estimated)
+          </div>
         </div>
       </div>
     </div>

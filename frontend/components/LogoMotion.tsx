@@ -75,7 +75,10 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       () => Math.max(1, Math.min(pathCount, TOTAL_LOGO_PATHS)),
       [pathCount],
     );
-    const animationAllowed = useMemo(() => enabled && !reduced, [enabled, reduced]);
+    const animationAllowed = useMemo(
+      () => enabled && !reduced,
+      [enabled, reduced],
+    );
 
     useEffect(() => {
       const svg = svgRef.current;
@@ -252,4 +255,3 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
     return <FunkSpaceLogoInline ref={svgRef} {...logoProps} />;
   },
 );
-
