@@ -9,6 +9,7 @@ import { createRef } from "react";
 import { LogoMotion } from "./LogoMotion";
 import type { LogoMotionRef } from "./LogoMotion";
 import { AnimationTimeline } from "@/utils/motion/timeline";
+import { buildLogoManifest } from "@/data/logoManifest";
 
 // Type for the mock timeline instance
 type MockTimeline = {
@@ -45,7 +46,7 @@ vi.mock("@/data/logoManifest", () => ({
       },
       {
         target: "#logo-path-1",
-        property: "opacity",
+        property: "fillOpacity",
         from: 0,
         to: 1,
         duration: 200,
@@ -113,6 +114,41 @@ describe("LogoMotion", () => {
       // The aria-label should be passed through, but jsdom might not support custom labels in getByRole
       // So we verify the SVG exists and has the role="img"
       expect(svg).toHaveAttribute("role", "img");
+    });
+
+    it("should fall back to a fully visible logo when animations are disabled", () => {
+      render(<LogoMotion enabled={false} />);
+      const svg = screen.getByRole("img");
+      const path = svg.querySelector("#logo-path-1") as SVGPathElement | null;
+
+      expect(path).not.toBeNull();
+      expect(path?.style.strokeDashoffset).toBe("0");
+      expect(path?.style.fillOpacity).toBe("1");
+    });
+
+    it("should initialize fill opacity to 0 when animation is active", async () => {
+      render(<LogoMotion enabled={true} autoPlay={false} />);
+      const svg = screen.getByRole("img");
+
+      await waitFor(() => {
+        expect(AnimationTimeline).toHaveBeenCalled();
+      });
+
+      const path = svg.querySelector("#logo-path-1") as SVGPathElement | null;
+      expect(path).not.toBeNull();
+      expect(path?.style.opacity).toBe("1");
+      expect(path?.style.fillOpacity).toBe("0");
+    });
+
+    it("should clamp the requested path count to the available logo paths", async () => {
+      render(<LogoMotion enabled={true} pathCount={42} autoPlay={false} />);
+
+      await waitFor(() => {
+        expect(buildLogoManifest).toHaveBeenCalled();
+      });
+
+      const [[, resolvedCount]] = vi.mocked(buildLogoManifest).mock.calls;
+      expect(resolvedCount).toBe(10);
     });
   });
 
@@ -253,6 +289,31 @@ describe("LogoMotion", () => {
 
       // play should not be called
       expect(mockTimeline.play).not.toHaveBeenCalled();
+    });
+
+    it("should clamp startAtMs to the timeline duration", async () => {
+      const mockTimeline: MockTimeline = {
+        play: vi.fn(),
+        pause: vi.fn(),
+        reverse: vi.fn(),
+        seek: vi.fn(),
+        setSpeed: vi.fn(),
+        destroy: vi.fn(),
+        duration: 1880,
+        time: 0,
+      };
+
+      vi.mocked(AnimationTimeline).mockImplementation(
+        () => mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
+      );
+
+      render(<LogoMotion enabled={true} autoPlay={false} startAtMs={99999} />);
+
+      await waitFor(() => {
+        expect(AnimationTimeline).toHaveBeenCalled();
+      });
+
+      expect(mockTimeline.seek).toHaveBeenCalledWith(1880);
     });
   });
 

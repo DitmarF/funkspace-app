@@ -9,7 +9,7 @@ Create a timeline-based animation for the **FunkSpace** SVG logo in which the **
 ## 2) Goals & Non‑Goals
 
 - **Goals**
-  - Path‑by‑path stroke “draw” → per‑path fill‑in via opacity on one timeline.
+  - Path‑by‑path stroke “draw” → per‑path fill‑in via `fillOpacity` on one timeline.
   - Engine controls: play, pause, reverse, seek (scrub), setSpeed.
   - Config via a declarative **Animation Manifest** (TS/JSON) for order, delays, easings.
   - SVG DOM renderer; future renderers (Canvas/WebGL) remain possible via abstraction.
@@ -75,7 +75,7 @@ transitionDuration: {
 - **Engine core**: `AnimationTimeline`
   - Controls: `play()`, `pause()`, `reverse()`, `seek(ms)`, `setSpeed(f)`.
   - Internal rAF loop with delta time; idempotent start/stop; speed multiplier.
-  - No layout thrash: animate **`strokeDashoffset`** and **`opacity`** (and later transform/opacity only).
+  - No layout thrash: animate **`strokeDashoffset`** and **`fillOpacity`** (and later transform/opacity only).
 
 - **Tween**: numeric interpolation + easing over `duration`, with optional `delay` and `offset`.
 - **Manifest**: declarative step list; resolves `target` selectors within an SVG root.
@@ -122,7 +122,7 @@ export const logoManifest: AnimationManifest = {
     },
     {
       target: "#logo-path-1",
-      property: "opacity",
+      property: "fillOpacity",
       from: 0,
       to: 1,
       duration: 200,
@@ -139,7 +139,7 @@ export const logoManifest: AnimationManifest = {
     },
     {
       target: "#logo-path-2",
-      property: "opacity",
+      property: "fillOpacity",
       from: 0,
       to: 1,
       duration: 200,
@@ -221,25 +221,28 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
 );
 ```
 
+> Implementation note: The runtime component paints the logo's final static state before enabling the timeline. This guarantees the SVG is visible in Storybook Docs and any non-animated scenarios (feature flag off, reduced motion, or errors). The manifest clamps `pathCount` to the 10 available IDs and animates `fillOpacity` so stroke outlines stay visible while fills fade in.
+
 ## 9) Storybook: Controls & Demos
 
 - Story: **Default** — plays automatically when enabled.
 - Story: **Controls** — buttons (Play/Pause/Reverse), slider (Scrub), select (Speed 0.5×/1×/2×).
 - Story: **Reduced Motion** — docs note + toggle to simulate `prefers-reduced-motion`.
 - Story: **Flag Off** — demonstrates the static fallback.
+- Docs args opt-in to the animation feature flag and apply a responsive width class so the SVG is always visible in Docs & Canvas.
 
 ## 10) Accessibility & Performance
 
 - **Reduced motion**: do not animate when user prefers reduced motion; render fully drawn logo immediately.
 - **CLS guard**: set fixed `viewBox` and dimensions; avoid layout‑affecting properties.
 - **A11y**: SVG `role="img"` with descriptive `aria-label`; ensure keyboard focus isn’t hijacked by controls.
-- **Perf**: code‑split engine; tween only `opacity` and path `strokeDashoffset`; avoid expensive layout reads in the loop.
+- **Perf**: code‑split engine; tween only `fillOpacity` and path `strokeDashoffset`; avoid expensive layout reads in the loop.
 
 ## 11) Testing Strategy
 
 - **Unit (Vitest)**: timeline math (play/pause/reverse/seek/speed), easing, overlapping delays, zero duration.
 - **Component**: `LogoMotion` renders static when flag off or reduced‑motion on; animates when enabled.
-- **E2E (Playwright)**: load story, wait for end; assert `strokeDashoffset≈0` and `opacity≈1`; run axe and fail on serious violations.
+- **E2E (Playwright)**: load story, wait for end; assert `strokeDashoffset≈0` and `fillOpacity≈1`; run axe and fail on serious violations.
 
 ## 12) Rollout & Flags
 
@@ -294,4 +297,5 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
 
 - Keep all timing/easing via tokens (CSS vars) for consistency.
 - Avoid animating layout; prefer opacity and stroke dashoffset.
+- Avoid animating layout; prefer fillOpacity and stroke dashoffset.
 - Defer Canvas/WebGL; renderer interface keeps door open for v2.

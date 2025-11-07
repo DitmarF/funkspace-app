@@ -105,7 +105,7 @@ export function buildLogoManifest(
     // Path fill fade animation
     steps.push({
       target: pathId,
-      property: "opacity",
+      property: "fillOpacity",
       from: 0,
       to: 1,
       duration: FILL_DURATION,

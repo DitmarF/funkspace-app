@@ -1,11 +1,20 @@
 "use client";
 
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useMemo,
+  type ComponentPropsWithoutRef,
+} from "react";
 import { AnimationTimeline } from "@/utils/motion/timeline";
 import { buildLogoManifest } from "@/data/logoManifest";
 import { FunkSpaceLogoInline } from "./FunkSpaceLogoInline";
 import { applyStrokeDrawInit } from "@/utils/motion/svg";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+
+const TOTAL_LOGO_PATHS = 10;
 
 export interface LogoMotionRef {
   play(): void;
@@ -13,9 +22,11 @@ export interface LogoMotionRef {
   reverse(): void;
   seek(ms: number): void;
   setSpeed(f: number): void;
+  isReady(): boolean;
 }
 
-export interface LogoMotionProps {
+export interface LogoMotionProps
+  extends Omit<ComponentPropsWithoutRef<typeof FunkSpaceLogoInline>, "ref"> {
   autoPlay?: boolean;
   speed?: number;
   pathCount?: number;
@@ -40,14 +51,17 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
     {
       autoPlay = true,
       speed = 1,
-      pathCount = 10,
+      pathCount = TOTAL_LOGO_PATHS,
       startAtMs,
       enabled: enabledProp,
+      ...logoProps
     },
     ref,
   ) {
     const svgRef = useRef<SVGSVGElement>(null);
     const timelineRef = useRef<AnimationTimeline | null>(null);
+    const autoPlayRef = useRef(autoPlay);
+    const speedRef = useRef(speed);
     const reduced = useReducedMotion();
     // Feature flag: use prop if provided, otherwise check env var
     // In Storybook, we can override via story args for testing
@@ -57,82 +71,185 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
         : typeof window !== "undefined" &&
           process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED === "true";
 
+    const resolvedPathCount = useMemo(
+      () => Math.max(1, Math.min(pathCount, TOTAL_LOGO_PATHS)),
+      [pathCount],
+    );
+    const animationAllowed = useMemo(() => enabled && !reduced, [enabled, reduced]);
+
     useEffect(() => {
-      if (!svgRef.current) return;
-
       const svg = svgRef.current;
-
-      // Initialize SVG elements for animation
-      // Set up stroke-dasharray and stroke-dashoffset for stroke draw effect
-      for (let i = 1; i <= pathCount; i++) {
-        const pathId = `logo-path-${i}`;
-        const element = svg.querySelector(`#${pathId}`) as
-          | SVGPathElement
-          | SVGPolygonElement
-          | null;
-
-        if (element) {
-          // Initialize stroke draw state (hides stroke via dashoffset)
-          applyStrokeDrawInit(element);
-          // Opacity will be managed by timeline; start at 1 so stroke is visible when drawn
-          // Timeline's update() will set it to 0 before animation starts (per manifest)
-          element.style.opacity = "1";
-        }
+      if (!svg) {
+        return;
       }
 
-      // Early exit: Show static final state if animations disabled or reduced motion preferred
-      // This ensures no timeline is created and no animation loop starts
-      if (!enabled || reduced) {
-        // Set final state immediately: stroke fully drawn, fill visible
-        for (let i = 1; i <= pathCount; i++) {
-          const pathId = `logo-path-${i}`;
-          const element = svg.querySelector(`#${pathId}`) as
+      const setStaticState = () => {
+        for (let i = 1; i <= resolvedPathCount; i++) {
+          const element = svg.querySelector(`#logo-path-${i}`) as
             | SVGPathElement
             | SVGPolygonElement
             | null;
 
           if (element) {
-            // Final state: stroke fully drawn (offset = 0), opacity = 1
             element.style.strokeDashoffset = "0";
             element.style.opacity = "1";
+            element.style.fillOpacity = "1";
           }
         }
-        return; // Early exit - no timeline created
+      };
+
+      const setAnimationStartState = () => {
+        for (let i = 1; i <= resolvedPathCount; i++) {
+          const element = svg.querySelector(`#logo-path-${i}`) as
+            | SVGPathElement
+            | SVGPolygonElement
+            | null;
+
+          if (element) {
+            applyStrokeDrawInit(element);
+            element.style.opacity = "1";
+            element.style.fillOpacity = "0";
+          }
+        }
+      };
+
+      // Always ensure the logo is visible before deciding about animation
+      setStaticState();
+
+      if (!animationAllowed) {
+        // Clean up existing timeline if it exists
+        if (timelineRef.current) {
+          timelineRef.current.pause();
+          timelineRef.current.destroy();
+        }
+        timelineRef.current = null;
+        return;
       }
 
-      // Build manifest with runtime path lengths
-      const manifest = buildLogoManifest(svg, pathCount);
+      // If timeline already exists, we still need to handle cleanup
+      // but we'll recreate it if dependencies changed (which is handled by the effect)
+      // For now, always create/update to ensure it's in sync with current props
 
-      // Create and start timeline
-      const timeline = new AnimationTimeline(svg, manifest);
-      timelineRef.current = timeline;
-      timeline.setSpeed(speed);
+      try {
+        setAnimationStartState();
 
-      // Set initial state: start at specified time or beginning (0)
-      // Clamp to valid timeline range [0, duration]
-      const initialTime = startAtMs
-        ? Math.max(0, Math.min(startAtMs, timeline.duration))
-        : 0;
-      timeline.seek(initialTime);
+        const manifest = buildLogoManifest(svg, resolvedPathCount);
+
+        if (!manifest.steps.length) {
+          setStaticState();
+          timelineRef.current = null;
+          return;
+        }
+
+        const timeline = new AnimationTimeline(svg, manifest);
+        timelineRef.current = timeline;
+        timeline.setSpeed(speedRef.current);
+
+        const initialTime = startAtMs
+          ? Math.max(0, Math.min(startAtMs, timeline.duration))
+          : 0;
+        timeline.seek(initialTime);
+
+        if (process.env.NODE_ENV !== "production") {
+          console.log("[LogoMotion] Timeline created:", {
+            duration: timeline.duration,
+            initialTime,
+            autoPlay: autoPlayRef.current,
+            enabled: animationAllowed,
+          });
+        }
+
+        if (autoPlayRef.current) {
+          timeline.play();
+        }
+
+        return () => {
+          if (process.env.NODE_ENV !== "production") {
+            console.log("[LogoMotion] Cleaning up timeline", {
+              hasTimeline: !!timelineRef.current,
+            });
+          }
+          // Only cleanup if this is still the current timeline
+          if (timelineRef.current === timeline) {
+            timeline.pause();
+            timeline.destroy();
+            timelineRef.current = null;
+          }
+        };
+      } catch (error) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn(
+            "[LogoMotion] Falling back to static render due to animation error",
+            error,
+          );
+        }
+        setStaticState();
+        timelineRef.current = null;
+      }
+    }, [animationAllowed, resolvedPathCount, startAtMs]);
+
+    useEffect(() => {
+      speedRef.current = speed;
+      if (!timelineRef.current) return;
+      timelineRef.current.setSpeed(speed);
+    }, [speed]);
+
+    useEffect(() => {
+      const previousAutoPlay = autoPlayRef.current;
+      autoPlayRef.current = autoPlay;
+
+      if (previousAutoPlay === autoPlay) {
+        return;
+      }
+
+      const timeline = timelineRef.current;
+      if (!timeline) return;
 
       if (autoPlay) {
         timeline.play();
-      }
-
-      return () => {
+      } else {
         timeline.pause();
-        timeline.destroy();
-      };
-    }, [enabled, reduced, autoPlay, speed, pathCount, startAtMs]);
+      }
+    }, [autoPlay]);
 
-    useImperativeHandle(ref, () => ({
-      play: () => timelineRef.current?.play(),
-      pause: () => timelineRef.current?.pause(),
-      reverse: () => timelineRef.current?.reverse(),
-      seek: (ms) => timelineRef.current?.seek(ms),
-      setSpeed: (f) => timelineRef.current?.setSpeed(f),
-    }));
+    useImperativeHandle(
+      ref,
+      () => ({
+        play: () => {
+          if (timelineRef.current) {
+            timelineRef.current.play();
+          } else {
+            console.warn("[LogoMotion] Cannot play: timeline not ready");
+          }
+        },
+        pause: () => {
+          if (timelineRef.current) {
+            timelineRef.current.pause();
+          }
+        },
+        reverse: () => {
+          if (timelineRef.current) {
+            timelineRef.current.reverse();
+          }
+        },
+        seek: (ms) => {
+          if (timelineRef.current) {
+            timelineRef.current.seek(ms);
+          }
+        },
+        setSpeed: (f) => {
+          if (timelineRef.current) {
+            timelineRef.current.setSpeed(f);
+          }
+        },
+        isReady: () => {
+          return timelineRef.current !== null;
+        },
+      }),
+      [], // Empty deps - methods always check current timelineRef
+    );
 
-    return <FunkSpaceLogoInline ref={svgRef} />;
+    return <FunkSpaceLogoInline ref={svgRef} {...logoProps} />;
   },
 );
+

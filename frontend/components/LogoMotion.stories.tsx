@@ -8,6 +8,13 @@ import type { LogoMotionProps } from "./LogoMotion";
 const meta: Meta<typeof LogoMotion> = {
   title: "Components/LogoMotion",
   component: LogoMotion,
+  args: {
+    enabled: true,
+    autoPlay: true,
+    speed: 1,
+    pathCount: 10,
+    className: "max-w-[420px] w-full",
+  },
   parameters: {
     layout: "centered",
     docs: {
@@ -57,9 +64,6 @@ type Story = StoryObj<typeof LogoMotion>;
 export const Default: Story = {
   args: {
     autoPlay: true,
-    speed: 1,
-    pathCount: 10,
-    enabled: true,
   },
   parameters: {
     docs: {
@@ -95,70 +99,110 @@ export const StartAtTime: Story = {
 };
 
 /**
- * Controls component for interactive story with Storybook args
+ * Simple Controls component - Play, Pause, and Reverse buttons
  */
-function ControlsStory(
-  args: LogoMotionProps & {
-    playing?: boolean;
-    reversed?: boolean;
-    timeMs?: number;
-    speed?: number;
-  },
-) {
+function ControlsStory(args: LogoMotionProps) {
   const timelineRef = useRef<LogoMotionRef>(null);
-  const [isPlaying, setIsPlaying] = useState(args.playing ?? false);
-  const [isReversed, setIsReversed] = useState(args.reversed ?? false);
-  const [currentTime, setCurrentTime] = useState(args.timeMs ?? 0);
-  const [speed, setSpeed] = useState(args.speed ?? 1);
-  const estimatedDuration = 1880; // Total duration for 10 paths: 1080ms delay + 800ms stroke = 1880ms
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isReversed, setIsReversed] = useState(false);
 
-  // Sync playing state from args
-  useEffect(() => {
-    if (args.playing !== undefined && args.playing !== isPlaying) {
-      if (args.playing) {
-        timelineRef.current?.play();
-        setIsPlaying(true);
-      } else {
-        timelineRef.current?.pause();
-        setIsPlaying(false);
+  const handlePlay = () => {
+    const timeline = timelineRef.current;
+    if (!timeline) {
+      console.warn("[ControlsStory] Timeline ref is null");
+      return;
+    }
+
+    if (!timeline.isReady?.()) {
+      console.warn("[ControlsStory] Timeline is not ready");
+      return;
+    }
+
+    try {
+      // Reset to forward direction if reversed
+      if (isReversed) {
+        timeline.reverse();
+        setIsReversed(false);
       }
+      timeline.seek(0);
+      timeline.play();
+      setIsPlaying(true);
+      console.log("[ControlsStory] Play clicked - animation started");
+    } catch (error) {
+      console.error("[ControlsStory] Error calling play:", error);
     }
-  }, [args.playing, isPlaying]);
+  };
 
-  // Sync reversed state from args
-  useEffect(() => {
-    if (args.reversed !== undefined && args.reversed !== isReversed) {
-      timelineRef.current?.reverse();
-      setIsReversed(args.reversed);
+  const handlePause = () => {
+    const timeline = timelineRef.current;
+    if (!timeline) {
+      console.warn("[ControlsStory] Timeline ref is null");
+      return;
     }
-  }, [args.reversed, isReversed]);
 
-  // Sync timeMs from args
-  useEffect(() => {
-    if (args.timeMs !== undefined && args.timeMs !== currentTime) {
-      timelineRef.current?.seek(args.timeMs);
-      setCurrentTime(args.timeMs);
+    try {
+      timeline.pause();
+      setIsPlaying(false);
+      console.log("[ControlsStory] Pause clicked - animation paused");
+    } catch (error) {
+      console.error("[ControlsStory] Error calling pause:", error);
     }
-  }, [args.timeMs, currentTime]);
+  };
 
-  // Sync speed from args
-  useEffect(() => {
-    if (args.speed !== undefined && args.speed !== speed) {
-      timelineRef.current?.setSpeed(args.speed);
-      setSpeed(args.speed);
+  const handleReverse = () => {
+    const timeline = timelineRef.current;
+    if (!timeline) {
+      console.warn("[ControlsStory] Timeline ref is null");
+      return;
     }
-  }, [args.speed, speed]);
 
-  // Poll timeline time for display (optional, for real-time feedback)
+    if (!timeline.isReady?.()) {
+      console.warn("[ControlsStory] Timeline is not ready");
+      return;
+    }
+
+    try {
+      // Toggle direction
+      timeline.reverse();
+      const newReversedState = !isReversed;
+      setIsReversed(newReversedState);
+      
+      // If animation is paused/done, start playing in the new direction
+      if (!isPlaying) {
+        // If going reverse, seek to end first, if forward, seek to beginning
+        if (newReversedState) {
+          // Playing backwards - start from end
+          timeline.seek(1880); // Estimated duration
+        } else {
+          // Playing forwards - start from beginning
+          timeline.seek(0);
+        }
+        timeline.play();
+        setIsPlaying(true);
+        console.log(
+          `[ControlsStory] Reverse clicked - playing ${newReversedState ? "backwards" : "forwards"}`,
+        );
+      } else {
+        // If already playing, just toggle direction (timeline handles this)
+        console.log("[ControlsStory] Reverse clicked - direction toggled while playing");
+      }
+    } catch (error) {
+      console.error("[ControlsStory] Error calling reverse:", error);
+    }
+  };
+
+  // Detect when animation finishes (estimated duration: ~1880ms)
   useEffect(() => {
     if (!isPlaying) return;
 
-    const interval = setInterval(() => {
-      // Note: We can't read timeline.time directly, so we track state
-      // In a real implementation, you might expose a getTime() method
-    }, 16); // ~60fps
+    const estimatedDuration = 1880; // ms
+    const timeout = setTimeout(() => {
+      // Animation should have finished by now
+      setIsPlaying(false);
+      console.log("[ControlsStory] Animation finished - Play button available");
+    }, estimatedDuration + 100); // Add small buffer
 
-    return () => clearInterval(interval);
+    return () => clearTimeout(timeout);
   }, [isPlaying]);
 
   return (
@@ -169,125 +213,36 @@ function ControlsStory(
           {...args}
           ref={timelineRef}
           autoPlay={false}
-          speed={speed}
         />
       </div>
 
-      {/* Controls panel - minimal layout */}
-      <div className="space-y-4 border rounded-lg p-4 bg-gray-50">
-        <h3 className="text-lg font-semibold">Timeline Controls</h3>
-
-        {/* Play/Pause/Reverse buttons - minimal panel */}
-        <div className="flex gap-2 flex-wrap">
+      {/* Simple Controls - Play, Pause, and Reverse */}
+      <div className="border rounded-lg p-4 bg-gray-50">
+        <h3 className="text-lg font-semibold mb-4">Controls</h3>
+        <div className="flex gap-2">
           <button
             type="button"
-            onClick={() => {
-              timelineRef.current?.play();
-              setIsPlaying(true);
-            }}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            onClick={handlePlay}
             disabled={isPlaying}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Play
           </button>
           <button
             type="button"
-            onClick={() => {
-              timelineRef.current?.pause();
-              setIsPlaying(false);
-            }}
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+            onClick={handlePause}
             disabled={!isPlaying}
+            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Pause
           </button>
           <button
             type="button"
-            onClick={() => {
-              timelineRef.current?.reverse();
-              setIsReversed(!isReversed);
-            }}
+            onClick={handleReverse}
             className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
           >
             Reverse {isReversed ? "→" : "←"}
           </button>
-        </div>
-
-        {/* Speed control */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium">Speed: {speed}x</label>
-          <input
-            type="range"
-            min="0"
-            max="3"
-            step="0.1"
-            value={speed}
-            onChange={(e) => {
-              const newSpeed = parseFloat(e.target.value);
-              setSpeed(newSpeed);
-              timelineRef.current?.setSpeed(newSpeed);
-            }}
-            className="w-full"
-          />
-          <div className="flex gap-2 text-xs text-gray-600">
-            <button
-              type="button"
-              onClick={() => {
-                setSpeed(0.5);
-                timelineRef.current?.setSpeed(0.5);
-              }}
-              className="px-2 py-1 border rounded hover:bg-gray-100"
-            >
-              0.5×
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSpeed(1);
-                timelineRef.current?.setSpeed(1);
-              }}
-              className="px-2 py-1 border rounded hover:bg-gray-100"
-            >
-              1×
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSpeed(2);
-                timelineRef.current?.setSpeed(2);
-              }}
-              className="px-2 py-1 border rounded hover:bg-gray-100"
-            >
-              2×
-            </button>
-          </div>
-        </div>
-
-        {/* Time scrubber */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium">
-            Scrub: {currentTime.toFixed(0)}ms
-          </label>
-          <input
-            type="range"
-            min="0"
-            max={estimatedDuration}
-            step="10"
-            value={currentTime}
-            onChange={(e) => {
-              const time = parseInt(e.target.value);
-              setCurrentTime(time);
-              timelineRef.current?.seek(time);
-            }}
-            className="w-full"
-          />
-          <div className="text-xs text-gray-600">
-            Duration: ~{estimatedDuration.toFixed(0)}ms (estimated)
-          </div>
-          <div className="text-xs text-gray-500">
-            Note: Duration is estimated. For first 3 paths: stroke (800ms) +
-            fill (200ms) + delays (240ms) ≈ 1240ms
-          </div>
         </div>
       </div>
     </div>
@@ -295,57 +250,20 @@ function ControlsStory(
 }
 
 /**
- * Story with interactive controls for play/pause/reverse/seek/speed
- * Includes Storybook args that can be controlled via the Controls panel
+ * Simple Controls story - just Play and Pause buttons for testing
  */
 export const Controls: Story = {
   args: {
     autoPlay: false,
     pathCount: 10,
     enabled: true,
-    playing: false,
-    reversed: false,
-    timeMs: 0,
-    speed: 1,
-  },
-  argTypes: {
-    playing: {
-      control: { type: "boolean" },
-      description: "Whether the animation is currently playing",
-      table: {
-        type: { summary: "boolean" },
-      },
-    },
-    reversed: {
-      control: { type: "boolean" },
-      description: "Whether the animation is playing in reverse",
-      table: {
-        type: { summary: "boolean" },
-      },
-    },
-    timeMs: {
-      control: { type: "number", min: 0, max: 1880, step: 10 },
-      description: "Current timeline time in milliseconds (for scrubbing)",
-      table: {
-        type: { summary: "number" },
-      },
-    },
-    speed: {
-      control: { type: "number", min: 0, max: 3, step: 0.1 },
-      description: "Animation playback speed multiplier",
-      table: {
-        type: { summary: "number" },
-      },
-    },
   },
   render: ControlsStory,
   parameters: {
     docs: {
       description: {
         story:
-          "Interactive controls for play, pause, reverse, speed adjustment, and timeline scrubbing. " +
-          "Use the Controls panel to manipulate `playing`, `reversed`, `timeMs`, and `speed` args. " +
-          "Changes are immediately reflected in the animation.",
+          "Simple controls with Play and Pause buttons. Click Play to start the animation from the beginning.",
       },
     },
   },

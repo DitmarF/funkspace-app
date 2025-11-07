@@ -10,7 +10,7 @@ export type EasingName =
 
 export interface AnimationStep {
   target: string; // '#logo-path-1'
-  property: "strokeDashoffset" | "opacity";
+  property: "strokeDashoffset" | "fillOpacity" | "opacity";
   from: number;
   to: number;
   duration: number; // ms
