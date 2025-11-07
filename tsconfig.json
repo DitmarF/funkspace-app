@@ -13,5 +13,5 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "__tests__", "vitest.setup.ts"]
+  "include": ["src", "__tests__", "vitest.setup.ts", "vitest-env.d.ts"]
 }

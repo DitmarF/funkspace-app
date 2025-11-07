@@ -1,13 +1,13 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   applyStrokeDrawInit,
   setStrokeDashoffset,
   applyFillOpacityInit,
   setFillOpacity,
-} from "@/utils/motion/svg";
+} from "../utils/motion/svg";
 
 function StrokeDrawDemo() {
   const pathRef = useRef<SVGPathElement>(null);

@@ -1,7 +1,7 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { LogoMotion, type LogoMotionRef } from "./LogoMotion";
 import type { LogoMotionProps } from "./LogoMotion";
 

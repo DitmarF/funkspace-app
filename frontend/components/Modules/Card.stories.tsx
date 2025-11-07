@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
 import Card, { type CardProps } from "./Card";
 import Text from "../Base/Text";
@@ -32,6 +33,15 @@ export const Default: Story = {};
 
 export const WithoutAction: Story = {
   args: {
+    title: "New Funk Demos",
+    description:
+      "Share a quick snapshot of what's shipping. Cards bundle imagery, copy, and calls to action.",
+    children: (
+      <Text>
+        Modules combine base and control components into reusable building
+        blocks that stay consistent across product surfaces.
+      </Text>
+    ),
     actionLabel: undefined,
     onAction: undefined,
   } satisfies CardProps,

@@ -18,9 +18,6 @@ const config: StorybookConfig = {
     name: getAbsolutePath("@storybook/nextjs-vite"),
     options: {},
   },
-  docs: {
-    autodocs: "tag",
-  },
   viteFinal: async (config, { configType }) => {
     const mode = configType === "PRODUCTION" ? "production" : "development";
 

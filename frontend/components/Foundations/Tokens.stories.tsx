@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { DesignTokenDocBlock } from "storybook-design-token/doc-blocks";
+import React from "react";
 
 const TokensDocPage = () => (
   <div className="space-y-6">
@@ -52,7 +53,7 @@ type Story = StoryObj;
 
 export const Overview: Story = {
   name: "Token catalogue",
-  render: () => null,
+  render: () => <></>,
   parameters: {
     docs: {
       disable: true,

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import FeatureCardMotion from "@/components/Modules/FeatureCardMotion";
+import React from "react";
+import FeatureCardMotion from "./FeatureCardMotion";
 
 const meta: Meta<typeof FeatureCardMotion> = {
   title: "Modules/FeatureCardMotion",

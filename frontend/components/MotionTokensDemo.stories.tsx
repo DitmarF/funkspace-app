@@ -1,7 +1,7 @@
 "use client";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 function MotionTokensDemo() {
   const [isExpanded, setIsExpanded] = useState(false);
