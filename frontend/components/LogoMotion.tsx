@@ -103,15 +103,25 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       };
 
       const setAnimationStartState = () => {
-        // logoMark (path 1) is NOT animated - keep it visible
+        // Initialize logoMark (path 1) for animation
         const logoMark = svg.querySelector(`#logo-path-1`) as
           | SVGPathElement
           | SVGPolygonElement
           | null;
         if (logoMark) {
-          logoMark.style.strokeDashoffset = "0";
+          applyStrokeDrawInit(logoMark);
           logoMark.style.opacity = "1";
-          logoMark.style.fillOpacity = "1";
+        }
+
+        // Initialize logoMark circles - all start hidden (opacity 0)
+        // lmd-dot-1 will be shown immediately by the animation manifest
+        for (let i = 1; i <= 9; i++) {
+          const circle = svg.querySelector(
+            `#lmd-dot-${i}`,
+          ) as SVGCircleElement | null;
+          if (circle) {
+            circle.style.opacity = "0";
+          }
         }
 
         // Initialize letter paths (2-10) for animation

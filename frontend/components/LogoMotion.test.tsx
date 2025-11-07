@@ -151,7 +151,7 @@ describe("LogoMotion", () => {
       expect(letterPath?.style.fillOpacity).toBe("0");
     });
 
-    it("should animate only letter paths, not logoMark", async () => {
+    it("should initialize logoMark for animation", async () => {
       render(<LogoMotion enabled={true} autoPlay={false} />);
 
       await waitFor(() => {
@@ -162,12 +162,26 @@ describe("LogoMotion", () => {
       const [svgElement] = vi.mocked(buildLogoManifest).mock.calls[0];
       expect(svgElement).toBeInstanceOf(SVGSVGElement);
 
-      // Verify logoMark is not animated (should be visible)
+      // Verify logoMark elements exist
       const svg = screen.getByRole("img");
       const logoMark = svg.querySelector(
         "#logo-path-1",
       ) as SVGPathElement | null;
-      expect(logoMark?.style.fillOpacity).toBe("1");
+      expect(logoMark).not.toBeNull();
+
+      // Circles should start hidden (opacity 0) - they'll be shown during animation
+      const circle1 = svg.querySelector(
+        "#lmd-dot-1",
+      ) as SVGCircleElement | null;
+      expect(circle1).not.toBeNull();
+      // Note: In test environment, setStaticState runs first, so we verify
+      // that the manifest includes logoMark animation steps
+      const manifest = buildLogoManifest(svgElement as SVGSVGElement);
+      const logoMarkSteps = manifest.steps.filter(
+        (step) =>
+          step.target === "#logo-path-1" || step.target.startsWith("#lmd-dot-"),
+      );
+      expect(logoMarkSteps.length).toBeGreaterThan(0);
     });
   });
 

@@ -156,3 +156,80 @@ export function getNumericStyle(element: SVGElement, property: string): number {
   }
   return parseFloat(value) || 0;
 }
+
+/**
+ * Find the distance along a path to the closest point to a given coordinate
+ * @param pathElement SVG path or polygon element
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @returns Distance along the path in pixels, or 0 if not found
+ */
+export function getDistanceAlongPath(
+  pathElement: SVGPathElement | SVGPolygonElement,
+  x: number,
+  y: number,
+): number {
+  const tagName = pathElement.tagName?.toLowerCase();
+
+  if (tagName === "path") {
+    const path = pathElement as SVGPathElement;
+    const pathLength = path.getTotalLength();
+    let closestDistance = Infinity;
+    let closestPoint = 0;
+
+    // Sample points along the path to find the closest one
+    for (let i = 0; i <= pathLength; i += 1) {
+      const point = path.getPointAtLength(i);
+      const distance = Math.sqrt(
+        Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2),
+      );
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestPoint = i;
+      }
+    }
+    return closestPoint;
+  }
+
+  if (tagName === "polygon" || tagName === "polyline") {
+    // Convert polygon to path for getPointAtLength
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const polygon = pathElement as SVGPolygonElement;
+    const points = polygon.points;
+    if (!points || points.length === 0) return 0;
+
+    const firstPoint = points.getItem ? points.getItem(0) : points[0];
+    if (!firstPoint) return 0;
+
+    let d = `M ${firstPoint.x},${firstPoint.y}`;
+    for (let i = 1; i < points.length; i++) {
+      const point = points.getItem ? points.getItem(i) : points[i];
+      if (point) {
+        d += ` L ${point.x},${point.y}`;
+      }
+    }
+    if (tagName === "polygon") {
+      d += " Z";
+    }
+    path.setAttribute("d", d);
+
+    const pathLength = path.getTotalLength();
+    let closestDistance = Infinity;
+    let closestPoint = 0;
+
+    // Sample points along the path to find the closest one
+    for (let i = 0; i <= pathLength; i += 1) {
+      const point = path.getPointAtLength(i);
+      const distance = Math.sqrt(
+        Math.pow(point.x - x, 2) + Math.pow(point.y - y, 2),
+      );
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestPoint = i;
+      }
+    }
+    return closestPoint;
+  }
+
+  return 0;
+}
