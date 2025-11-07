@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import HeroMotion from "@/components/Modules/HeroMotion";
+import React from "react";
+import HeroMotion from "./HeroMotion";
 
 const meta: Meta<typeof HeroMotion> = {
   title: "Modules/HeroMotion",

@@ -1,5 +1,9 @@
 /**
- * Motion utilities
+ * Motion utilities for CSS transitions and variants
+ *
+ * This file provides utilities for CSS-based animations (transitions, variants).
+ * For timeline-based SVG animations, see `utils/motion/` directory.
+ *
  * Single source of truth for durations, easings, and safe animation variants.
  * Uses transform/opacity only per MDN performance guidance.
  */

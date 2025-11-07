@@ -52,6 +52,14 @@ const CATEGORY_METADATA = {
     label: "Typography/Line Heights",
     presenter: "LineHeight",
   },
+  "fs-motion/Durations": {
+    label: "Motion/Durations",
+    presenter: "Duration",
+  },
+  "fs-motion/Easings": {
+    label: "Motion/Easings",
+    presenter: "CubicBezier",
+  },
 };
 
 const buildThemeBlock = (selector, tokens) => {

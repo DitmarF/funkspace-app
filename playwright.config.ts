@@ -10,7 +10,9 @@ export default defineConfig({
 
   use: {
     baseURL: "http://localhost:3000", // so tests can `page.goto('/')`
-    trace: "on-first-retry",
+    trace: "on-first-retry", // Trace on retry (CI-friendly)
+    video: "retain-on-failure", // Save video on failure
+    screenshot: "only-on-failure", // Save screenshot on failure
   },
 
   projects: [

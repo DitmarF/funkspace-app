@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 import { workSans, spaceGrotesk } from "../../app/fonts";
 
 type Theme = "default" | "dark" | "muted" | "dark-high-contrast";
+
+type TypographyArgs = {
+  theme: Theme;
+};
 
 const meta = {
   title: "Foundations/Typography",
@@ -18,7 +23,8 @@ const meta = {
   parameters: {
     layout: "centered",
   },
-  render: ({ theme }: { theme: Theme }) => {
+  render: (args: TypographyArgs) => {
+    const { theme } = args;
     const weights = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
     return (
       <div
@@ -40,7 +46,7 @@ const meta = {
       </div>
     );
   },
-} satisfies Meta;
+} satisfies Meta<TypographyArgs>;
 
 export default meta;
 

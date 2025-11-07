@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { Hello } from "@/components/Hello";
+import { Hello } from "../src/components/Hello";
 
 it("renders personalised greeting", () => {
   render(<Hello name="Coder" />);

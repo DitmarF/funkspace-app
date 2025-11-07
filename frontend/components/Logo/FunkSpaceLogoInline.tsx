@@ -1,0 +1,215 @@
+import { forwardRef } from "react";
+
+export interface FunkSpaceLogoInlineProps {
+  className?: string;
+  "aria-label"?: string;
+}
+
+/**
+ * Inline SVG version of the FunkSpace logo with stable IDs for animation.
+ * Each path has a deterministic `id="logo-path-N"` for timeline targeting.
+ */
+export const FunkSpaceLogoInline = forwardRef<
+  SVGSVGElement,
+  FunkSpaceLogoInlineProps
+>(function FunkSpaceLogoInline(
+  { className = "", "aria-label": ariaLabel = "FunkSpace logo" },
+  ref,
+) {
+  return (
+    <svg
+      ref={ref}
+      id="logo"
+      xmlns="http://www.w3.org/2000/svg"
+      baseProfile="tiny"
+      version="1.2"
+      viewBox="0 0 1652.1 849.75"
+      className={className}
+      role="img"
+      aria-label={ariaLabel}
+    >
+      <g id="logoMark">
+        <g id="logoMarkPhats">
+          <polygon
+            id="logo-path-1"
+            points="1041.07 98.11 1158.2 218.38 1439.32 312.77 1447.58 473.18 1109.65 832.07 1629.18 454.18 1607.24 288.22 1487.5 169.26 1206.38 74.87 1041.07 98.11"
+            fill="none"
+            stroke="var(--fs-color-content-primary)"
+            strokeMiterlimit="10"
+            strokeWidth="9"
+          />
+        </g>
+        <g id="logoMarkDots">
+          <circle
+            id="lmd-dot-9"
+            cx="1205.07"
+            cy="75.52"
+            r="12.45"
+            fill="var(--fs-color-content-primary)"
+          />
+          <circle
+            id="lmd-dot-8"
+            cx="1486.18"
+            cy="169.91"
+            r="12.45"
+            fill="var(--fs-color-content-primary)"
+          />
+          <circle
+            id="lmd-dot-7"
+            cx="1603.97"
+            cy="288.21"
+            r="18.66"
+            fill="var(--fs-color-content-primary)"
+          />
+          <circle
+            id="lmd-dot-6"
+            cx="1627.21"
+            cy="453.51"
+            r="24.88"
+            fill="var(--fs-color-content-primary)"
+          />
+          <circle
+            id="lmd-dot-5"
+            cx="1102.42"
+            cy="837.31"
+            r="12.45"
+            fill="var(--fs-color-content-primary)"
+          />
+          <circle
+            id="lmd-dot-4"
+            cx="1445.52"
+            cy="473.44"
+            r="37.33"
+            fill="var(--fs-color-content-primary)"
+          />
+          <circle
+            id="lmd-dot-3"
+            cx="1440.63"
+            cy="312.11"
+            r="31.11"
+            fill="var(--fs-color-content-primary)"
+          />
+          <circle
+            id="lmd-dot-2"
+            cx="1157.55"
+            cy="217.07"
+            r="31.11"
+            fill="var(--fs-color-content-primary)"
+          />
+          <circle
+            id="lmd-dot-1"
+            cx="1037.8"
+            cy="98.11"
+            r="18.66"
+            fill="var(--fs-color-content-primary)"
+          />
+        </g>
+      </g>
+      <g id="logoText">
+        <g id="lt-space">
+          <g id="lts-s">
+            <path
+              id="logo-path-2"
+              data-name="lts-s"
+              d="M285.91,313.19s-25.65-39.04-110.35-37.35-93.41,50.06-93.41,50.06c0,0-17.94,49.36,18.48,71.38s98.95,33.03,98.95,33.03c0,0,26.48,9.47,25.87,21.79-.47,9.45-2.31,17.71-15.86,27.02s-76.57,9.88-115.35-32.49l-26.49,38.66s31.57,39.04,106.11,40.74,90.71-29.19,90.71-29.19c0,0,42.89-43.46,2.69-92.71,0,0-19.15-21.41-62.07-25.95-38.87-4.11-60.75-17.94-60.75-17.94,0,0-20.86-25.37,11.16-39.03,23.53-10.04,59.75-.31,59.75-.31,0,0,27.95,10.86,43.2,27.8l27.34-35.5Z"
+              fill="var(--fs-color-content-primary)"
+              stroke="var(--fs-color-content-primary)"
+              strokeMiterlimit="10"
+              strokeWidth="9"
+            />
+          </g>
+          <g id="lts-p">
+            <path
+              id="logo-path-3"
+              data-name="lts-p"
+              d="M533.63,380.23c-14.4-33.32-29.88-37.08-42.17-41.17-12.28-4.09-30.35-6.35-47.29,0-15.31,5.74-30.22,26.64-37.92,44.92v-44.8l-56.47.13v262.23h56.38v-120.81s20.5,36.11,34.62,40.62c14.12,4.52,35.01,5.78,53.08-1,18.08-6.77,31.15-20.41,38.77-38.76,6.99-16.82,15.4-68.05,1-101.36ZM483.44,429.53c-.56,34.45-8.8,42.97-16.81,50.13-6.52,5.83-27.96,12.74-43.53-1-14.38-12.68-16.94-44.43-16.94-44.43,0,0,.43-45.58,20.76-54.62,20.33-9.03,36.89,1,36.89,1,0,0,20.2,14.47,19.63,48.92Z"
+              fill="var(--fs-color-content-primary)"
+              stroke="var(--fs-color-content-primary)"
+              strokeMiterlimit="10"
+              strokeWidth="9"
+            />
+          </g>
+          <g id="lts-a">
+            <path
+              id="logo-path-4"
+              data-name="lts-a"
+              d="M766.03,474.53c.56-20.89,0-85.27,0-85.27,0,0,.48-34.53-41.87-46.95-42.35-12.43-70.88-5.13-70.88-5.13,0,0-49.36,6.73-57.26,50.77l46.95,11.56s4.98-30.86,36.45-27.67,31.8,27.07,31.93,42.88l-80.93,16.81s-32.8-1.02-36.53,41.31c-4.08,46.3,38.22,49.9,38.22,49.9,0,0,57.14,14.23,85.45-27.97,0,0,10.09,40.5,69.8,27.46l3.95-29.84s-25.85,3.04-25.28-17.86ZM674.16,492.52s-21.05-2.99-24.33-16.42c-4.07-16.65,16.29-28.03,16.29-28.03l44.97-9.03c10.92,48.23-36.93,53.48-36.93,53.48Z"
+              fill="var(--fs-color-content-primary)"
+              stroke="var(--fs-color-content-primary)"
+              strokeMiterlimit="10"
+              strokeWidth="9"
+            />
+          </g>
+          <g id="lts-c">
+            <path
+              id="logo-path-5"
+              data-name="lts-c"
+              d="M1003.92,386.83s-6.91-51.46-89.31-50.86c-92.62.67-93,84.27-93,84.27,0,0-15.99,107.02,95.82,104.76,0,0,71.67,1.8,88.35-50.73l-51.47-16.76s-6.39,31.19-33.49,29.49-40.44-19.86-42.4-56.52c-2.26-42.35,23.74-58.75,39.01-58.08,12.99.56,28.41,2.26,34.75,32.49l51.73-18.07Z"
+              fill="var(--fs-color-content-primary)"
+              stroke="var(--fs-color-content-primary)"
+              strokeMiterlimit="10"
+              strokeWidth="9"
+            />
+          </g>
+          <g id="lts-e">
+            <path
+              id="logo-path-6"
+              data-name="lts-e"
+              d="M1146.56,334.97c-115.2,1.37-91.57,114.71-87.61,125.44,3.95,10.73,12.45,65.63,90.43,66.03,70.7.36,85.92-44.26,85.92-44.26l-43.95-14.07s-9.39,20.46-41.02,19.89c-31.62-.56-40.74-30.72-42.09-45.27l134.14.87s13.27-109.93-95.82-108.63ZM1107.8,415.28s6.01-42.18,43.45-43.01c34.38-.76,44.01,44.01,44.01,44.01l-87.46-1Z"
+              fill="var(--fs-color-content-primary)"
+              stroke="var(--fs-color-content-primary)"
+              strokeMiterlimit="10"
+              strokeWidth="9"
+            />
+          </g>
+        </g>
+        <g id="lt-funk">
+          <g id="ltf-f">
+            <polygon
+              id="logo-path-7"
+              data-name="ltf-f"
+              points="4.5 24.26 4.5 264.17 59.88 264.17 59.88 169.3 162.65 169.3 162.65 126.48 59.88 126.48 59.88 63.83 189.06 64.83 189.06 23.57 4.5 24.26"
+              fill="var(--fs-color-content-primary)"
+              stroke="var(--fs-color-content-primary)"
+              strokeMiterlimit="10"
+              strokeWidth="9"
+            />
+          </g>
+          <g id="ltf-u">
+            <path
+              id="logo-path-8"
+              data-name="ltf-u"
+              d="M226.37,84.12v123.62s-6.39,58.16,61.94,60.81c0,0,27.67,4.13,60.99-37.88v32.36h56.99V83.43h-56.94l1,101.73s-2.74,45.09-38.88,41.71c0,0-31.11-3.87-29.98-38.32s0-103.99,0-103.99l-55.12-.44Z"
+              fill="var(--fs-color-content-primary)"
+              stroke="var(--fs-color-content-primary)"
+              strokeMiterlimit="10"
+              strokeWidth="9"
+            />
+          </g>
+          <g id="ltf-n">
+            <path
+              id="logo-path-9"
+              data-name="ltf-n"
+              d="M472.18,84.56v179.05h57.07l-1-104.99s4.87-34.93,37.06-38.19c0,0,31.54,1.48,32.54,36.06.9,31.05-1,107.68-1,107.68h56.64l-1-134.35s-6.15-45.74-55.89-49.21c0,0-44.56-2.74-67.21,34.22l-.47-30.27h-56.73Z"
+              fill="var(--fs-color-content-primary)"
+              stroke="var(--fs-color-content-primary)"
+              strokeMiterlimit="10"
+              strokeWidth="9"
+            />
+          </g>
+          <g id="ltf-k">
+            <polygon
+              id="logo-path-10"
+              data-name="ltf-k"
+              points="716.25 4.5 716.25 264.17 771.5 264.17 771.5 221.99 805.99 182.81 855.3 264.73 914.89 264.73 842.47 153.53 908.8 83.69 848.78 84.69 771.63 167.92 771.5 4.5 716.25 4.5"
+              fill="var(--fs-color-content-primary)"
+              stroke="var(--fs-color-content-primary)"
+              strokeMiterlimit="10"
+              strokeWidth="9"
+            />
+          </g>
+        </g>
+      </g>
+    </svg>
+  );
+});
