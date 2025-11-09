@@ -163,13 +163,21 @@ describe("focusIntoSection", () => {
 
   it("should not warn in production when section not found", () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    Object.defineProperty(process.env, "NODE_ENV", {
+      value: "production",
+      writable: true,
+      configurable: true,
+    });
 
     focusIntoSection("non-existent");
 
     expect(console.warn).not.toHaveBeenCalled();
 
-    process.env.NODE_ENV = originalEnv;
+    Object.defineProperty(process.env, "NODE_ENV", {
+      value: originalEnv,
+      writable: true,
+      configurable: true,
+    });
   });
 });
 

@@ -156,7 +156,7 @@ describe("useScrollProgress", () => {
   });
 
   it("should handle null ref gracefully", () => {
-    const nullRef = { current: null } as RefObject<HTMLElement>;
+    const nullRef = { current: null } as unknown as RefObject<HTMLElement>;
     const { result } = renderHook(() => useScrollProgress(nullRef));
 
     expect(result.current.inView).toBe(false);

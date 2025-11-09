@@ -184,9 +184,14 @@ describe("LogoMotion", () => {
       });
 
       // buildLogoManifest is called with SVG element
-      const [svgElement] = vi.mocked(
+      const calls = vi.mocked(
         mockAnimationOrchestrator.buildLogoManifest,
-      ).mock.calls[0];
+      ).mock.calls;
+      expect(calls.length).toBeGreaterThan(0);
+      const firstCall = calls[0];
+      expect(firstCall).toBeDefined();
+      expect(firstCall?.length).toBeGreaterThan(0);
+      const svgElement = (firstCall as unknown[])[0] as SVGSVGElement;
       expect(svgElement).toBeInstanceOf(SVGSVGElement);
 
       // Verify logoMark elements exist
