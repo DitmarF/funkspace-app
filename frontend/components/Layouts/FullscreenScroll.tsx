@@ -8,6 +8,20 @@ export type FullscreenScrollProps = ComponentPropsWithoutRef<"div"> & {
    * - `none`: Disables scroll snapping
    */
   snapMode?: "mandatory" | "proximity" | "none";
+  /**
+   * Scroll padding top value to account for sticky headers.
+   * When a sticky header is present, this ensures focused elements
+   * are not hidden behind it. Can be a Tailwind class or custom value.
+   * Default: `scroll-padding-top-0` (no padding)
+   *
+   * @example
+   * ```tsx
+   * <FullscreenScroll scrollPaddingTop="scroll-padding-top-20">
+   *   {/* content with sticky header *\/}
+   * </FullscreenScroll>
+   * ```
+   */
+  scrollPaddingTop?: string;
 };
 
 /**
@@ -38,6 +52,7 @@ export type FullscreenScrollProps = ComponentPropsWithoutRef<"div"> & {
  */
 const FullscreenScroll = ({
   snapMode = "mandatory",
+  scrollPaddingTop = "scroll-padding-top-0",
   className = "",
   children,
   ...props
@@ -57,6 +72,7 @@ const FullscreenScroll = ({
     "overflow-y-auto",
     "snap-y",
     "scroll-smooth",
+    scrollPaddingTop, // Scroll padding to account for sticky headers
     snapClass,
     className,
   ]
