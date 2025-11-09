@@ -6,7 +6,7 @@ import React, { useRef, useEffect } from "react";
 import Container from "../Layouts/Container";
 import FullscreenScroll from "../Layouts/FullscreenScroll";
 import { useScrollProgress } from "../../hooks/useScrollProgress";
-import { HTMLTimeline } from "../../utils/motion/htmlTimeline";
+import { HTMLTimeline } from "../../infrastructure/motion/htmlTimeline";
 import SnapSection from "./SnapSection";
 
 /**

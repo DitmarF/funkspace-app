@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { AnimationTimeline } from "./timeline";
-import type { AnimationManifest } from "./types";
+import type { AnimationManifest } from "@/domain/animations/AnimationManifest";
 
 describe("AnimationTimeline", () => {
   let mockSvg: SVGSVGElement;

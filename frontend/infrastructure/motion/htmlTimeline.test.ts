@@ -42,10 +42,18 @@ describe("HTMLTimeline", () => {
       }
     });
     activeTimelines.length = 0;
-    // Save cancelAnimationFrame before restore
+
+    // Save mocks before restore - these will be used as fallback no-ops
+    const savedRaf = global.requestAnimationFrame;
     const savedCancelRaf = global.cancelAnimationFrame;
+
+    // Restore mocks (this removes the spies)
     vi.restoreAllMocks();
-    // Always ensure cancelAnimationFrame is available for cleanup
+
+    // Ensure requestAnimationFrame and cancelAnimationFrame are always available as no-ops
+    // This prevents errors when pending setTimeout callbacks (from rafSpy mock) try to
+    // call these functions after the test environment is torn down
+    global.requestAnimationFrame = savedRaf || (() => 0);
     global.cancelAnimationFrame = savedCancelRaf || (() => {});
   });
 
