@@ -164,7 +164,6 @@ describe("focusIntoSection", () => {
   it("should not warn in production when section not found", () => {
     // Use Vitest's stubEnv to mock NODE_ENV
     const originalEnv = process.env.NODE_ENV;
-    // @ts-expect-error - Vitest stubEnv types may not be perfect
     vi.stubEnv("NODE_ENV", "production");
 
     focusIntoSection("non-existent");
@@ -172,7 +171,6 @@ describe("focusIntoSection", () => {
     expect(console.warn).not.toHaveBeenCalled();
 
     // Restore original value
-    // @ts-expect-error - Vitest stubEnv types may not be perfect
     vi.stubEnv("NODE_ENV", originalEnv || "test");
   });
 });
