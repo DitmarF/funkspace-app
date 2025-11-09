@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import type { ComponentPropsWithoutRef } from "react";
 
 export type SnapSectionProps = ComponentPropsWithoutRef<"section"> & {
@@ -37,41 +38,49 @@ export type SnapSectionProps = ComponentPropsWithoutRef<"section"> & {
  * </SnapSection>
  * ```
  */
-const SnapSection = ({
-  id,
-  "aria-label": ariaLabel,
-  snap = "start",
-  relaxSnap = false,
-  className = "",
-  children,
-  ...props
-}: SnapSectionProps) => {
-  const snapClass =
-    snap === "start"
-      ? "snap-start"
-      : snap === "center"
-        ? "snap-center"
-        : snap === "end"
-          ? "snap-end"
-          : "";
+const SnapSection = forwardRef<HTMLElement, SnapSectionProps>(
+  (
+    {
+      id,
+      "aria-label": ariaLabel,
+      snap = "start",
+      relaxSnap = false,
+      className = "",
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const snapClass =
+      snap === "start"
+        ? "snap-start"
+        : snap === "center"
+          ? "snap-center"
+          : snap === "end"
+            ? "snap-end"
+            : "";
 
-  const classes = ["h-[100dvh]", "w-screen", snapClass, className]
-    .filter(Boolean)
-    .join(" ");
+    const classes = ["h-[100dvh]", "w-screen", snapClass, className]
+      .filter(Boolean)
+      .join(" ");
 
-  return (
-    <section
-      id={id}
-      role="region"
-      tabIndex={-1}
-      aria-label={ariaLabel}
-      data-snap={relaxSnap ? "proximity" : undefined}
-      className={classes}
-      {...props}
-    >
-      {children}
-    </section>
-  );
-};
+    return (
+      <section
+        ref={ref}
+        id={id}
+        role="region"
+        tabIndex={-1}
+        aria-label={ariaLabel}
+        data-snap={relaxSnap ? "proximity" : undefined}
+        className={classes}
+        {...props}
+      >
+        {children}
+      </section>
+    );
+  },
+);
+
+SnapSection.displayName = "SnapSection";
 
 export default SnapSection;
