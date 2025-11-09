@@ -60,18 +60,7 @@ function TimelineScrubDemo() {
           easing: "ease-out",
         },
       ],
-      {
-        onEnter: () => {
-          if (process.env.NODE_ENV !== "production") {
-            console.log("[TimelineScrubDemo] Entered");
-          }
-        },
-        onLeave: () => {
-          if (process.env.NODE_ENV !== "production") {
-            console.log("[TimelineScrubDemo] Left");
-          }
-        },
-      },
+      {},
     );
 
     timelineRef.current = timeline;

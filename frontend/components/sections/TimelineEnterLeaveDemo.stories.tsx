@@ -47,18 +47,7 @@ function TimelineEnterLeaveDemo() {
           easing: "ease-out",
         },
       ],
-      {
-        onEnter: () => {
-          if (process.env.NODE_ENV !== "production") {
-            console.log("[TimelineEnterLeaveDemo] Entered");
-          }
-        },
-        onLeave: () => {
-          if (process.env.NODE_ENV !== "production") {
-            console.log("[TimelineEnterLeaveDemo] Left");
-          }
-        },
-      },
+      {},
     );
 
     timelineRef.current = timeline;

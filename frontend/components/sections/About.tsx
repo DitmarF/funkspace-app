@@ -82,47 +82,60 @@ const About = ({
       return;
     }
 
-    const timeline = new HTMLTimeline(
-      [
+    try {
+      const timeline = new HTMLTimeline(
+        [
+          {
+            element: heading as HTMLElement,
+            fromTransform: "translateY(30px)",
+            toTransform: "translateY(0)",
+            fromOpacity: 0,
+            toOpacity: 1,
+            duration: 600,
+            delay: 0,
+            easing: "ease-out",
+          },
+        ],
         {
-          element: heading as HTMLElement,
-          fromTransform: "translateY(30px)",
-          toTransform: "translateY(0)",
-          fromOpacity: 0,
-          toOpacity: 1,
-          duration: 600,
-          delay: 0,
-          easing: "ease-out",
+          onEnter: () => {
+            if (process.env.NODE_ENV !== "production") {
+              console.log("[About] Animation entered");
+            }
+          },
+          onLeave: () => {
+            if (process.env.NODE_ENV !== "production") {
+              console.log("[About] Animation left");
+            }
+          },
         },
-      ],
-      {
-        onEnter: () => {
-          if (process.env.NODE_ENV !== "production") {
-            console.log("[About] Animation entered");
-          }
-        },
-        onLeave: () => {
-          if (process.env.NODE_ENV !== "production") {
-            console.log("[About] Animation left");
-          }
-        },
-      },
-    );
+      );
 
-    timelineRef.current = timeline;
+      timelineRef.current = timeline;
 
-    // Set initial state
-    timeline.seek(0);
+      // Set initial state
+      timeline.seek(0);
 
-    // If already in view, play immediately
-    if (inView) {
-      timeline.playFrom(0);
-    }
+      // If already in view, play immediately
+      if (inView) {
+        timeline.playFrom(0);
+      }
 
-    return () => {
-      timeline.destroy();
+      return () => {
+        timeline.destroy();
+        timelineRef.current = null;
+      };
+    } catch (error) {
+      // Graceful fallback: render static end state if timeline creation fails
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          "[About] Timeline creation failed, rendering static state",
+          error,
+        );
+      }
+      heading.style.transform = "translateY(0)";
+      heading.style.opacity = "1";
       timelineRef.current = null;
-    };
+    }
   }, [inView, prefersReduced]);
 
   return (

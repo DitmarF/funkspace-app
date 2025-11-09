@@ -73,7 +73,9 @@ export default function RootLayout({
                     }
                   }
                 } catch (error) {
-                  console.error('Theme initialization failed', error);
+                  if (process.env.NODE_ENV !== "production") {
+                    console.error("Theme initialization failed", error);
+                  }
                 }
               })();
             `,

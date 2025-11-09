@@ -22,9 +22,6 @@ const meta = {
     subheading:
       "A modern design system built for performance, accessibility, and developer experience.",
     ctaLabel: "Get Started",
-    onCtaClick: () => {
-      console.log("CTA clicked");
-    },
     backgroundColor: "bg-fs-blue",
   },
   argTypes: {

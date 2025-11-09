@@ -88,7 +88,6 @@ export function focusIntoSection(
   });
 
   // Wait for scroll to complete (if smooth), then focus
-  // For smooth scrolling, we need to wait a bit for the animation
   const focusElement = () => {
     const focusable = findFirstFocusable(section);
     const target = focusable || section;
@@ -104,9 +103,47 @@ export function focusIntoSection(
   };
 
   if (behavior === "smooth") {
-    // Wait for smooth scroll animation to complete
-    // Rough estimate: most smooth scrolls take ~500ms
-    setTimeout(focusElement, 600);
+    // Use scrollend event if available (Chrome 114+, Safari 17+)
+    // Otherwise fall back to polling scroll position
+    if ("onscrollend" in window) {
+      const handleScrollEnd = () => {
+        focusElement();
+        section.removeEventListener("scrollend", handleScrollEnd);
+      };
+      section.addEventListener("scrollend", handleScrollEnd, { once: true });
+    } else {
+      // Fallback: poll scroll position until stable
+      let lastScrollTop = window.scrollY;
+      let lastScrollLeft = window.scrollX;
+      let stableCount = 0;
+      const checkScrollComplete = () => {
+        const currentScrollTop = window.scrollY;
+        const currentScrollLeft = window.scrollX;
+
+        if (
+          currentScrollTop === lastScrollTop &&
+          currentScrollLeft === lastScrollLeft
+        ) {
+          stableCount++;
+          if (stableCount >= 2) {
+            // Scroll position stable for 2 frames (~33ms at 60fps)
+            focusElement();
+            return;
+          }
+        } else {
+          stableCount = 0;
+        }
+
+        lastScrollTop = currentScrollTop;
+        lastScrollLeft = currentScrollLeft;
+        requestAnimationFrame(checkScrollComplete);
+      };
+
+      // Start checking after a short delay to allow scroll to start
+      setTimeout(() => {
+        requestAnimationFrame(checkScrollComplete);
+      }, 50);
+    }
   } else {
     // Immediate focus for auto scroll
     focusElement();

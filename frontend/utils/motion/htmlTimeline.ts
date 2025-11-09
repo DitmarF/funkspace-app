@@ -53,6 +53,37 @@ export type HTMLTimelineOptions = {
 
 /**
  * Simple timeline for HTML element animations (transform/opacity only)
+ *
+ * Designed for scroll-triggered animations with enter/leave controls.
+ * Supports GPU-accelerated animations using only transform and opacity properties.
+ *
+ * @example
+ * ```tsx
+ * const timeline = new HTMLTimeline([
+ *   {
+ *     element: headingRef.current,
+ *     fromTransform: "translateY(20px)",
+ *     toTransform: "translateY(0)",
+ *     fromOpacity: 0,
+ *     toOpacity: 1,
+ *     duration: 600,
+ *     delay: 0,
+ *     easing: "ease-out",
+ *   },
+ * ], {
+ *   onEnter: () => console.log("Animation started"),
+ *   onLeave: () => console.log("Animation reset"),
+ * });
+ *
+ * timeline.play();
+ * ```
+ *
+ * @remarks
+ * - Only supports transform and opacity animations for performance
+ * - Automatically sets `will-change: transform, opacity` for GPU acceleration
+ * - Callbacks are invoked only once per enter/leave cycle
+ * - Zero-duration steps are handled gracefully
+ * - Missing elements are skipped without errors
  */
 export class HTMLTimeline {
   private steps: HTMLTimelineStep[] = [];
@@ -113,7 +144,18 @@ export class HTMLTimeline {
   }
 
   /**
-   * Play the timeline from the beginning
+   * Play the timeline from a specific time (ms)
+   *
+   * @param start - Start time in milliseconds (default: 0)
+   * @remarks
+   * - Clamps start time to [0, duration]
+   * - Calls onEnter callback if not already entered
+   * - Does nothing if already playing
+   *
+   * @example
+   * ```tsx
+   * timeline.playFrom(500); // Start from 500ms
+   * ```
    */
   playFrom(start: number = 0): void {
     this.currentTime = Math.max(0, start);
@@ -129,7 +171,18 @@ export class HTMLTimeline {
   }
 
   /**
-   * Play the timeline
+   * Play the timeline from current time
+   *
+   * @remarks
+   * - Does nothing if already playing
+   * - Calls onEnter callback if not already entered
+   * - Uses requestAnimationFrame for smooth 60fps updates
+   *
+   * @example
+   * ```tsx
+   * timeline.seek(0.5); // Seek to 50%
+   * timeline.play(); // Play from 50%
+   * ```
    */
   play(): void {
     if (this.isPlaying) return;
@@ -156,6 +209,20 @@ export class HTMLTimeline {
 
   /**
    * Reset the timeline to initial state
+   *
+   * @remarks
+   * - Pauses the timeline
+   * - Resets time to 0
+   * - Resets hasEntered flag (allows onEnter to be called again)
+   * - Restores initial element styles
+   * - Calls onLeave callback
+   *
+   * @example
+   * ```tsx
+   * timeline.play();
+   * // ... later
+   * timeline.reset(); // Reset to start, calls onLeave
+   * ```
    */
   reset(): void {
     this.pause();
@@ -177,7 +244,19 @@ export class HTMLTimeline {
   }
 
   /**
-   * Seek to a specific time (ms)
+   * Seek to a specific progress (0-1)
+   *
+   * @param progress - Progress value from 0 to 1 (0 = start, 1 = end)
+   * @remarks
+   * - Clamps progress to [0, 1]
+   * - Immediately updates element styles without animation
+   * - Useful for scroll-based scrubbing
+   *
+   * @example
+   * ```tsx
+   * timeline.seek(0.5); // Jump to 50% progress
+   * timeline.seek(1.0); // Jump to end
+   * ```
    */
   seek(progress: number): void {
     // Progress is 0-1, convert to time
@@ -335,6 +414,19 @@ export class HTMLTimeline {
 
   /**
    * Cleanup: stop animation and release resources
+   *
+   * @remarks
+   * - Pauses any active animation
+   * - Clears all steps
+   * - Should be called when component unmounts to prevent memory leaks
+   *
+   * @example
+   * ```tsx
+   * useEffect(() => {
+   *   const timeline = new HTMLTimeline([...]);
+   *   return () => timeline.destroy();
+   * }, []);
+   * ```
    */
   destroy(): void {
     this.pause();

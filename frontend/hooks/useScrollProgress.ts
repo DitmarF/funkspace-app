@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useState, useRef, type RefObject } from "react";
 
 export type UseScrollProgressOptions = {
   /**
@@ -42,6 +42,10 @@ export type UseScrollProgressReturn = {
  *
  * @param ref - Ref to the section element to track
  * @param options - Configuration options
+ * @param options.root - Root element for Intersection Observer (defaults to viewport)
+ * @param options.thresholds - Thresholds for Intersection Observer (defaults to [0.2, 0.8])
+ * @param options.onEnter - Callback when section enters viewport (called once per enter)
+ * @param options.onLeave - Callback when section leaves viewport (called once per leave)
  * @returns Object with `inView` (boolean) and `progress` (0-1)
  *
  * @example
@@ -50,6 +54,24 @@ export type UseScrollProgressReturn = {
  * const { inView, progress } = useScrollProgress(sectionRef, {
  *   onEnter: () => console.log('Entered'),
  *   onLeave: () => console.log('Left'),
+ * });
+ * ```
+ *
+ * @remarks
+ * - Returns `{ inView: false, progress: 0 }` if ref is null
+ * - Progress is clamped to [0, 1]
+ * - Callbacks are called only on state transitions (not on every scroll)
+ * - Uses passive scroll listeners for performance
+ * - Automatically cleans up observers and listeners on unmount
+ * - Handles viewport resize events
+ *
+ * @example
+ * ```tsx
+ * // With custom root and thresholds
+ * const containerRef = useRef<HTMLElement>(null);
+ * const { inView, progress } = useScrollProgress(sectionRef, {
+ *   root: containerRef.current,
+ *   thresholds: [0.1, 0.5, 0.9],
  * });
  * ```
  */
@@ -61,6 +83,8 @@ export function useScrollProgress(
 
   const [inView, setInView] = useState(false);
   const [progress, setProgress] = useState(0);
+  // Use ref to track previous inView state to avoid stale closures
+  const previousInViewRef = useRef(false);
 
   useEffect(() => {
     const element = ref.current;
@@ -73,11 +97,15 @@ export function useScrollProgress(
       (entries) => {
         entries.forEach((entry) => {
           const isIntersecting = entry.isIntersecting;
-          setInView(isIntersecting);
+          const previousInView = previousInViewRef.current;
 
-          if (isIntersecting && !inView && onEnter) {
+          setInView(isIntersecting);
+          previousInViewRef.current = isIntersecting;
+
+          // Call callbacks only on state transitions
+          if (isIntersecting && !previousInView && onEnter) {
             onEnter();
-          } else if (!isIntersecting && inView && onLeave) {
+          } else if (!isIntersecting && previousInView && onLeave) {
             onLeave();
           }
         });
@@ -143,7 +171,7 @@ export function useScrollProgress(
       scrollContainer.removeEventListener("scroll", calculateProgress);
       window.removeEventListener("resize", calculateProgress);
     };
-  }, [ref, root, thresholds, onEnter, onLeave, inView]);
+  }, [ref, root, thresholds, onEnter, onLeave]);
 
   return { inView, progress };
 }

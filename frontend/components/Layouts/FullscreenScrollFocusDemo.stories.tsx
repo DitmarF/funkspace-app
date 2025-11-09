@@ -108,34 +108,39 @@ function FocusPaddingWithStickyHeaderDemo() {
       >
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-8">
           <h2 className="text-xl font-bold text-white">Sticky Header Demo</h2>
-          <nav className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => {
-                focusIntoSection("hero");
-              }}
-              className="rounded px-4 py-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
-            >
-              Hero
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                focusIntoSection("about");
-              }}
-              className="rounded px-4 py-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
-            >
-              About
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                focusIntoSection("contact");
-              }}
-              className="rounded px-4 py-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
-            >
-              Contact
-            </button>
+          <nav aria-label="Section navigation">
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  focusIntoSection("hero");
+                }}
+                aria-label="Navigate to Hero section"
+                className="rounded px-4 py-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
+              >
+                Hero
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  focusIntoSection("about");
+                }}
+                aria-label="Navigate to About section"
+                className="rounded px-4 py-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
+              >
+                About
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  focusIntoSection("contact");
+                }}
+                aria-label="Navigate to Contact section"
+                className="rounded px-4 py-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white"
+              >
+                Contact
+              </button>
+            </div>
           </nav>
         </div>
       </header>

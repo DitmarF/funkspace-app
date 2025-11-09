@@ -140,7 +140,11 @@ export function applyNumericStyle(
   property: string,
   value: number,
 ): void {
-  (element.style as any)[property] = `${value}`;
+  // Type-safe access to CSSStyleDeclaration properties
+  // We use a type assertion here because CSSStyleDeclaration doesn't have an index signature
+  // but we know these properties exist at runtime
+  const style = element.style as CSSStyleDeclaration & Record<string, string>;
+  style[property] = `${value}`;
 }
 
 /**
@@ -150,7 +154,11 @@ export function applyNumericStyle(
  * @returns Numeric value or 0 if not set
  */
 export function getNumericStyle(element: SVGElement, property: string): number {
-  const value = (element.style as any)[property];
+  // Type-safe access to CSSStyleDeclaration properties
+  // We use a type assertion here because CSSStyleDeclaration doesn't have an index signature
+  // but we know these properties exist at runtime
+  const style = element.style as CSSStyleDeclaration & Record<string, string>;
+  const value = style[property];
   if (!value || value === "none") {
     return 0;
   }
