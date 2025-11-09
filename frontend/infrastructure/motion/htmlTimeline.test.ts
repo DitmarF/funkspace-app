@@ -7,21 +7,31 @@ describe("HTMLTimeline", () => {
   let rafSpy: ReturnType<typeof vi.fn>;
   let cancelRafSpy: ReturnType<typeof vi.fn>;
   const activeTimelines: HTMLTimeline[] = [];
+  const pendingTimeouts: (number | NodeJS.Timeout)[] = [];
 
   beforeEach(() => {
     // Create mock elements
     mockElement1 = document.createElement("div");
     mockElement2 = document.createElement("div");
 
-    // Mock requestAnimationFrame
+    // Clear any leftover timeouts
+    pendingTimeouts.forEach((timeout) => clearTimeout(timeout));
+    pendingTimeouts.length = 0;
+
+    // Mock requestAnimationFrame - track timeouts so we can clear them
     rafSpy = vi.fn((callback: FrameRequestCallback) => {
-      setTimeout(callback, 16); // ~60fps
+      const timeout = setTimeout(callback, 16); // ~60fps
+      pendingTimeouts.push(timeout);
       return 1;
     });
     global.requestAnimationFrame = rafSpy;
 
-    // Mock cancelAnimationFrame
-    cancelRafSpy = vi.fn();
+    // Mock cancelAnimationFrame - clear tracked timeouts
+    cancelRafSpy = vi.fn((id: number) => {
+      // Clear all pending timeouts (simplified - in real RAF, we'd track by id)
+      pendingTimeouts.forEach((timeout) => clearTimeout(timeout));
+      pendingTimeouts.length = 0;
+    });
     global.cancelAnimationFrame = cancelRafSpy;
 
     // Mock performance.now
@@ -33,7 +43,20 @@ describe("HTMLTimeline", () => {
   });
 
   afterEach(() => {
-    // Destroy all active timelines before restoring mocks
+    // Pause all active timelines first (this cancels pending RAF)
+    activeTimelines.forEach((timeline) => {
+      try {
+        timeline.pause();
+      } catch {
+        // Ignore errors during cleanup
+      }
+    });
+
+    // Clear all pending timeouts
+    pendingTimeouts.forEach((timeout) => clearTimeout(timeout));
+    pendingTimeouts.length = 0;
+
+    // Destroy all active timelines
     activeTimelines.forEach((timeline) => {
       try {
         timeline.destroy();
@@ -43,18 +66,17 @@ describe("HTMLTimeline", () => {
     });
     activeTimelines.length = 0;
 
-    // Save mocks before restore - these will be used as fallback no-ops
-    const savedRaf = global.requestAnimationFrame;
-    const savedCancelRaf = global.cancelAnimationFrame;
+    // Ensure requestAnimationFrame and cancelAnimationFrame are always available as no-ops
+    // This prevents errors when any remaining callbacks try to call these functions
+    global.requestAnimationFrame = (() => 0) as typeof requestAnimationFrame;
+    global.cancelAnimationFrame = (() => {}) as typeof cancelAnimationFrame;
 
     // Restore mocks (this removes the spies)
     vi.restoreAllMocks();
 
-    // Ensure requestAnimationFrame and cancelAnimationFrame are always available as no-ops
-    // This prevents errors when pending setTimeout callbacks (from rafSpy mock) try to
-    // call these functions after the test environment is torn down
-    global.requestAnimationFrame = savedRaf || (() => 0);
-    global.cancelAnimationFrame = savedCancelRaf || (() => {});
+    // Re-assign no-ops after restore (in case restore removed them)
+    global.requestAnimationFrame = (() => 0) as typeof requestAnimationFrame;
+    global.cancelAnimationFrame = (() => {}) as typeof cancelAnimationFrame;
   });
 
   describe("constructor and initialization", () => {
