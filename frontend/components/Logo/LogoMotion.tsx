@@ -8,11 +8,11 @@ import {
   useMemo,
   type ComponentPropsWithoutRef,
 } from "react";
-import { AnimationTimeline } from "@/utils/motion/timeline";
-import { buildLogoManifest } from "@/data/animations/logo";
+import { AnimationTimeline } from "@/infrastructure/motion/timeline";
 import { FunkSpaceLogoInline } from "./FunkSpaceLogoInline";
-import { applyStrokeDrawInit } from "@/utils/motion/svg";
+import { applyStrokeDrawInit } from "@/infrastructure/motion/svg";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useServices } from "@/application/providers/ServiceProvider";
 
 const TOTAL_LOGO_PATHS = 10;
 
@@ -63,6 +63,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
     const autoPlayRef = useRef(autoPlay);
     const speedRef = useRef(speed);
     const reduced = useReducedMotion();
+    const { animationService } = useServices();
     // Feature flag: use prop if provided, otherwise check env var
     // In Storybook, we can override via story args for testing
     const enabled =
@@ -161,7 +162,8 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       try {
         setAnimationStartState();
 
-        const manifest = buildLogoManifest(svg);
+        const orchestrator = animationService.getOrchestrator();
+        const manifest = orchestrator.buildLogoManifest(svg);
 
         if (!manifest.steps.length) {
           setStaticState();
@@ -214,7 +216,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
         setStaticState();
         timelineRef.current = null;
       }
-    }, [animationAllowed, resolvedPathCount, startAtMs]);
+    }, [animationAllowed, resolvedPathCount, startAtMs, animationService]);
 
     useEffect(() => {
       speedRef.current = speed;

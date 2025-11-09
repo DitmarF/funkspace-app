@@ -1,0 +1,99 @@
+---
+description: "FunkSpace — Clean Architecture & Dependency Rules"
+globs: ["frontend/domain/**/*.ts", "frontend/application/**/*.ts", "frontend/infrastructure/**/*.ts", "frontend/components/**/*.tsx", "frontend/hooks/**/*.ts"]
+alwaysApply: false
+---
+
+## Architecture Layers
+
+FunkSpace follows Clean Architecture with four main layers:
+
+1. **Domain** (`frontend/domain/`) - Pure business logic, entities, and rules
+2. **Application** (`frontend/application/`) - Use cases and orchestration
+3. **Infrastructure** (`frontend/infrastructure/`) - External concerns (DOM, storage, browser APIs)
+4. **Presentation** (`frontend/components/`, `frontend/hooks/`, `frontend/app/`) - UI components and React hooks
+
+## Dependency Rules
+
+Dependencies point **inward**:
+
+```
+Presentation → Application → Domain ← Infrastructure
+```
+
+### Import Boundaries
+
+- **Domain**: No dependencies (pure TypeScript)
+- **Application**: Imports Domain only
+- **Infrastructure**: Implements Domain ports/interfaces (depends on Domain)
+- **Presentation**: Uses Application services via hooks (depends on Application and Domain types)
+
+### Valid Imports
+
+✅ **Application importing from Domain:**
+```typescript
+import type { Theme } from "@/domain/theme/Theme";
+```
+
+✅ **Infrastructure implementing Domain port:**
+```typescript
+import type { StoragePort } from "@/domain/ports/StoragePort";
+export class LocalStorageAdapter implements StoragePort { ... }
+```
+
+✅ **Presentation using Application service via hook:**
+```typescript
+import { useTheme } from "@/hooks/useTheme";
+```
+
+### Invalid Imports
+
+❌ **Domain importing from Application/Infrastructure/Presentation:**
+```typescript
+// WRONG
+import { ThemeService } from "@/application/theme/ThemeService";
+```
+
+❌ **Application importing from Infrastructure:**
+```typescript
+// WRONG
+import { LocalStorageAdapter } from "@/infrastructure/storage/LocalStorageAdapter";
+```
+
+❌ **Presentation directly importing from Infrastructure/Application:**
+```typescript
+// WRONG - use hooks instead
+import { ThemeService } from "@/application/theme/ThemeService";
+```
+
+## Service Injection Pattern
+
+Services are injected via React Context:
+
+1. **Infrastructure creates services**: `createServices()` in `infrastructure/services/`
+2. **Application provides via Context**: `<ServiceProvider services={services}>`
+3. **Presentation consumes via hooks**: `const { themeService } = useServices()`
+
+Components should use hooks (e.g., `useTheme`, `useScrollProgressService`) to access services, not import services directly.
+
+## File Organization
+
+- `domain/` - Entities, business rules, port interfaces
+- `application/` - Services, orchestrators, service providers
+- `infrastructure/` - Adapters, utilities, service factory
+- `components/` - React components (presentation layer)
+- `hooks/` - React hooks (thin wrappers around services)
+- `app/` - Next.js App Router pages (presentation layer)
+
+## Testing Strategy
+
+- **Unit Tests**: Test domain logic and application services in isolation
+- **Integration Tests**: Test service interactions with infrastructure adapters
+- **Component Tests**: Test presentation components with mocked services
+- **E2E Tests**: Test full user flows
+
+Tests should be colocated with source files (`*.test.tsx` next to source).
+
+## Reference
+
+See `docs/architecture.md` for detailed architecture documentation, migration notes, and best practices.

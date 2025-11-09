@@ -1,6 +1,6 @@
 ---
 description: "FunkSpace — Content (Markdown/MDX)"
-globs: ["content/**/*.{md,mdx}", "app/**/*.{md,mdx}"]
+globs: ["docs/**/*.{md,mdx}", "frontend/app/**/*.{md,mdx}"]
 alwaysApply: false
 ---
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { workSans, spaceGrotesk } from "./fonts";
+import { ServiceProvider } from "@/application/providers/ServiceProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -73,13 +74,15 @@ export default function RootLayout({
                     }
                   }
                 } catch (error) {
-                  console.error('Theme initialization failed', error);
+                  if (process.env.NODE_ENV !== "production") {
+                    console.error("Theme initialization failed", error);
+                  }
                 }
               })();
             `,
           }}
         />
-        {children}
+        <ServiceProvider>{children}</ServiceProvider>
       </body>
     </html>
   );

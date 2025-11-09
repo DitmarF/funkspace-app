@@ -113,12 +113,10 @@ function ControlsStory(args: LogoMotionProps) {
   const handlePlay = () => {
     const timeline = timelineRef.current;
     if (!timeline) {
-      console.warn("[ControlsStory] Timeline ref is null");
       return;
     }
 
     if (!timeline.isReady?.()) {
-      console.warn("[ControlsStory] Timeline is not ready");
       return;
     }
 
@@ -132,37 +130,36 @@ function ControlsStory(args: LogoMotionProps) {
       setCurrentTime(0);
       timeline.play();
       setIsPlaying(true);
-      console.log("[ControlsStory] Play clicked - animation started");
     } catch (error) {
-      console.error("[ControlsStory] Error calling play:", error);
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[ControlsStory] Error calling play:", error);
+      }
     }
   };
 
   const handlePause = () => {
     const timeline = timelineRef.current;
     if (!timeline) {
-      console.warn("[ControlsStory] Timeline ref is null");
       return;
     }
 
     try {
       timeline.pause();
       setIsPlaying(false);
-      console.log("[ControlsStory] Pause clicked - animation paused");
     } catch (error) {
-      console.error("[ControlsStory] Error calling pause:", error);
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[ControlsStory] Error calling pause:", error);
+      }
     }
   };
 
   const handleReverse = () => {
     const timeline = timelineRef.current;
     if (!timeline) {
-      console.warn("[ControlsStory] Timeline ref is null");
       return;
     }
 
     if (!timeline.isReady?.()) {
-      console.warn("[ControlsStory] Timeline is not ready");
       return;
     }
 
@@ -186,17 +183,11 @@ function ControlsStory(args: LogoMotionProps) {
         }
         timeline.play();
         setIsPlaying(true);
-        console.log(
-          `[ControlsStory] Reverse clicked - playing ${newReversedState ? "backwards" : "forwards"}`,
-        );
-      } else {
-        // If already playing, just toggle direction (timeline handles this)
-        console.log(
-          "[ControlsStory] Reverse clicked - direction toggled while playing",
-        );
       }
     } catch (error) {
-      console.error("[ControlsStory] Error calling reverse:", error);
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[ControlsStory] Error calling reverse:", error);
+      }
     }
   };
 
@@ -234,9 +225,6 @@ function ControlsStory(args: LogoMotionProps) {
         // Animation should have finished by now
         setIsPlaying(false);
         setCurrentTime(isReversed ? 0 : estimatedDuration);
-        console.log(
-          "[ControlsStory] Animation finished - Play button available",
-        );
       },
       estimatedDuration / speed + 100,
     ); // Adjust for speed

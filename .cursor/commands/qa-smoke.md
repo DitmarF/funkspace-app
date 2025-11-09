@@ -26,17 +26,24 @@ pnpm test
 pnpm e2e
 ```
 
-### 5) Perf spot-check (manual/Lab)
+### 5) Lighthouse CI (Performance)
 
 ```bash
-# Lighthouse (manual if LHCI not configured):
-# 1) Start preview locally, run Lighthouse in Chrome on /
-# 2) Record LCP/INP/CLS; target: CLS ≤ 0.1; minimal LCP/INP delta
+pnpm lhci:ci
 ```
 
-### 6) A11y scan (axe via Storybook or E2E route)
+Runs Lighthouse CI with animations flag both OFF and ON. Validates:
+
+- CLS ≤ 0.1 (p75)
+- LCP ≤ 2500ms (p75)
+- Performance score ≥ 0.9
+
+Note: For animation testing, set `NEXT_PUBLIC_ANIMATIONS_ENABLED=true` before running.
+
+### 6) A11y scan (axe via E2E)
 
 ```bash
-# If Storybook is available, open and run addon-a11y checks.
-# Otherwise, run E2E a11y assertions (if implemented) on /
+pnpm e2e:smoke
 ```
+
+Runs Playwright a11y smoke tests with axe-core. Verifies zero violations on key routes.
