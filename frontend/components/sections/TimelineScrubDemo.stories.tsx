@@ -7,7 +7,7 @@ import Container from "../Layouts/Container";
 import FullscreenScroll from "../Layouts/FullscreenScroll";
 import { useScrollProgress } from "../../hooks/useScrollProgress";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
-import { HTMLTimeline } from "../../utils/motion/htmlTimeline";
+import { HTMLTimeline } from "../../infrastructure/motion/htmlTimeline";
 import SnapSection from "./SnapSection";
 
 /**

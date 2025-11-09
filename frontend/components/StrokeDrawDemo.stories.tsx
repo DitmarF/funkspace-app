@@ -7,7 +7,7 @@ import {
   setStrokeDashoffset,
   applyFillOpacityInit,
   setFillOpacity,
-} from "../utils/motion/svg";
+} from "../infrastructure/motion/svg";
 
 function StrokeDrawDemo() {
   const pathRef = useRef<SVGPathElement>(null);

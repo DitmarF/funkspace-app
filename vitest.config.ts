@@ -47,7 +47,6 @@ export default defineConfig({
         "**/domain/**",
         // Utils that are not yet tested
         "**/utils/motion.ts",
-        "**/utils/motion/types.ts",
         // Components not yet tested
         "**/components/ThemeSwitcher.tsx",
         "**/components/Modules/**",

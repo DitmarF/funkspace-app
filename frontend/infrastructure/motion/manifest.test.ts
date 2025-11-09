@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { resolveSelector, validateManifest, loadManifest } from "./manifest";
-import type { AnimationManifest } from "./types";
+import type { AnimationManifest } from "@/domain/animations/AnimationManifest";
 
 describe("Manifest loader", () => {
   let svg: SVGSVGElement;
