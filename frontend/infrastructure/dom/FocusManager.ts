@@ -62,43 +62,53 @@ export function focusIntoSection(
   };
 
   if (behavior === "smooth") {
-    // Use scrollend event if available
-    if ("onscrollend" in window) {
-      const handleScrollEnd = () => {
-        focusElement();
-        section.removeEventListener("scrollend", handleScrollEnd);
-      };
-      section.addEventListener("scrollend", handleScrollEnd, { once: true });
+    // Check if we're in a browser environment
+    if (typeof window === "undefined") {
+      // Server-side fallback: immediate focus
+      focusElement();
     } else {
-      // Fallback: poll scroll position until stable
-      let lastScrollTop = window.scrollY;
-      let lastScrollLeft = window.scrollX;
-      let stableCount = 0;
-      const checkScrollComplete = () => {
-        const currentScrollTop = window.scrollY;
-        const currentScrollLeft = window.scrollX;
+      // Extract window to avoid type narrowing issues
+      const win = window;
+      // Check if scrollend event is supported (avoid 'in' operator to prevent type narrowing)
+      const hasScrollEnd = typeof win.onscrollend !== "undefined";
+      if (hasScrollEnd) {
+        // Use scrollend event if available
+        const handleScrollEnd = () => {
+          focusElement();
+          section.removeEventListener("scrollend", handleScrollEnd);
+        };
+        section.addEventListener("scrollend", handleScrollEnd, { once: true });
+      } else {
+        // Fallback: poll scroll position until stable
+        let lastScrollTop = win.scrollY;
+        let lastScrollLeft = win.scrollX;
+        let stableCount = 0;
+        const checkScrollComplete = () => {
+          const currentScrollTop = win.scrollY;
+          const currentScrollLeft = win.scrollX;
 
-        if (
-          currentScrollTop === lastScrollTop &&
-          currentScrollLeft === lastScrollLeft
-        ) {
-          stableCount++;
-          if (stableCount >= 2) {
-            focusElement();
-            return;
+          if (
+            currentScrollTop === lastScrollTop &&
+            currentScrollLeft === lastScrollLeft
+          ) {
+            stableCount++;
+            if (stableCount >= 2) {
+              focusElement();
+              return;
+            }
+          } else {
+            stableCount = 0;
           }
-        } else {
-          stableCount = 0;
-        }
 
-        lastScrollTop = currentScrollTop;
-        lastScrollLeft = currentScrollLeft;
-        requestAnimationFrame(checkScrollComplete);
-      };
+          lastScrollTop = currentScrollTop;
+          lastScrollLeft = currentScrollLeft;
+          requestAnimationFrame(checkScrollComplete);
+        };
 
-      setTimeout(() => {
-        requestAnimationFrame(checkScrollComplete);
-      }, 50);
+        setTimeout(() => {
+          requestAnimationFrame(checkScrollComplete);
+        }, 50);
+      }
     }
   } else {
     // Immediate focus for auto scroll
