@@ -5,9 +5,12 @@
 
 "use client";
 
-import { useEffect, useState, useRef, type RefObject } from "react";
+import { useEffect, useState, useRef, useMemo, type RefObject } from "react";
 import { useServices } from "@/application/providers/ServiceProvider";
 import type { ScrollProgress } from "@/application/scroll/ScrollService";
+
+// Hoist default thresholds to avoid recreating array on every render
+const DEFAULT_THRESHOLDS: number[] = [0.2, 0.8];
 
 export interface UseScrollProgressOptions {
   /**
@@ -36,7 +39,29 @@ export function useScrollProgressService(
   options: UseScrollProgressOptions = {},
 ): ScrollProgress {
   const { scrollService } = useServices();
-  const { root, thresholds = [0.2, 0.8], onEnter, onLeave } = options;
+  const { root, thresholds, onEnter, onLeave } = options;
+
+  // Memoize thresholds to avoid recreating on every render
+  // Only recreate if the caller actually provides a different array
+  // If thresholds is undefined, use the constant directly (no memoization needed)
+  const memoizedThresholds = useMemo(() => {
+    if (!thresholds) {
+      return DEFAULT_THRESHOLDS;
+    }
+    return thresholds;
+    // Compare by stringified values to detect actual changes, not just reference changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [thresholds?.join(",")]);
+
+  // Store callbacks in refs to avoid re-attaching observers when they change
+  const onEnterRef = useRef(onEnter);
+  const onLeaveRef = useRef(onLeave);
+
+  // Update refs when callbacks change (without triggering effect re-run)
+  useEffect(() => {
+    onEnterRef.current = onEnter;
+    onLeaveRef.current = onLeave;
+  }, [onEnter, onLeave]);
 
   const [inView, setInView] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -59,16 +84,17 @@ export function useScrollProgressService(
           previousInViewRef.current = isIntersecting;
 
           // Call callbacks only on state transitions
-          if (isIntersecting && !previousInView && onEnter) {
-            onEnter();
-          } else if (!isIntersecting && previousInView && onLeave) {
-            onLeave();
+          // Read from refs to get latest callbacks without re-running effect
+          if (isIntersecting && !previousInView && onEnterRef.current) {
+            onEnterRef.current();
+          } else if (!isIntersecting && previousInView && onLeaveRef.current) {
+            onLeaveRef.current();
           }
         });
       },
       {
         root: root || null,
-        threshold: thresholds,
+        threshold: memoizedThresholds,
       },
     );
 
@@ -97,7 +123,9 @@ export function useScrollProgressService(
       scrollContainer.removeEventListener("scroll", calculateProgress);
       window.removeEventListener("resize", calculateProgress);
     };
-  }, [ref, root, thresholds, onEnter, onLeave, scrollService]);
+    // Only re-run when ref, root, thresholds, or scrollService actually change
+    // Callbacks are handled via refs to avoid unnecessary re-attachments
+  }, [ref, root, memoizedThresholds, scrollService]);
 
   return { inView, progress };
 }
