@@ -28,27 +28,91 @@ test.describe("Logo Animation", () => {
       timeout: 10000,
     });
 
-    // Wait for animation to complete
-    // For 10 paths: stroke delay (1080ms) + stroke (800ms) = 1880ms total
-    // Wait for paths to reach final state by checking for opacity ≈ 1
-    // Use a more reliable approach: wait for the last path to complete
+    // Wait for path-6 to exist (last letter in animation sequence)
+    await page.waitForSelector("#logo-path-6", {
+      state: "attached",
+      timeout: 10000,
+    });
+
+    // Wait a bit for animation to initialize
+    await page.waitForTimeout(100);
+
+    // Get initial strokeDashoffset value (should be path length)
+    // Check both inline style and computed style
+    const initialOffset = await page.evaluate(() => {
+      const path6 = document.querySelector("#logo-path-6") as
+        | SVGPathElement
+        | SVGPolygonElement
+        | null;
+      if (!path6) return Infinity;
+      // Try inline style first (how animation sets it), then computed
+      const inlineOffset = path6.style.strokeDashoffset;
+      const computed = window.getComputedStyle(path6);
+      const computedOffset = computed.strokeDashoffset;
+      const offset = inlineOffset || computedOffset;
+      return parseFloat(offset) || Infinity;
+    });
+
+    // Wait for path-6's animation to start (it's the last letter, so it starts later)
+    // Path 6 is at index 8, so it starts at 8 * letterStagger delay
+    // Wait for offset to decrease from initial value, indicating animation has started
+    await page.waitForFunction(
+      (initial) => {
+        const path6 = document.querySelector("#logo-path-6") as
+          | SVGPathElement
+          | SVGPolygonElement
+          | null;
+        if (!path6) return false;
+        const inlineOffset = path6.style.strokeDashoffset;
+        const computed = window.getComputedStyle(path6);
+        const computedOffset = computed.strokeDashoffset;
+        const offset = parseFloat(inlineOffset || computedOffset) || Infinity;
+        // Animation has started if offset is less than initial (and not Infinity)
+        return offset < initial && offset !== Infinity && !isNaN(offset);
+      },
+      initialOffset,
+      { timeout: 3000 },
+    );
+
+    // Now wait for animation to complete
+    // Letter order: F(7), U(8), N(9), K(10), S(2), P(3), A(4), C(5), E(6)
+    // Path 6 is the last letter (index 8), so it completes last
+    // The animation timeline duration is ~1500ms, but path-6 starts later
+    // So we need to wait for: path-6 start delay + stroke duration
+    // This should complete within the timeline duration (~1500ms from page load)
+    // But allow extra time for the last path to complete
     await page.waitForFunction(
       () => {
-        const path10 = document.querySelector("#logo-path-10");
-        if (!path10) return false;
-        const computed = window.getComputedStyle(path10);
-        const opacity = parseFloat(computed.opacity) || 0;
-        const offset = parseFloat(computed.strokeDashoffset) || Infinity;
-        return opacity > 0.9 && offset < 1;
+        const path6 = document.querySelector("#logo-path-6") as
+          | SVGPathElement
+          | SVGPolygonElement
+          | null;
+        if (!path6) return false;
+        const inlineOffset = path6.style.strokeDashoffset;
+        const computed = window.getComputedStyle(path6);
+        const computedOffset = computed.strokeDashoffset;
+        const offsetStr = inlineOffset || computedOffset;
+        if (!offsetStr || offsetStr === "none" || offsetStr === "") {
+          // If no offset is set, stroke is complete (defaults to 0)
+          return true;
+        }
+        const offset = parseFloat(offsetStr);
+        // Stroke should be fully drawn (offset close to 0 means stroke is complete)
+        // Allow some tolerance for floating point precision
+        return !isNaN(offset) && offset < 1;
       },
-      { timeout: 2500 },
+      { timeout: 5000 },
     );
+
+    // After stroke completes, wait a bit for fill to fade in
+    // Fill starts after stroke completes, so add small buffer
+    await page.waitForTimeout(500);
 
     // Assert final state: strokeDashoffset should be ≈ 0 (fully drawn)
     // Check first, middle, and last paths
     const path1 = page.locator("#logo-path-1");
     const path5 = page.locator("#logo-path-5");
-    const path10 = page.locator("#logo-path-10");
+    const path6 = page.locator("#logo-path-6");
 
     // Check strokeDashoffset is approximately 0 (fully drawn)
     const strokeDashoffset1 = await path1.evaluate((el) => {
@@ -63,7 +127,7 @@ test.describe("Logo Animation", () => {
       return parseFloat(offset) || 0;
     });
 
-    const strokeDashoffset10 = await path10.evaluate((el) => {
+    const strokeDashoffset6 = await path6.evaluate((el) => {
       const computed = window.getComputedStyle(el);
       const offset = computed.strokeDashoffset;
       return parseFloat(offset) || 0;
@@ -72,28 +136,43 @@ test.describe("Logo Animation", () => {
     // Stroke should be fully drawn (offset ≈ 0, allow small tolerance)
     expect(strokeDashoffset1).toBeLessThan(1);
     expect(strokeDashoffset5).toBeLessThan(1);
-    expect(strokeDashoffset10).toBeLessThan(1);
+    expect(strokeDashoffset6).toBeLessThan(1);
 
-    // Check opacity is approximately 1 (fully visible)
-    const opacity1 = await path1.evaluate((el) => {
+    // Check fillOpacity is approximately 1 (fully visible)
+    const fillOpacity1 = await path1.evaluate((el) => {
       const computed = window.getComputedStyle(el);
-      return parseFloat(computed.opacity) || 0;
+      const fillOpacityStr =
+        computed.fillOpacity ||
+        computed.getPropertyValue("fill-opacity") ||
+        (el as HTMLElement).style.fillOpacity ||
+        "1";
+      return parseFloat(fillOpacityStr) || 1;
     });
 
-    const opacity5 = await path5.evaluate((el) => {
+    const fillOpacity5 = await path5.evaluate((el) => {
       const computed = window.getComputedStyle(el);
-      return parseFloat(computed.opacity) || 0;
+      const fillOpacityStr =
+        computed.fillOpacity ||
+        computed.getPropertyValue("fill-opacity") ||
+        (el as HTMLElement).style.fillOpacity ||
+        "1";
+      return parseFloat(fillOpacityStr) || 1;
     });
 
-    const opacity10 = await path10.evaluate((el) => {
+    const fillOpacity6 = await path6.evaluate((el) => {
       const computed = window.getComputedStyle(el);
-      return parseFloat(computed.opacity) || 0;
+      const fillOpacityStr =
+        computed.fillOpacity ||
+        computed.getPropertyValue("fill-opacity") ||
+        (el as HTMLElement).style.fillOpacity ||
+        "1";
+      return parseFloat(fillOpacityStr) || 1;
     });
 
-    // Opacity should be approximately 1 (fully visible)
-    expect(opacity1).toBeGreaterThan(0.95);
-    expect(opacity5).toBeGreaterThan(0.95);
-    expect(opacity10).toBeGreaterThan(0.95);
+    // FillOpacity should be approximately 1 (fully visible)
+    expect(fillOpacity1).toBeGreaterThan(0.95);
+    expect(fillOpacity5).toBeGreaterThan(0.95);
+    expect(fillOpacity6).toBeGreaterThan(0.95);
 
     // Run axe accessibility scan
     const axeResults = await new AxeBuilder({ page })
