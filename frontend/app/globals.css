@@ -26,3 +26,41 @@
    * - [data-theme="dark-high-contrast"]
    */
 }
+
+@layer utilities {
+  /* Reduced motion guardrails: disable animations and transitions
+   * when user prefers reduced motion.
+   * 
+   * Classes with "motion-" prefix should respect this preference.
+   * Use Tailwind's motion-reduce: utilities for component-level control.
+   * 
+   * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
+   */
+  @media (prefers-reduced-motion: reduce) {
+    [class*="motion-"] {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+/* Keyframe animations for reduced motion demo */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
