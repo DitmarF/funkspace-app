@@ -7,7 +7,7 @@ describe("HTMLTimeline", () => {
   let rafSpy: ReturnType<typeof vi.fn>;
   let cancelRafSpy: ReturnType<typeof vi.fn>;
   const activeTimelines: HTMLTimeline[] = [];
-  const pendingTimeouts: NodeJS.Timeout[] = [];
+  const pendingTimeouts: (number | NodeJS.Timeout)[] = [];
 
   beforeEach(() => {
     // Create mock elements
