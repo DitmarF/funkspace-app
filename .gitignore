@@ -7,3 +7,7 @@ test-results/
 *storybook.log
 storybook-static
 frontend/storybook-static
+
+# Lighthouse CI artifacts
+.lighthouse/reports/
+.lighthouseci/
