@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
+import SnapSection from "../sections/SnapSection";
 import FullscreenScroll, {
   type FullscreenScrollProps,
 } from "./FullscreenScroll";
@@ -22,18 +23,24 @@ const meta = {
     snapMode: "mandatory",
     children: (
       <>
-        <section
-          className="h-[100dvh] w-screen snap-start flex items-center justify-center"
+        <SnapSection
+          id="section-1"
+          aria-label="First section"
+          snap="start"
+          className="flex items-center justify-center"
           style={{ backgroundColor: "var(--fs-color-blue)" }}
         >
           <div className="text-white text-4xl font-bold">Section 1</div>
-        </section>
-        <section
-          className="h-[100dvh] w-screen snap-start flex items-center justify-center"
+        </SnapSection>
+        <SnapSection
+          id="section-2"
+          aria-label="Second section"
+          snap="start"
+          className="flex items-center justify-center"
           style={{ backgroundColor: "var(--fs-color-violet)" }}
         >
           <div className="text-white text-4xl font-bold">Section 2</div>
-        </section>
+        </SnapSection>
       </>
     ),
   },
