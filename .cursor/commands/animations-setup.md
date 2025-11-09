@@ -38,7 +38,17 @@ pnpm -F frontend build
 pnpm -F frontend storybook:build
 ```
 
+### 7) Environment variable (for animation testing)
+
+```bash
+# Set NEXT_PUBLIC_ANIMATIONS_ENABLED=true to enable animations
+export NEXT_PUBLIC_ANIMATIONS_ENABLED=true
+pnpm -F frontend dev
+```
+
 ### Notes
 
 - Verifies motion tokens, Tailwind bindings, and Motion components compile.
-- Respects NEXT_PUBLIC_ANIMATIONS_ENABLED and prefers-reduced-motion.
+- **NEXT_PUBLIC_ANIMATIONS_ENABLED**: Defaults to `false` (animations disabled). Must be set to `"true"` to enable animations. This flag gates all motion features.
+- Respects `prefers-reduced-motion` when animations are enabled.
+- For Storybook: animations are controlled by the same flag; set it before running `pnpm storybook`.

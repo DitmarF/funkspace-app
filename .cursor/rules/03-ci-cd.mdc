@@ -3,13 +3,46 @@ description: "FunkSpace — CI/CD & Release"
 alwaysApply: false
 ---
 
-## GitHub Actions
-- Jobs: lint → typecheck → unit tests → build; run e2e smoke on PRs.
-- Use node LTS; cache pnpm; fail on warnings for lint/types.
+## GitHub Actions CI Pipeline
 
-## Vercel
-- No secrets in code; require env placeholders. Surface build logs on failure with actionable tips.
+CI runs on PRs and pushes to `main`. Steps (in order):
+
+1. **Build tokens**: `pnpm build:tokens`
+2. **Lint & Prettier**: `pnpm lint` (fails on warnings)
+3. **Typecheck**: `cd frontend && pnpm exec tsc --noEmit`
+4. **Unit tests**: `pnpm coverage` (Vitest with coverage)
+5. **E2E tests**: `pnpm e2e` (Playwright)
+6. **Build frontend**: `pnpm -F frontend build`
+7. **Lighthouse CI (flag OFF)**: `pnpm lhci:off`
+8. **Lighthouse CI (flag ON)**: `pnpm lhci:on`
+
+**Configuration:**
+- Node 22 (LTS)
+- pnpm 9 (cached)
+- Timeout: 30 minutes
+- Fail on lint/type warnings
+
+## Lighthouse CI Targets
+
+- **CLS** ≤ 0.1 (p75)
+- **LCP** ≤ 2500ms (p75)
+- **Performance score** ≥ 0.9 (warn threshold)
+
+Runs with `NEXT_PUBLIC_ANIMATIONS_ENABLED` both `false` and `true` to validate both states.
+
+## Environment Variables
+
+- **NEXT_PUBLIC_ANIMATIONS_ENABLED**: Controls animation feature flag (default: `false`). Set to `"true"` to enable animations.
+- **VERCEL**: Set to `"1"` in Vercel builds; skips Playwright browser install in `postinstall` script.
+
+## Vercel Deployment
+
+- Auto-deploys on merge to `main`
+- Preview deployments for PRs
+- No secrets in code; use Vercel environment variable settings
+- Surface build logs on failure with actionable tips
 
 ## Outputs
+
 - Generate PR checklist (tests added/updated, a11y considered, perf impact).
 - Produce changelog-ready summaries when requested.

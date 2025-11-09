@@ -14,6 +14,11 @@ alwaysApply: false
 - Use `<Image>` for media; include `alt`. Lazy-load below the fold.
 - Animations: respect `prefers-reduced-motion`; keep durations short; avoid layout thrash.
 
+## Architecture & Service Injection
+- Components in `components/` and `app/` are **presentation layer** (see `docs/architecture.md`).
+- Access services via hooks (e.g., `useTheme`, `useScrollProgressService`); do not directly import from `infrastructure/` or `application/`.
+- Keep components pure; business logic lives in application layer services.
+
 ## Patterns
 - Data fetching: prefer server components; if client, use hooks with suspense/placeholder.
 - Refs & accessibility: avoid `div` soup; use semantic roles & headings.

@@ -24,11 +24,20 @@ Use this command when you need a fast but thorough sweep of a change set before 
    - Confirm accessible names, focus order, and dark mode behaviour for changed components.
 5. **E2E spot checks**
    - For user flows, run `pnpm e2e` (Playwright) or `pnpm e2e --project=chromium` for targeted runs.
-6. **Code review checklist**
-   - Verify props/state types stay strict (no `any`).
-   - Ensure tokens and Tailwind classes respect design system + responsive behaviour.
-   - Confirm no secrets/logging leaks, and new APIs validate inputs.
-   - Check Definition of Done: build ready, tests green, a11y addressed, documentation updated.
+6. **Performance validation**
+   - Run `pnpm lhci:ci` to validate Lighthouse CI targets (CLS ≤ 0.1, LCP ≤ 2500ms, performance ≥ 0.9).
+   - Check both animation flag states if motion code changed.
+7. **Code review checklist**
+   - **Architecture layers**: Verify imports follow dependency rules:
+     - Domain: no dependencies (pure TypeScript)
+     - Application: imports Domain only
+     - Infrastructure: implements Domain ports/interfaces
+     - Presentation (components/hooks): uses Application services via hooks, not direct imports
+   - **Service injection**: Components should use hooks (e.g., `useTheme`, `useScrollProgressService`) to access services, not import from `infrastructure/` or `application/` directly.
+   - **Type safety**: Verify props/state types stay strict (no `any`).
+   - **Design system**: Ensure tokens and Tailwind classes respect design system + responsive behaviour.
+   - **Security**: Confirm no secrets/logging leaks, and new APIs validate inputs.
+   - **Definition of Done**: build ready, tests green, a11y addressed, documentation updated.
 
 ## Reporting
 
