@@ -2,7 +2,6 @@ import type { Preview } from "@storybook/nextjs-vite";
 import { withThemeByDataAttribute } from "@storybook/addon-themes";
 import { createElement } from "react";
 import { ServiceProvider } from "../application/providers/ServiceProvider";
-import { createServices } from "../infrastructure/services/createServices";
 
 import "../app/globals.css";
 
@@ -37,14 +36,12 @@ if (process.env.NODE_ENV !== "production") {
   }
 }
 
-// Create services for Storybook
-const storybookServices = createServices();
-
 const preview: Preview = {
   decorators: [
     // Wrap all stories with ServiceProvider
+    // Services are created internally by ServiceProvider on the client side
     (Story) => (
-      <ServiceProvider services={storybookServices}>
+      <ServiceProvider>
         <Story />
       </ServiceProvider>
     ),

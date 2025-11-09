@@ -5,7 +5,8 @@
 
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createServices } from "@/infrastructure/services/createServices";
 import type { ThemeService } from "../theme/ThemeService";
 import type { ScrollService } from "../scroll/ScrollService";
 import type { AnimationService } from "../animations/AnimationService";
@@ -20,10 +21,13 @@ const ServiceContext = createContext<ServiceContextValue | null>(null);
 
 export interface ServiceProviderProps {
   children: ReactNode;
-  services: ServiceContextValue;
 }
 
-export function ServiceProvider({ children, services }: ServiceProviderProps) {
+export function ServiceProvider({ children }: ServiceProviderProps) {
+  // Create services on the client side to avoid serialization issues
+  // during SSR/prerendering
+  const services = useMemo(() => createServices(), []);
+
   return (
     <ServiceContext.Provider value={services}>
       {children}
