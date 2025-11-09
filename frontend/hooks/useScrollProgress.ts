@@ -54,7 +54,7 @@ export type UseScrollProgressReturn = {
  * ```
  */
 export function useScrollProgress(
-  ref: RefObject<HTMLElement>,
+  ref: RefObject<HTMLElement | null>,
   options: UseScrollProgressOptions = {},
 ): UseScrollProgressReturn {
   const { root, thresholds = [0.2, 0.8], onEnter, onLeave } = options;
