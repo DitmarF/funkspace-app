@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { workSans, spaceGrotesk } from "./fonts";
+import { ServiceProvider } from "@/application/providers/ServiceProvider";
+import { createServices } from "@/infrastructure/services/createServices";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,6 +15,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const services = createServices();
+
   return (
     <html
       lang="en"
@@ -81,7 +85,7 @@ export default function RootLayout({
             `,
           }}
         />
-        {children}
+        <ServiceProvider services={services}>{children}</ServiceProvider>
       </body>
     </html>
   );

@@ -3,9 +3,9 @@
 import { useRef, useEffect } from "react";
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
-import { useScrollProgress } from "../../hooks/useScrollProgress";
+import { useScrollProgressService } from "../../hooks/useScrollProgressService";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
-import { HTMLTimeline } from "../../utils/motion/htmlTimeline";
+import { HTMLTimeline } from "../../infrastructure/motion/htmlTimeline";
 import Text from "../Base/Text";
 import SnapSection from "./SnapSection";
 
@@ -57,7 +57,7 @@ const About = ({
   const timelineRef = useRef<HTMLTimeline | null>(null);
   const prefersReduced = useReducedMotion();
 
-  const { inView } = useScrollProgress(sectionRef, {
+  const { inView } = useScrollProgressService(sectionRef, {
     onEnter: () => {
       if (timelineRef.current && !prefersReduced) {
         timelineRef.current.playFrom(0);

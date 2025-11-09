@@ -1,7 +1,6 @@
 import type { Preview } from "@storybook/nextjs-vite";
 import { withThemeByDataAttribute } from "@storybook/addon-themes";
 import { createElement } from "react";
-import React from "react";
 import { ServiceProvider } from "../application/providers/ServiceProvider";
 import { createServices } from "../infrastructure/services/createServices";
 
@@ -44,12 +43,11 @@ const storybookServices = createServices();
 const preview: Preview = {
   decorators: [
     // Wrap all stories with ServiceProvider
-    (Story) =>
-      createElement(
-        ServiceProvider,
-        { services: storybookServices },
-        createElement(Story),
-      ),
+    (Story) => (
+      <ServiceProvider services={storybookServices}>
+        <Story />
+      </ServiceProvider>
+    ),
     withThemeByDataAttribute({
       themes: {
         default: "",

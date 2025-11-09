@@ -20,7 +20,13 @@ export default defineConfig({
     coverage: {
       enabled: Boolean(process.env.CI),
       provider: "v8",
-      include: ["src/**/*.{ts,tsx}"],
+      include: ["frontend/**/*.{ts,tsx}", "src/**/*.{ts,tsx}"],
+      exclude: [
+        "**/*.stories.{ts,tsx}",
+        "**/*.test.{ts,tsx}",
+        "**/node_modules/**",
+        "**/.next/**",
+      ],
       reporter: ["text", "html"],
       thresholds: {
         lines: 80,

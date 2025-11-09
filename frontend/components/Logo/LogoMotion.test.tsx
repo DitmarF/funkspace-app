@@ -10,8 +10,9 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { createRef } from "react";
 import { LogoMotion } from "./LogoMotion";
 import type { LogoMotionRef } from "./LogoMotion";
-import { AnimationTimeline } from "@/utils/motion/timeline";
-import { buildLogoManifest } from "@/data/animations/logo";
+import { AnimationTimeline } from "@/infrastructure/motion/timeline";
+import type { ThemeService } from "@/application/theme/ThemeService";
+import type { ScrollService } from "@/application/scroll/ScrollService";
 
 // Type for the mock timeline instance
 type MockTimeline = {
@@ -26,40 +27,44 @@ type MockTimeline = {
 };
 
 // Mock SVG utilities to avoid needing full SVG DOM support in jsdom
-vi.mock("@/utils/motion/svg", () => ({
+vi.mock("@/infrastructure/motion/svg", () => ({
   getPathLength: vi.fn(() => 100), // Return a mock path length
   applyStrokeDrawInit: vi.fn(() => 100), // Return mock length
   setStrokeDashoffset: vi.fn(),
   applyNumericStyle: vi.fn(),
 }));
 
-// Mock logoManifest to return a simple manifest
-vi.mock("@/data/animations/logo", () => ({
-  buildLogoManifest: vi.fn(() => ({
-    steps: [
-      {
-        target: "#logo-path-1",
-        property: "strokeDashoffset",
-        from: 100,
-        to: 0,
-        duration: 800,
-        easing: "emph",
-        delay: 0,
-      },
-      {
-        target: "#logo-path-1",
-        property: "fillOpacity",
-        from: 0,
-        to: 1,
-        duration: 200,
-        delay: 100,
-      },
-    ],
+// Mock AnimationOrchestrator to return a simple manifest
+const mockManifest = {
+  steps: [
+    {
+      target: "#logo-path-1",
+      property: "strokeDashoffset" as const,
+      from: 100,
+      to: 0,
+      duration: 800,
+      easing: "emph" as const,
+      delay: 0,
+    },
+    {
+      target: "#logo-path-1",
+      property: "fillOpacity" as const,
+      from: 0,
+      to: 1,
+      duration: 200,
+      delay: 100,
+    },
+  ],
+};
+
+vi.mock("@/application/animations/AnimationOrchestrator", () => ({
+  AnimationOrchestratorImpl: vi.fn().mockImplementation(() => ({
+    buildLogoManifest: vi.fn(() => mockManifest),
   })),
 }));
 
 // Mock the AnimationTimeline to avoid needing actual SVG elements in tests
-vi.mock("@/utils/motion/timeline", () => ({
+vi.mock("@/infrastructure/motion/timeline", () => ({
   AnimationTimeline: vi.fn().mockImplementation(() => ({
     play: vi.fn(),
     pause: vi.fn(),
@@ -80,6 +85,24 @@ vi.mock("@/utils/motion/timeline", () => ({
 const mockUseReducedMotion = vi.fn(() => false);
 vi.mock("@/hooks/useReducedMotion", () => ({
   useReducedMotion: () => mockUseReducedMotion(),
+}));
+
+// Mock ServiceProvider
+const mockAnimationOrchestrator = {
+  buildLogoManifest: vi.fn(() => mockManifest),
+};
+
+const mockAnimationService = {
+  getOrchestrator: vi.fn(() => mockAnimationOrchestrator),
+};
+
+vi.mock("@/application/providers/ServiceProvider", () => ({
+  ServiceProvider: ({ children }: { children: React.ReactNode }) => children,
+  useServices: () => ({
+    animationService: mockAnimationService,
+    themeService: {} as Partial<ThemeService>,
+    scrollService: {} as Partial<ScrollService>,
+  }),
 }));
 
 describe("LogoMotion", () => {
@@ -157,11 +180,13 @@ describe("LogoMotion", () => {
       render(<LogoMotion enabled={true} autoPlay={false} />);
 
       await waitFor(() => {
-        expect(buildLogoManifest).toHaveBeenCalled();
+        expect(mockAnimationOrchestrator.buildLogoManifest).toHaveBeenCalled();
       });
 
-      // buildLogoManifest is called without pathCount (it's ignored)
-      const [svgElement] = vi.mocked(buildLogoManifest).mock.calls[0];
+      // buildLogoManifest is called with SVG element
+      const [svgElement] = vi.mocked(
+        mockAnimationOrchestrator.buildLogoManifest,
+      ).mock.calls[0];
       expect(svgElement).toBeInstanceOf(SVGSVGElement);
 
       // Verify logoMark elements exist
@@ -178,7 +203,8 @@ describe("LogoMotion", () => {
       expect(circle1).not.toBeNull();
       // Note: In test environment, setStaticState runs first, so we verify
       // that the manifest includes logoMark animation steps
-      const manifest = buildLogoManifest(svgElement as SVGSVGElement);
+      // Use the mock manifest that was returned by the orchestrator
+      const manifest = mockManifest;
       const logoMarkSteps = manifest.steps.filter(
         (step) =>
           step.target === "#logo-path-1" || step.target.startsWith("#lmd-dot-"),

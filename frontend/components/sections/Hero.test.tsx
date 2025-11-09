@@ -2,7 +2,9 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Hero from "./Hero";
-import { HTMLTimeline } from "@/utils/motion/htmlTimeline";
+import { HTMLTimeline } from "@/infrastructure/motion/htmlTimeline";
+import type { ThemeService } from "@/application/theme/ThemeService";
+import type { AnimationService } from "@/application/animations/AnimationService";
 
 // Mock hooks - use vi.hoisted() to define mocks before vi.mock() calls
 const { mockUseScrollProgress, mockUseReducedMotion, mockTimeline, mockState } =
@@ -42,15 +44,28 @@ const { mockUseScrollProgress, mockUseReducedMotion, mockTimeline, mockState } =
     };
   });
 
-vi.mock("@/hooks/useScrollProgress", () => ({
-  useScrollProgress: mockUseScrollProgress,
+vi.mock("@/hooks/useScrollProgressService", () => ({
+  useScrollProgressService: mockUseScrollProgress,
+}));
+
+// Mock ServiceProvider
+vi.mock("@/application/providers/ServiceProvider", () => ({
+  ServiceProvider: ({ children }: { children: React.ReactNode }) => children,
+  useServices: () => ({
+    scrollService: {
+      calculateProgress: vi.fn(() => 0),
+      isInView: vi.fn(() => false),
+    },
+    themeService: {} as Partial<ThemeService>,
+    animationService: {} as Partial<AnimationService>,
+  }),
 }));
 
 vi.mock("@/hooks/useReducedMotion", () => ({
   useReducedMotion: () => mockUseReducedMotion(),
 }));
 
-vi.mock("@/utils/motion/htmlTimeline", () => ({
+vi.mock("@/infrastructure/motion/htmlTimeline", () => ({
   HTMLTimeline: vi.fn().mockImplementation(() => mockTimeline),
 }));
 
