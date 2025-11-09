@@ -29,7 +29,15 @@ export type SnapSectionProps = ComponentPropsWithoutRef<"section"> & {
  * SnapSection is a semantic full-screen section component with CSS Scroll Snap support.
  *
  * Renders a `<section>` with proper accessibility attributes and scroll snap behavior.
- * Uses `100dvh` for mobile viewport handling and supports keyboard navigation.
+ * Uses `100dvh` (dynamic viewport height) to handle mobile browser chrome correctly.
+ *
+ * Why `100dvh`?
+ * - Accounts for dynamic browser UI (address bar, toolbars) that can show/hide
+ * - On iOS Safari, prevents content from being cropped when address bar appears/disappears
+ * - Ensures sections always fill the actual visible viewport, not the static viewport
+ * - Fallback to `h-screen` (100vh) for older browsers without `dvh` support
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/length#dynamic_viewport_units
  *
  * @example
  * ```tsx
@@ -60,7 +68,15 @@ const SnapSection = forwardRef<HTMLElement, SnapSectionProps>(
             ? "snap-end"
             : "";
 
-    const classes = ["h-[100dvh]", "w-screen", snapClass, className]
+    // Use 100dvh as primary, with h-screen as fallback for older browsers
+    // Modern browsers will use h-[100dvh], older browsers will fall back to h-screen
+    const classes = [
+      "h-screen", // Fallback for browsers without dvh support
+      "h-[100dvh]", // Primary: dynamic viewport height for mobile browser chrome
+      "w-screen",
+      snapClass,
+      className,
+    ]
       .filter(Boolean)
       .join(" ");
 
