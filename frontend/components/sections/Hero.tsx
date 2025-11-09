@@ -6,6 +6,7 @@ import type { ComponentPropsWithoutRef } from "react";
 import { useScrollProgressService } from "../../hooks/useScrollProgressService";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { HTMLTimeline } from "../../infrastructure/motion/htmlTimeline";
+import Container from "../Layouts/Container";
 import Text from "../Base/Text";
 import Button from "../Controls/Button";
 import SnapSection from "./SnapSection";
@@ -202,7 +203,7 @@ const Hero = ({
       {/* Sticky pin demo: small badge that stays pinned until container ends */}
       {/* Uses CSS position: sticky - no scroll hijacking, pure CSS solution */}
       <div className="sticky top-0 z-10 w-full py-4">
-        <div className="mx-auto max-w-4xl px-8">
+        <Container width="medium" padding="lg">
           <div
             className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm"
             role="status"
@@ -211,12 +212,17 @@ const Hero = ({
             <span className="h-2 w-2 rounded-full bg-fs-green"></span>
             Sticky Pin Demo
           </div>
-        </div>
+        </Container>
       </div>
 
       {/* Main content - centered vertically and horizontally */}
       <div className="flex flex-1 items-center justify-center">
-        <div className="max-w-4xl space-y-8 p-8 text-center">
+        <Container
+          width="medium"
+          spacing="loose"
+          padding="lg"
+          className="text-center"
+        >
           <h1
             ref={headingRef}
             className="font-display text-5xl font-bold text-white sm:text-6xl"
@@ -262,7 +268,7 @@ const Hero = ({
               </Button>
             </div>
           )}
-        </div>
+        </Container>
       </div>
     </SnapSection>
   );

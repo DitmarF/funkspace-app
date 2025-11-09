@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
+import Container from "../Layouts/Container";
 import FullscreenScroll from "../Layouts/FullscreenScroll";
 import SnapSection from "./SnapSection";
 
@@ -131,7 +132,12 @@ export const WithRelaxedSnap: Story = {
         className="flex items-center justify-center"
         style={{ backgroundColor: "var(--fs-color-orange)" }}
       >
-        <div className="max-w-2xl space-y-4 p-8 text-center text-white">
+        <Container
+          width="sm-medium"
+          spacing="normal"
+          padding="lg"
+          className="text-center text-white"
+        >
           <h2 className="mb-4 text-4xl font-bold">Dense Content Section</h2>
           <p className="text-lg">
             This section has relaxed snap behavior for better scrolling with
@@ -147,7 +153,7 @@ export const WithRelaxedSnap: Story = {
               nisi ut aliquip ex ea commodo consequat.
             </p>
           </div>
-        </div>
+        </Container>
       </SnapSection>
     </FullscreenScroll>
   ),

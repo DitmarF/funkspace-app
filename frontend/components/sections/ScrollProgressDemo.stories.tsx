@@ -3,6 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React, { useRef } from "react";
 
+import Container from "../Layouts/Container";
 import FullscreenScroll from "../Layouts/FullscreenScroll";
 import { useScrollProgress } from "../../hooks/useScrollProgress";
 import SnapSection from "./SnapSection";
@@ -36,7 +37,12 @@ function ScrollProgressDemo() {
         snap="start"
         className="flex items-center justify-center bg-fs-blue"
       >
-        <div className="max-w-2xl space-y-6 p-8 text-center text-white">
+        <Container
+          width="sm-medium"
+          spacing="medium"
+          padding="lg"
+          className="text-center text-white"
+        >
           <h2 className="text-4xl font-bold">Section 1</h2>
           <div className="space-y-4">
             <div className="rounded-lg bg-white/20 p-4">
@@ -52,7 +58,7 @@ function ScrollProgressDemo() {
               progress value updates as you scroll through this section.
             </p>
           </div>
-        </div>
+        </Container>
       </SnapSection>
 
       <SnapSection
@@ -62,7 +68,12 @@ function ScrollProgressDemo() {
         snap="start"
         className="flex items-center justify-center bg-fs-violet"
       >
-        <div className="max-w-2xl space-y-6 p-8 text-center text-white">
+        <Container
+          width="sm-medium"
+          spacing="medium"
+          padding="lg"
+          className="text-center text-white"
+        >
           <h2 className="text-4xl font-bold">Section 2</h2>
           <div className="space-y-4">
             <div className="rounded-lg bg-white/20 p-4">
@@ -78,7 +89,7 @@ function ScrollProgressDemo() {
               progress bar shows Section 1&apos;s progress.
             </p>
           </div>
-        </div>
+        </Container>
       </SnapSection>
 
       <SnapSection
@@ -88,7 +99,12 @@ function ScrollProgressDemo() {
         snap="start"
         className="flex items-center justify-center bg-fs-cyan"
       >
-        <div className="max-w-2xl space-y-6 p-8 text-center text-white">
+        <Container
+          width="sm-medium"
+          spacing="medium"
+          padding="lg"
+          className="text-center text-white"
+        >
           <h2 className="text-4xl font-bold">Section 3</h2>
           <div className="space-y-4">
             <div className="rounded-lg bg-white/20 p-4">
@@ -104,7 +120,7 @@ function ScrollProgressDemo() {
               (0.2 and 0.8). Progress smoothly goes from 0 to 1 as you scroll.
             </p>
           </div>
-        </div>
+        </Container>
       </SnapSection>
     </FullscreenScroll>
   );

@@ -6,6 +6,7 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import { useScrollProgressService } from "../../hooks/useScrollProgressService";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { HTMLTimeline } from "../../infrastructure/motion/htmlTimeline";
+import Container from "../Layouts/Container";
 import Text from "../Base/Text";
 import SnapSection from "./SnapSection";
 
@@ -177,13 +178,13 @@ const About = ({
             scrollBehavior: "smooth",
           }}
         >
-          <div className="max-w-4xl mx-auto p-8 space-y-6">
+          <Container width="medium" padding="lg" spacing="medium">
             {typeof children === "string" ? (
               <Text className="text-white">{children}</Text>
             ) : (
               <div className="text-white space-y-4">{children}</div>
             )}
-          </div>
+          </Container>
         </div>
       </div>
     </SnapSection>

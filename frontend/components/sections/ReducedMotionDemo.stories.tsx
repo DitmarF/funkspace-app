@@ -3,6 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
+import Container from "../Layouts/Container";
 import FullscreenScroll from "../Layouts/FullscreenScroll";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import SnapSection from "./SnapSection";
@@ -21,7 +22,12 @@ function ReducedMotionDemo() {
         snap="start"
         className="flex items-center justify-center bg-fs-blue"
       >
-        <div className="max-w-2xl space-y-6 p-8 text-center text-white">
+        <Container
+          width="sm-medium"
+          spacing="medium"
+          padding="lg"
+          className="text-center text-white"
+        >
           <h2 className="text-4xl font-bold">
             Reduced Motion: {prefersReduced ? "Active" : "Inactive"}
           </h2>
@@ -58,7 +64,7 @@ function ReducedMotionDemo() {
               </p>
             </div>
           </div>
-        </div>
+        </Container>
       </SnapSection>
       <SnapSection
         id="static-content"
@@ -66,7 +72,12 @@ function ReducedMotionDemo() {
         snap="start"
         className="flex items-center justify-center bg-fs-violet"
       >
-        <div className="max-w-2xl space-y-6 p-8 text-center text-white">
+        <Container
+          width="sm-medium"
+          spacing="medium"
+          padding="lg"
+          className="text-center text-white"
+        >
           <h2 className="text-4xl font-bold">Static Content</h2>
           <p className="text-lg">
             This section demonstrates that content remains readable and
@@ -90,7 +101,7 @@ function ReducedMotionDemo() {
               <p className="text-sm">Accessibility maintained</p>
             </div>
           </div>
-        </div>
+        </Container>
       </SnapSection>
     </FullscreenScroll>
   );
