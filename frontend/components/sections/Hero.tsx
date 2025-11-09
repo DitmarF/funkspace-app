@@ -202,7 +202,7 @@ const Hero = ({
     >
       {/* Sticky pin demo: small badge that stays pinned until container ends */}
       {/* Uses CSS position: sticky - no scroll hijacking, pure CSS solution */}
-      <div className="sticky top-0 z-10 w-full py-4">
+      <header className="sticky top-0 z-10 w-full py-4">
         <Container width="medium" padding="lg">
           <div
             className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm"
@@ -213,7 +213,7 @@ const Hero = ({
             Sticky Pin Demo
           </div>
         </Container>
-      </div>
+      </header>
 
       {/* Main content - centered vertically and horizontally */}
       <div className="flex flex-1 items-center justify-center">

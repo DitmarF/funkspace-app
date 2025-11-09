@@ -47,6 +47,12 @@ const meta = {
     ),
   },
   argTypes: {
+    as: {
+      control: { type: "select" },
+      options: ["div", "main", "section"],
+      description:
+        "The HTML element to render. Use `main` for page-level wrappers for better accessibility.",
+    },
     snapMode: {
       control: { type: "select" },
       options: ["mandatory", "proximity", "none"],
@@ -181,6 +187,51 @@ export const CompositeLayoutWithInnerScroll: Story = {
       description: {
         story:
           "Composite layout with Hero and About sections. The About section has inner scrolling enabled, so the snap mode is set to proximity to avoid trapping users. Use the toolbar control to test different snap modes.",
+      },
+    },
+  },
+};
+
+/**
+ * Example using semantic main element for page wrapper
+ */
+export const SemanticMain: Story = {
+  render: (args) => (
+    <FullscreenScroll {...args} as="main">
+      <SnapSection
+        id="section-1"
+        aria-label="First section"
+        snap="start"
+        className="flex items-center justify-center"
+        style={{ backgroundColor: "var(--fs-color-blue)" }}
+      >
+        <div className="text-white text-4xl font-bold">
+          Page wrapped in &lt;main&gt;
+        </div>
+      </SnapSection>
+      <SnapSection
+        id="section-2"
+        aria-label="Second section"
+        snap="start"
+        className="flex items-center justify-center"
+        style={{ backgroundColor: "var(--fs-color-violet)" }}
+      >
+        <div className="text-white text-4xl font-bold">
+          Better accessibility
+        </div>
+      </SnapSection>
+    </FullscreenScroll>
+  ),
+  args: {
+    as: "main",
+    snapMode: "mandatory",
+  } satisfies FullscreenScrollProps,
+  parameters: {
+    layout: "fullscreen",
+    docs: {
+      description: {
+        story:
+          "FullscreenScroll with as='main' renders as a semantic <main> element. This is recommended for page-level wrappers to improve accessibility and SEO.",
       },
     },
   },

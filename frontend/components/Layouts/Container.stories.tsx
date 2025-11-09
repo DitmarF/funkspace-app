@@ -24,6 +24,21 @@ const meta = {
     ),
   },
   argTypes: {
+    as: {
+      control: { type: "select" },
+      options: [
+        "div",
+        "section",
+        "article",
+        "main",
+        "header",
+        "footer",
+        "aside",
+        "nav",
+      ],
+      description:
+        "The HTML element to render. Use semantic elements for better accessibility.",
+    },
     width: {
       control: { type: "select" },
       options: [
@@ -413,5 +428,107 @@ export const InSectionContext: Story = {
   ),
   parameters: {
     layout: "fullscreen",
+  },
+};
+
+export const SemanticElements: Story = {
+  render: () => (
+    <div className="min-h-screen bg-fs-surface-background space-y-8 p-8">
+      <div>
+        <Text
+          size="sm"
+          className="mb-4 font-semibold text-fs-content-elevation-2"
+        >
+          Default (div)
+        </Text>
+        <Container className="bg-fs-surface-elevation-1">
+          <Text>Default container renders as &lt;div&gt;</Text>
+        </Container>
+      </div>
+      <div>
+        <Text
+          size="sm"
+          className="mb-4 font-semibold text-fs-content-elevation-2"
+        >
+          Section
+        </Text>
+        <Container as="section" className="bg-fs-surface-elevation-1">
+          <Text>
+            Container with as=&quot;section&quot; renders as &lt;section&gt;
+          </Text>
+        </Container>
+      </div>
+      <div>
+        <Text
+          size="sm"
+          className="mb-4 font-semibold text-fs-content-elevation-2"
+        >
+          Article
+        </Text>
+        <Container as="article" className="bg-fs-surface-elevation-1">
+          <Text>
+            Container with as=&quot;article&quot; renders as &lt;article&gt;
+          </Text>
+        </Container>
+      </div>
+      <div>
+        <Text
+          size="sm"
+          className="mb-4 font-semibold text-fs-content-elevation-2"
+        >
+          Header
+        </Text>
+        <Container as="header" className="bg-fs-surface-elevation-1">
+          <Text>
+            Container with as=&quot;header&quot; renders as &lt;header&gt;
+          </Text>
+        </Container>
+      </div>
+      <div>
+        <Text
+          size="sm"
+          className="mb-4 font-semibold text-fs-content-elevation-2"
+        >
+          Footer
+        </Text>
+        <Container as="footer" className="bg-fs-surface-elevation-1">
+          <Text>
+            Container with as=&quot;footer&quot; renders as &lt;footer&gt;
+          </Text>
+        </Container>
+      </div>
+      <div>
+        <Text
+          size="sm"
+          className="mb-4 font-semibold text-fs-content-elevation-2"
+        >
+          Nav
+        </Text>
+        <Container as="nav" className="bg-fs-surface-elevation-1">
+          <Text>Container with as=&quot;nav&quot; renders as &lt;nav&gt;</Text>
+        </Container>
+      </div>
+      <div>
+        <Text
+          size="sm"
+          className="mb-4 font-semibold text-fs-content-elevation-2"
+        >
+          Aside
+        </Text>
+        <Container as="aside" className="bg-fs-surface-elevation-1">
+          <Text>
+            Container with as=&quot;aside&quot; renders as &lt;aside&gt;
+          </Text>
+        </Container>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Container supports semantic HTML elements via the `as` prop. Use semantic elements for better accessibility and SEO. All container props (width, align, spacing, padding) work with semantic elements.",
+      },
+    },
   },
 };

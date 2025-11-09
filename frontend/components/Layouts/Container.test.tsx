@@ -416,4 +416,119 @@ describe("Container", () => {
     expect(screen.getByTestId("default")).toHaveClass("max-w-5xl");
     expect(screen.getByTestId("wide")).toHaveClass("max-w-7xl");
   });
+
+  describe("semantic HTML elements", () => {
+    it("should render as div by default", () => {
+      render(
+        <Container data-testid="container">
+          <div>Content</div>
+        </Container>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("DIV");
+    });
+
+    it("should render as section when as='section'", () => {
+      render(
+        <Container as="section" data-testid="container">
+          <div>Content</div>
+        </Container>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("SECTION");
+    });
+
+    it("should render as article when as='article'", () => {
+      render(
+        <Container as="article" data-testid="container">
+          <div>Content</div>
+        </Container>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("ARTICLE");
+    });
+
+    it("should render as main when as='main'", () => {
+      render(
+        <Container as="main" data-testid="container">
+          <div>Content</div>
+        </Container>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("MAIN");
+    });
+
+    it("should render as header when as='header'", () => {
+      render(
+        <Container as="header" data-testid="container">
+          <div>Content</div>
+        </Container>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("HEADER");
+    });
+
+    it("should render as footer when as='footer'", () => {
+      render(
+        <Container as="footer" data-testid="container">
+          <div>Content</div>
+        </Container>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("FOOTER");
+    });
+
+    it("should render as aside when as='aside'", () => {
+      render(
+        <Container as="aside" data-testid="container">
+          <div>Content</div>
+        </Container>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("ASIDE");
+    });
+
+    it("should render as nav when as='nav'", () => {
+      render(
+        <Container as="nav" data-testid="container">
+          <div>Content</div>
+        </Container>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("NAV");
+    });
+
+    it("should apply all container props when using semantic element", () => {
+      render(
+        <Container
+          as="section"
+          width="medium"
+          align="left"
+          spacing="normal"
+          padding="lg"
+          className="custom-class"
+          data-testid="semantic-container"
+        >
+          <div>Content</div>
+        </Container>,
+      );
+
+      const container = screen.getByTestId("semantic-container");
+      expect(container.tagName).toBe("SECTION");
+      expect(container).toHaveClass("max-w-4xl");
+      expect(container).toHaveClass("mr-auto");
+      expect(container).toHaveClass("space-y-4");
+      expect(container).toHaveClass("px-6");
+      expect(container).toHaveClass("py-8");
+      expect(container).toHaveClass("custom-class");
+    });
+  });
 });

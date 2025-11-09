@@ -147,4 +147,61 @@ describe("FullscreenScroll", () => {
     expect(container).toHaveClass("h-screen");
     expect(container).toHaveClass("h-[100dvh]");
   });
+
+  describe("semantic HTML elements", () => {
+    it("should render as div by default", () => {
+      render(
+        <FullscreenScroll data-testid="container">
+          <div>Content</div>
+        </FullscreenScroll>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("DIV");
+    });
+
+    it("should render as main when as='main'", () => {
+      render(
+        <FullscreenScroll as="main" data-testid="container">
+          <div>Content</div>
+        </FullscreenScroll>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("MAIN");
+    });
+
+    it("should render as section when as='section'", () => {
+      render(
+        <FullscreenScroll as="section" data-testid="container">
+          <div>Content</div>
+        </FullscreenScroll>,
+      );
+
+      const container = screen.getByTestId("container");
+      expect(container.tagName).toBe("SECTION");
+    });
+
+    it("should apply all props when using semantic element", () => {
+      render(
+        <FullscreenScroll
+          as="main"
+          snapMode="proximity"
+          scrollPaddingTop="scroll-padding-top-16"
+          className="custom-class"
+          data-testid="semantic-container"
+        >
+          <div>Content</div>
+        </FullscreenScroll>,
+      );
+
+      const container = screen.getByTestId("semantic-container");
+      expect(container.tagName).toBe("MAIN");
+      expect(container).toHaveClass("snap-proximity");
+      expect(container).toHaveClass("scroll-padding-top-16");
+      expect(container).toHaveClass("custom-class");
+      expect(container).toHaveClass("h-screen");
+      expect(container).toHaveClass("h-[100dvh]");
+    });
+  });
 });

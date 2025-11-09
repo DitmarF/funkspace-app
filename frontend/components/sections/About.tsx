@@ -151,7 +151,7 @@ const About = ({
     >
       <div className="flex flex-col h-full">
         {/* Header area - fixed height */}
-        <div className="flex-shrink-0 p-8 text-center">
+        <header className="flex-shrink-0 p-8 text-center">
           <h2
             ref={headingRef}
             className="font-display text-4xl font-bold text-white sm:text-5xl"
@@ -163,7 +163,7 @@ const About = ({
           >
             {heading}
           </h2>
-        </div>
+        </header>
 
         {/* Content area - scrollable when innerScrollable is true */}
         <div

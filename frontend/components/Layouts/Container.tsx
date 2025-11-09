@@ -1,4 +1,4 @@
-import type { ComponentPropsWithoutRef } from "react";
+import type { ComponentPropsWithoutRef, ElementType } from "react";
 
 type ContainerWidth =
   | "xs"
@@ -13,7 +13,29 @@ type ContainerAlign = "left" | "center" | "right";
 type ContainerSpacing = "none" | "tight" | "normal" | "medium" | "loose";
 type ContainerPadding = "none" | "sm" | "md" | "lg";
 
-export type ContainerProps = ComponentPropsWithoutRef<"div"> & {
+type ContainerElement =
+  | "div"
+  | "section"
+  | "article"
+  | "main"
+  | "header"
+  | "footer"
+  | "aside"
+  | "nav";
+
+type ContainerPropsBase = {
+  /**
+   * The HTML element to render. Use semantic elements for better accessibility.
+   * - `div`: Default, for layout-only containers
+   * - `section`: For distinct sections of content
+   * - `article`: For standalone content
+   * - `main`: For main page content
+   * - `header`: For header content
+   * - `footer`: For footer content
+   * - `aside`: For sidebar content
+   * - `nav`: For navigation
+   */
+  as?: ContainerElement;
   /**
    * Maximum width constraint for the container.
    * - `xs`: 20rem (320px)
@@ -53,6 +75,9 @@ export type ContainerProps = ComponentPropsWithoutRef<"div"> & {
   padding?: ContainerPadding;
 };
 
+export type ContainerProps = ContainerPropsBase &
+  ComponentPropsWithoutRef<"div">;
+
 const widthClasses: Record<ContainerWidth, string> = {
   xs: "max-w-xs",
   sm: "max-w-sm",
@@ -86,6 +111,7 @@ const paddingClasses: Record<ContainerPadding, string> = {
 };
 
 const Container = ({
+  as = "div",
   width = "default",
   align = "center",
   spacing,
@@ -94,6 +120,7 @@ const Container = ({
   children,
   ...props
 }: ContainerProps) => {
+  const Element = as as ElementType;
   const classes = [
     "w-full",
     widthClasses[width],
@@ -106,9 +133,12 @@ const Container = ({
     .join(" ");
 
   return (
-    <div className={classes} {...props}>
+    <Element
+      className={classes}
+      {...(props as ComponentPropsWithoutRef<typeof Element>)}
+    >
       {children}
-    </div>
+    </Element>
   );
 };
 
