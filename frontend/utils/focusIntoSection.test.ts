@@ -162,22 +162,18 @@ describe("focusIntoSection", () => {
   });
 
   it("should not warn in production when section not found", () => {
+    // Use Vitest's stubEnv to mock NODE_ENV
     const originalEnv = process.env.NODE_ENV;
-    Object.defineProperty(process.env, "NODE_ENV", {
-      value: "production",
-      writable: true,
-      configurable: true,
-    });
+    // @ts-expect-error - Vitest stubEnv types may not be perfect
+    vi.stubEnv("NODE_ENV", "production");
 
     focusIntoSection("non-existent");
 
     expect(console.warn).not.toHaveBeenCalled();
 
-    Object.defineProperty(process.env, "NODE_ENV", {
-      value: originalEnv,
-      writable: true,
-      configurable: true,
-    });
+    // Restore original value
+    // @ts-expect-error - Vitest stubEnv types may not be perfect
+    vi.stubEnv("NODE_ENV", originalEnv || "test");
   });
 });
 
