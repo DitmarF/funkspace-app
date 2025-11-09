@@ -95,3 +95,32 @@ export const WithMultipleSections: Story = {
     </FullscreenScroll>
   ),
 };
+
+/**
+ * Hero with sticky pin demo
+ * Demonstrates CSS position: sticky without scroll hijacking
+ */
+export const WithStickyPin: Story = {
+  render: (args) => (
+    <FullscreenScroll snapMode="mandatory">
+      <Hero
+        {...args}
+        heading="Hero with Sticky Pin"
+        subheading="Scroll to see the sticky badge stay pinned at the top until the section ends. No scroll hijacking - pure CSS position: sticky."
+      />
+      <Hero
+        heading="Next Section"
+        subheading="The sticky element released when the previous section ended"
+        backgroundColor="bg-fs-violet"
+      />
+    </FullscreenScroll>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Demonstrates CSS position: sticky pinning without scroll hijacking. The sticky badge stays at the top of the Hero section until the container ends, then releases. Keyboard focus remains unaffected.",
+      },
+    },
+  },
+};

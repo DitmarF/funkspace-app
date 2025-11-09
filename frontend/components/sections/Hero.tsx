@@ -175,41 +175,43 @@ const Hero = ({
       id="hero"
       aria-label="Hero section"
       snap="start"
-      className={`flex items-center justify-center ${backgroundColor} ${className}`.trim()}
+      className={`relative flex flex-col ${backgroundColor} ${className}`.trim()}
       {...props}
     >
-      <div className="max-w-4xl space-y-8 p-8 text-center">
-        <h1
-          ref={headingRef}
-          className="font-display text-5xl font-bold text-white sm:text-6xl"
-          style={{
-            willChange: prefersReduced ? "auto" : "transform, opacity",
-            transform: prefersReduced ? "translateY(0)" : "translateY(30px)",
-            opacity: prefersReduced ? "1" : "0",
-          }}
-        >
-          {heading}
-        </h1>
-        {subheading && (
-          <Text
-            ref={subheadingRef}
-            size="lg"
-            className="mx-auto max-w-2xl text-white"
+      {/* Sticky pin demo: small badge that stays pinned until container ends */}
+      {/* Uses CSS position: sticky - no scroll hijacking, pure CSS solution */}
+      <div className="sticky top-0 z-10 w-full py-4">
+        <div className="mx-auto max-w-4xl px-8">
+          <div
+            className="inline-flex items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm"
+            role="status"
+            aria-live="polite"
+          >
+            <span className="h-2 w-2 rounded-full bg-fs-green"></span>
+            Sticky Pin Demo
+          </div>
+        </div>
+      </div>
+
+      {/* Main content - centered vertically and horizontally */}
+      <div className="flex flex-1 items-center justify-center">
+        <div className="max-w-4xl space-y-8 p-8 text-center">
+          <h1
+            ref={headingRef}
+            className="font-display text-5xl font-bold text-white sm:text-6xl"
             style={{
               willChange: prefersReduced ? "auto" : "transform, opacity",
-              transform: prefersReduced ? "translateY(0)" : "translateY(20px)",
+              transform: prefersReduced ? "translateY(0)" : "translateY(30px)",
               opacity: prefersReduced ? "1" : "0",
             }}
           >
-            {subheading}
-          </Text>
-        )}
-        {ctaLabel && (
-          <div className="flex justify-center">
-            <Button
-              ref={ctaRef}
-              variant="primary"
-              onClick={onCtaClick}
+            {heading}
+          </h1>
+          {subheading && (
+            <Text
+              ref={subheadingRef}
+              size="lg"
+              className="mx-auto max-w-2xl text-white"
               style={{
                 willChange: prefersReduced ? "auto" : "transform, opacity",
                 transform: prefersReduced
@@ -218,10 +220,28 @@ const Hero = ({
                 opacity: prefersReduced ? "1" : "0",
               }}
             >
-              {ctaLabel}
-            </Button>
-          </div>
-        )}
+              {subheading}
+            </Text>
+          )}
+          {ctaLabel && (
+            <div className="flex justify-center">
+              <Button
+                ref={ctaRef}
+                variant="primary"
+                onClick={onCtaClick}
+                style={{
+                  willChange: prefersReduced ? "auto" : "transform, opacity",
+                  transform: prefersReduced
+                    ? "translateY(0)"
+                    : "translateY(20px)",
+                  opacity: prefersReduced ? "1" : "0",
+                }}
+              >
+                {ctaLabel}
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </SnapSection>
   );
