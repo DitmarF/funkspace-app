@@ -2,6 +2,14 @@
 
 Use this playbook to craft or extend automated tests with consistent tooling and coverage expectations.
 
+## Reasoning mode (systematic 80/20 coverage)
+
+- Clarify **what behavior matters most** and which failures are most harmful.
+- Apply the 80/20 rule:
+  - First, write tests that cover: primary happy path, key failure modes, and a11y/perf constraints.
+  - Then, add more cases only when they significantly increase confidence.
+- For overall strategy (unit vs integration vs E2E), see `.cursor/rules/02-testing.mdc`.
+
 ## Prerequisites
 
 - Install deps: `pnpm install` at repo root.

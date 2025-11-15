@@ -8,6 +8,15 @@ alwaysApply: false
 - Arrange/Act/Assert; cover happy path + edge cases (empty, nullish, boundary values).
 - Avoid network & time dependence; mock/stub IO; keep tests < 200ms each when possible.
 
+### Systematic test design (80/20)
+
+- Clarify the behavior and **most important risks** first.
+- Start with tests that cover:
+  - The main happy path.
+  - The most likely failure modes.
+  - Critical a11y or perf constraints.
+- Add additional cases when they materially improve confidence; avoid over‑specifying implementation details.
+
 ## Component tests
 - Use @testing-library/react selectors by role/text; assert accessible behavior.
 
@@ -17,4 +26,5 @@ alwaysApply: false
 
 ## Quality gates
 - Require CI to run lint, typecheck, unit, e2e smoke on PRs.
-- Use `.cursor/commands/write-tests.md` for authoring guidance and `.cursor/commands/review-code.md` for final QA passes.
+- Use `.cursor/commands/write-tests.md` for authoring workflow guidance and `.cursor/commands/review-code.md` for final QA passes.
+- See `.cursor/rules/03-ci-cd.mdc` for the canonical CI pipeline and thresholds.

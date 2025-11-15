@@ -8,6 +8,43 @@ alwaysApply: true
 - Priorities: Accessibility (a11y) → Performance → Maintainability → Polish.
 - Definition of Done: build ok, lint/type clean, tests green, no serious a11y issues, lightweight PR notes.
 
+## Systematic Thinking & Reasoning Modes
+
+- Systematically approach every change:
+  - Clarify the **goal** and constraints.
+  - Sketch the **high‑impact path** (80/20: what 20% of work covers 80% of impact).
+  - Identify **edge cases** and risks (a11y, perf, security, data loss).
+  - Implement in **small, reversible steps**, validating as you go.
+- Apply the Pareto principle:
+  - Solve the **core user path first**, then add refinements.
+  - Prefer a simple, well‑tested solution over an intricate but fragile one.
+- Use hermeneutic prompting (iterative interpretation):
+  - Restate the problem in your own words.
+  - Check understanding with the requester (or via examples/tests).
+  - Refine the solution as new context appears.
+
+### For humans
+
+- Before coding:
+  - Write down the **user story**, constraints, and success criteria.
+  - Decide which parts deliver the **largest impact** and implement those first.
+  - Sketch architecture: which **layer(s)** (Domain, Application, Infrastructure, Presentation) should change.
+- While coding:
+  - Keep functions, components, and modules **single‑responsibility** and **idempotent** where possible.
+  - Prefer composition over deep inheritance and global state.
+  - Continuously run lint/tests on the scope you touch.
+
+### For agents (Cursor / AI assistants)
+
+- When responding in this repo:
+  - Summarize the **intent** you inferred and outline your plan before making changes.
+  - Prefer **targeted edits** over broad rewrites; respect existing architecture and design tokens.
+  - Ask at most a few **focused questions** when requirements are ambiguous; otherwise choose a safe default and state it.
+- When proposing work:
+  - Start with the **80/20 path** (cover main flows and risks first).
+  - Use hermeneutic prompting: paraphrase requirements, show small diffs, and iterate with the user.
+  - Keep code TypeScript‑strict, accessible, and performance‑aware by default.
+
 ## Conventions
 - Components live under `app/**` or `components/**`; colocate tests as `*.test.ts(x)`.
 - Use Tailwind tokens from `tailwind.config.*` (no inline styles). Prefer `<Image>` for images.
