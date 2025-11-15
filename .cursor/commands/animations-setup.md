@@ -2,6 +2,8 @@
 
 Run these in order. Approvals ON.
 
+For CI, a11y, and performance targets, see `.cursor/rules/03-ci-cd.mdc`. For architecture and layering, see `.cursor/rules/05-architecture.mdc`.
+
 ### 1) Install deps (workspace root)
 
 ```bash

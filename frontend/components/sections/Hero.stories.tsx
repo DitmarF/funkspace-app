@@ -63,18 +63,21 @@ export const Default: Story = {};
 
 export const WithoutSubheading: Story = {
   args: {
+    heading: "Welcome to FunkSpace",
     subheading: undefined,
   } satisfies HeroProps,
 };
 
 export const WithoutCTA: Story = {
   args: {
+    heading: "Welcome to FunkSpace",
     ctaLabel: undefined,
   } satisfies HeroProps,
 };
 
 export const Minimal: Story = {
   args: {
+    heading: "Welcome to FunkSpace",
     subheading: undefined,
     ctaLabel: undefined,
   } satisfies HeroProps,

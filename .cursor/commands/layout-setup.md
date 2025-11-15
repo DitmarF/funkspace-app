@@ -2,6 +2,8 @@
 
 Use this command when developing fullscreen scroll layouts with snap sections and scroll-triggered animations.
 
+For architecture and clean code rules, see `.cursor/rules/05-architecture.mdc`. For CI and perf targets, see `.cursor/rules/03-ci-cd.mdc`.
+
 ## Prerequisites
 
 - `pnpm install` at repo root
@@ -22,9 +24,9 @@ Create layout primitives following clean architecture:
 
 **Architecture notes:**
 
-- Components in `components/` are presentation layer
-- Use hooks (e.g., `useScrollProgressService`) to access services, not direct imports from `application/` or `infrastructure/`
-- Keep components pure; business logic lives in application layer services
+- Components in `components/` are presentation layer.
+- Use hooks (e.g., `useScrollProgressService`) to access services, not direct imports from `application/` or `infrastructure/`.
+- Keep components pure; business logic lives in application and domain services (see `.cursor/rules/05-architecture.mdc` for details).
 
 ### 2) Build design tokens
 

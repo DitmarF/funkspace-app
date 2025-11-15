@@ -2,11 +2,10 @@
 
 Run with Approvals ON before opening the PR.
 
-### 1) Lint & Prettier
+### 1) Standard CI sequence (canonical)
 
-```bash
-pnpm lint
-```
+- Run the **full CI pipeline locally** as defined in `.cursor/rules/03-ci-cd.mdc` (lint, typecheck, unit, E2E, build, Lighthouse).
+- Fix any failures before requesting review.
 
 ### 2) Typecheck (frontend)
 
@@ -46,11 +45,13 @@ Runs Lighthouse CI with animations flag both OFF and ON. Validates:
 
 ### 7) A11y scan
 
+- Run the a11y smoke suite (axe via Playwright), typically:
+
 ```bash
 pnpm e2e:smoke
 ```
 
-Runs Playwright a11y smoke tests with axe-core. Verifies zero violations on key routes.
+Verifies zero violations on key routes.
 
 ### 8) Environment variables
 

@@ -388,7 +388,7 @@ export const InSectionContext: Story = {
     <div className="min-h-screen bg-fs-surface-background">
       <section className="py-16">
         <Container width="default" spacing="normal">
-          <Text size="xl" className="font-semibold">
+          <Text size="lg" className="font-semibold">
             Section Heading
           </Text>
           <Text>
@@ -404,7 +404,7 @@ export const InSectionContext: Story = {
       </section>
       <section className="bg-fs-surface-elevation-1 py-16">
         <Container width="narrow" spacing="loose">
-          <Text size="xl" className="font-semibold">
+          <Text size="lg" className="font-semibold">
             Narrow Container
           </Text>
           <Text>
@@ -415,7 +415,7 @@ export const InSectionContext: Story = {
       </section>
       <section className="py-16">
         <Container width="wide" align="left" spacing="tight">
-          <Text size="xl" className="font-semibold">
+          <Text size="lg" className="font-semibold">
             Wide Left-Aligned
           </Text>
           <Text>

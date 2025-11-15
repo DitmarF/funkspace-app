@@ -3,7 +3,7 @@ description: "FunkSpace — CI/CD & Release"
 alwaysApply: false
 ---
 
-## GitHub Actions CI Pipeline
+## GitHub Actions CI Pipeline (Canonical)
 
 CI runs on PRs and pushes to `main`. Steps (in order):
 
@@ -22,7 +22,7 @@ CI runs on PRs and pushes to `main`. Steps (in order):
 - Timeout: 30 minutes
 - Fail on lint/type warnings
 
-## Lighthouse CI Targets
+## Lighthouse CI Targets (Canonical)
 
 - **CLS** ≤ 0.1 (p75)
 - **LCP** ≤ 2500ms (p75)

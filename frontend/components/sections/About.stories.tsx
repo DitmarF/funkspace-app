@@ -90,6 +90,7 @@ export const Default: Story = {};
 
 export const WithInnerScroll: Story = {
   args: {
+    heading: "About FunkSpace",
     innerScrollable: true,
     children: longContent,
   } satisfies AboutProps,

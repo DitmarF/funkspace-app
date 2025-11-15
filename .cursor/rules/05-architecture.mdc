@@ -1,5 +1,5 @@
 ---
-description: "FunkSpace — Clean Architecture & Dependency Rules"
+description: "FunkSpace — Clean Architecture & Clean Code"
 globs: ["frontend/domain/**/*.ts", "frontend/application/**/*.ts", "frontend/infrastructure/**/*.ts", "frontend/components/**/*.tsx", "frontend/hooks/**/*.ts"]
 alwaysApply: false
 ---
@@ -84,6 +84,41 @@ Components should use hooks (e.g., `useTheme`, `useScrollProgressService`) to ac
 - `components/` - React components (presentation layer)
 - `hooks/` - React hooks (thin wrappers around services)
 - `app/` - Next.js App Router pages (presentation layer)
+
+## Clean Code & Design Principles
+
+### Single Responsibility & Idempotency
+
+- Give each variable, type, function, and module **one clear reason to change**.
+  - Variables: represent a **single concept**; avoid reusing the same variable for multiple meanings.
+  - Types/interfaces: describe one cohesive shape or role; split if the type grows unrelated fields.
+  - Functions: do **one thing** at one level of abstraction; prefer small, composable helpers.
+  - Modules/files: group closely related behavior; extract when a file becomes a “grab‑bag”.
+- Aim for **idempotent** functions where practical:
+  - Pure functions (no hidden state, no I/O) are easiest to test and reuse.
+  - Application and infrastructure services should minimize hidden side effects and make them explicit via return types or events.
+
+### Modular Architecture Design
+
+- Map modules to layers:
+  - Domain modules express **business concepts** (e.g., animations, theme) without framework imports.
+  - Application modules orchestrate **use cases** using domain entities and ports.
+  - Infrastructure modules adapt to **browser/DOM/storage** and external APIs.
+  - Presentation modules render **UI**, delegating behavior to hooks/services.
+- When to introduce a new module:
+  - The concept is reused across multiple features.
+  - A file exceeds a small, understandable scope (e.g., > ~200–250 lines or multiple unrelated concerns).
+  - You need to swap implementations (e.g., local storage vs. in‑memory) behind a port.
+
+### Function & Object Design
+
+- Prefer:
+  - Pure functions for domain logic.
+  - Small, named helpers instead of long inline callbacks.
+  - Data‑first design: pass explicit parameters, avoid grabbing global state.
+- Avoid:
+  - Long parameter lists without grouping (introduce small value objects where helpful).
+  - Deep object mutation across layers; prefer returning new values.
 
 ## Testing Strategy
 

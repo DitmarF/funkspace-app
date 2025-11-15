@@ -9,15 +9,27 @@ alwaysApply: false
 - Use semantic colors & tokens from Tailwind theme; no hardcoded hex except in token files.
 - Provide focus states, visible labels, and ARIA where needed.
 
+## Systematic UI Design
+
+- Start from **structure and semantics**:
+  - Define landmarks (`main`, `header`, `nav`, `section`, `footer`) and heading hierarchy.
+  - Ensure keyboard navigation and focus order work before adding visual polish.
+- Apply the **80/20 principle**:
+  - Design and test the primary user path and smallest viable set of breakpoints first.
+  - Add advanced states, motion, and visual details after the core flow is solid.
+- Respect user preferences:
+  - a11y and reduced motion always win over decorative effects.
+  - Prefer smooth, minimal motion that doesn’t block interaction.
+
 ## Components
 - Presentational vs Container: keep props serializable; derive minimal required state.
 - Use `<Image>` for media; include `alt`. Lazy-load below the fold.
 - Animations: respect `prefers-reduced-motion`; keep durations short; avoid layout thrash.
 
 ## Architecture & Service Injection
-- Components in `components/` and `app/` are **presentation layer** (see `docs/architecture.md`).
+- Components in `components/` and `app/` are **presentation layer** (see `docs/architecture.md` and `.cursor/rules/05-architecture.mdc`).
 - Access services via hooks (e.g., `useTheme`, `useScrollProgressService`); do not directly import from `infrastructure/` or `application/`.
-- Keep components pure; business logic lives in application layer services.
+- Keep components pure; business logic and orchestration live in application and domain services.
 
 ## Semantic HTML
 - Use semantic elements (`main`, `section`, `article`, `header`, `footer`, `nav`, `aside`) for content structure.

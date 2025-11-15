@@ -9,6 +9,12 @@ alwaysApply: false
 - Use fenced code blocks ``` for all code; no indented blocks.
 - Keep paragraphs short; avoid claims not in source; add captions/alt text for media.
 
+### Systematic content design
+
+- State the **intent**, **audience**, and **key claims** near the top.
+- Apply 80/20: cover the most important concepts and workflows first; add depth later.
+- Prefer examples and small, focused sections over long, dense paragraphs.
+
 ## MDX
 - Prefer project MDX components (Image, Callout, Video) over raw HTML.
 - Validate links; avoid dead references; run a quick spellcheck.
