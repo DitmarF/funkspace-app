@@ -22,7 +22,7 @@
     "@eslint/eslintrc": "^3",
     "@storybook/addon-a11y": "^10.0.3",
     "@storybook/addon-docs": "^10.0.3",
-    "@storybook/addon-themes": "^10.0.3",
+    "@storybook/addon-themes": "^10.0.7",
     "@storybook/nextjs-vite": "^10.0.3",
     "@storybook/react": "^10.0.6",
     "@types/node": "^20",
