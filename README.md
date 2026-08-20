@@ -36,11 +36,13 @@ pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 - `styles/` – generated CSS custom properties for default, dark, muted, and
   high-contrast themes.
 - `common/generated/` – generated, framework-neutral TypeScript token constants.
+- `common/motion/` – pure easing, interpolation, tween, and timeline utilities.
 - `e2e/` – Playwright tests; configuration lives in `playwright.config.ts`.
 - `__tests__/` – Vitest suites run with React Testing Library.
 - `backend/` – stub reserved for possible future server capabilities.
 - `common/` – framework-neutral shared boundary; currently contains generated
-  TypeScript token artifacts but is not yet an installable package.
+  TypeScript token artifacts and a staged motion core, but is not yet an
+  installable package.
 - `scripts/` – automation helpers (e.g. GitHub branch protection script).
 
 ### Theming

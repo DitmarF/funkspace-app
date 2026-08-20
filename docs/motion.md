@@ -1,5 +1,16 @@
 ## Motion Rules — Accessibility and Performance
 
+### Architecture boundary
+
+- `common/motion/` owns pure easing, numeric interpolation, tween data, timeline
+  resolution, sampling, seeking, and delta-based advancement.
+- The common layer accepts identifiers and numbers only. It does not import
+  React or access DOM, SVG, Canvas, WebGL, browser clocks, or render loops.
+- Frontend infrastructure owns `requestAnimationFrame`, element lookup, style
+  updates, cleanup, and application of sampled values to rendering targets.
+- Existing frontend timelines remain in place during this extraction. Moving
+  consumers to the common core requires a later adapter and compatibility task.
+
 ### Reduced‑Motion Policy
 
 - Honor `prefers-reduced-motion: reduce` across all animations.

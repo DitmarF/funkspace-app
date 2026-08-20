@@ -20,7 +20,11 @@ export default defineConfig({
     coverage: {
       enabled: Boolean(process.env.CI),
       provider: "v8",
-      include: ["frontend/**/*.{ts,tsx}", "src/**/*.{ts,tsx}"],
+      include: [
+        "frontend/**/*.{ts,tsx}",
+        "src/**/*.{ts,tsx}",
+        "common/motion/**/*.ts",
+      ],
       exclude: [
         "**/*.stories.{ts,tsx}",
         "**/*.test.{ts,tsx}",

@@ -27,12 +27,13 @@ Project priorities, in order:
 - `tokens/` - source design and motion tokens.
 - `styles/` - generated CSS token output; regenerate it instead of hand-editing it.
 - `common/generated/` - generated framework-neutral TypeScript token output; never hand-edit it.
+- `common/motion/` - pure easing, interpolation, tween, and timeline concepts; no renderer or platform APIs.
 - `e2e/` - Playwright end-to-end and accessibility coverage.
 - `docs/architecture.md` - detailed layer responsibilities and migration notes.
 - `docs/decisions/` - accepted Architecture Decision Records (ADRs); supersede one with a new ADR rather than silently contradicting it.
 - `docs/motion.md` and `docs/features/` - motion rules and feature decisions.
 - `backend/` - reserved workspace stub; do not invent responsibilities for it without an approved design.
-- `common/` - future shared package boundary; currently owns generated TypeScript token artifacts but has no package manifest or runtime code.
+- `common/` - future shared package boundary; currently owns generated TypeScript tokens and a staged pure motion core, but has no package manifest or application consumer.
 
 The files in `.cursor/` and the PDFs in `docs/global/` capture earlier workflows and historical design input. They are useful context, but this file, current Markdown architecture/feature docs, repository configuration, and working code are authoritative. Do not make a task depend on a specific editor or agent product.
 
@@ -62,6 +63,7 @@ Presentation -> Application -> Domain <- Infrastructure
 - Some direct Presentation-to-Infrastructure imports remain from the ongoing migration. Do not copy that pattern into new code; remove it only when the assigned task includes that migration and tests protect the behavior.
 - Keep external-library types out of Domain interfaces. Wrap replaceable libraries behind ports or focused adapters.
 - Use the `@/` alias for frontend imports and relative imports for closely related files when that is clearer.
+- Keep `common/motion/` deterministic and independent of React, DOM, SVG, Canvas, WebGL, clocks, and render loops. Rendering adapters own platform state and apply sampled values.
 
 If a requested change conflicts with these boundaries, stop and propose the smallest architectural adjustment. Update `docs/architecture.md` when a deliberate boundary or dependency decision changes.
 

@@ -15,15 +15,15 @@ games/*
 
 The configured locations are not all active packages. A pnpm workspace package requires its own `package.json`.
 
-| Location        | Current state                                           | Manifest                | Runtime/build responsibility                                                                   |
-| --------------- | ------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
-| Repository root | Active private package                                  | `package.json`          | Workspace tooling, token generation, tests, E2E, CI commands, and frontend build orchestration |
-| `frontend/`     | Active private package                                  | `frontend/package.json` | The complete web application and all current product runtime behavior                          |
-| `common/`       | Generated-artifact boundary; not an installable package | None                    | Framework-neutral TypeScript token generation; no runtime code or build of its own             |
-| `backend/`      | Placeholder directory                                   | None                    | None                                                                                           |
-| `games/*`       | Configured package collection; currently empty          | No child manifests yet  | Future standalone game packages                                                                |
+| Location        | Current state                                        | Manifest                | Runtime/build responsibility                                                                   |
+| --------------- | ---------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
+| Repository root | Active private package                               | `package.json`          | Workspace tooling, token generation, tests, E2E, CI commands, and frontend build orchestration |
+| `frontend/`     | Active private package                               | `frontend/package.json` | The complete web application and all current product runtime behavior                          |
+| `common/`       | Staged shared foundation; not an installable package | None                    | Generated TypeScript tokens and a pure, renderer-neutral motion core                           |
+| `backend/`      | Placeholder directory                                | None                    | None                                                                                           |
+| `games/*`       | Configured package collection; currently empty       | No child manifests yet  | Future standalone game packages                                                                |
 
-`pnpm list -r --depth -1` currently recognizes only the root package and `frontend`. `backend` contains only a README; `common` contains a README and generated TypeScript token artifacts but no package manifest. `games/` contains workspace guidance but no child package. A future direct child with a `package.json` will be discovered through `games/*`.
+`pnpm list -r --depth -1` currently recognizes only the root package and `frontend`. `backend` contains only a README; `common` contains generated TypeScript token artifacts and a staged pure motion core but no package manifest. `games/` contains workspace guidance but no child package. A future direct child with a `package.json` will be discovered through `games/*`.
 
 The current dependency shape is:
 
@@ -32,7 +32,7 @@ root token sources -> generated styles/tokens.css   -> frontend
                    -> common/generated/*.ts        -> non-CSS consumers
 root tooling       -> frontend build, tests, Storybook, E2E, Lighthouse
 
-common  [generated token artifacts; no package imports or exports yet]
+common  [generated tokens + pure motion core; no package imports or exports yet]
 backend [placeholder; no runtime or deployment]
 games/* [configured collection; no game packages yet]
 ```
@@ -50,7 +50,7 @@ The following ownership model applies as inactive boundaries become installable 
 | `games/*`  | Game simulation, rendering, game-specific rules and content, input/audio/persistence adapters, and game lifecycle | Portfolio routing/UI, frontend internals, or unrelated shared utilities                                             |
 | `backend`  | Optional server-owned capabilities when justified                                                                 | Frontend presentation, game rendering, or shared browser code                                                       |
 
-These are package responsibilities, not a refactor claim. Shared tokens are physically at the repository root and current motion code is physically in `frontend`; moving either requires a separate implementation task with updated imports, builds, tests, and CI.
+These are package responsibilities, not a completed consumer migration. Shared tokens remain physically at the repository root. Pure motion concepts now also exist in `common/motion/`, while the current rendering timelines remain in `frontend`; redirecting frontend consumers requires a separate adapter task with updated imports, builds, tests, and CI.
 
 ### Allowed dependency direction
 
@@ -149,9 +149,9 @@ Within `frontend`, the package boundary does not override Clean Architecture:
 
 ### Current state
 
-`common` has no current runtime responsibility and remains a non-installable directory. It now contains generated, framework-neutral TypeScript token constants for future application consumers. No existing application code depends on it.
+`common` remains a non-installable directory with no current application consumer. It contains generated, framework-neutral TypeScript token constants and a staged pure motion core for future frontend and game adapters.
 
-The generated artifacts do not activate `common` as a workspace package or authorize handwritten runtime code. Add a manifest, public exports, and runtime utilities only through a feature plan that also updates consumers, tests, and CI.
+The motion core establishes the allowed handwritten boundary: deterministic easing, interpolation, tween data, and timeline state calculations. It does not activate `common` as a workspace package. Add a manifest, public package exports, consumers, or additional runtime utilities only through a feature plan that also updates tests and CI.
 
 ### Responsibilities when activated
 
@@ -287,7 +287,7 @@ Network relationships do not permit filesystem imports across private implementa
 ### Near term: keep the current layout
 
 1. Keep the configured `frontend`, `backend`, `common`, and `games/*` workspace locations; do not rename or remove them during the remaining architecture review.
-2. Treat `backend` as an inactive placeholder and `common` as a generated-artifact boundary until a feature activates an installable package.
+2. Treat `backend` as an inactive placeholder and `common` as a staged pure foundation until a feature activates an installable package and public exports.
 3. Keep portfolio pages and embedded experiences in `frontend`; place future standalone games in direct `games/<game-slug>` packages.
 4. Keep each game's source isolated and keep the first game's lightweight engine private to that game, as required by [`ADR-004`](../decisions/ADR-004-game-development-architecture.md).
 5. Add automated package/import-boundary checks when `common` or the first game package is activated.
