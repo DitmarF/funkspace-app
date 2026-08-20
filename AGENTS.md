@@ -31,6 +31,7 @@ Project priorities, in order:
 - `common/motion/` - pure easing, interpolation, tween, and timeline concepts; no renderer or platform APIs.
 - `e2e/` - Playwright end-to-end and accessibility coverage.
 - `docs/architecture.md` - detailed layer responsibilities and migration notes.
+- `docs/development/ai-workflow.md` - planning-to-handoff workflow for AI-assisted repository changes.
 - `docs/decisions/` - accepted Architecture Decision Records (ADRs); supersede one with a new ADR rather than silently contradicting it.
 - `docs/templates/` - reusable feature and task formats for durable planning, execution evidence, and AI handoff.
 - `docs/motion.md` and `docs/features/` - motion rules and feature decisions.
@@ -84,6 +85,8 @@ If a requested change conflicts with these boundaries, stop and propose the smal
 - Validate and sanitize untrusted input at system boundaries. Never expose secrets in client code, logs, fixtures, or documentation.
 
 ## Development workflow
+
+Follow `docs/development/ai-workflow.md` for the durable planning, implementation, review, testing, cleanup, and handoff process. The steps below are the concise repository operating sequence.
 
 1. Read this file, the related feature/architecture docs, nearby code and tests, and the relevant package scripts.
 2. Check the working tree and preserve unrelated user changes.
