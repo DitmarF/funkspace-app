@@ -32,6 +32,7 @@ Project priorities, in order:
 - `e2e/` - Playwright end-to-end and accessibility coverage.
 - `docs/architecture.md` - detailed layer responsibilities and migration notes.
 - `docs/decisions/` - accepted Architecture Decision Records (ADRs); supersede one with a new ADR rather than silently contradicting it.
+- `docs/templates/` - reusable feature and task formats for durable planning, execution evidence, and AI handoff.
 - `docs/motion.md` and `docs/features/` - motion rules and feature decisions.
 - `backend/` - reserved workspace stub; do not invent responsibilities for it without an approved design.
 - `common/` - private shared package exporting generated TypeScript tokens and the pure motion core. It must remain platform-independent.
@@ -107,6 +108,8 @@ pnpm build
 ```
 
 Do not commit, push, open a pull request, deploy, change repository settings, or use network access unless the user explicitly asks or the current task requires it and approval is available.
+
+Use `docs/templates/task.md` when a bounded task needs a durable execution record. Preserve the requested outcome and acceptance criteria, then record inspected evidence, scope, protected areas, planned paths, validation, and completion results. Use `docs/templates/feature-plan.md` for larger features, epics, or changes that require deeper product, architecture, dependency, risk, and rollout planning. Do not create a task document merely to restate a trivial change with no lasting coordination value.
 
 ## Testing expectations
 
