@@ -72,8 +72,17 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@20.19.4)(@vitest/browser@3.2.4)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.30.1)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
+  common:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.8.3
+
   frontend:
     dependencies:
+      '@funkspace/common':
+        specifier: workspace:*
+        version: link:../common
       framer-motion:
         specifier: ^12.23.24
         version: 12.23.24(react-dom@19.1.0(react@19.1.0))(react@19.1.0)

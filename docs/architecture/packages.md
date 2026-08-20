@@ -15,29 +15,34 @@ games/*
 
 The configured locations are not all active packages. A pnpm workspace package requires its own `package.json`.
 
-| Location        | Current state                                        | Manifest                | Runtime/build responsibility                                                                   |
-| --------------- | ---------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
-| Repository root | Active private package                               | `package.json`          | Workspace tooling, token generation, tests, E2E, CI commands, and frontend build orchestration |
-| `frontend/`     | Active private package                               | `frontend/package.json` | The complete web application and all current product runtime behavior                          |
-| `common/`       | Staged shared foundation; not an installable package | None                    | Generated TypeScript tokens and a pure, renderer-neutral motion core                           |
-| `backend/`      | Placeholder directory                                | None                    | None                                                                                           |
-| `games/*`       | Configured package collection; currently empty       | No child manifests yet  | Future standalone game packages                                                                |
+| Location        | Current state                                  | Manifest                | Runtime/build responsibility                                                                   |
+| --------------- | ---------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
+| Repository root | Active private package                         | `package.json`          | Workspace tooling, token generation, tests, E2E, CI commands, and frontend build orchestration |
+| `frontend/`     | Active private package                         | `frontend/package.json` | The complete web application and all current product runtime behavior                          |
+| `common/`       | Active private package                         | `common/package.json`   | Generated TypeScript tokens and a pure, renderer-neutral motion core                           |
+| `backend/`      | Placeholder directory                          | None                    | None                                                                                           |
+| `games/*`       | Configured package collection; currently empty | No child manifests yet  | Future standalone game packages                                                                |
 
-`pnpm list -r --depth -1` currently recognizes only the root package and `frontend`. `backend` contains only a README; `common` contains generated TypeScript token artifacts and a staged pure motion core but no package manifest. `games/` contains workspace guidance but no child package. A future direct child with a `package.json` will be discovered through `games/*`.
+`pnpm list -r --depth -1` recognizes the root package, `frontend`, and `@funkspace/common`. `backend` remains a README-only placeholder. `games/` contains workspace guidance but no child package; a future direct child with a `package.json` will be discovered through `games/*`.
 
 The current dependency shape is:
 
 ```text
 root token sources -> generated styles/tokens.css   -> frontend
-                   -> common/generated/*.ts        -> non-CSS consumers
+                   -> common/generated/*.ts
+                                  |
+                                  +-> @funkspace/common/motion
+                                  +-> public token exports
+
+frontend motion adapters -> @funkspace/common/motion
 root tooling       -> frontend build, tests, Storybook, E2E, Lighthouse
 
-common  [generated tokens + pure motion core; no package imports or exports yet]
+common  [active private package; explicit motion and token exports]
 backend [placeholder; no runtime or deployment]
 games/* [configured collection; no game packages yet]
 ```
 
-CI type-checks, tests, builds, and deploys the frontend. No current application code imports from `backend`, `common`, or `games`.
+The root production build type-checks `common` before building the frontend. Repository tests cover the core and both frontend motion adapters. No current application code imports from `backend` or `games`.
 
 ## Package boundary contract
 
@@ -50,7 +55,7 @@ The following ownership model applies as inactive boundaries become installable 
 | `games/*`  | Game simulation, rendering, game-specific rules and content, input/audio/persistence adapters, and game lifecycle | Portfolio routing/UI, frontend internals, or unrelated shared utilities                                             |
 | `backend`  | Optional server-owned capabilities when justified                                                                 | Frontend presentation, game rendering, or shared browser code                                                       |
 
-These are package responsibilities, not a completed consumer migration. Shared tokens remain physically at the repository root. Pure motion concepts now also exist in `common/motion/`, while the current rendering timelines remain in `frontend`; redirecting frontend consumers requires a separate adapter task with updated imports, builds, tests, and CI.
+Shared token sources remain physically at the repository root. Pure motion concepts live in `common/motion/`; frontend SVG and HTML timelines consume them through the package's public motion export while keeping rendering and browser lifecycle concerns in `frontend/infrastructure/motion/`.
 
 ### Allowed dependency direction
 
@@ -111,12 +116,12 @@ New portfolio pages, animations, and embedded experiments remain in `frontend` u
 
 `frontend` may depend on:
 
-- Dependencies declared in `frontend/package.json`. The current runtime dependencies are Next.js, React, React DOM, and Framer Motion.
+- Dependencies declared in `frontend/package.json`. The current runtime dependencies are `@funkspace/common`, Next.js, React, React DOM, and Framer Motion.
 - Its own modules when imports follow the layer rules in `AGENTS.md` and `docs/architecture.md`.
 - Generated design-token CSS and other intentional root-owned build outputs.
 - Root development tooling through workspace scripts; tooling must not become a browser runtime dependency.
-- A future shared workspace package only after that package has a manifest, explicit exports, clear ownership, and is declared in `frontend/package.json` with the workspace protocol.
-- A future `common` public API for tokens, pure utilities, and framework-neutral motion primitives.
+- The public `@funkspace/common/motion` entry point for pure timing, easing, interpolation, and tween sampling.
+- Other `@funkspace/common` entry points only when they are explicitly exported and the frontend has a real consumer.
 - A game only through a frontend-owned integration adapter and the game's documented public API or deployed artifact.
 - A future backend through a documented network contract and frontend-owned port/client adapter.
 
@@ -134,7 +139,7 @@ Within `frontend`, the package boundary does not override Clean Architecture:
 
 - Import files from `backend` by relative path or depend on backend runtime internals.
 - Import server-only libraries, private credentials, privileged environment values, or deployment secrets into client code.
-- Import from `common` by relative path while `common` is not a package with an explicit public API.
+- Deep-import files from `common` or bypass its explicit package exports.
 - Reach into another workspace package's private source files after packages are introduced.
 - Rely on undeclared or transitively available dependencies.
 - Import root CI/build implementation modules into application runtime code.
@@ -149,11 +154,11 @@ Within `frontend`, the package boundary does not override Clean Architecture:
 
 ### Current state
 
-`common` remains a non-installable directory with no current application consumer. It contains generated, framework-neutral TypeScript token constants and a staged pure motion core for future frontend and game adapters.
+`common` is an active private workspace package. It exports the pure motion core and generated token modules through explicit entry points. The frontend declares a workspace dependency and consumes `@funkspace/common/motion` from its HTML and SVG adapters.
 
-The motion core establishes the allowed handwritten boundary: deterministic easing, interpolation, tween data, and timeline state calculations. It does not activate `common` as a workspace package. Add a manifest, public package exports, consumers, or additional runtime utilities only through a feature plan that also updates tests and CI.
+The motion core establishes the allowed handwritten boundary: deterministic easing, interpolation, tween data, and timeline state calculations. Adding public entry points or additional runtime utilities requires a feature plan that updates consumers, tests, and build validation.
 
-### Responsibilities when activated
+### Responsibilities
 
 `common` owns reusable, environment-neutral foundations shared by `frontend`, games, and a possible backend:
 
@@ -162,7 +167,7 @@ The motion core establishes the allowed handwritten boundary: deterministic easi
 - Motion primitives such as timing types, easing math, interpolation, geometry/vector math, manifests, and deterministic state transitions.
 - Serializable types, value objects, validation rules, API schemas, and event contracts shared across runtimes.
 
-The JSON token files in root `tokens/` remain authoritative under [`ADR-002`](../decisions/ADR-002-design-token-source-of-truth.md) until a planned migration activates `common`. Assigning token responsibility here does not authorize duplicate token sources. During migration, move the source and build contract atomically so there is still exactly one source of truth.
+The JSON token files in root `tokens/` remain authoritative under [`ADR-002`](../decisions/ADR-002-design-token-source-of-truth.md). Activating the package does not move or duplicate token sources. A future source migration must move the build contract atomically so there is still exactly one source of truth.
 
 Motion primitives in `common` stop before environment integration. `requestAnimationFrame`, DOM reads/writes, React hooks, SVG element manipulation, Canvas/WebGL renderers, audio, and input listeners belong to `frontend` or the owning game.
 
@@ -170,7 +175,7 @@ Motion primitives in `common` stop before environment integration. `requestAnima
 
 ### Purity requirements
 
-Future `common` code must:
+`common` code must:
 
 - Be strict TypeScript with deterministic behavior.
 - Remain independent of React, Next.js, browser frameworks, DOM APIs, browser storage, and Node-only APIs.
@@ -207,7 +212,7 @@ The first game follows [`ADR-004`](../decisions/ADR-004-game-development-archite
 A game may depend on:
 
 - Its own declared runtime and development dependencies.
-- The future `common` public API for tokens, pure utilities, motion primitives, and stable contracts.
+- The public `@funkspace/common` API for tokens, pure utilities, motion primitives, and stable contracts.
 - A backend only through a documented network adapter and API contract.
 - Root tooling through explicit workspace scripts that do not become runtime dependencies.
 
@@ -287,10 +292,10 @@ Network relationships do not permit filesystem imports across private implementa
 ### Near term: keep the current layout
 
 1. Keep the configured `frontend`, `backend`, `common`, and `games/*` workspace locations; do not rename or remove them during the remaining architecture review.
-2. Treat `backend` as an inactive placeholder and `common` as a staged pure foundation until a feature activates an installable package and public exports.
+2. Treat `backend` as an inactive placeholder and keep `common` limited to its pure, explicitly exported foundation responsibilities.
 3. Keep portfolio pages and embedded experiences in `frontend`; place future standalone games in direct `games/<game-slug>` packages.
 4. Keep each game's source isolated and keep the first game's lightweight engine private to that game, as required by [`ADR-004`](../decisions/ADR-004-game-development-architecture.md).
-5. Add automated package/import-boundary checks when `common` or the first game package is activated.
+5. Extend automated package/import-boundary checks when the first game package is activated.
 6. Update root scripts and CI whenever a real package is activated; do not assume recursive commands cover a directory without a manifest.
 
 ### Extraction triggers
@@ -299,9 +304,9 @@ Network relationships do not permit filesystem imports across private implementa
 | ------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Embedded interactive experience | It shares the frontend build, deployment, and dependency profile                                    | It needs independent deployment, incompatible/heavy dependencies, distinct ownership, or hard runtime isolation; then create a package under `games/*` or another approved collection |
 | Standalone game                 | Not applicable; `games/*` is already configured                                                     | Add a direct child package only after its feature plan defines ownership, build, tests, and integration                                                                               |
-| Design tokens                   | Root remains the physical source; CSS and TypeScript artifacts are generated for different runtimes | Activate `common` as a package and add public exports when a game or second app needs a declared workspace dependency                                                                 |
+| Design tokens                   | Root remains the physical source; CSS and TypeScript artifacts are generated for different runtimes | Migrate token sources only when ownership/build benefits justify it; keep the move atomic                                                                                             |
 | Reusable UI/design system       | Components are consumed only by the frontend and its Storybook                                      | A second application needs a stable, versioned component API                                                                                                                          |
-| `common`                        | No second package consumes shared foundations                                                       | A game/backend needs shared tokens, pure motion primitives, utilities, or stable serialized contracts                                                                                 |
+| `common`                        | Motion and token contracts cover current shared needs                                               | A real consumer requires another stable, environment-neutral public contract                                                                                                          |
 | Backend                         | All behavior is public and browser-safe                                                             | Secrets, authoritative state, persistence, protected integrations, or server coordination are required                                                                                |
 | Shared game/simulation core     | Only the first game needs its engine                                                                | A second real game proves compatible deterministic primitives and ownership                                                                                                           |
 
@@ -317,7 +322,7 @@ games/
 backend/               # optional server capabilities
 ```
 
-Only `frontend` is an active application package today. Generated TypeScript token artifacts do not make `common` installable. Activating the other boundaries affects scripts, imports, CI, deployment, token paths, and documentation, so each activation requires a dedicated feature plan. Additional package splits require demonstrated reuse and an ADR.
+Only `frontend` is an active application package today; `common` is an active private library package with no independent runtime or deployment. Activating the other boundaries affects scripts, imports, CI, deployment, token paths, and documentation, so each activation requires a dedicated feature plan. Additional package splits require demonstrated reuse and an ADR.
 
 ## Rules for AI agents
 

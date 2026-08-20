@@ -27,7 +27,7 @@ frontend/
     providers/         # React context providers for dependency injection
 
   infrastructure/      # External concerns and implementations
-    motion/            # Animation infrastructure (timeline, SVG utilities)
+    motion/            # HTML/SVG renderer adapters and platform utilities
     dom/               # DOM manipulation utilities
     storage/           # Storage adapters (localStorage)
     services/          # Service factory
@@ -35,6 +35,10 @@ frontend/
   components/          # Presentation layer - pure UI components
   hooks/               # React hooks (thin wrappers around services)
   app/                 # Next.js App Router pages
+
+common/
+  motion/              # Pure easing, interpolation, tween, and timeline core
+  generated/           # Generated framework-neutral design tokens
 ```
 
 ## Dependency Rules
@@ -56,7 +60,8 @@ Presentation → Application → Domain ← Infrastructure
 
 1. **Domain** should never import from Application, Infrastructure, or Presentation
 2. **Application** can import from Domain only
-3. **Infrastructure** can import from Domain (ports) and implement them
+3. **Infrastructure** can import from Domain (ports) and the public
+   `@funkspace/common` API, then implement platform adapters
 4. **Presentation** can import from Application (services via hooks) and Domain (types)
 
 ### Examples
@@ -113,10 +118,11 @@ import { useTheme } from "@/hooks/useTheme";
 ### Infrastructure Layer
 
 - **Purpose**: Implement external concerns
-- **Dependencies**: Domain (ports/interfaces)
+- **Dependencies**: Domain (ports/interfaces) and public `@funkspace/common`
+  entry points
 - **Contains**:
   - Adapters (LocalStorageAdapter, DOMAdapter, AnimationAdapter)
-  - Infrastructure utilities (SVG manipulation, timeline engine)
+  - HTML/SVG renderer adapters, clocks, and platform manipulation utilities
   - Service factory
 - **No**: Business logic, React components
 

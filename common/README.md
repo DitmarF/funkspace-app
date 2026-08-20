@@ -1,9 +1,8 @@
 # Common
 
-`common` is the boundary for framework-neutral assets shared by FunkSpace
-applications. It is not an installable workspace package yet. It currently
-contains generated TypeScript design-token modules and a staged pure motion
-core.
+`common` is the private workspace package for framework-neutral assets shared by
+FunkSpace applications. It exports generated TypeScript design-token modules
+and the pure motion core through explicit package entry points.
 
 ## Motion core
 
@@ -13,9 +12,9 @@ It has no renderer, clock, lifecycle, or platform dependencies. Its dedicated
 `tsconfig.json` intentionally excludes DOM libraries so React, DOM, SVG, Canvas,
 and browser APIs cannot enter the core unnoticed.
 
-Current frontend animations still use their existing infrastructure timelines.
-See [`motion/README.md`](motion/README.md) for the extraction boundary and future
-adapter direction.
+Frontend SVG and HTML timelines consume this core and retain only platform
+clocks, lifecycle, element lookup, and rendering. See
+[`motion/README.md`](motion/README.md) for the adapter boundary.
 
 ## Generated tokens
 
@@ -33,6 +32,5 @@ custom-property resolver.
 
 Do not edit files in `generated/` directly. Edit the JSON sources in `tokens/`
 and rebuild. Handwritten code belongs in an explicit area such as `motion/`, not
-beside generated artifacts. When `common` becomes an installable package, expose
-these modules through explicit package exports rather than introducing deep
-imports.
+beside generated artifacts. Consumers must use the public exports declared in
+`package.json` rather than deep-importing package files.

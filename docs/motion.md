@@ -8,8 +8,9 @@
   React or access DOM, SVG, Canvas, WebGL, browser clocks, or render loops.
 - Frontend infrastructure owns `requestAnimationFrame`, element lookup, style
   updates, cleanup, and application of sampled values to rendering targets.
-- Existing frontend timelines remain in place during this extraction. Moving
-  consumers to the common core requires a later adapter and compatibility task.
+- The SVG and HTML timeline classes are platform adapters over
+  `@funkspace/common/motion`; they must not reimplement timeline timing or
+  easing logic.
 
 ### Reduced‑Motion Policy
 

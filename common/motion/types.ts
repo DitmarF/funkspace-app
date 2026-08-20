@@ -7,7 +7,7 @@ export type EasingName =
 
 export type EasingFunction = (progress: number) => number;
 
-export type Easing = EasingName | EasingFunction;
+export type Easing = string | EasingFunction;
 
 export type TimelineDirection = 1 | -1;
 
@@ -20,7 +20,7 @@ export interface TweenDefinition<TProperty extends string = string> {
   readonly to: number;
   readonly duration: number;
   readonly delay?: number;
-  readonly easing?: EasingName;
+  readonly easing?: string;
 }
 
 export interface ResolvedTween<TProperty extends string = string> {
@@ -32,7 +32,7 @@ export interface ResolvedTween<TProperty extends string = string> {
   readonly delay: number;
   readonly startTime: number;
   readonly endTime: number;
-  readonly easing: EasingName;
+  readonly easing: string;
 }
 
 export interface MotionTimeline<TProperty extends string = string> {

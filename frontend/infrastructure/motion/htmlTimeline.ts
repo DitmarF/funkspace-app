@@ -5,6 +5,17 @@
  * Designed for scroll-triggered animations with enter/leave controls.
  */
 
+import {
+  advanceTimeline,
+  createTimeline,
+  interpolateNumber,
+  sampleTimeline,
+  seekTimeline,
+  type MotionTimeline,
+} from "@funkspace/common/motion";
+
+type HTMLCoreProperty = "progress";
+
 export type HTMLTimelineStep = {
   /**
    * Target element to animate
@@ -87,6 +98,7 @@ export type HTMLTimelineOptions = {
  */
 export class HTMLTimeline {
   private steps: HTMLTimelineStep[] = [];
+  private timeline: MotionTimeline<HTMLCoreProperty>;
   private currentTime: number = 0;
   private isPlaying: boolean = false;
   private rafId: number | null = null;
@@ -98,6 +110,7 @@ export class HTMLTimeline {
 
   constructor(steps: HTMLTimelineStep[], options: HTMLTimelineOptions = {}) {
     this.steps = steps;
+    this.timeline = this.createMotionTimeline();
     this.onEnter = options.onEnter;
     this.onLeave = options.onLeave;
     this.initializeSteps();
@@ -130,10 +143,7 @@ export class HTMLTimeline {
    * Get total duration of the timeline (ms)
    */
   get duration(): number {
-    if (this.steps.length === 0) return 0;
-    return Math.max(
-      ...this.steps.map((step) => (step.delay || 0) + step.duration),
-    );
+    return this.timeline.duration;
   }
 
   /**
@@ -259,9 +269,7 @@ export class HTMLTimeline {
    * ```
    */
   seek(progress: number): void {
-    // Progress is 0-1, convert to time
-    const targetTime = progress * this.duration;
-    this.currentTime = Math.max(0, Math.min(targetTime, this.duration));
+    this.currentTime = seekTimeline(this.timeline, progress * this.duration);
     this.update();
   }
 
@@ -279,15 +287,22 @@ export class HTMLTimeline {
     if (!this.isPlaying) return;
 
     const now = performance.now();
-    const delta = (now - this.lastFrameTime) * this.speed;
+    const delta = now - this.lastFrameTime;
     this.lastFrameTime = now;
 
-    this.currentTime = Math.min(this.currentTime + delta, this.duration);
+    const advancement = advanceTimeline(
+      {
+        time: this.currentTime,
+        duration: this.duration,
+        direction: 1,
+        speed: this.speed,
+      },
+      delta,
+    );
+    this.currentTime = advancement.state.time;
     this.update();
 
-    if (this.currentTime >= this.duration) {
-      this.pause();
-    }
+    if (advancement.completed) this.pause();
 
     if (this.isPlaying) {
       this.rafId = requestAnimationFrame(this.tick);
@@ -298,19 +313,14 @@ export class HTMLTimeline {
    * Update all active steps based on current time
    */
   private update(): void {
-    for (const step of this.steps) {
+    for (const sample of sampleTimeline(this.timeline, this.currentTime)) {
+      const step = this.steps[Number(sample.tween.target)];
+      if (!step) continue;
+
       const element = step.element;
       if (!element) continue;
 
-      const delay = step.delay || 0;
-      const startTime = delay;
-      const endTime = startTime + step.duration;
-
-      // Check if step is active
-      const isActive =
-        this.currentTime >= startTime && this.currentTime <= endTime;
-
-      if (this.currentTime < startTime) {
+      if (sample.phase === "before") {
         // Before start: set to initial value
         if (step.fromTransform !== undefined) {
           element.style.transform = step.fromTransform;
@@ -321,7 +331,7 @@ export class HTMLTimeline {
         continue;
       }
 
-      if (this.currentTime > endTime) {
+      if (sample.phase === "after") {
         // After end: set to final value
         if (step.toTransform !== undefined) {
           element.style.transform = step.toTransform;
@@ -332,15 +342,6 @@ export class HTMLTimeline {
         continue;
       }
 
-      if (!isActive) continue;
-
-      // Calculate progress [0, 1] within the step duration
-      const elapsed = this.currentTime - startTime;
-      const progress = step.duration > 0 ? elapsed / step.duration : 1;
-
-      // Apply easing (simple linear for now, can be extended)
-      const easedProgress = this.applyEasing(progress, step.easing);
-
       // Interpolate transform
       if (step.fromTransform !== undefined && step.toTransform !== undefined) {
         // For simplicity, we'll interpolate numeric values
@@ -348,44 +349,35 @@ export class HTMLTimeline {
         const transform = this.interpolateTransform(
           step.fromTransform,
           step.toTransform,
-          easedProgress,
+          sample.value,
         );
         element.style.transform = transform;
       }
 
       // Interpolate opacity
       if (step.fromOpacity !== undefined && step.toOpacity !== undefined) {
-        const opacity =
-          step.fromOpacity +
-          (step.toOpacity - step.fromOpacity) * easedProgress;
+        const opacity = interpolateNumber(
+          step.fromOpacity,
+          step.toOpacity,
+          sample.value,
+        );
         element.style.opacity = String(opacity);
       }
     }
   }
 
-  /**
-   * Apply easing function to progress
-   */
-  private applyEasing(progress: number, easing?: string): number {
-    if (!easing || easing === "linear") {
-      return progress;
-    }
-
-    // Simple easing implementations
-    // Can be extended with more easing functions
-    if (easing === "ease-out") {
-      return 1 - Math.pow(1 - progress, 3);
-    }
-    if (easing === "ease-in") {
-      return Math.pow(progress, 3);
-    }
-    if (easing === "ease-in-out") {
-      return progress < 0.5
-        ? 4 * progress * progress * progress
-        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-    }
-
-    return progress;
+  private createMotionTimeline(): MotionTimeline<HTMLCoreProperty> {
+    return createTimeline(
+      this.steps.map((step, index) => ({
+        target: String(index),
+        property: "progress" as const,
+        from: 0,
+        to: 1,
+        duration: step.duration,
+        delay: step.delay,
+        easing: step.easing,
+      })),
+    );
   }
 
   /**
@@ -404,7 +396,7 @@ export class HTMLTimeline {
     if (fromMatch && toMatch) {
       const fromValue = parseFloat(fromMatch[1]);
       const toValue = parseFloat(toMatch[1]);
-      const value = fromValue + (toValue - fromValue) * progress;
+      const value = interpolateNumber(fromValue, toValue, progress);
       return `translateY(${value}px)`;
     }
 
@@ -431,5 +423,6 @@ export class HTMLTimeline {
   destroy(): void {
     this.pause();
     this.steps = [];
+    this.timeline = createTimeline([]);
   }
 }

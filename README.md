@@ -40,9 +40,8 @@ pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 - `e2e/` – Playwright tests; configuration lives in `playwright.config.ts`.
 - `__tests__/` – Vitest suites run with React Testing Library.
 - `backend/` – stub reserved for possible future server capabilities.
-- `common/` – framework-neutral shared boundary; currently contains generated
-  TypeScript token artifacts and a staged motion core, but is not yet an
-  installable package.
+- `common/` – private framework-neutral package exporting generated TypeScript
+  token artifacts and the shared motion core.
 - `scripts/` – automation helpers (e.g. GitHub branch protection script).
 
 ### Theming

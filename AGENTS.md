@@ -33,7 +33,7 @@ Project priorities, in order:
 - `docs/decisions/` - accepted Architecture Decision Records (ADRs); supersede one with a new ADR rather than silently contradicting it.
 - `docs/motion.md` and `docs/features/` - motion rules and feature decisions.
 - `backend/` - reserved workspace stub; do not invent responsibilities for it without an approved design.
-- `common/` - future shared package boundary; currently owns generated TypeScript tokens and a staged pure motion core, but has no package manifest or application consumer.
+- `common/` - private shared package exporting generated TypeScript tokens and the pure motion core. It must remain platform-independent.
 
 The files in `.cursor/` and the PDFs in `docs/global/` capture earlier workflows and historical design input. They are useful context, but this file, current Markdown architecture/feature docs, repository configuration, and working code are authoritative. Do not make a task depend on a specific editor or agent product.
 
