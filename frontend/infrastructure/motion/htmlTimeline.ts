@@ -11,6 +11,7 @@ import {
   interpolateNumber,
   sampleTimeline,
   seekTimeline,
+  type AnimationRuntime,
   type MotionTimeline,
 } from "@funkspace/common/motion";
 
@@ -96,7 +97,7 @@ export type HTMLTimelineOptions = {
  * - Zero-duration steps are handled gracefully
  * - Missing elements are skipped without errors
  */
-export class HTMLTimeline {
+export class HTMLTimeline implements AnimationRuntime {
   private steps: HTMLTimelineStep[] = [];
   private timeline: MotionTimeline<HTMLCoreProperty>;
   private currentTime: number = 0;
@@ -169,15 +170,7 @@ export class HTMLTimeline {
    */
   playFrom(start: number = 0): void {
     this.currentTime = Math.max(0, start);
-    if (!this.isPlaying) {
-      this.isPlaying = true;
-      this.lastFrameTime = performance.now();
-      if (!this.hasEntered && this.onEnter) {
-        this.onEnter();
-        this.hasEntered = true;
-      }
-      this.tick();
-    }
+    this.resume();
   }
 
   /**
@@ -195,6 +188,13 @@ export class HTMLTimeline {
    * ```
    */
   play(): void {
+    this.resume();
+  }
+
+  /**
+   * Resume playback from the current timeline time
+   */
+  resume(): void {
     if (this.isPlaying) return;
     this.isPlaying = true;
     this.lastFrameTime = performance.now();
@@ -270,7 +270,7 @@ export class HTMLTimeline {
    */
   seek(progress: number): void {
     this.currentTime = seekTimeline(this.timeline, progress * this.duration);
-    this.update();
+    this.render();
   }
 
   /**
@@ -290,19 +290,7 @@ export class HTMLTimeline {
     const delta = now - this.lastFrameTime;
     this.lastFrameTime = now;
 
-    const advancement = advanceTimeline(
-      {
-        time: this.currentTime,
-        duration: this.duration,
-        direction: 1,
-        speed: this.speed,
-      },
-      delta,
-    );
-    this.currentTime = advancement.state.time;
-    this.update();
-
-    if (advancement.completed) this.pause();
+    this.update(delta);
 
     if (this.isPlaying) {
       this.rafId = requestAnimationFrame(this.tick);
@@ -310,9 +298,30 @@ export class HTMLTimeline {
   };
 
   /**
-   * Update all active steps based on current time
+   * Advance an active timeline by an elapsed duration
    */
-  private update(): void {
+  update(deltaMilliseconds: number): void {
+    if (!this.isPlaying) return;
+
+    const advancement = advanceTimeline(
+      {
+        time: this.currentTime,
+        duration: this.duration,
+        direction: 1,
+        speed: this.speed,
+      },
+      deltaMilliseconds,
+    );
+    this.currentTime = advancement.state.time;
+    this.render();
+
+    if (advancement.completed) this.pause();
+  }
+
+  /**
+   * Render all sampled steps at the current time
+   */
+  private render(): void {
     for (const sample of sampleTimeline(this.timeline, this.currentTime)) {
       const step = this.steps[Number(sample.tween.target)];
       if (!step) continue;
@@ -424,5 +433,7 @@ export class HTMLTimeline {
     this.pause();
     this.steps = [];
     this.timeline = createTimeline([]);
+    this.currentTime = 0;
+    this.hasEntered = false;
   }
 }

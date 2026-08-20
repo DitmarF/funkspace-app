@@ -8,9 +8,12 @@ and the pure motion core through explicit package entry points.
 
 `motion/` contains strict, deterministic TypeScript for easing, interpolation,
 tween data, timeline resolution, sampling, seeking, and delta-based advancement.
-It has no renderer, clock, lifecycle, or platform dependencies. Its dedicated
-`tsconfig.json` intentionally excludes DOM libraries so React, DOM, SVG, Canvas,
-and browser APIs cannot enter the core unnoticed.
+It has no renderer, clock, runtime implementation, or platform dependencies.
+Its dedicated `tsconfig.json` intentionally excludes DOM libraries so React,
+DOM, SVG, Canvas, and browser APIs cannot enter the core unnoticed.
+
+The shared `AnimationRuntime` interface standardizes adapter lifecycle without
+placing platform clocks or rendering in `common`.
 
 Frontend SVG and HTML timelines consume this core and retain only platform
 clocks, lifecycle, element lookup, and rendering. See

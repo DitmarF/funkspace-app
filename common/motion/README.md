@@ -4,6 +4,11 @@ This directory contains deterministic motion concepts shared by FunkSpace
 renderers. It owns easing, numeric interpolation, tween data, timeline
 resolution, sampling, seeking, and delta-based advancement.
 
+`AnimationRuntime` defines the shared adapter lifecycle: `update(delta)`,
+`pause()`, `resume()`, `reset()`, and `destroy()`. Adapters may retain additional
+controls such as `play()`, `seek()`, `reverse()`, or `setSpeed()` when their
+consumers need them.
+
 It deliberately does not own clocks, render loops, element lookup, style
 mutation, input, lifecycle callbacks, or rendering. React, DOM, SVG, Canvas,
 WebGL, `requestAnimationFrame`, and platform globals are forbidden here.

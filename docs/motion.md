@@ -11,6 +11,11 @@
 - The SVG and HTML timeline classes are platform adapters over
   `@funkspace/common/motion`; they must not reimplement timeline timing or
   easing logic.
+- Animation adapters implement `AnimationRuntime`: `update(delta)` advances an
+  active runtime, `pause()` preserves state, `resume()` continues, `reset()`
+  restores the initial state, and `destroy()` releases adapter-owned resources.
+- Existing adapter-specific controls such as `play`, `playFrom`, `seek`,
+  `reverse`, and `setSpeed` remain valid compatibility APIs.
 
 ### Reduced‑Motion Policy
 

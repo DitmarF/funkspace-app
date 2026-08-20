@@ -48,12 +48,12 @@ The root production build type-checks `common` before building the frontend. Rep
 
 The following ownership model applies as inactive boundaries become installable packages. It defines dependency direction now so future implementation does not create conflicting patterns.
 
-| Package    | Responsible for                                                                                                   | Not responsible for                                                                                                 |
-| ---------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `frontend` | Next.js, React, routing, portfolio UI, accessibility, web metadata, and frontend-owned integration adapters       | Game simulation, game rendering engines, backend internals, or environment-neutral shared primitives                |
-| `common`   | Pure TypeScript shared utilities, design-token sources/artifacts, and framework-neutral motion primitives         | React/Next.js, DOM or browser APIs, render loops, SVG/Canvas/WebGL manipulation, product UI, or game-specific logic |
-| `games/*`  | Game simulation, rendering, game-specific rules and content, input/audio/persistence adapters, and game lifecycle | Portfolio routing/UI, frontend internals, or unrelated shared utilities                                             |
-| `backend`  | Optional server-owned capabilities when justified                                                                 | Frontend presentation, game rendering, or shared browser code                                                       |
+| Package    | Responsible for                                                                                                                | Not responsible for                                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `frontend` | Next.js, React, routing, portfolio UI, accessibility, web metadata, and frontend-owned integration adapters                    | Game simulation, game rendering engines, backend internals, or environment-neutral shared primitives                |
+| `common`   | Pure TypeScript shared utilities, design-token sources/artifacts, framework-neutral motion primitives, and lifecycle contracts | React/Next.js, DOM or browser APIs, render loops, SVG/Canvas/WebGL manipulation, product UI, or game-specific logic |
+| `games/*`  | Game simulation, rendering, game-specific rules and content, input/audio/persistence adapters, and game lifecycle              | Portfolio routing/UI, frontend internals, or unrelated shared utilities                                             |
+| `backend`  | Optional server-owned capabilities when justified                                                                              | Frontend presentation, game rendering, or shared browser code                                                       |
 
 Shared token sources remain physically at the repository root. Pure motion concepts live in `common/motion/`; frontend SVG and HTML timelines consume them through the package's public motion export while keeping rendering and browser lifecycle concerns in `frontend/infrastructure/motion/`.
 
@@ -156,7 +156,7 @@ Within `frontend`, the package boundary does not override Clean Architecture:
 
 `common` is an active private workspace package. It exports the pure motion core and generated token modules through explicit entry points. The frontend declares a workspace dependency and consumes `@funkspace/common/motion` from its HTML and SVG adapters.
 
-The motion core establishes the allowed handwritten boundary: deterministic easing, interpolation, tween data, and timeline state calculations. Adding public entry points or additional runtime utilities requires a feature plan that updates consumers, tests, and build validation.
+The motion core establishes the allowed handwritten boundary: deterministic easing, interpolation, tween data, timeline state calculations, and the platform-neutral `AnimationRuntime` lifecycle contract. Adding public entry points or additional runtime utilities requires a feature plan that updates consumers, tests, and build validation.
 
 ### Responsibilities
 

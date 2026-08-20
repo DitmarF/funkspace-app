@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { HTMLTimeline } from "./htmlTimeline";
+import type { AnimationRuntime } from "@funkspace/common/motion";
 
 describe("HTMLTimeline", () => {
   let mockElement1: HTMLElement;
@@ -239,6 +240,34 @@ describe("HTMLTimeline", () => {
       // Time may advance slightly due to tick() being called, so check it's close to 0
       expect(timeline.time).toBeGreaterThanOrEqual(0);
       expect(timeline.time).toBeLessThan(20);
+    });
+  });
+
+  describe("shared lifecycle", () => {
+    it("implements resume, update, pause, and reset consistently", () => {
+      const timeline = new HTMLTimeline([
+        {
+          element: mockElement1,
+          fromOpacity: 0,
+          toOpacity: 1,
+          duration: 1000,
+        },
+      ]);
+      const runtime: AnimationRuntime = timeline;
+
+      runtime.resume();
+      const resumedTime = timeline.time;
+      runtime.update(100);
+      expect(timeline.time).toBeGreaterThan(resumedTime);
+
+      runtime.pause();
+      const pausedTime = timeline.time;
+      runtime.update(100);
+      expect(timeline.time).toBe(pausedTime);
+
+      runtime.reset();
+      expect(timeline.time).toBe(0);
+      expect(mockElement1.style.opacity).toBe("0");
     });
   });
 

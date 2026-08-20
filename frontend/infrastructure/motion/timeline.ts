@@ -14,12 +14,13 @@ import {
   createTimeline,
   sampleTimeline,
   seekTimeline,
+  type AnimationRuntime,
   type MotionTimeline,
   type TimelineDirection,
 } from "@funkspace/common/motion";
 import { setStrokeDashoffset, applyNumericStyle } from "./svg";
 
-export class AnimationTimeline {
+export class AnimationTimeline implements AnimationRuntime {
   private root: SVGSVGElement;
   private timeline: MotionTimeline<AnimationStep["property"]>;
   private currentTime: number = 0;
@@ -53,6 +54,13 @@ export class AnimationTimeline {
    * Play the timeline forward
    */
   play(): void {
+    this.resume();
+  }
+
+  /**
+   * Resume playback from the current timeline time
+   */
+  resume(): void {
     if (this.isPlaying) return;
     this.isPlaying = true;
     this.lastFrameTime = performance.now();
@@ -88,7 +96,17 @@ export class AnimationTimeline {
    */
   seek(ms: number): void {
     this.currentTime = seekTimeline(this.timeline, ms);
-    this.update();
+    this.render();
+  }
+
+  /**
+   * Reset playback and render the initial timeline state
+   */
+  reset(): void {
+    this.pause();
+    this.currentTime = 0;
+    this.direction = 1;
+    this.render();
   }
 
   /**
@@ -108,20 +126,7 @@ export class AnimationTimeline {
     const delta = now - this.lastFrameTime;
     this.lastFrameTime = now;
 
-    const advancement = advanceTimeline(
-      {
-        time: this.currentTime,
-        duration: this.duration,
-        direction: this.direction,
-        speed: this.speed,
-      },
-      delta,
-    );
-    this.currentTime = advancement.state.time;
-
-    if (advancement.completed) this.pause();
-
-    this.update();
+    this.update(delta);
 
     if (this.isPlaying) {
       this.rafId = requestAnimationFrame(this.tick);
@@ -129,9 +134,31 @@ export class AnimationTimeline {
   };
 
   /**
-   * Update all active tweens based on current time
+   * Advance an active timeline by an elapsed duration
    */
-  private update(): void {
+  update(deltaMilliseconds: number): void {
+    if (!this.isPlaying) return;
+
+    const advancement = advanceTimeline(
+      {
+        time: this.currentTime,
+        duration: this.duration,
+        direction: this.direction,
+        speed: this.speed,
+      },
+      deltaMilliseconds,
+    );
+    this.currentTime = advancement.state.time;
+
+    this.render();
+
+    if (advancement.completed) this.pause();
+  }
+
+  /**
+   * Render all sampled tweens at the current time
+   */
+  private render(): void {
     for (const sample of sampleTimeline(this.timeline, this.currentTime)) {
       this.applyValue(sample.tween.target, sample.tween.property, sample.value);
     }
@@ -180,6 +207,8 @@ export class AnimationTimeline {
   destroy(): void {
     this.pause();
     this.timeline = createTimeline([]);
+    this.currentTime = 0;
+    this.direction = 1;
     this.elementCache.clear();
   }
 }

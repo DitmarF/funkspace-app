@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { AnimationTimeline } from "./timeline";
 import type { AnimationManifest } from "@/domain/animations/AnimationManifest";
+import type { AnimationRuntime } from "@funkspace/common/motion";
 
 describe("AnimationTimeline", () => {
   let mockSvg: SVGSVGElement;
@@ -82,6 +83,25 @@ describe("AnimationTimeline", () => {
     it("should pause a non-playing timeline without error", () => {
       const timeline = new AnimationTimeline(mockSvg, manifest);
       expect(() => timeline.pause()).not.toThrow();
+    });
+  });
+
+  describe("shared lifecycle", () => {
+    it("implements resume, update, pause, and reset consistently", () => {
+      const timeline = new AnimationTimeline(mockSvg, manifest);
+      const runtime: AnimationRuntime = timeline;
+
+      runtime.resume();
+      runtime.update(100);
+      expect(timeline.time).toBeGreaterThanOrEqual(100);
+
+      runtime.pause();
+      const pausedTime = timeline.time;
+      runtime.update(100);
+      expect(timeline.time).toBe(pausedTime);
+
+      runtime.reset();
+      expect(timeline.time).toBe(0);
     });
   });
 
