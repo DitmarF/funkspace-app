@@ -25,12 +25,14 @@ Project priorities, in order:
 - `frontend/data/` - declarative feature data and animation configuration.
 - `games/` - parent workspace for isolated standalone game packages; currently contains no game package or source code.
 - `tokens/` - source design and motion tokens.
-- `styles/` - generated token output; regenerate it instead of hand-editing it.
+- `styles/` - generated CSS token output; regenerate it instead of hand-editing it.
+- `common/generated/` - generated framework-neutral TypeScript token output; never hand-edit it.
 - `e2e/` - Playwright end-to-end and accessibility coverage.
 - `docs/architecture.md` - detailed layer responsibilities and migration notes.
 - `docs/decisions/` - accepted Architecture Decision Records (ADRs); supersede one with a new ADR rather than silently contradicting it.
 - `docs/motion.md` and `docs/features/` - motion rules and feature decisions.
-- `backend/` and `common/` - reserved workspace stubs; do not invent responsibilities for them without an approved design.
+- `backend/` - reserved workspace stub; do not invent responsibilities for it without an approved design.
+- `common/` - future shared package boundary; currently owns generated TypeScript token artifacts but has no package manifest or runtime code.
 
 The files in `.cursor/` and the PDFs in `docs/global/` capture earlier workflows and historical design input. They are useful context, but this file, current Markdown architecture/feature docs, repository configuration, and working code are authoritative. Do not make a task depend on a specific editor or agent product.
 
@@ -65,7 +67,7 @@ If a requested change conflicts with these boundaries, stop and propose the smal
 
 ## Design, accessibility, performance, and security
 
-- Consume semantic design and motion tokens through Tailwind/CSS variables. Change sources in `tokens/`, run `pnpm build:tokens`, and never hand-edit generated `styles/tokens.css`.
+- Consume semantic design and motion tokens through Tailwind/CSS variables in the frontend and generated TypeScript constants in non-CSS runtimes. Change sources in `tokens/`, run `pnpm build:tokens`, and never hand-edit `styles/tokens.css` or `common/generated/`.
 - Do not hardcode colors, spacing, durations, or easing when a project token exists.
 - Use semantic HTML, a logical heading order, visible labels, visible focus states, and keyboard-operable controls. Add ARIA only when native semantics are insufficient.
 - Support dark/high-contrast themes where relevant and always honor `prefers-reduced-motion` with a complete static or simplified experience.

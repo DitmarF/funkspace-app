@@ -18,8 +18,8 @@ motion).
 ## Install & run
 
 ```bash
-pnpm install -r          # installs every workspace (frontend, backend, common)
-pnpm build:tokens        # optional: regenerate styles/tokens.css from tokens/fs.tokens.json
+pnpm install -r          # installs every active workspace
+pnpm build:tokens        # regenerate CSS and TypeScript token artifacts
 pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 ```
 
@@ -32,22 +32,26 @@ pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
   `styles/tokens.css`, Storybook configuration, and component library (Base,
   Controls, Modules, Layouts, Templates).
 - `src/` – shared UI primitives consumed by Vitest demos (e.g. `Hello`).
-- `tokens/` – source of truth for design tokens; build outputs to `styles/`.
+- `tokens/` – source of truth for design and motion tokens.
 - `styles/` – generated CSS custom properties for default, dark, muted, and
   high-contrast themes.
+- `common/generated/` – generated, framework-neutral TypeScript token constants.
 - `e2e/` – Playwright tests; configuration lives in `playwright.config.ts`.
 - `__tests__/` – Vitest suites run with React Testing Library.
-- `backend/`, `common/` – stubs reserved for future API and shared domain code.
+- `backend/` – stub reserved for possible future server capabilities.
+- `common/` – framework-neutral shared boundary; currently contains generated
+  TypeScript token artifacts but is not yet an installable package.
 - `scripts/` – automation helpers (e.g. GitHub branch protection script).
 
 ### Theming
 
-Tokens are transformed into CSS variables for each theme. Frontend components
-consume the variables through Tailwind token utilities. The home page opts into
-server components by default; the `ThemeSwitcher` is a small client component
-that respects `system`, `default`, `dark`, `muted`, and high-contrast modes by
-persisting the choice in `localStorage` and reacting to system preference
-changes.
+Tokens are transformed into CSS variables for the frontend and TypeScript
+constants for framework-neutral consumers such as games. Frontend components
+continue to consume CSS variables through Tailwind token utilities. The home
+page opts into server components by default; the `ThemeSwitcher` is a small
+client component that respects `system`, `default`, `dark`, `muted`, and
+high-contrast modes by persisting the choice in `localStorage` and reacting to
+system preference changes.
 
 ## Testing & quality
 

@@ -24,12 +24,14 @@ The audit covers:
 
 ```text
 tokens/fs.tokens.json -----------+
-tokens/fs.motion.tokens.json ----+-> Style Dictionary -> styles/tokens.css
-tokens/fs.game.tokens.json ------+
-                                                |
-                                                +-> frontend/app/globals.css
-                                                +-> Storybook token docs/themes
-                                                +-> Tailwind shared UI mappings
+tokens/fs.motion.tokens.json ----+-> Style Dictionary -+-> styles/tokens.css
+tokens/fs.game.tokens.json ------+                    |      +-> frontend/app/globals.css
+                                                       |      +-> Storybook token docs/themes
+                                                       |      +-> Tailwind shared UI mappings
+                                                       |
+                                                       +-> common/generated/colors.ts
+                                                       +-> common/generated/motion.ts
+                                                       +-> common/generated/themes.ts
 ```
 
 The JSON files use Design Tokens Community Group-style `$type` and `$value` fields. Tokens place the mode at the final path segment: `default`, `dark`, `muted`, or `dark-high-contrast`.
@@ -43,8 +45,20 @@ The active `style-dictionary.config.mjs` configuration:
 5. Emits `default` values under `:root`.
 6. Emits other color modes under `[data-theme="dark"]`, `[data-theme="muted"]`, and `[data-theme="dark-high-contrast"]`.
 7. Adds Storybook token-category comments for known groups.
+8. Emits resolved, readonly TypeScript color data for all four themes, grouped into primitive, semantic, and game layers.
+9. Emits readonly TypeScript motion data and supported theme metadata.
 
-The generated CSS currently contains 86 variables in `:root` and 48 color variables in each non-default theme block. `frontend/app/globals.css` imports that generated file directly, and Storybook imports the same global CSS and switches the `data-theme` attribute.
+The generated CSS currently contains 86 variables in `:root` and 48 color variables in each non-default theme block. `frontend/app/globals.css` imports that generated file directly, and Storybook imports the same global CSS and switches the `data-theme` attribute. The TypeScript build is an additional target; it does not change the CSS artifact or its consumers.
+
+The generated TypeScript contract is:
+
+| File                         | Contents                                                                              | Intended consumers                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `common/generated/colors.ts` | Resolved primitive, semantic, and game colors grouped by theme, plus token-name types | Canvas/WebGL renderers, games, and framework-neutral tooling |
+| `common/generated/motion.ts` | Duration, easing, and spring constants, plus token-name types                         | Games, animation adapters, and tooling                       |
+| `common/generated/themes.ts` | Supported theme names, default theme, and `ThemeName`                                 | Theme-aware non-CSS consumers                                |
+
+CSS aliases remain `var(--fs-...)` references so the browser can switch themes through custom properties. TypeScript color aliases are resolved to literal values during generation because a non-DOM renderer cannot rely on the browser's CSS-variable resolver. All generated modules contain data and type aliases only; edit the source JSON and run `pnpm build:tokens` instead of editing an output.
 
 `style-dictionary.config.ts` is not invoked by any package script. It duplicates the formatter without the category metadata in the active `.mjs` file and can drift. It should be removed or made canonical in a later configuration task, not during this audit.
 
@@ -131,6 +145,7 @@ This began as **Primitive → Semantic → Component**, but it was a conceptual 
 
 - Source token JSON is separate from generated CSS.
 - One build command produces a deterministic CSS artifact.
+- The same build command produces framework-neutral TypeScript constants without replacing the CSS contract.
 - Semantic UI roles exist and cover core surface, content, action, feedback, and border needs.
 - Default, dark, muted, and dark-high-contrast modes use one selector convention.
 - Frontend and Storybook consume the same generated variables.
@@ -254,7 +269,7 @@ Recommended rules:
 
 - Use one canonical Style Dictionary configuration.
 - Preserve explicit layer and application namespaces in CSS variables and other generated artifacts.
-- Generate a platform-neutral artifact for `common` as well as CSS when a second application is activated.
+- Keep the platform-neutral TypeScript artifacts in `common/generated/` aligned with the CSS output through the same build command.
 - Keep root token JSON authoritative until the planned `common` migration is implemented atomically.
 - Keep generated files read-only and reproducible.
 - Validate unresolved aliases, duplicate output names, and circular references in CI.

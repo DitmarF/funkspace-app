@@ -15,23 +15,24 @@ games/*
 
 The configured locations are not all active packages. A pnpm workspace package requires its own `package.json`.
 
-| Location | Current state | Manifest | Runtime/build responsibility |
-| --- | --- | --- | --- |
-| Repository root | Active private package | `package.json` | Workspace tooling, token generation, tests, E2E, CI commands, and frontend build orchestration |
-| `frontend/` | Active private package | `frontend/package.json` | The complete web application and all current product runtime behavior |
-| `common/` | Placeholder directory | None | None |
-| `backend/` | Placeholder directory | None | None |
-| `games/*` | Configured package collection; currently empty | No child manifests yet | Future standalone game packages |
+| Location        | Current state                                           | Manifest                | Runtime/build responsibility                                                                   |
+| --------------- | ------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
+| Repository root | Active private package                                  | `package.json`          | Workspace tooling, token generation, tests, E2E, CI commands, and frontend build orchestration |
+| `frontend/`     | Active private package                                  | `frontend/package.json` | The complete web application and all current product runtime behavior                          |
+| `common/`       | Generated-artifact boundary; not an installable package | None                    | Framework-neutral TypeScript token generation; no runtime code or build of its own             |
+| `backend/`      | Placeholder directory                                   | None                    | None                                                                                           |
+| `games/*`       | Configured package collection; currently empty          | No child manifests yet  | Future standalone game packages                                                                |
 
-`pnpm list -r --depth -1` currently recognizes only the root package and `frontend`. `backend` and `common` each contain only a README, while `games/` contains workspace guidance but no child package. A future direct child with a `package.json` will be discovered through `games/*`.
+`pnpm list -r --depth -1` currently recognizes only the root package and `frontend`. `backend` contains only a README; `common` contains a README and generated TypeScript token artifacts but no package manifest. `games/` contains workspace guidance but no child package. A future direct child with a `package.json` will be discovered through `games/*`.
 
 The current dependency shape is:
 
 ```text
-root token sources -> generated styles/tokens.css -> frontend
+root token sources -> generated styles/tokens.css   -> frontend
+                   -> common/generated/*.ts        -> non-CSS consumers
 root tooling       -> frontend build, tests, Storybook, E2E, Lighthouse
 
-common  [placeholder; no imports or exports]
+common  [generated token artifacts; no package imports or exports yet]
 backend [placeholder; no runtime or deployment]
 games/* [configured collection; no game packages yet]
 ```
@@ -40,14 +41,14 @@ CI type-checks, tests, builds, and deploys the frontend. No current application 
 
 ## Package boundary contract
 
-The following ownership model applies when the placeholder packages are activated. It defines dependency direction now so future implementation does not create conflicting patterns.
+The following ownership model applies as inactive boundaries become installable packages. It defines dependency direction now so future implementation does not create conflicting patterns.
 
-| Package | Responsible for | Not responsible for |
-| --- | --- | --- |
-| `frontend` | Next.js, React, routing, portfolio UI, accessibility, web metadata, and frontend-owned integration adapters | Game simulation, game rendering engines, backend internals, or environment-neutral shared primitives |
-| `common` | Pure TypeScript shared utilities, design-token sources/artifacts, and framework-neutral motion primitives | React/Next.js, DOM or browser APIs, render loops, SVG/Canvas/WebGL manipulation, product UI, or game-specific logic |
-| `games/*` | Game simulation, rendering, game-specific rules and content, input/audio/persistence adapters, and game lifecycle | Portfolio routing/UI, frontend internals, or unrelated shared utilities |
-| `backend` | Optional server-owned capabilities when justified | Frontend presentation, game rendering, or shared browser code |
+| Package    | Responsible for                                                                                                   | Not responsible for                                                                                                 |
+| ---------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `frontend` | Next.js, React, routing, portfolio UI, accessibility, web metadata, and frontend-owned integration adapters       | Game simulation, game rendering engines, backend internals, or environment-neutral shared primitives                |
+| `common`   | Pure TypeScript shared utilities, design-token sources/artifacts, and framework-neutral motion primitives         | React/Next.js, DOM or browser APIs, render loops, SVG/Canvas/WebGL manipulation, product UI, or game-specific logic |
+| `games/*`  | Game simulation, rendering, game-specific rules and content, input/audio/persistence adapters, and game lifecycle | Portfolio routing/UI, frontend internals, or unrelated shared utilities                                             |
+| `backend`  | Optional server-owned capabilities when justified                                                                 | Frontend presentation, game rendering, or shared browser code                                                       |
 
 These are package responsibilities, not a refactor claim. Shared tokens are physically at the repository root and current motion code is physically in `frontend`; moving either requires a separate implementation task with updated imports, builds, tests, and CI.
 
@@ -78,7 +79,7 @@ It currently owns:
 - Workspace discovery and lockfile management.
 - Shared development and CI tooling.
 - Style Dictionary configuration and source tokens in `tokens/`.
-- Generated token CSS in `styles/`.
+- Generated token CSS in `styles/` and TypeScript token constants in `common/generated/`.
 - Vitest, Playwright, and Lighthouse configuration.
 - Root scripts that invoke the frontend build and Storybook.
 - Repository-wide documentation and governance.
@@ -148,9 +149,9 @@ Within `frontend`, the package boundary does not override Clean Architecture:
 
 ### Current state
 
-`common` has no current runtime responsibility. It is a reserved directory, not an installable package. No existing code depends on it.
+`common` has no current runtime responsibility and remains a non-installable directory. It now contains generated, framework-neutral TypeScript token constants for future application consumers. No existing application code depends on it.
 
-This task defines its future boundary but does not activate or populate it. Add a manifest and code only through a feature plan that also updates consumers, tests, and CI.
+The generated artifacts do not activate `common` as a workspace package or authorize handwritten runtime code. Add a manifest, public exports, and runtime utilities only through a feature plan that also updates consumers, tests, and CI.
 
 ### Responsibilities when activated
 
@@ -285,8 +286,8 @@ Network relationships do not permit filesystem imports across private implementa
 
 ### Near term: keep the current layout
 
-1. Keep `frontend`, `backend`, `common`, and the new `games/*` collection unchanged during the remaining architecture review.
-2. Treat `backend` and `common` as inactive placeholders until a feature activates their documented responsibility.
+1. Keep the configured `frontend`, `backend`, `common`, and `games/*` workspace locations; do not rename or remove them during the remaining architecture review.
+2. Treat `backend` as an inactive placeholder and `common` as a generated-artifact boundary until a feature activates an installable package.
 3. Keep portfolio pages and embedded experiences in `frontend`; place future standalone games in direct `games/<game-slug>` packages.
 4. Keep each game's source isolated and keep the first game's lightweight engine private to that game, as required by [`ADR-004`](../decisions/ADR-004-game-development-architecture.md).
 5. Add automated package/import-boundary checks when `common` or the first game package is activated.
@@ -294,15 +295,15 @@ Network relationships do not permit filesystem imports across private implementa
 
 ### Extraction triggers
 
-| Candidate boundary | Keep current placement until | Extract when |
-| --- | --- | --- |
-| Embedded interactive experience | It shares the frontend build, deployment, and dependency profile | It needs independent deployment, incompatible/heavy dependencies, distinct ownership, or hard runtime isolation; then create a package under `games/*` or another approved collection |
-| Standalone game | Not applicable; `games/*` is already configured | Add a direct child package only after its feature plan defines ownership, build, tests, and integration |
-| Design tokens | Root remains the physical source while the frontend is the only consumer | Activate `common` and migrate token sources/artifacts when a game or second app needs them |
-| Reusable UI/design system | Components are consumed only by the frontend and its Storybook | A second application needs a stable, versioned component API |
-| `common` | No second package consumes shared foundations | A game/backend needs shared tokens, pure motion primitives, utilities, or stable serialized contracts |
-| Backend | All behavior is public and browser-safe | Secrets, authoritative state, persistence, protected integrations, or server coordination are required |
-| Shared game/simulation core | Only the first game needs its engine | A second real game proves compatible deterministic primitives and ownership |
+| Candidate boundary              | Keep current placement until                                                                        | Extract when                                                                                                                                                                          |
+| ------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Embedded interactive experience | It shares the frontend build, deployment, and dependency profile                                    | It needs independent deployment, incompatible/heavy dependencies, distinct ownership, or hard runtime isolation; then create a package under `games/*` or another approved collection |
+| Standalone game                 | Not applicable; `games/*` is already configured                                                     | Add a direct child package only after its feature plan defines ownership, build, tests, and integration                                                                               |
+| Design tokens                   | Root remains the physical source; CSS and TypeScript artifacts are generated for different runtimes | Activate `common` as a package and add public exports when a game or second app needs a declared workspace dependency                                                                 |
+| Reusable UI/design system       | Components are consumed only by the frontend and its Storybook                                      | A second application needs a stable, versioned component API                                                                                                                          |
+| `common`                        | No second package consumes shared foundations                                                       | A game/backend needs shared tokens, pure motion primitives, utilities, or stable serialized contracts                                                                                 |
+| Backend                         | All behavior is public and browser-safe                                                             | Secrets, authoritative state, persistence, protected integrations, or server coordination are required                                                                                |
+| Shared game/simulation core     | Only the first game needs its engine                                                                | A second real game proves compatible deterministic primitives and ownership                                                                                                           |
 
 ### Possible later layout
 
@@ -316,7 +317,7 @@ games/
 backend/               # optional server capabilities
 ```
 
-Only `frontend` is active today. Activating the other boundaries affects scripts, imports, CI, deployment, token paths, and documentation, so each activation requires a dedicated feature plan. Additional package splits require demonstrated reuse and an ADR.
+Only `frontend` is an active application package today. Generated TypeScript token artifacts do not make `common` installable. Activating the other boundaries affects scripts, imports, CI, deployment, token paths, and documentation, so each activation requires a dedicated feature plan. Additional package splits require demonstrated reuse and an ADR.
 
 ## Rules for AI agents
 
