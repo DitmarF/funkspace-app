@@ -15,15 +15,18 @@ games/*
 
 The configured locations are not all active packages. A pnpm workspace package requires its own `package.json`.
 
-| Location        | Current state                                  | Manifest                | Runtime/build responsibility                                                                   |
-| --------------- | ---------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------- |
-| Repository root | Active private package                         | `package.json`          | Workspace tooling, token generation, tests, E2E, CI commands, and frontend build orchestration |
-| `frontend/`     | Active private package                         | `frontend/package.json` | The complete web application and all current product runtime behavior                          |
-| `common/`       | Active private package                         | `common/package.json`   | Generated TypeScript tokens and a pure, renderer-neutral motion core                           |
-| `backend/`      | Placeholder directory                          | None                    | None                                                                                           |
-| `games/*`       | Configured package collection; currently empty | No child manifests yet  | Future standalone game packages                                                                |
+| Location        | Current state             | Manifest                | Runtime/build responsibility                                                                      |
+| --------------- | ------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
+| Repository root | Active private package    | `package.json`          | Workspace tooling, token generation, tests, E2E, CI commands, and frontend build orchestration    |
+| `frontend/`     | Active private package    | `frontend/package.json` | The complete web application and all current product runtime behavior                             |
+| `common/`       | Active private package    | `common/package.json`   | Generated TypeScript tokens and a pure, renderer-neutral motion core                              |
+| `backend/`      | Placeholder directory     | None                    | None                                                                                              |
+| `games/*`       | Active package collection | `wave-survivor`         | Standalone game packages with independent manifests, builds, dependencies, and product boundaries |
 
-`pnpm list -r --depth -1` recognizes the root package, `frontend`, and `@funkspace/common`. `backend` remains a README-only placeholder. `games/` contains workspace guidance but no child package; a future direct child with a `package.json` will be discovered through `games/*`.
+`pnpm list -r --depth -1` recognizes the root package, `frontend`,
+`@funkspace/common`, and `@funkspace/wave-survivor`. `backend` remains a
+README-only placeholder. The first game package is buildable TypeScript
+scaffolding with no gameplay implementation or runtime dependencies.
 
 The current dependency shape is:
 
@@ -36,13 +39,17 @@ root token sources -> generated styles/tokens.css   -> frontend
 
 frontend motion adapters -> @funkspace/common/motion
 root tooling       -> frontend build, tests, Storybook, E2E, Lighthouse
+wave-survivor      -> independent TypeScript build
 
 common  [active private package; explicit motion and token exports]
 backend [placeholder; no runtime or deployment]
-games/* [configured collection; no game packages yet]
+games/* [active collection; wave-survivor scaffold]
 ```
 
-The root production build type-checks `common` before building the frontend. Repository tests cover the core and both frontend motion adapters. No current application code imports from `backend` or `games`.
+The root production build type-checks `common` before building the frontend.
+Wave Survivor builds independently through its package script. Repository tests
+cover the core and both frontend motion adapters. No current application code
+imports from `backend` or the Wave Survivor package.
 
 ## Package boundary contract
 
@@ -192,7 +199,11 @@ Organize exports by explicit areas such as `tokens`, `motion`, `utilities`, and 
 
 ### Current state
 
-`games/*` is a configured workspace collection with no game package yet. The parent [`games/README.md`](../../games/README.md) defines creation and isolation requirements.
+`games/*` is a configured workspace collection. It currently contains the
+private `@funkspace/wave-survivor` TypeScript package scaffold. The package has
+no gameplay or renderer implementation yet and declares no runtime
+dependencies. The parent [`games/README.md`](../../games/README.md) defines
+creation and isolation requirements.
 
 ### Responsibilities
 

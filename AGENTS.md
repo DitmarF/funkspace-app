@@ -24,7 +24,7 @@ Project priorities, in order:
 - `frontend/application/` - use cases, services, orchestration, and providers.
 - `frontend/infrastructure/` - browser, DOM, storage, and motion adapters plus service construction.
 - `frontend/data/` - declarative feature data and animation configuration.
-- `games/` - parent workspace for isolated standalone game packages; currently contains no game package or source code.
+- `games/` - parent workspace for isolated standalone game packages. `games/wave-survivor/` is the framework-free TypeScript scaffold for the first game.
 - `tokens/` - source design and motion tokens.
 - `styles/` - generated CSS token output; regenerate it instead of hand-editing it.
 - `common/generated/` - generated framework-neutral TypeScript token output; never hand-edit it.

@@ -1,14 +1,16 @@
 # FunkSpace games workspace
 
-The `games/` directory is the parent workspace for standalone FunkSpace game projects. Each future direct child may become an independent pnpm package:
+The `games/` directory is the parent workspace for standalone FunkSpace game projects. Each direct child is an independent pnpm package:
 
 ```text
 games/
-  <game-slug>/
+  wave-survivor/
     package.json
 ```
 
-There is no game package or game source code yet. This README does not make `games/` itself a package; pnpm will discover a future `games/<game-slug>` only when that child contains a `package.json`.
+`wave-survivor` is the first package and currently contains architecture and
+build scaffolding only. This README does not make `games/` itself a package;
+pnpm discovers direct child packages through `games/*`.
 
 ## Purpose
 
@@ -50,13 +52,20 @@ game     -/-> frontend private source
 
 Games must not import frontend components, hooks, services, Tailwind configuration, or application internals. If multiple applications need the same UI, extract a supported shared UI package only after reuse is demonstrated.
 
-Shared visual and motion decisions still originate in the root `tokens/` sources according to [`ADR-002`](../docs/decisions/ADR-002-design-token-source-of-truth.md). A game feature plan must define a supported build-time consumption path without importing `frontend` internals. When `common` is activated, it becomes the package boundary for shared token artifacts and pure motion primitives; moving the current sources requires a separate migration so there is never more than one source of truth.
+Shared visual and motion decisions still originate in the root `tokens/`
+sources according to
+[`ADR-002`](../docs/decisions/ADR-002-design-token-source-of-truth.md). A game
+feature plan must define a supported build-time consumption path without
+importing `frontend` internals. The active `common` package is the supported
+boundary for shared token artifacts and pure motion primitives; moving the
+current sources requires a separate migration so there is never more than one
+source of truth.
 
 ## Relationship with `common`
 
-`common` is currently a placeholder directory, not a package. Games must not import from it today.
-
-If `common` is activated later, a game may depend on its public API for shared tokens, pure TypeScript utilities, framework-neutral motion primitives, and stable contracts only when:
+`common` is an active private workspace package. A game may depend on its
+public API for shared tokens, pure TypeScript utilities, framework-neutral
+motion primitives, and stable contracts only when:
 
 - At least two workspaces share the same stable contract or deterministic rule.
 - `common` has its own manifest and explicit exports.
@@ -72,7 +81,8 @@ Before adding code:
 1. Copy `docs/templates/feature-plan.md` to `docs/features/<game-slug>.md` and define scope, architecture, controls, accessibility, performance, tests, rollout, and rollback.
 2. Create `games/<game-slug>/package.json` with a unique private package name and explicit scripts and dependencies.
 3. Define the package's public integration contract, if one is needed.
-4. Add targeted root/CI commands; the current root build intentionally builds only `frontend`.
+4. Add targeted root/CI commands; the current root build intentionally builds
+   `common` and `frontend`, while game packages build independently.
 5. Verify pnpm discovery, type checking, tests, production build, and any deployment configuration for the new package.
 
 Do not add a framework, shared engine, backend dependency, or cross-package source import without the feature plan and applicable ADR review.
