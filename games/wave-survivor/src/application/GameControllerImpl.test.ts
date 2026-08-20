@@ -1,6 +1,26 @@
 import { describe, expect, it } from "vitest";
+import { vi } from "vitest";
 import { createGame } from "../createGame.js";
+import type { GameTheme } from "../GameTheme.js";
+import type { GamePresentationPort } from "../domain/GamePresentationPort.js";
 import { GameControllerImpl } from "./GameControllerImpl.js";
+
+const initialTheme: GameTheme = {
+  colors: {
+    background: "background",
+    player: "player",
+    enemy: "enemy",
+    projectile: "projectile",
+    effect: "effect",
+  },
+};
+
+function createPresentation(): GamePresentationPort {
+  return {
+    setTheme: vi.fn(),
+    destroy: vi.fn(),
+  };
+}
 
 describe("createGame", () => {
   it("returns the public lifecycle contract", () => {
@@ -10,6 +30,7 @@ describe("createGame", () => {
     expect(controller.pause).toBeTypeOf("function");
     expect(controller.resume).toBeTypeOf("function");
     expect(controller.restart).toBeTypeOf("function");
+    expect(controller.setTheme).toBeTypeOf("function");
     expect(controller.destroy).toBeTypeOf("function");
   });
 });
@@ -45,7 +66,14 @@ describe("GameController lifecycle", () => {
   });
 
   it("makes destroy terminal and safe to repeat", () => {
-    const controller = new GameControllerImpl();
+    const presentation = createPresentation();
+    const controller = new GameControllerImpl(presentation);
+    const replacementTheme: GameTheme = {
+      colors: {
+        ...initialTheme.colors,
+        background: "replacement-background",
+      },
+    };
     controller.start();
     controller.destroy();
     controller.destroy();
@@ -54,7 +82,25 @@ describe("GameController lifecycle", () => {
     controller.pause();
     controller.resume();
     controller.restart();
+    controller.setTheme(replacementTheme);
 
     expect(controller.lifecycleState).toBe("destroyed");
+    expect(presentation.destroy).toHaveBeenCalledOnce();
+    expect(presentation.setTheme).not.toHaveBeenCalled();
+  });
+
+  it("accepts theme updates before destruction", () => {
+    const presentation = createPresentation();
+    const controller = new GameControllerImpl(presentation);
+    const replacementTheme: GameTheme = {
+      colors: {
+        ...initialTheme.colors,
+        player: "replacement-player",
+      },
+    };
+
+    controller.setTheme(replacementTheme);
+
+    expect(presentation.setTheme).toHaveBeenCalledWith(replacementTheme);
   });
 });

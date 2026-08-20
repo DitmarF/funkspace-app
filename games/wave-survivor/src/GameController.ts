@@ -1,3 +1,5 @@
+import type { GameTheme } from "./GameTheme.js";
+
 /**
  * Public lifecycle contract for an embedded Wave Survivor instance.
  */
@@ -13,6 +15,9 @@ export interface GameController {
 
   /** Reset the session and start it from the beginning. */
   restart(): void;
+
+  /** Apply resolved host theme values without reading portfolio state. */
+  setTheme(theme: GameTheme): void;
 
   /** Permanently stop the instance and release its resources. */
   destroy(): void;

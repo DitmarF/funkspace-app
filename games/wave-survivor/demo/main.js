@@ -10,7 +10,20 @@ if (
   throw new Error("The Wave Survivor demo markup is incomplete.");
 }
 
-const game = createGame();
+const canvasStyle = getComputedStyle(canvas);
+const foreground = canvasStyle.color;
+const game = createGame({
+  canvas,
+  theme: {
+    colors: {
+      background: canvasStyle.backgroundColor,
+      player: foreground,
+      enemy: foreground,
+      projectile: foreground,
+      effect: foreground,
+    },
+  },
+});
 
 game.start();
 canvas.dataset.gameState = "started";

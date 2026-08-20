@@ -1,4 +1,6 @@
 import type { GameController } from "../GameController.js";
+import type { GameTheme } from "../GameTheme.js";
+import type { GamePresentationPort } from "../domain/GamePresentationPort.js";
 
 export type GameLifecycleState = "idle" | "running" | "paused" | "destroyed";
 
@@ -10,6 +12,8 @@ export type GameLifecycleState = "idle" | "running" | "paused" | "destroyed";
  */
 export class GameControllerImpl implements GameController {
   private state: GameLifecycleState = "idle";
+
+  constructor(private presentation: GamePresentationPort | null = null) {}
 
   get lifecycleState(): GameLifecycleState {
     return this.state;
@@ -39,7 +43,17 @@ export class GameControllerImpl implements GameController {
     }
   }
 
+  setTheme(theme: GameTheme): void {
+    if (this.state !== "destroyed") {
+      this.presentation?.setTheme(theme);
+    }
+  }
+
   destroy(): void {
+    if (this.state === "destroyed") return;
+
     this.state = "destroyed";
+    this.presentation?.destroy();
+    this.presentation = null;
   }
 }

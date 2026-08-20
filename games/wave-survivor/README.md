@@ -1,26 +1,29 @@
 # Wave Survivor
 
 Wave Survivor is the first standalone FunkSpace game package. It exposes a
-minimal lifecycle API for portfolio integration but does not contain gameplay,
-rendering, or engine code yet.
+minimal lifecycle API for portfolio integration but does not contain gameplay
+or drawing code yet.
 
 ## Public API
 
 ```ts
 import { createGame } from "@funkspace/wave-survivor";
 
-const game = createGame();
+const game = createGame({ canvas, theme });
 game.start();
 game.pause();
 game.resume();
 game.restart();
+game.setTheme(nextTheme);
 game.destroy();
 ```
 
 `createGame()` returns a fresh `GameController`. Lifecycle calls are
 idempotent. `restart()` starts a new session from any non-destroyed state, and
-`destroy()` is terminal and safe to repeat. Rendering and gameplay dependencies
-will be composed inside the factory when those layers are implemented.
+`destroy()` is terminal and safe to repeat. Gameplay and drawing capabilities
+will be composed inside the factory when those layers are implemented. A host
+may supply a canvas and resolved `GameTheme` values through `GameMountOptions`;
+theme changes are forwarded with `setTheme()`.
 
 ## Package boundaries
 

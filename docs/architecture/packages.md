@@ -201,12 +201,15 @@ Organize exports by explicit areas such as `tokens`, `motion`, `utilities`, and 
 
 `games/*` is a configured workspace collection. It currently contains the
 private `@funkspace/wave-survivor` TypeScript package scaffold. The package has
-no gameplay or renderer implementation yet and declares no runtime
-dependencies. Its public entry point exposes `createGame()` and the
-`GameController` lifecycle contract (`start`, `pause`, `resume`, `restart`, and
-`destroy`) so a portfolio adapter can own an instance without accessing game
-internals. The parent [`games/README.md`](../../games/README.md) defines creation
-and isolation requirements.
+no gameplay or drawing implementation yet and declares no runtime dependencies.
+Its renderer layer owns the mounted canvas and theme state without drawing to
+it yet. The public entry point exposes `createGame()` and the `GameController`
+lifecycle contract (`start`, `pause`, `resume`, `restart`, and `destroy`) plus a
+canvas/theme mount contract so a portfolio adapter can own an instance without
+accessing game internals. Theme changes cross the same public boundary through
+`setTheme()`. The parent
+[`games/README.md`](../../games/README.md) defines creation and isolation
+requirements.
 
 ### Responsibilities
 
@@ -256,7 +259,11 @@ The portfolio-owned game theme bridge lives in
 resolved game color token layer into an immutable `GameTheme` object and maps
 `ThemeService` subscriptions to that object. A game receives literal color
 values through its integration contract; it does not read portfolio CSS
-variables, DOM theme attributes, or frontend services.
+variables, DOM theme attributes, or frontend services. `GameLoader` lazily
+imports explicit game package entry points, while `GameHost` mounts the canvas,
+starts the controller, pauses or resumes it with document visibility, forwards
+theme updates, and destroys it on unmount. React owns none of the simulation or
+rendering loop.
 
 Portfolio routes and components depend on a frontend-owned adapter interface, not on game types. The adapter must provide teardown and must not expose the game's engine, renderer, or mutable state to the rest of `frontend`.
 

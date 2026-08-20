@@ -68,7 +68,7 @@ Presentation -> Application -> Domain <- Infrastructure
 - Motion runtimes implement the shared `AnimationRuntime` lifecycle. Keep platform scheduling and cleanup inside the adapter, and preserve compatibility controls only where consumers use them.
 - `ThemeService` is the sole post-hydration theme authority. Components delegate selection to it and use its subscription API for immediate updates; the root layout script may only perform the one-time, hydration-safe initial application.
 - Integrated games receive immutable, resolved `GameTheme` values through the frontend-owned theme adapter. Game code must not read portfolio CSS variables, DOM theme attributes, or `ThemeService` directly.
-- Wave Survivor exposes only `createGame()` and its `GameController` lifecycle from the package root. Keep engine state and layer implementations private; `destroy()` is terminal and repeated lifecycle calls must remain safe.
+- Wave Survivor exposes `createGame()`, its canvas/theme mount contract, and its `GameController` lifecycle from the package root. The frontend may consume that surface only through `frontend/features/games/`. Keep engine state and layer implementations private; `destroy()` is terminal and repeated lifecycle calls must remain safe.
 
 If a requested change conflicts with these boundaries, stop and propose the smallest architectural adjustment. Update `docs/architecture.md` when a deliberate boundary or dependency decision changes.
 

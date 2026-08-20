@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@funkspace/common"],
+  transpilePackages: ["@funkspace/common", "@funkspace/wave-survivor"],
   webpack: (config, { webpack }) => {
     // Exclude Storybook story files from the build
     config.plugins.push(
