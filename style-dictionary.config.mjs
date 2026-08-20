@@ -3,6 +3,23 @@ import StyleDictionary from "style-dictionary";
 const getTokensByMode = (tokens, mode) =>
   tokens.filter((token) => token.path[token.path.length - 1] === mode);
 
+const TOKEN_MODES = new Set(["default", "dark", "muted", "dark-high-contrast"]);
+
+const toCssVariableReference = (value) => {
+  if (typeof value !== "string") return undefined;
+
+  const match = value.match(/^\{([^}]+)\}$/);
+  if (!match) return undefined;
+
+  const path = match[1].split(".");
+  const lastSegment = path[path.length - 1];
+  const tokenName = TOKEN_MODES.has(lastSegment)
+    ? path[path.length - 2]
+    : lastSegment;
+
+  return tokenName ? `var(--fs-${tokenName})` : undefined;
+};
+
 const CATEGORY_METADATA = {
   "fs-colors/FS-Primitive-Colors": {
     label: "Colors/Primitives",
@@ -31,6 +48,10 @@ const CATEGORY_METADATA = {
   "fs-colors/FS-Semantic-Colors/Borders": {
     label: "Borders",
     presenter: "Border",
+  },
+  "fs-game/Game-Colors": {
+    label: "Game/Colors",
+    presenter: "Color",
   },
   "fs-spacing/Spacing": {
     label: "Spacing Scale",
@@ -65,9 +86,11 @@ const CATEGORY_METADATA = {
 const buildThemeBlock = (selector, tokens) => {
   const lines = tokens.map((token) => {
     const baseName = token.path[token.path.length - 2];
-    // Use transformed value, fallback to original value if not transformed
+    const originalValue = token.original?.$value ?? token.original?.value;
+    // Preserve aliases as CSS-variable references; keep existing literal output stable.
     const value =
-      token.value !== undefined ? token.value : token.original?.$value;
+      toCssVariableReference(originalValue) ??
+      (token.value !== undefined ? token.value : originalValue);
     const groupKey = token.path.slice(0, token.path.length - 2).join("/");
 
     return {
@@ -125,7 +148,11 @@ StyleDictionary.registerFormat({
 });
 
 const config = {
-  source: ["tokens/fs.tokens.json", "tokens/fs.motion.tokens.json"],
+  source: [
+    "tokens/fs.tokens.json",
+    "tokens/fs.motion.tokens.json",
+    "tokens/fs.game.tokens.json",
+  ],
   platforms: {
     css: {
       transformGroup: "css",

@@ -108,6 +108,13 @@
   --fs-motion-spring-soft: stiffness(120) damping(18) mass(1);
   --fs-motion-spring-medium: stiffness(170) damping(22) mass(1);
   --fs-motion-spring-strong: stiffness(220) damping(28) mass(1);
+  /* @tokens Game/Colors */
+  /* @presenter Color */
+  --fs-color-game-player: var(--fs-color-action-primary);
+  --fs-color-game-enemy: var(--fs-color-feedback-error);
+  --fs-color-game-projectile: var(--fs-color-feedback-warning);
+  --fs-color-game-background: var(--fs-color-surface-background);
+  --fs-color-game-effect: var(--fs-color-feedback-info);
 }
 
 [data-theme="dark"] {
@@ -168,6 +175,13 @@
   --fs-color-border-subtle: rgba(128,128,128,1);
   --fs-color-border-strong: rgba(204,204,204,1);
   --fs-color-border-focus: rgba(59,148,204,1);
+  /* @tokens Game/Colors */
+  /* @presenter Color */
+  --fs-color-game-player: var(--fs-color-action-primary);
+  --fs-color-game-enemy: var(--fs-color-feedback-error);
+  --fs-color-game-projectile: var(--fs-color-feedback-warning);
+  --fs-color-game-background: var(--fs-color-surface-background);
+  --fs-color-game-effect: var(--fs-color-feedback-info);
 }
 
 [data-theme="muted"] {
@@ -228,6 +242,13 @@
   --fs-color-border-subtle: rgba(128,128,128,1);
   --fs-color-border-strong: rgba(0,0,0,1);
   --fs-color-border-focus: rgba(30,36,102,1);
+  /* @tokens Game/Colors */
+  /* @presenter Color */
+  --fs-color-game-player: var(--fs-color-action-primary);
+  --fs-color-game-enemy: var(--fs-color-feedback-error);
+  --fs-color-game-projectile: var(--fs-color-feedback-warning);
+  --fs-color-game-background: var(--fs-color-surface-background);
+  --fs-color-game-effect: var(--fs-color-feedback-info);
 }
 
 [data-theme="dark-high-contrast"] {
@@ -288,4 +309,11 @@
   --fs-color-border-subtle: rgba(128,128,128,1);
   --fs-color-border-strong: rgba(255,255,255,1);
   --fs-color-border-focus: rgba(74,186,255,1);
+  /* @tokens Game/Colors */
+  /* @presenter Color */
+  --fs-color-game-player: var(--fs-color-action-primary);
+  --fs-color-game-enemy: var(--fs-color-feedback-error);
+  --fs-color-game-projectile: var(--fs-color-feedback-warning);
+  --fs-color-game-background: var(--fs-color-surface-background);
+  --fs-color-game-effect: var(--fs-color-feedback-info);
 }

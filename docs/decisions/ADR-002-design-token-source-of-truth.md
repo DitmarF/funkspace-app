@@ -10,7 +10,7 @@ Accepted
 
 FunkSpace is design-system-first and must present a coherent visual and motion language across portfolio pages, Storybook components, experiments, and games. It supports multiple themes and reduced-motion behavior.
 
-The repository already defines design values in `tokens/fs.tokens.json` and motion values in `tokens/fs.motion.tokens.json`. Style Dictionary transforms those sources into `styles/tokens.css`, and Tailwind maps semantic utilities to the generated CSS custom properties.
+The repository defines shared design values in `tokens/fs.tokens.json`, motion values in `tokens/fs.motion.tokens.json`, and game application roles in `tokens/fs.game.tokens.json`. Style Dictionary transforms those sources into `styles/tokens.css`, and Tailwind maps shared UI utilities to generated CSS custom properties.
 
 If components or experiences define competing colors, spacing, typography, durations, or easing values, themes drift and global changes become risky. Generated CSS is also unsuitable as an authoring source because regeneration overwrites manual edits.
 
@@ -20,6 +20,7 @@ The JSON files in `tokens/` are the source of truth for shared visual and motion
 
 - Edit `tokens/fs.tokens.json` for shared color, spacing, and typography values.
 - Edit `tokens/fs.motion.tokens.json` for shared duration and easing values.
+- Edit `tokens/fs.game.tokens.json` for game application roles that reference shared semantic tokens.
 - Generate `styles/tokens.css` with `pnpm build:tokens`; never hand-edit the generated file.
 - Tailwind configuration and component styles must consume generated CSS variables rather than duplicate token values.
 - Prefer semantic tokens such as content, surface, action, feedback, and border roles in product code. Primitive values belong at the token-definition layer.

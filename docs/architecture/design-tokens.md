@@ -13,6 +13,7 @@ The audit covers:
 
 - `tokens/fs.tokens.json`
 - `tokens/fs.motion.tokens.json`
+- `tokens/fs.game.tokens.json`
 - `style-dictionary.config.mjs`, which the root `build:tokens` script executes
 - `style-dictionary.config.ts`, an inactive alternate configuration
 - Generated `styles/tokens.css`
@@ -23,26 +24,27 @@ The audit covers:
 
 ```text
 tokens/fs.tokens.json -----------+
-                                  +-> Style Dictionary -> styles/tokens.css
-tokens/fs.motion.tokens.json ----+
+tokens/fs.motion.tokens.json ----+-> Style Dictionary -> styles/tokens.css
+tokens/fs.game.tokens.json ------+
                                                 |
                                                 +-> frontend/app/globals.css
                                                 +-> Storybook token docs/themes
-                                                +-> Tailwind CSS-variable mappings
+                                                +-> Tailwind shared UI mappings
 ```
 
 The JSON files use Design Tokens Community Group-style `$type` and `$value` fields. Tokens place the mode at the final path segment: `default`, `dark`, `muted`, or `dark-high-contrast`.
 
 The active `style-dictionary.config.mjs` configuration:
 
-1. Loads both JSON sources.
+1. Loads all three JSON sources.
 2. Selects tokens by the last path segment for each mode.
 3. Flattens every token to `--fs-<base-name>`.
-4. Emits `default` values under `:root`.
-5. Emits other color modes under `[data-theme="dark"]`, `[data-theme="muted"]`, and `[data-theme="dark-high-contrast"]`.
-6. Adds Storybook token-category comments for known groups.
+4. Preserves a pure token alias as a CSS `var()` reference to the flattened target name.
+5. Emits `default` values under `:root`.
+6. Emits other color modes under `[data-theme="dark"]`, `[data-theme="muted"]`, and `[data-theme="dark-high-contrast"]`.
+7. Adds Storybook token-category comments for known groups.
 
-The generated CSS currently contains 81 variables in `:root` and 43 color variables in each non-default theme block. `frontend/app/globals.css` imports that generated file directly, and Storybook imports the same global CSS and switches the `data-theme` attribute.
+The generated CSS currently contains 86 variables in `:root` and 48 color variables in each non-default theme block. `frontend/app/globals.css` imports that generated file directly, and Storybook imports the same global CSS and switches the `data-theme` attribute.
 
 `style-dictionary.config.ts` is not invoked by any package script. It duplicates the formatter without the category metadata in the active `.mjs` file and can drift. It should be removed or made canonical in a later configuration task, not during this audit.
 
@@ -60,15 +62,29 @@ These are called primitives, but they are not stable raw palette values. Their v
 
 There are 20 semantic color roles, also defined independently for all four modes:
 
-| Group | Current roles |
-| --- | --- |
-| Surface | `background`, `elevation-1`, `elevation-2`, `overlay` |
-| Content | `inverse`, `elevation-2`, `elevation-1`, `primary`, `disabled` |
-| Action | `primary`, `hover`, `link`, `disabled` |
-| Feedback | `success`, `warning`, `error`, `info` |
-| Border | `subtle`, `strong`, `focus` |
+| Group    | Current roles                                                  |
+| -------- | -------------------------------------------------------------- |
+| Surface  | `background`, `elevation-1`, `elevation-2`, `overlay`          |
+| Content  | `inverse`, `elevation-2`, `elevation-1`, `primary`, `disabled` |
+| Action   | `primary`, `hover`, `link`, `disabled`                         |
+| Feedback | `success`, `warning`, `error`, `info`                          |
+| Border   | `subtle`, `strong`, `focus`                                    |
 
-The semantic tokens repeat RGBA literals. They do not reference primitive tokens, and no source token in either JSON file uses a token alias. The relationship between a primitive and a semantic role is therefore maintained manually.
+The shared semantic tokens repeat RGBA literals and do not reference primitive tokens. The relationship between a primitive and a shared semantic role is therefore maintained manually. The game application tokens are the first source aliases in the system: they reference these semantic roles per mode.
+
+### Game application colors
+
+`fs.game.tokens.json` introduces five namespaced game roles:
+
+| Game role         | Shared semantic reference |
+| ----------------- | ------------------------- |
+| `game.player`     | Action primary            |
+| `game.enemy`      | Feedback error            |
+| `game.projectile` | Feedback warning          |
+| `game.background` | Surface background        |
+| `game.effect`     | Feedback info             |
+
+Each role contains references for default, dark, muted, and dark-high-contrast modes. The source file contains no raw color literals. The custom formatter emits `--fs-color-game-*` variables whose values are CSS references to the corresponding shared semantic variables.
 
 ### Spacing and typography
 
@@ -96,7 +112,7 @@ All motion tokens have only a `default` mode. Tailwind maps the duration and eas
 
 ### Component consumption
 
-There is no source-level Component token group. Components compose Tailwind utilities and CSS variables directly.
+There is no source-level Component token group. Components compose Tailwind utilities and CSS variables directly. No frontend component currently consumes the new game variables.
 
 Semantic consumption exists in global styles and components, including surface, content, action, feedback, and border roles. However, components and stories also consume primitive colors directly through utilities such as `bg-fs-blue`, `bg-fs-violet`, and `text-fs-white`, or through variables such as `var(--fs-color-blue)`.
 
@@ -104,10 +120,12 @@ The effective current hierarchy is therefore:
 
 ```text
 Primitive literals --manual duplication--> Semantic literals --> Component usage
-        \-------------------------------------------------------> Component usage
+        \----------------------------------------------+---------> Component usage
+                                                       |
+                                                       +-> Game application aliases
 ```
 
-This can be summarized as **Primitive → Semantic → Component**, but it is a conceptual convention rather than an enforced alias chain. The Component level is consumption, not a token layer.
+This began as **Primitive → Semantic → Component**, but it was a conceptual convention rather than an enforced alias chain. The Component level remains consumption rather than a token layer; the game file now adds an initial Application layer that aliases Semantic tokens.
 
 ## Current strengths
 
@@ -122,9 +140,9 @@ This can be summarized as **Primitive → Semantic → Component**, but it is a 
 ## Current limitations for multiple applications
 
 1. **No Brand layer.** FunkSpace identity values are mixed into the primitive palette without explicit brand roles.
-2. **No Application layer.** Portfolio, game, and experiment meanings cannot vary without adding global semantic roles or consuming raw colors.
+2. **The Application layer is incomplete.** Five initial game roles exist, but there are no portfolio or experiment namespaces and no game-specific component/state roles yet.
 3. **No Component token layer.** Component decisions are encoded in classes and props rather than named token contracts.
-4. **No aliases.** Semantic changes require editing repeated literals, which can drift from the intended primitive or brand mapping.
+4. **Shared layers still lack aliases.** Game roles reference Semantic tokens, but Semantic tokens still repeat literals instead of referencing Primitive or Brand tokens.
 5. **Theme-dependent primitives.** Raw-looking names do not guarantee stable values, making direct consumption misleading.
 6. **All variables are globally exposed.** The generated artifact does not distinguish shared, portfolio, game, or component ownership.
 7. **Flattened names can collide.** The formatter discards the source path and emits only the base name; future application/component groups could accidentally produce the same CSS variable.
@@ -182,11 +200,11 @@ Application tokens translate shared semantics into the vocabulary of one product
 
 Examples:
 
-| Application | Example roles |
-| --- | --- |
-| Portfolio | hero background/accent, project-card surface, navigation indicator, case-study highlight |
-| Game | world background, player, ally, enemy, hazard, collectible, HUD surface/content, score highlight |
-| Interactive experiment | canvas background, data series, control surface, active selection, visualization emphasis |
+| Application            | Example roles                                                                                    |
+| ---------------------- | ------------------------------------------------------------------------------------------------ |
+| Portfolio              | hero background/accent, project-card surface, navigation indicator, case-study highlight         |
+| Game                   | world background, player, ally, enemy, hazard, collectible, HUD surface/content, score highlight |
+| Interactive experiment | canvas background, data series, control surface, active selection, visualization emphasis        |
 
 Application tokens reference Semantic or Brand roles and may provide application-specific modes. They must be namespaced by application or game so a game theme cannot silently change the portfolio.
 
@@ -254,7 +272,7 @@ No migration is performed by this task. A future feature plan should sequence th
 5. Resolve typography ownership and align token sources with the self-hosted frontend fonts.
 6. Decide how spacing and spring tokens are exposed and consumed.
 7. Add namespaced Portfolio application tokens and migrate direct primitive usages.
-8. Add game Application tokens only when the first game's visual requirements are known.
+8. Expand the initial game Application tokens only when the first game's visual requirements are known.
 9. Add Component tokens only for repeated, stable component decisions.
 10. Activate the `common` package and move token ownership only when at least two workspaces consume the artifacts.
 11. Remove the inactive Style Dictionary configuration after choosing the canonical implementation.
@@ -264,7 +282,7 @@ Each migration step must regenerate CSS, inspect the diff, validate all four cur
 ## Rules for AI agents
 
 - Inspect token sources, generated output, and consumer mappings before proposing a token.
-- Do not treat current semantic values as aliases; they are independent literals today.
+- Do not treat current shared semantic values as aliases; they remain independent literals. Game application tokens are aliases to them.
 - Do not hand-edit `styles/tokens.css`.
 - Do not introduce Brand, Application, or Component values as hard-coded component styles while waiting for the hierarchy migration.
 - Do not let games consume portfolio tokens or make simulation decisions from colors.

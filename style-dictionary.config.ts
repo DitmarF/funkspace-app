@@ -1,15 +1,34 @@
-import StyleDictionary, { TransformedToken } from "style-dictionary";
-import type { Config } from "style-dictionary";
+import StyleDictionary from "style-dictionary";
+import type { Config, TransformedToken } from "style-dictionary";
 
 const getTokensByMode = (tokens: TransformedToken[], mode: string) =>
   tokens.filter((token) => token.path[token.path.length - 1] === mode);
 
+const TOKEN_MODES = new Set(["default", "dark", "muted", "dark-high-contrast"]);
+
+const toCssVariableReference = (value: unknown) => {
+  if (typeof value !== "string") return undefined;
+
+  const match = value.match(/^\{([^}]+)\}$/);
+  if (!match) return undefined;
+
+  const path = match[1].split(".");
+  const lastSegment = path[path.length - 1];
+  const tokenName = TOKEN_MODES.has(lastSegment)
+    ? path[path.length - 2]
+    : lastSegment;
+
+  return tokenName ? `var(--fs-${tokenName})` : undefined;
+};
+
 const buildThemeBlock = (selector: string, tokens: TransformedToken[]) => {
   const lines = tokens.map((token) => {
     const baseName = token.path[token.path.length - 2];
-    // Use transformed value, fallback to original value if not transformed
+    const originalValue = token.original?.$value ?? token.original?.value;
+    // Preserve aliases as CSS-variable references; keep existing literal output stable.
     const value =
-      token.value !== undefined ? token.value : token.original?.$value;
+      toCssVariableReference(originalValue) ??
+      (token.value !== undefined ? token.value : originalValue);
     return `  --fs-${baseName}: ${value};`;
   });
 
@@ -43,7 +62,11 @@ StyleDictionary.registerFormat({
 });
 
 const config: Config = {
-  source: ["tokens/fs.tokens.json", "tokens/fs.motion.tokens.json"],
+  source: [
+    "tokens/fs.tokens.json",
+    "tokens/fs.motion.tokens.json",
+    "tokens/fs.game.tokens.json",
+  ],
   platforms: {
     css: {
       transformGroup: "css",

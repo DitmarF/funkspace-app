@@ -1,0 +1,78 @@
+{
+  "fs-game": {
+    "$type": "color",
+    "Game-Colors": {
+      "$type": "color",
+      "color-game-player": {
+        "default": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Action.color-action-primary.default}"
+        },
+        "dark": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Action.color-action-primary.dark}"
+        },
+        "muted": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Action.color-action-primary.muted}"
+        },
+        "dark-high-contrast": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Action.color-action-primary.dark-high-contrast}"
+        }
+      },
+      "color-game-enemy": {
+        "default": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-error.default}"
+        },
+        "dark": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-error.dark}"
+        },
+        "muted": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-error.muted}"
+        },
+        "dark-high-contrast": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-error.dark-high-contrast}"
+        }
+      },
+      "color-game-projectile": {
+        "default": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-warning.default}"
+        },
+        "dark": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-warning.dark}"
+        },
+        "muted": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-warning.muted}"
+        },
+        "dark-high-contrast": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-warning.dark-high-contrast}"
+        }
+      },
+      "color-game-background": {
+        "default": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Surface.color-surface-background.default}"
+        },
+        "dark": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Surface.color-surface-background.dark}"
+        },
+        "muted": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Surface.color-surface-background.muted}"
+        },
+        "dark-high-contrast": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Surface.color-surface-background.dark-high-contrast}"
+        }
+      },
+      "color-game-effect": {
+        "default": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-info.default}"
+        },
+        "dark": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-info.dark}"
+        },
+        "muted": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-info.muted}"
+        },
+        "dark-high-contrast": {
+          "$value": "{fs-colors.FS-Semantic-Colors.Feedback.color-feedback-info.dark-high-contrast}"
+        }
+      }
+    }
+  }
+}
