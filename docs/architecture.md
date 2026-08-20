@@ -1,6 +1,6 @@
 # FunkSpace Architecture
 
-This document describes the clean architecture principles and layer boundaries for the FunkSpace application. See [`docs/architecture/packages.md`](architecture/packages.md) for repository workspace responsibilities and package-level dependency rules.
+This document describes the clean architecture principles and layer boundaries for the FunkSpace application. See [`docs/architecture/packages.md`](architecture/packages.md) for repository workspace responsibilities and [`docs/architecture/design-tokens.md`](architecture/design-tokens.md) for the current and recommended design-token hierarchy.
 
 ## Architecture Overview
 
