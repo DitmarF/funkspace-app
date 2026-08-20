@@ -38,6 +38,37 @@ games/* [configured collection; no game packages yet]
 
 CI type-checks, tests, builds, and deploys the frontend. No current application code imports from `backend`, `common`, or `games`.
 
+## Package boundary contract
+
+The following ownership model applies when the placeholder packages are activated. It defines dependency direction now so future implementation does not create conflicting patterns.
+
+| Package | Responsible for | Not responsible for |
+| --- | --- | --- |
+| `frontend` | Next.js, React, routing, portfolio UI, accessibility, web metadata, and frontend-owned integration adapters | Game simulation, game rendering engines, backend internals, or environment-neutral shared primitives |
+| `common` | Pure TypeScript shared utilities, design-token sources/artifacts, and framework-neutral motion primitives | React/Next.js, DOM or browser APIs, render loops, SVG/Canvas/WebGL manipulation, product UI, or game-specific logic |
+| `games/*` | Game simulation, rendering, game-specific rules and content, input/audio/persistence adapters, and game lifecycle | Portfolio routing/UI, frontend internals, or unrelated shared utilities |
+| `backend` | Optional server-owned capabilities when justified | Frontend presentation, game rendering, or shared browser code |
+
+These are package responsibilities, not a refactor claim. Shared tokens are physically at the repository root and current motion code is physically in `frontend`; moving either requires a separate implementation task with updated imports, builds, tests, and CI.
+
+### Allowed dependency direction
+
+```text
+frontend -------------------------------> common
+games/* --------------------------------> common
+backend (if activated) -----------------> common
+
+frontend integration adapter ----------> game public API/artifact
+frontend presentation/application -----> frontend-owned adapter contract
+
+games/* -/-> frontend
+common  -/-> frontend, games/*, or backend
+common  -/-> React, Next.js, DOM, or other browser frameworks/APIs
+frontend -/-> game private source
+```
+
+The one permitted `frontend -> games/*` edge is an integration adapter. No other frontend module may import a game package directly.
+
 ## Root workspace responsibilities
 
 The root is an orchestration and shared-foundation boundary, not a product runtime.
@@ -62,8 +93,10 @@ While both `package.json#workspaces` and `pnpm-workspace.yaml` declare workspace
 
 `frontend` is the only active application package. It owns:
 
+- The Next.js runtime and React application boundary.
 - Next.js App Router pages, layouts, metadata, and public assets.
-- The portfolio and all current user-facing routes.
+- Routing, navigation, the portfolio UI, and all current user-facing routes.
+- Accessibility semantics, focus behavior, keyboard access, reduced-motion integration, and web-level performance.
 - The design-system component implementation and Storybook stories.
 - Theme and design-token consumption through `styles/tokens.css` and Tailwind.
 - Interactive demonstrations and sandbox routes.
@@ -82,6 +115,8 @@ New portfolio pages, animations, and embedded experiments remain in `frontend` u
 - Generated design-token CSS and other intentional root-owned build outputs.
 - Root development tooling through workspace scripts; tooling must not become a browser runtime dependency.
 - A future shared workspace package only after that package has a manifest, explicit exports, clear ownership, and is declared in `frontend/package.json` with the workspace protocol.
+- A future `common` public API for tokens, pure utilities, and framework-neutral motion primitives.
+- A game only through a frontend-owned integration adapter and the game's documented public API or deployed artifact.
 - A future backend through a documented network contract and frontend-owned port/client adapter.
 
 Within `frontend`, the package boundary does not override Clean Architecture:
@@ -104,34 +139,40 @@ Within `frontend`, the package boundary does not override Clean Architecture:
 - Import root CI/build implementation modules into application runtime code.
 - Make the portfolio shell depend on an experiment's or game's private engine, renderer, state, or lifecycle.
 - Import private source files from a package under `games/*`.
+- Import a game package anywhere except its dedicated frontend integration adapter.
+- Put game simulation, game-specific rendering, or game rules in portfolio components, routes, or hooks.
 - Let one interactive experience import another experience's internals.
 - Bypass the internal layer rules for convenience.
 
 ## `common`
 
-### Current responsibilities
+### Current state
 
 `common` has no current runtime responsibility. It is a reserved directory, not an installable package. No existing code depends on it.
 
-Do not place code in `common` until at least two active workspaces need the same stable runtime contract. Reuse within `frontend` alone is not evidence for a cross-workspace package.
+This task defines its future boundary but does not activate or populate it. Add a manifest and code only through a feature plan that also updates consumers, tests, and CI.
 
-### Possible future responsibilities
+### Responsibilities when activated
 
-If activated, `common` may contain a deliberately small set of environment-neutral contracts such as:
+`common` owns reusable, environment-neutral foundations shared by `frontend`, games, and a possible backend:
 
-- Serializable types shared by a frontend and backend.
-- Pure value objects and validation rules with identical meaning in both runtimes.
-- API request/response schemas or event contracts.
-- Deterministic helpers that are genuinely used by more than one workspace.
+- Pure TypeScript utilities with at least two real workspace consumers.
+- Design-token source data, token types, and portable generated artifacts.
+- Motion primitives such as timing types, easing math, interpolation, geometry/vector math, manifests, and deterministic state transitions.
+- Serializable types, value objects, validation rules, API schemas, and event contracts shared across runtimes.
 
-It must not become a general utility drawer. UI components, Tailwind configuration, backend services, browser adapters, game renderers, and product-specific orchestration do not belong in `common`.
+The JSON token files in root `tokens/` remain authoritative under [`ADR-002`](../decisions/ADR-002-design-token-source-of-truth.md) until a planned migration activates `common`. Assigning token responsibility here does not authorize duplicate token sources. During migration, move the source and build contract atomically so there is still exactly one source of truth.
+
+Motion primitives in `common` stop before environment integration. `requestAnimationFrame`, DOM reads/writes, React hooks, SVG element manipulation, Canvas/WebGL renderers, audio, and input listeners belong to `frontend` or the owning game.
+
+`common` must not become a general utility drawer. Code belongs here only when its semantics are shared and stable; game-specific simulation and frontend-specific behavior stay with their owners.
 
 ### Purity requirements
 
 Future `common` code must:
 
 - Be strict TypeScript with deterministic behavior.
-- Remain independent of React, Next.js, DOM APIs, browser storage, and Node-only APIs.
+- Remain independent of React, Next.js, browser frameworks, DOM APIs, browser storage, and Node-only APIs.
 - Avoid file, network, database, environment-variable, clock, random, and other hidden I/O.
 - Have no dependency on `frontend`, `backend`, or a game package.
 - Expose explicit entry points instead of requiring deep source imports.
@@ -139,7 +180,58 @@ Future `common` code must:
 - Keep external dependencies minimal, environment-neutral, and justified.
 - Include unit tests for behavior and compatibility tests for serialized contracts.
 
-If future needs combine unrelated concerns, create narrowly named packages such as `contracts` or `simulation-core` instead of expanding an ambiguous `common` package. Renaming or replacing the directory requires a separate migration decision.
+Organize exports by explicit areas such as `tokens`, `motion`, `utilities`, and `contracts`. If those areas later require different tooling, versioning, or ownership, splitting `common` requires a separate ADR and migration.
+
+## `games/*`
+
+### Current state
+
+`games/*` is a configured workspace collection with no game package yet. The parent [`games/README.md`](../../games/README.md) defines creation and isolation requirements.
+
+### Responsibilities
+
+Each `games/<game-slug>` package is responsible for its complete game product boundary:
+
+- Deterministic simulation state, rules, scoring, collision/math, and state transitions.
+- Session lifecycle such as start, pause, resume, reset, completion, and teardown.
+- Game-specific rendering and renderer selection.
+- Input, audio, persistence, clock, randomness, and platform adapters.
+- Game-specific UI, content, assets, accessibility behavior, reduced-motion behavior, and performance budgets.
+- Its own manifest, dependencies, build, tests, documentation, and deployment configuration.
+
+The first game follows [`ADR-004`](../decisions/ADR-004-game-development-architecture.md): its lightweight engine remains private to that game until a second real consumer proves a shareable primitive.
+
+### Allowed dependencies
+
+A game may depend on:
+
+- Its own declared runtime and development dependencies.
+- The future `common` public API for tokens, pure utilities, motion primitives, and stable contracts.
+- A backend only through a documented network adapter and API contract.
+- Root tooling through explicit workspace scripts that do not become runtime dependencies.
+
+### Forbidden dependencies
+
+A game must not:
+
+- Import `frontend`, its components, hooks, routes, services, Tailwind configuration, or private source.
+- Import another game's private source or engine.
+- Put game-specific simulation, rendering, or orchestration into `common`.
+- Depend on undeclared, hoisted, or transitive packages.
+- Expose internal state or renderer details as its public integration contract.
+
+### Frontend integration adapters
+
+`frontend` consumes a game through an adapter it owns. The adapter is the only frontend module permitted to depend on the game's public integration surface.
+
+An adapter may:
+
+- Link or navigate to a separately deployed game.
+- Embed a public game artifact or communicate through a documented messaging contract.
+- Import an explicit game package entry point when the game is built for in-process integration.
+- Translate frontend concerns such as navigation, theme values, reduced-motion preferences, lifecycle, errors, and analytics into the game's public contract.
+
+Portfolio routes and components depend on a frontend-owned adapter interface, not on game types. The adapter must provide teardown and must not expose the game's engine, renderer, or mutable state to the rest of `frontend`.
 
 ## `backend`
 
@@ -174,31 +266,30 @@ Activation requires an explicit feature plan and, when the boundary is significa
 - Local development, CI, deployment, observability, and rollback behavior.
 - How frontend clients depend on the service through ports rather than backend source imports.
 
-## Recommended dependency direction if all three become active
+## Backend dependency direction
 
 ```text
-frontend ---- declared public import ----> common <---- declared public import ---- backend
-game packages ---- declared public import --> common
-frontend ---- documented network API -------------------------------------------> backend
+frontend ---- documented network API ----> backend
+games/* ---- documented network API -----> backend
+backend ---- declared public import ------> common
 
-common  -/-> frontend
-common  -/-> backend
 backend -/-> frontend source
 frontend -/-> backend source
-games/* -/-> frontend or other games' private source
+backend -/-> game source
+games/* -/-> backend source
 ```
 
-`common` would provide contracts, not orchestration. A network relationship between frontend and backend does not permit filesystem imports across their private implementations.
+Network relationships do not permit filesystem imports across private implementations. Shared request/response contracts may live in `common` when they satisfy its purity rules.
 
 ## Recommendations for future workspace structure
 
 ### Near term: keep the current layout
 
 1. Keep `frontend`, `backend`, `common`, and the new `games/*` collection unchanged during the remaining architecture review.
-2. Treat `backend` and `common` as inactive placeholders until a feature supplies a concrete responsibility.
+2. Treat `backend` and `common` as inactive placeholders until a feature activates their documented responsibility.
 3. Keep portfolio pages and embedded experiences in `frontend`; place future standalone games in direct `games/<game-slug>` packages.
 4. Keep each game's source isolated and keep the first game's lightweight engine private to that game, as required by [`ADR-004`](../decisions/ADR-004-game-development-architecture.md).
-5. Add automated package/import-boundary checks before the number of active workspaces grows.
+5. Add automated package/import-boundary checks when `common` or the first game package is activated.
 6. Update root scripts and CI whenever a real package is activated; do not assume recursive commands cover a directory without a manifest.
 
 ### Extraction triggers
@@ -207,35 +298,32 @@ games/* -/-> frontend or other games' private source
 | --- | --- | --- |
 | Embedded interactive experience | It shares the frontend build, deployment, and dependency profile | It needs independent deployment, incompatible/heavy dependencies, distinct ownership, or hard runtime isolation; then create a package under `games/*` or another approved collection |
 | Standalone game | Not applicable; `games/*` is already configured | Add a direct child package only after its feature plan defines ownership, build, tests, and integration |
-| Design tokens | The frontend is the only runtime consumer | Multiple packages/apps need versioned token artifacts or independent builds |
+| Design tokens | Root remains the physical source while the frontend is the only consumer | Activate `common` and migrate token sources/artifacts when a game or second app needs them |
 | Reusable UI/design system | Components are consumed only by the frontend and its Storybook | A second application needs a stable, versioned component API |
-| `common` contracts | Only one runtime uses the types/rules | At least frontend and backend need the same stable serialized contract |
+| `common` | No second package consumes shared foundations | A game/backend needs shared tokens, pure motion primitives, utilities, or stable serialized contracts |
 | Backend | All behavior is public and browser-safe | Secrets, authoritative state, persistence, protected integrations, or server coordination are required |
 | Shared game/simulation core | Only the first game needs its engine | A second real game proves compatible deterministic primitives and ownership |
 
 ### Possible later layout
 
-If multiple independently built applications emerge, consider a conventional split such as:
+The intended near-term structure is:
 
 ```text
-apps/
-  web/                 # portfolio and integrated experiences
-  api/                 # only when a backend is required
-  <experience>/        # only for an independently built/deployed experience
-
-packages/
-  design-tokens/       # generated, versioned token artifacts
-  ui/                  # proven cross-app components
-  contracts/           # pure serialized frontend/backend contracts
-  <shared-core>/       # only after demonstrated cross-app reuse
+frontend/              # Next.js, React, routing, portfolio UI, accessibility
+common/                # pure TypeScript utilities, tokens, motion primitives
+games/
+  <game-slug>/         # simulation, rendering, game-specific logic
+backend/               # optional server capabilities
 ```
 
-This is a direction, not an approved migration. Moving the current folders would affect scripts, imports, CI, deployment, token paths, and documentation, so it requires a dedicated feature plan and ADR.
+Only `frontend` is active today. Activating the other boundaries affects scripts, imports, CI, deployment, token paths, and documentation, so each activation requires a dedicated feature plan. Additional package splits require demonstrated reuse and an ADR.
 
 ## Rules for AI agents
 
 - Verify the presence of a package manifest before treating a configured directory as a workspace package.
 - Do not create code in a placeholder to make a planned architecture appear implemented.
 - Prefer the current, simplest boundary until an extraction trigger is supported by repository evidence.
+- Enforce `games/* -/-> frontend` and `common -/-> browser frameworks` in every plan and review.
+- Permit `frontend -> games/*` only inside a frontend-owned adapter that consumes a documented public integration surface.
 - Record new package responsibilities, public exports, dependency direction, tests, and ownership in this document when a workspace is activated.
 - Report documentation/configuration mismatches instead of silently normalizing them in unrelated tasks.

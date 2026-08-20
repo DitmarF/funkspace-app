@@ -50,13 +50,13 @@ game     -/-> frontend private source
 
 Games must not import frontend components, hooks, services, Tailwind configuration, or application internals. If multiple applications need the same UI, extract a supported shared UI package only after reuse is demonstrated.
 
-Shared visual and motion decisions still originate in the root `tokens/` sources according to [`ADR-002`](../docs/decisions/ADR-002-design-token-source-of-truth.md). A game feature plan must define a supported build-time consumption path without importing `frontend` internals. If multiple packages need versioned token artifacts, create a dedicated token package through a separate migration.
+Shared visual and motion decisions still originate in the root `tokens/` sources according to [`ADR-002`](../docs/decisions/ADR-002-design-token-source-of-truth.md). A game feature plan must define a supported build-time consumption path without importing `frontend` internals. When `common` is activated, it becomes the package boundary for shared token artifacts and pure motion primitives; moving the current sources requires a separate migration so there is never more than one source of truth.
 
 ## Relationship with `common`
 
 `common` is currently a placeholder directory, not a package. Games must not import from it today.
 
-If `common` is activated later, a game may depend on its public API only when:
+If `common` is activated later, a game may depend on its public API for shared tokens, pure TypeScript utilities, framework-neutral motion primitives, and stable contracts only when:
 
 - At least two workspaces share the same stable contract or deterministic rule.
 - `common` has its own manifest and explicit exports.
