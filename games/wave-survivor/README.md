@@ -1,8 +1,26 @@
 # Wave Survivor
 
-Wave Survivor is the first standalone FunkSpace game package. This scaffold
-establishes its TypeScript and architecture boundaries; it does not contain
-gameplay, rendering, or engine code yet.
+Wave Survivor is the first standalone FunkSpace game package. It exposes a
+minimal lifecycle API for portfolio integration but does not contain gameplay,
+rendering, or engine code yet.
+
+## Public API
+
+```ts
+import { createGame } from "@funkspace/wave-survivor";
+
+const game = createGame();
+game.start();
+game.pause();
+game.resume();
+game.restart();
+game.destroy();
+```
+
+`createGame()` returns a fresh `GameController`. Lifecycle calls are
+idempotent. `restart()` starts a new session from any non-destroyed state, and
+`destroy()` is terminal and safe to repeat. Rendering and gameplay dependencies
+will be composed inside the factory when those layers are implemented.
 
 ## Package boundaries
 
@@ -26,6 +44,7 @@ From the repository root:
 
 ```bash
 pnpm --filter @funkspace/wave-survivor typecheck
+pnpm --filter @funkspace/wave-survivor test
 pnpm --filter @funkspace/wave-survivor build
 ```
 

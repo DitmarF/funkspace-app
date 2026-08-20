@@ -202,8 +202,11 @@ Organize exports by explicit areas such as `tokens`, `motion`, `utilities`, and 
 `games/*` is a configured workspace collection. It currently contains the
 private `@funkspace/wave-survivor` TypeScript package scaffold. The package has
 no gameplay or renderer implementation yet and declares no runtime
-dependencies. The parent [`games/README.md`](../../games/README.md) defines
-creation and isolation requirements.
+dependencies. Its public entry point exposes `createGame()` and the
+`GameController` lifecycle contract (`start`, `pause`, `resume`, `restart`, and
+`destroy`) so a portfolio adapter can own an instance without accessing game
+internals. The parent [`games/README.md`](../../games/README.md) defines creation
+and isolation requirements.
 
 ### Responsibilities
 
