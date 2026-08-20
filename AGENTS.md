@@ -115,7 +115,7 @@ Before handing off code, run at minimum type checking, linting, and the affected
 
 ## Adding a new feature
 
-- For substantial work, create or update `docs/features/<feature>.md` before implementation. Include purpose, user impact, goals/non-goals, acceptance criteria, affected layers, accessibility/performance risks, rollout or feature flag, and test plan.
+- For substantial work, copy `docs/templates/feature-plan.md` to `docs/features/<feature>.md` and complete it before implementation.
 - Reuse existing components, hooks, services, ports, and tokens before creating parallel abstractions.
 - Place logic in the correct layer; do not hide business rules in components or browser adapters.
 - Define failure, loading, empty, disabled, and reduced-motion states as part of the feature rather than as later polish.
