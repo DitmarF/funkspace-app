@@ -20,11 +20,15 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "demo": "pnpm build && vite demo",
+    "demo:build": "pnpm build && vite build demo",
+    "demo:preview": "vite preview demo",
     "test": "vitest run --config vitest.config.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "typescript": "^5",
+    "vite": "^7.0.2",
     "vitest": "^3.2.4"
   }
 }

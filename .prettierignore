@@ -9,3 +9,4 @@ test-results/
 styles/tokens.css
 common/generated/
 games/*/dist/
+games/*/demo/dist/

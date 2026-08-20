@@ -46,6 +46,16 @@ From the repository root:
 pnpm --filter @funkspace/wave-survivor typecheck
 pnpm --filter @funkspace/wave-survivor test
 pnpm --filter @funkspace/wave-survivor build
+pnpm --filter @funkspace/wave-survivor demo
+pnpm --filter @funkspace/wave-survivor demo:build
 ```
 
 Build output is emitted to `dist/` and is not source-controlled.
+
+## Standalone demo
+
+`demo/` is a framework-free HTML entry point that proves the game can run
+without the portfolio or Next.js. The demo builds and imports the package's
+public JavaScript entry point, creates a game controller, and starts the empty
+game. It contains a canvas for future rendering but deliberately has no
+gameplay or renderer integration yet.

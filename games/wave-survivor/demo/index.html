@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wave Survivor — Standalone Demo</title>
+    <style>
+      :root {
+        color-scheme: dark light;
+        font-family: system-ui, sans-serif;
+      }
+
+      body {
+        display: grid;
+        min-height: 100vh;
+        margin: 0;
+        place-items: center;
+        background: Canvas;
+        color: CanvasText;
+      }
+
+      main {
+        width: min(60rem, calc(100% - 2rem));
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        border: 1px solid currentColor;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Wave Survivor</h1>
+      <canvas
+        id="game-canvas"
+        width="960"
+        height="540"
+        aria-label="Wave Survivor game canvas"
+      >
+        Your browser does not support the canvas element.
+      </canvas>
+      <p id="game-status" role="status" aria-live="polite">
+        Starting empty game…
+      </p>
+    </main>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
