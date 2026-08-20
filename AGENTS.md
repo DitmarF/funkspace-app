@@ -1,6 +1,6 @@
 # FunkSpace - AI Development Guide
 
-This file is the primary operating guide for AI coding agents working in this repository. Read it before planning or editing. Use `docs/architecture.md` for the detailed architecture model and `docs/features/` for feature-specific decisions.
+This file is the primary operating guide for AI coding agents working in this repository. Read it before planning or editing. Use `docs/architecture.md` for the detailed architecture model, `docs/decisions/` for accepted decisions, and `docs/features/` for feature-specific plans.
 
 ## Project purpose
 
@@ -27,6 +27,7 @@ Project priorities, in order:
 - `styles/` - generated token output; regenerate it instead of hand-editing it.
 - `e2e/` - Playwright end-to-end and accessibility coverage.
 - `docs/architecture.md` - detailed layer responsibilities and migration notes.
+- `docs/decisions/` - accepted Architecture Decision Records (ADRs); supersede one with a new ADR rather than silently contradicting it.
 - `docs/motion.md` and `docs/features/` - motion rules and feature decisions.
 - `backend/` and `common/` - reserved workspace stubs; do not invent responsibilities for them without an approved design.
 
@@ -114,7 +115,7 @@ Before handing off code, run at minimum type checking, linting, and the affected
 
 ## Adding a new feature
 
-- For substantial work, create or update `docs/features/<feature>.md` before implementation. Include purpose, user impact, goals/non-goals, acceptance criteria, affected layers, accessibility/performance risks, rollout or feature flag, and test plan.
+- For substantial work, copy `docs/templates/feature-plan.md` to `docs/features/<feature>.md` and complete it before implementation.
 - Reuse existing components, hooks, services, ports, and tokens before creating parallel abstractions.
 - Place logic in the correct layer; do not hide business rules in components or browser adapters.
 - Define failure, loading, empty, disabled, and reduced-motion states as part of the feature rather than as later polish.
