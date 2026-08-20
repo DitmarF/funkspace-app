@@ -18,6 +18,7 @@ Project priorities, in order:
 
 - `frontend/app/` - Next.js App Router pages and layouts.
 - `frontend/components/` - presentation components and Storybook stories.
+- `frontend/features/` - bounded frontend feature integrations, including portfolio-owned game adapters.
 - `frontend/hooks/` - presentation hooks; keep them thin.
 - `frontend/domain/` - pure entities, rules, and port interfaces.
 - `frontend/application/` - use cases, services, orchestration, and providers.
@@ -66,6 +67,7 @@ Presentation -> Application -> Domain <- Infrastructure
 - Keep `common/motion/` deterministic and independent of React, DOM, SVG, Canvas, WebGL, clocks, and render loops. Rendering adapters own platform state and apply sampled values.
 - Motion runtimes implement the shared `AnimationRuntime` lifecycle. Keep platform scheduling and cleanup inside the adapter, and preserve compatibility controls only where consumers use them.
 - `ThemeService` is the sole post-hydration theme authority. Components delegate selection to it and use its subscription API for immediate updates; the root layout script may only perform the one-time, hydration-safe initial application.
+- Integrated games receive immutable, resolved `GameTheme` values through the frontend-owned theme adapter. Game code must not read portfolio CSS variables, DOM theme attributes, or `ThemeService` directly.
 
 If a requested change conflicts with these boundaries, stop and propose the smallest architectural adjustment. Update `docs/architecture.md` when a deliberate boundary or dependency decision changes.
 

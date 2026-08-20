@@ -237,6 +237,13 @@ An adapter may:
 - Import an explicit game package entry point when the game is built for in-process integration.
 - Translate frontend concerns such as navigation, theme values, reduced-motion preferences, lifecycle, errors, and analytics into the game's public contract.
 
+The portfolio-owned game theme bridge lives in
+`frontend/features/games/theme/`. `FunkSpaceGameThemeAdapter` translates the
+resolved game color token layer into an immutable `GameTheme` object and maps
+`ThemeService` subscriptions to that object. A game receives literal color
+values through its integration contract; it does not read portfolio CSS
+variables, DOM theme attributes, or frontend services.
+
 Portfolio routes and components depend on a frontend-owned adapter interface, not on game types. The adapter must provide teardown and must not expose the game's engine, renderer, or mutable state to the rest of `frontend`.
 
 ## `backend`
