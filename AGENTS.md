@@ -23,6 +23,7 @@ Project priorities, in order:
 - `frontend/application/` - use cases, services, orchestration, and providers.
 - `frontend/infrastructure/` - browser, DOM, storage, and motion adapters plus service construction.
 - `frontend/data/` - declarative feature data and animation configuration.
+- `games/` - parent workspace for isolated standalone game packages; currently contains no game package or source code.
 - `tokens/` - source design and motion tokens.
 - `styles/` - generated token output; regenerate it instead of hand-editing it.
 - `e2e/` - Playwright end-to-end and accessibility coverage.

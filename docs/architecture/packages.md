@@ -4,12 +4,13 @@ This document describes the repository's current workspace boundaries and the co
 
 ## Current state
 
-The root `package.json` and `pnpm-workspace.yaml` both list three workspace locations:
+The root `package.json` and `pnpm-workspace.yaml` declare these workspace locations:
 
 ```text
 frontend
 backend
 common
+games/*
 ```
 
 The configured locations are not all active packages. A pnpm workspace package requires its own `package.json`.
@@ -20,8 +21,9 @@ The configured locations are not all active packages. A pnpm workspace package r
 | `frontend/` | Active private package | `frontend/package.json` | The complete web application and all current product runtime behavior |
 | `common/` | Placeholder directory | None | None |
 | `backend/` | Placeholder directory | None | None |
+| `games/*` | Configured package collection; currently empty | No child manifests yet | Future standalone game packages |
 
-`pnpm list -r --depth -1` currently recognizes only the root package and `frontend`. `backend` and `common` each contain only a README.
+`pnpm list -r --depth -1` currently recognizes only the root package and `frontend`. `backend` and `common` each contain only a README, while `games/` contains workspace guidance but no child package. A future direct child with a `package.json` will be discovered through `games/*`.
 
 The current dependency shape is:
 
@@ -31,9 +33,10 @@ root tooling       -> frontend build, tests, Storybook, E2E, Lighthouse
 
 common  [placeholder; no imports or exports]
 backend [placeholder; no runtime or deployment]
+games/* [configured collection; no game packages yet]
 ```
 
-CI type-checks, tests, builds, and deploys the frontend. No current application code imports from `backend` or `common`.
+CI type-checks, tests, builds, and deploys the frontend. No current application code imports from `backend`, `common`, or `games`.
 
 ## Root workspace responsibilities
 
@@ -68,7 +71,7 @@ While both `package.json#workspaces` and `pnpm-workspace.yaml` declare workspace
 - Browser integrations for DOM, storage, animation, and motion.
 - Frontend unit/component tests; root tooling supplies E2E and quality orchestration.
 
-New portfolio pages, animations, experiments, and the first game remain in `frontend` unless an extraction trigger in this document is met. Interactive work must still follow the isolation boundary in [`ADR-003`](../decisions/ADR-003-interactive-experience-boundary.md).
+New portfolio pages, animations, and embedded experiments remain in `frontend` unless an extraction trigger in this document is met. Standalone games belong in a future `games/<game-slug>` package. Interactive work in either location must follow the isolation boundary in [`ADR-003`](../decisions/ADR-003-interactive-experience-boundary.md).
 
 ### Allowed dependencies
 
@@ -100,6 +103,7 @@ Within `frontend`, the package boundary does not override Clean Architecture:
 - Rely on undeclared or transitively available dependencies.
 - Import root CI/build implementation modules into application runtime code.
 - Make the portfolio shell depend on an experiment's or game's private engine, renderer, state, or lifecycle.
+- Import private source files from a package under `games/*`.
 - Let one interactive experience import another experience's internals.
 - Bypass the internal layer rules for convenience.
 
@@ -129,7 +133,7 @@ Future `common` code must:
 - Be strict TypeScript with deterministic behavior.
 - Remain independent of React, Next.js, DOM APIs, browser storage, and Node-only APIs.
 - Avoid file, network, database, environment-variable, clock, random, and other hidden I/O.
-- Have no dependency on `frontend` or `backend`.
+- Have no dependency on `frontend`, `backend`, or a game package.
 - Expose explicit entry points instead of requiring deep source imports.
 - Use serializable data at cross-runtime boundaries.
 - Keep external dependencies minimal, environment-neutral, and justified.
@@ -174,12 +178,14 @@ Activation requires an explicit feature plan and, when the boundary is significa
 
 ```text
 frontend ---- declared public import ----> common <---- declared public import ---- backend
+game packages ---- declared public import --> common
 frontend ---- documented network API -------------------------------------------> backend
 
 common  -/-> frontend
 common  -/-> backend
 backend -/-> frontend source
 frontend -/-> backend source
+games/* -/-> frontend or other games' private source
 ```
 
 `common` would provide contracts, not orchestration. A network relationship between frontend and backend does not permit filesystem imports across their private implementations.
@@ -188,10 +194,10 @@ frontend -/-> backend source
 
 ### Near term: keep the current layout
 
-1. Keep `frontend`, `backend`, and `common` names and locations unchanged during the architecture review.
+1. Keep `frontend`, `backend`, `common`, and the new `games/*` collection unchanged during the remaining architecture review.
 2. Treat `backend` and `common` as inactive placeholders until a feature supplies a concrete responsibility.
-3. Keep portfolio pages and isolated experiences in `frontend`; enforce internal layer and experience boundaries.
-4. Keep the first game's lightweight engine private to that game, as required by [`ADR-004`](../decisions/ADR-004-game-development-architecture.md).
+3. Keep portfolio pages and embedded experiences in `frontend`; place future standalone games in direct `games/<game-slug>` packages.
+4. Keep each game's source isolated and keep the first game's lightweight engine private to that game, as required by [`ADR-004`](../decisions/ADR-004-game-development-architecture.md).
 5. Add automated package/import-boundary checks before the number of active workspaces grows.
 6. Update root scripts and CI whenever a real package is activated; do not assume recursive commands cover a directory without a manifest.
 
@@ -199,7 +205,8 @@ frontend -/-> backend source
 
 | Candidate boundary | Keep current placement until | Extract when |
 | --- | --- | --- |
-| Interactive experience/game | It shares the frontend build, deployment, and dependency profile | It needs independent deployment, incompatible/heavy dependencies, distinct ownership, or hard runtime isolation |
+| Embedded interactive experience | It shares the frontend build, deployment, and dependency profile | It needs independent deployment, incompatible/heavy dependencies, distinct ownership, or hard runtime isolation; then create a package under `games/*` or another approved collection |
+| Standalone game | Not applicable; `games/*` is already configured | Add a direct child package only after its feature plan defines ownership, build, tests, and integration |
 | Design tokens | The frontend is the only runtime consumer | Multiple packages/apps need versioned token artifacts or independent builds |
 | Reusable UI/design system | Components are consumed only by the frontend and its Storybook | A second application needs a stable, versioned component API |
 | `common` contracts | Only one runtime uses the types/rules | At least frontend and backend need the same stable serialized contract |

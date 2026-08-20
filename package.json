@@ -5,7 +5,8 @@
   "workspaces": [
     "frontend",
     "backend",
-    "common"
+    "common",
+    "games/*"
   ],
   "engines": {
     "node": ">=22"
