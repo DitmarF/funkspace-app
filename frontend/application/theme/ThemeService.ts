@@ -3,7 +3,7 @@
  * Application service for theme management
  */
 
-import type { Theme, ResolvedTheme } from "@/domain/theme/Theme";
+import { isTheme, type Theme, type ResolvedTheme } from "@/domain/theme/Theme";
 import type { StoragePort } from "@/domain/ports/StoragePort";
 import type { DOMPort } from "@/domain/ports/DOMPort";
 
@@ -39,13 +39,14 @@ export interface ThemeService {
   initialize(): void;
 
   /**
-   * Subscribe to system theme changes
+   * Release the system-theme listener owned by the service
    */
-  subscribeToSystemTheme(callback: (theme: ResolvedTheme) => void): () => void;
+  destroy(): void;
 }
 
 export class ThemeServiceImpl implements ThemeService {
   private readonly storageKey = "theme";
+  private unsubscribeSystemTheme: (() => void) | null = null;
 
   constructor(
     private readonly storage: StoragePort,
@@ -54,13 +55,7 @@ export class ThemeServiceImpl implements ThemeService {
 
   getStoredTheme(): Theme {
     const stored = this.storage.getItem(this.storageKey);
-    return stored === "default" ||
-      stored === "dark" ||
-      stored === "muted" ||
-      stored === "dark-high-contrast" ||
-      stored === "system"
-      ? stored
-      : "system";
+    return isTheme(stored) ? stored : "system";
   }
 
   setTheme(theme: Theme): void {
@@ -94,14 +89,26 @@ export class ThemeServiceImpl implements ThemeService {
   }
 
   initialize(): void {
-    const stored = this.getStoredTheme();
-    if (!stored) {
+    const storedValue = this.storage.getItem(this.storageKey);
+    const theme = isTheme(storedValue) ? storedValue : "system";
+
+    if (!isTheme(storedValue)) {
       this.storage.setItem(this.storageKey, "system");
     }
-    this.applyTheme(stored || "system");
+
+    this.applyTheme(theme);
+
+    if (!this.unsubscribeSystemTheme) {
+      this.unsubscribeSystemTheme = this.listenForSystemThemeChanges();
+    }
   }
 
-  subscribeToSystemTheme(callback: (theme: ResolvedTheme) => void): () => void {
+  destroy(): void {
+    this.unsubscribeSystemTheme?.();
+    this.unsubscribeSystemTheme = null;
+  }
+
+  private listenForSystemThemeChanges(): () => void {
     if (!this.dom.hasMatchMedia()) {
       return () => {};
     }
@@ -114,7 +121,7 @@ export class ThemeServiceImpl implements ThemeService {
     const handleChange = () => {
       const stored = this.getStoredTheme();
       if (stored === "system") {
-        callback(this.resolveSystemTheme());
+        this.applyTheme(stored);
       }
     };
 

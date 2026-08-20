@@ -65,6 +65,7 @@ Presentation -> Application -> Domain <- Infrastructure
 - Use the `@/` alias for frontend imports and relative imports for closely related files when that is clearer.
 - Keep `common/motion/` deterministic and independent of React, DOM, SVG, Canvas, WebGL, clocks, and render loops. Rendering adapters own platform state and apply sampled values.
 - Motion runtimes implement the shared `AnimationRuntime` lifecycle. Keep platform scheduling and cleanup inside the adapter, and preserve compatibility controls only where consumers use them.
+- `ThemeService` is the sole post-hydration theme authority. Components delegate selection to it; the root layout script may only perform the one-time, hydration-safe initial application.
 
 If a requested change conflicts with these boundaries, stop and propose the smallest architectural adjustment. Update `docs/architecture.md` when a deliberate boundary or dependency decision changes.
 

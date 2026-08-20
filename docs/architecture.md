@@ -76,8 +76,8 @@ import type { Theme } from "@/domain/theme/Theme";
 import type { StoragePort } from "@/domain/ports/StoragePort";
 export class LocalStorageAdapter implements StoragePort { ... }
 
-// Presentation using Application service
-import { useTheme } from "@/hooks/useTheme";
+// Presentation using Application services through the provider
+import { useServices } from "@/application/providers/ServiceProvider";
 ```
 
 ❌ **Invalid:**
@@ -141,13 +141,11 @@ import { useTheme } from "@/hooks/useTheme";
 Services are injected via React Context:
 
 ```typescript
-// Infrastructure creates services
-const services = createServices();
+// The root layout establishes the provider boundary
+<ServiceProvider>{children}</ServiceProvider>
 
-// Application provides via Context
-<ServiceProvider services={services}>
-  {children}
-</ServiceProvider>
+// The provider creates services through the composition root,
+// initializes ThemeService, and owns its cleanup.
 
 // Presentation consumes via hooks
 const { themeService } = useServices();
@@ -169,7 +167,14 @@ Tests should be colocated with source files (`*.test.tsx` next to source).
 - `utils/motion/*` → `infrastructure/motion/*`
 - `data/animations/logo.ts` → `application/animations/AnimationOrchestrator.ts`
 - `hooks/useScrollProgress` → `hooks/useScrollProgressService` (wraps `ScrollService`)
-- `components/ThemeSwitcher` → Uses `useTheme` hook (wraps `ThemeService`)
+- `components/ThemeSwitcher` delegates theme persistence and application to
+  `ThemeService`; it owns only selection UI state.
+
+The pre-hydration script in `app/layout.tsx` performs a one-time application of
+the stored theme to prevent a visual flash. After hydration, `ThemeService` is
+the sole runtime authority: it validates and persists selections, updates the
+document theme, responds to system preference changes, and owns listener
+cleanup through `ServiceProvider`.
 
 ### Backward Compatibility
 

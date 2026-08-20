@@ -3,6 +3,7 @@ import Script from "next/script";
 import "./globals.css";
 import { workSans, spaceGrotesk } from "./fonts";
 import { ServiceProvider } from "@/application/providers/ServiceProvider";
+import { THEME_VALUES } from "@/domain/theme/Theme";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -28,6 +29,7 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
+                  var validThemes = ${JSON.stringify(THEME_VALUES)};
                   var applyTheme = function(theme) {
                     if (theme && theme !== 'default') {
                       document.documentElement.setAttribute('data-theme', theme);
@@ -45,36 +47,14 @@ export default function RootLayout({
 
                   var storedTheme = localStorage.getItem('theme');
 
-                  if (!storedTheme) {
+                  if (validThemes.indexOf(storedTheme) === -1) {
                     storedTheme = 'system';
                     localStorage.setItem('theme', 'system');
                   }
 
-                  var prefersDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-                  var applyStoredTheme = function(theme) {
-                    if (theme === 'system') {
-                      applyTheme(getSystemTheme());
-                    } else {
-                      applyTheme(theme);
-                    }
-                  };
-
-                  applyStoredTheme(storedTheme);
-
-                  if (prefersDark) {
-                    var listener = function(event) {
-                      if (localStorage.getItem('theme') === 'system') {
-                        applyTheme(event.matches ? 'dark' : 'default');
-                      }
-                    };
-                    if (typeof prefersDark.addEventListener === 'function') {
-                      prefersDark.addEventListener('change', listener);
-                    } else if (typeof prefersDark.addListener === 'function') {
-                      prefersDark.addListener(listener);
-                    }
-                  }
+                  applyTheme(storedTheme === 'system' ? getSystemTheme() : storedTheme);
                 } catch (error) {
-                  if (process.env.NODE_ENV !== "production") {
+                  if (${process.env.NODE_ENV !== "production"}) {
                     console.error("Theme initialization failed", error);
                   }
                 }

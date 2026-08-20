@@ -3,24 +3,21 @@
  * Pure domain model with no framework dependencies
  */
 
-export type Theme =
-  | "default"
-  | "dark"
-  | "muted"
-  | "dark-high-contrast"
-  | "system";
+export const THEME_VALUES = [
+  "default",
+  "dark",
+  "muted",
+  "dark-high-contrast",
+  "system",
+] as const;
+
+export type Theme = (typeof THEME_VALUES)[number];
 
 /**
  * Validates if a string is a valid theme value
  */
 export function isTheme(value: string | null): value is Theme {
-  return (
-    value === "default" ||
-    value === "dark" ||
-    value === "muted" ||
-    value === "dark-high-contrast" ||
-    value === "system"
-  );
+  return value !== null && (THEME_VALUES as readonly string[]).includes(value);
 }
 
 /**
