@@ -12,12 +12,13 @@ export default function ThemeSwitcher() {
   const [currentTheme, setCurrentTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
-    setCurrentTheme(themeService.getStoredTheme());
+    return themeService.subscribe(({ selectedTheme }) => {
+      setCurrentTheme(selectedTheme);
+    });
   }, [themeService]);
 
   const selectTheme = (theme: Theme) => {
     themeService.setTheme(theme);
-    setCurrentTheme(theme);
   };
 
   return (

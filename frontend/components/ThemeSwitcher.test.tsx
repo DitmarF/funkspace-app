@@ -4,9 +4,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import ThemeSwitcher from "./ThemeSwitcher";
 
 const themeService = vi.hoisted(() => ({
-  getStoredTheme: vi.fn(),
+  subscribe: vi.fn(),
   setTheme: vi.fn(),
 }));
+
+let themeSubscriber:
+  | ((state: { selectedTheme: string; resolvedTheme: string }) => void)
+  | null = null;
 
 vi.mock("@/application/providers/ServiceProvider", () => ({
   useServices: () => ({ themeService }),
@@ -14,9 +18,17 @@ vi.mock("@/application/providers/ServiceProvider", () => ({
 
 describe("ThemeSwitcher", () => {
   beforeEach(() => {
-    themeService.getStoredTheme.mockReset();
-    themeService.getStoredTheme.mockReturnValue("dark");
+    themeSubscriber = null;
+    themeService.subscribe.mockReset();
+    themeService.subscribe.mockImplementation((callback) => {
+      themeSubscriber = callback;
+      callback({ selectedTheme: "dark", resolvedTheme: "dark" });
+      return vi.fn();
+    });
     themeService.setTheme.mockReset();
+    themeService.setTheme.mockImplementation((theme) => {
+      themeSubscriber?.({ selectedTheme: theme, resolvedTheme: theme });
+    });
   });
 
   it("renders domain theme choices and marks the stored selection", async () => {
@@ -36,7 +48,7 @@ describe("ThemeSwitcher", () => {
     );
   });
 
-  it("delegates a selection to ThemeService and updates only UI state", async () => {
+  it("delegates selections and reacts through the service subscription", async () => {
     const user = userEvent.setup();
     render(<ThemeSwitcher />);
 

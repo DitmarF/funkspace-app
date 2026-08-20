@@ -174,7 +174,9 @@ The pre-hydration script in `app/layout.tsx` performs a one-time application of
 the stored theme to prevent a visual flash. After hydration, `ThemeService` is
 the sole runtime authority: it validates and persists selections, updates the
 document theme, responds to system preference changes, and owns listener
-cleanup through `ServiceProvider`.
+cleanup through `ServiceProvider`. Consumers use `ThemeService.subscribe()` to
+receive the selected and resolved themes immediately; polling and DOM mutation
+observers are not part of the theme contract.
 
 ### Backward Compatibility
 

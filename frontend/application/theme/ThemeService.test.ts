@@ -86,18 +86,50 @@ describe("ThemeServiceImpl", () => {
     expect(document.documentElement).not.toHaveAttribute("data-theme");
   });
 
+  it("subscribes immediately and notifies explicit theme changes", () => {
+    storedValues.set("theme", "dark");
+    const service = new ThemeServiceImpl(storage, dom);
+    const subscriber = vi.fn();
+
+    const unsubscribe = service.subscribe(subscriber);
+    expect(subscriber).toHaveBeenLastCalledWith({
+      selectedTheme: "dark",
+      resolvedTheme: "dark",
+    });
+
+    service.setTheme("muted");
+    expect(subscriber).toHaveBeenLastCalledWith({
+      selectedTheme: "muted",
+      resolvedTheme: "muted",
+    });
+
+    unsubscribe();
+    service.setTheme("default");
+    expect(subscriber).toHaveBeenCalledTimes(2);
+  });
+
   it("reapplies system preferences while system mode is selected", () => {
     storedValues.set("theme", "system");
     const service = new ThemeServiceImpl(storage, dom);
+    const subscriber = vi.fn();
     service.initialize();
+    service.subscribe(subscriber);
 
     prefersDark = true;
     systemChangeListener?.({ matches: true } as MediaQueryListEvent);
     expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    expect(subscriber).toHaveBeenLastCalledWith({
+      selectedTheme: "system",
+      resolvedTheme: "dark",
+    });
 
     prefersDark = false;
     systemChangeListener?.({ matches: false } as MediaQueryListEvent);
     expect(document.documentElement).not.toHaveAttribute("data-theme");
+    expect(subscriber).toHaveBeenLastCalledWith({
+      selectedTheme: "system",
+      resolvedTheme: "default",
+    });
   });
 
   it("ignores system changes when an explicit theme is selected", () => {
@@ -116,13 +148,18 @@ describe("ThemeServiceImpl", () => {
 
   it("owns one system listener and removes it on destroy", () => {
     const service = new ThemeServiceImpl(storage, dom);
+    const subscriber = vi.fn();
 
     service.initialize();
     service.initialize();
+    service.subscribe(subscriber);
     expect(mediaQuery.addEventListener).toHaveBeenCalledTimes(1);
 
     service.destroy();
     expect(mediaQuery.removeEventListener).toHaveBeenCalledTimes(1);
     expect(systemChangeListener).toBeNull();
+
+    service.setTheme("dark");
+    expect(subscriber).toHaveBeenCalledTimes(1);
   });
 });

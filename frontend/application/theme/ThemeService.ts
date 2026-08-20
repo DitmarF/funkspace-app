@@ -7,6 +7,13 @@ import { isTheme, type Theme, type ResolvedTheme } from "@/domain/theme/Theme";
 import type { StoragePort } from "@/domain/ports/StoragePort";
 import type { DOMPort } from "@/domain/ports/DOMPort";
 
+export interface ThemeState {
+  selectedTheme: Theme;
+  resolvedTheme: ResolvedTheme;
+}
+
+export type ThemeSubscriber = (state: ThemeState) => void;
+
 export interface ThemeService {
   /**
    * Get the current theme from storage
@@ -39,6 +46,12 @@ export interface ThemeService {
   initialize(): void;
 
   /**
+   * Subscribe to selected or resolved theme changes.
+   * The subscriber receives the current state immediately.
+   */
+  subscribe(callback: ThemeSubscriber): () => void;
+
+  /**
    * Release the system-theme listener owned by the service
    */
   destroy(): void;
@@ -46,6 +59,7 @@ export interface ThemeService {
 
 export class ThemeServiceImpl implements ThemeService {
   private readonly storageKey = "theme";
+  private readonly subscribers = new Set<ThemeSubscriber>();
   private unsubscribeSystemTheme: (() => void) | null = null;
 
   constructor(
@@ -60,7 +74,8 @@ export class ThemeServiceImpl implements ThemeService {
 
   setTheme(theme: Theme): void {
     this.storage.setItem(this.storageKey, theme);
-    this.applyTheme(theme);
+    const resolvedTheme = this.applyTheme(theme);
+    this.notifySubscribers(theme, resolvedTheme);
   }
 
   resolveSystemTheme(): ResolvedTheme {
@@ -96,16 +111,27 @@ export class ThemeServiceImpl implements ThemeService {
       this.storage.setItem(this.storageKey, "system");
     }
 
-    this.applyTheme(theme);
+    const resolvedTheme = this.applyTheme(theme);
+    this.notifySubscribers(theme, resolvedTheme);
 
     if (!this.unsubscribeSystemTheme) {
       this.unsubscribeSystemTheme = this.listenForSystemThemeChanges();
     }
   }
 
+  subscribe(callback: ThemeSubscriber): () => void {
+    this.subscribers.add(callback);
+    callback(this.getThemeState());
+
+    return () => {
+      this.subscribers.delete(callback);
+    };
+  }
+
   destroy(): void {
     this.unsubscribeSystemTheme?.();
     this.unsubscribeSystemTheme = null;
+    this.subscribers.clear();
   }
 
   private listenForSystemThemeChanges(): () => void {
@@ -121,7 +147,8 @@ export class ThemeServiceImpl implements ThemeService {
     const handleChange = () => {
       const stored = this.getStoredTheme();
       if (stored === "system") {
-        this.applyTheme(stored);
+        const resolvedTheme = this.applyTheme(stored);
+        this.notifySubscribers(stored, resolvedTheme);
       }
     };
 
@@ -142,7 +169,25 @@ export class ThemeServiceImpl implements ThemeService {
     return () => {};
   }
 
-  private applyTheme(theme: Theme): void {
+  private getThemeState(): ThemeState {
+    const selectedTheme = this.getStoredTheme();
+    return {
+      selectedTheme,
+      resolvedTheme: this.resolveTheme(selectedTheme),
+    };
+  }
+
+  private notifySubscribers(
+    selectedTheme: Theme,
+    resolvedTheme: ResolvedTheme,
+  ): void {
+    const state: ThemeState = { selectedTheme, resolvedTheme };
+    for (const subscriber of [...this.subscribers]) {
+      subscriber(state);
+    }
+  }
+
+  private applyTheme(theme: Theme): ResolvedTheme {
     const htmlElement = this.dom.getDocumentElement();
     const resolved = this.resolveTheme(theme);
 
@@ -151,5 +196,7 @@ export class ThemeServiceImpl implements ThemeService {
     } else {
       htmlElement.setAttribute("data-theme", resolved);
     }
+
+    return resolved;
   }
 }
