@@ -83,14 +83,14 @@ As a [user], I want [capability], so that [value].
 
 Review `AGENTS.md`, `docs/architecture.md`, and relevant ADRs before completing this section. New decisions that conflict with or extend accepted ADRs require a new ADR.
 
-| Layer or concern | Planned change | Boundary or contract | Why it belongs here |
-| --- | --- | --- | --- |
-| Domain | [Pure rules/types, or `None`] | [Inputs/outputs/ports] | [Reason] |
-| Application | [Use cases/orchestration, or `None`] | [Service contract] | [Reason] |
-| Infrastructure | [Browser/storage/network/renderer adapter, or `None`] | [Implemented port] | [Reason] |
-| Presentation | [Route/component/hook, or `None`] | [Props/user interaction] | [Reason] |
-| Tokens/design system | [Token/component impact, or `None`] | [Shared semantic token/API] | [Reason] |
-| Data, privacy, or security | [Data flow/storage/input impact, or `None`] | [Validation/retention boundary] | [Reason] |
+| Layer or concern           | Planned change                                        | Boundary or contract            | Why it belongs here |
+| -------------------------- | ----------------------------------------------------- | ------------------------------- | ------------------- |
+| Domain                     | [Pure rules/types, or `None`]                         | [Inputs/outputs/ports]          | [Reason]            |
+| Application                | [Use cases/orchestration, or `None`]                  | [Service contract]              | [Reason]            |
+| Infrastructure             | [Browser/storage/network/renderer adapter, or `None`] | [Implemented port]              | [Reason]            |
+| Presentation               | [Route/component/hook, or `None`]                     | [Props/user interaction]        | [Reason]            |
+| Tokens/design system       | [Token/component impact, or `None`]                   | [Shared semantic token/API]     | [Reason]            |
+| Data, privacy, or security | [Data flow/storage/input impact, or `None`]           | [Validation/retention boundary] | [Reason]            |
 
 ### Dependency direction check
 
@@ -105,10 +105,10 @@ Review `AGENTS.md`, `docs/architecture.md`, and relevant ADRs before completing 
 
 List expected changes after inspecting the repository. Mark uncertain paths as `Proposed`; do not invent files and present them as existing.
 
-| Path | Status | Change | Reason |
-| --- | --- | --- | --- |
+| Path                          | Status   | Change   | Reason    |
+| ----------------------------- | -------- | -------- | --------- |
 | `[existing/or/proposed/path]` | Existing | [Modify] | [Purpose] |
-| `[proposed/path]` | Proposed | [Create] | [Purpose] |
+| `[proposed/path]`             | Proposed | [Create] | [Purpose] |
 
 ### Files or areas intentionally unchanged
 
@@ -137,23 +137,23 @@ List expected changes after inspecting the repository. Mark uncertain paths as `
 
 Include product and technical risks. Accessibility, performance, security/privacy, data loss, compatibility, and rollout should be considered explicitly.
 
-| Risk | Likelihood | Impact | Mitigation | Verification |
-| --- | --- | --- | --- | --- |
+| Risk                    | Likelihood      | Impact          | Mitigation                      | Verification                   |
+| ----------------------- | --------------- | --------------- | ------------------------------- | ------------------------------ |
 | [Specific failure mode] | Low/Medium/High | Low/Medium/High | [Preventive action or fallback] | [Test, measurement, or review] |
 
 ## Testing strategy
 
 Tests should map to behavior and risk. Use `Not required` with a reason instead of silently skipping a level.
 
-| Level | Coverage planned | Key cases |
-| --- | --- | --- |
-| Domain/unit | [Test files or `Not required`] | [Rules, boundaries, deterministic state] |
-| Application/integration | [Test files or `Not required`] | [Use cases and adapter contracts] |
-| Component/hook | [Test files or `Not required`] | [User behavior, keyboard, states] |
-| Storybook/visual | [Stories or `Not required`] | [Themes, responsive states, reduced motion] |
-| End-to-end | [Playwright specs or `Not required`] | [Critical user flow and fallback] |
-| Accessibility | [Automated/manual checks] | [Semantics, focus, keyboard, contrast, motion] |
-| Performance | [Budget/measurement or `Not required`] | [Bundle, LCP/INP/CLS, frame lifecycle] |
+| Level                   | Coverage planned                       | Key cases                                      |
+| ----------------------- | -------------------------------------- | ---------------------------------------------- |
+| Domain/unit             | [Test files or `Not required`]         | [Rules, boundaries, deterministic state]       |
+| Application/integration | [Test files or `Not required`]         | [Use cases and adapter contracts]              |
+| Component/hook          | [Test files or `Not required`]         | [User behavior, keyboard, states]              |
+| Storybook/visual        | [Stories or `Not required`]            | [Themes, responsive states, reduced motion]    |
+| End-to-end              | [Playwright specs or `Not required`]   | [Critical user flow and fallback]              |
+| Accessibility           | [Automated/manual checks]              | [Semantics, focus, keyboard, contrast, motion] |
+| Performance             | [Budget/measurement or `Not required`] | [Bundle, LCP/INP/CLS, frame lifecycle]         |
 
 ### Validation commands
 
@@ -186,8 +186,8 @@ Write criteria as independently verifiable outcomes. Avoid implementation-only s
 
 ### Acceptance evidence
 
-| Criterion | Evidence or test |
-| --- | --- |
+| Criterion           | Evidence or test                                                      |
+| ------------------- | --------------------------------------------------------------------- |
 | [Criterion summary] | [Automated test, manual result, screenshot, measurement, or document] |
 
 ## Implementation handoff
