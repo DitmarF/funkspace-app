@@ -1,6 +1,6 @@
 # Task WS-0 — Establish the implementation baseline
 
-> Shared execution record for WS-0.3 through WS-0.6. WS-0.3 records the inspected scaffold; WS-0.4, WS-0.5, and WS-0.6 remain pending.
+> Shared execution record for WS-0.3 through WS-0.6. WS-0.3 scaffold inspection and WS-0.4 package validation are complete; WS-0.5 and WS-0.6 remain pending.
 
 ## Task metadata
 
@@ -35,9 +35,9 @@ Record the actual Wave Survivor package and portfolio-integration baseline witho
 - [x] It distinguishes existing foundations from missing gameplay.
 - [x] It records verified mismatches with the approved concept.
 - [x] It distinguishes verified facts from assumptions.
-- [x] It leaves WS-0.4, WS-0.5, and WS-0.6 visibly pending.
+- [x] WS-0.3 left WS-0.4, WS-0.5, and WS-0.6 visibly pending at its completion.
 - [x] WS-0.3 changes documentation only.
-- [ ] WS-0.4 package validation is complete.
+- [x] WS-0.4 package validation is complete.
 - [ ] WS-0.5 frontend validation is complete.
 - [ ] WS-0.6 scope-firewall audit and EPIC 0 status are complete.
 
@@ -62,6 +62,18 @@ Record the actual Wave Survivor package and portfolio-integration baseline witho
 | Initial untracked files | None                                                                  |
 | Node                    | `v22.22.0`                                                            |
 | PNPM                    | `10.30.3`                                                             |
+
+### WS-0.4 environment confirmation
+
+| Item                        | Verified WS-0.4 value                                                                                |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Execution date              | `2026-08-23`                                                                                         |
+| Branch                      | `feature/wave-survivor`; unchanged from WS-0.3                                                       |
+| HEAD                        | `b0205d866a9ff3a68c52fdac1f82b63ff6cb2627`                                                           |
+| HEAD change since WS-0.3    | Advanced from `3508d8900ba7e41ab55ff381b6cb83ae19adea1f` through the committed WS-0.3 execution note |
+| Initial WS-0.4 working tree | Clean; no tracked or visible untracked changes                                                       |
+| Node                        | `v22.22.0`; unchanged                                                                                |
+| PNPM                        | `10.30.3`; unchanged                                                                                 |
 
 ### Authoritative sources
 
@@ -400,8 +412,8 @@ No observed mismatch blocks WS-0.4 or WS-0.5. All four requested checks are pres
 
 | Path                                                   | Status    | Planned change                   | Boundary or reason                                        |
 | ------------------------------------------------------ | --------- | -------------------------------- | --------------------------------------------------------- |
-| `docs/tasks/ws-0-establish-implementation-baseline.md` | Proposed  | Create and retain through WS-0.6 | Durable EPIC 0 inspection, validation, and handoff record |
-| Runtime and configuration paths                        | Protected | No change                        | WS-0.3 is documentation-only                              |
+| `docs/tasks/ws-0-establish-implementation-baseline.md` | Existing  | Update and retain through WS-0.6 | Durable EPIC 0 inspection, validation, and handoff record |
+| Runtime and configuration paths                        | Protected | No change                        | EPIC 0 remains baseline-only                              |
 
 ### Implementation sequence
 
@@ -434,14 +446,45 @@ git status --short
 2. Confirm repository identity, API signatures, lifecycle methods, mount/theme contracts, dimensions, test paths, and scripts match inspected files.
 3. Confirm facts, approved direction, deferred work, and pending validation are distinguishable.
 4. Confirm all links from this note resolve.
-5. Confirm WS-0.4, WS-0.5, and WS-0.6 remain pending.
+5. At WS-0.3 completion, confirm WS-0.4, WS-0.5, and WS-0.6 remain pending.
 
-## WS-0.4 package validation — Pending
+## WS-0.4 package validation — Complete
 
-- **Status:** Pending; commands were not run during WS-0.3.
-- **Scope:** Game package typecheck, unit tests, build, and standalone demo build.
-- **Results:** Not yet recorded.
-- **Required update:** Record each command, exit result, relevant output, and any pre-existing failure without changing runtime solely to make the baseline pass.
+- **Status:** Complete.
+- **Execution environment:** Branch `feature/wave-survivor`, HEAD `b0205d866a9ff3a68c52fdac1f82b63ff6cb2627`, Node `v22.22.0`, PNPM `10.30.3`.
+- **Package baseline:** **PASS**
+- **Failure reproduction:** Not applicable; all commands passed on their first attempt.
+
+### Command results
+
+Commands ran from the workspace root in the approved order.
+
+| Exact command                                       | Result | Exit status | Relevant evidence                                                                                                                                    | Output and working-tree effect                                                                                                                                                                    | Classification |
+| --------------------------------------------------- | ------ | ----------: | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| `pnpm --filter @funkspace/wave-survivor typecheck`  | Pass   |         `0` | `tsc -p tsconfig.json --noEmit` completed with no diagnostic output                                                                                  | Emitted no files; `git status --short` remained empty                                                                                                                                             | pass           |
+| `pnpm --filter @funkspace/wave-survivor test`       | Pass   |         `0` | Vitest `v3.2.4`: 2 test files passed, 7 tests passed; `CanvasGameRenderer.test.ts` 2 tests and `GameControllerImpl.test.ts` 5 tests; duration 178 ms | Emitted no repository output; `git status --short` remained empty                                                                                                                                 | pass           |
+| `pnpm --filter @funkspace/wave-survivor build`      | Pass   |         `0` | `tsc -p tsconfig.json` completed with no diagnostic output                                                                                           | Refreshed 48 ignored files under `games/wave-survivor/dist/`; no tracked or visible untracked change                                                                                              | pass           |
+| `pnpm --filter @funkspace/wave-survivor demo:build` | Pass   |         `0` | Re-ran the package build, then Vite `v7.0.2` transformed 8 modules and built in 38 ms                                                                | Refreshed `games/wave-survivor/demo/dist/index.html` (1.24 kB; gzip 0.61 kB) and `assets/index-OuOKItC6.js` (2.01 kB; gzip 0.90 kB), plus package `dist/`; no tracked or visible untracked change | pass           |
+
+### Generated-artifact review
+
+- `games/wave-survivor/dist/` existed before WS-0.4 and was already ignored. The build refreshed 48 JavaScript, source-map, declaration, and declaration-map files.
+- `games/wave-survivor/demo/dist/` existed before WS-0.4 and was already ignored. The demo build refreshed two files.
+- `git status --short --ignored` continued to report both output directories with `!!`; neither entered the tracked or visible untracked diff.
+- No generated file was committed, promoted to source, or hand-edited.
+- No output was removed because both directories predated WS-0.4 and are expected ignored package/demo build artifacts.
+
+### Working-tree review
+
+- The working tree was clean before the first command.
+- `git status --short` remained empty after each of the four commands.
+- After recording results, the only intended tracked change is this execution note.
+
+### Package-baseline classification
+
+**Package baseline: PASS**
+
+The package typecheck, 7-test suite, TypeScript build, and standalone demo production build all pass on the recorded toolchain. There are no exceptions, blockers, reproducibility investigations, or repair scopes to carry forward from WS-0.4.
 
 ## WS-0.5 frontend validation — Pending
 
@@ -470,6 +513,10 @@ git status --short
 
 The current scaffold has been inspected and recorded. It provides the approved package and integration boundaries but intentionally lacks gameplay and drawing. The observed landscape dimensions, copied frontend contracts, lifecycle-only states, and no-drawing Canvas renderer are deferred roadmap work and were not fixed.
 
+### WS-0.4 outcome
+
+The Wave Survivor package baseline passes without runtime, test, manifest, dependency, TypeScript, Vite, or configuration changes. Expected ignored build outputs were refreshed and reviewed; they created no tracked or visible untracked change.
+
 ### Files changed
 
 - `docs/tasks/ws-0-establish-implementation-baseline.md`
@@ -483,6 +530,7 @@ The current scaffold has been inspected and recorded. It provides the approved p
 - Concept mismatches: classified mismatch table.
 - Pending work: dedicated WS-0.4, WS-0.5, and WS-0.6 sections.
 - Protected scope: protected-areas section plus final Git review.
+- Package validation: complete WS-0.4 command table, generated-artifact review, and `Package baseline: PASS` classification.
 
 ### Validation results
 
@@ -492,12 +540,17 @@ The current scaffold has been inspected and recorded. It provides the approved p
 - `git diff --check`: passed.
 - `git status --short`: showed only the new `docs/tasks/` path.
 - Manual content, link, and scope review: passed; only this execution note changed.
-- WS-0.4 and WS-0.5 package/frontend commands: not run, as required.
+- At WS-0.3 completion, WS-0.4 and WS-0.5 package/frontend commands were not run, as required.
+- WS-0.4 package commands: all four later ran successfully and are recorded in the WS-0.4 section.
+- Initial WS-0.4 result-recording Prettier check: failed because the expanded Markdown tables needed formatting.
+- WS-0.4 result-recording Prettier write and final check: passed.
+- Final WS-0.4 `git diff --check`: passed.
+- Final WS-0.4 `git status --short`: showed only this modified execution note.
 
 ### Deviations from plan
 
-None. No runtime or existing documentation file was changed.
+None. No runtime, configuration, or documentation file other than this shared execution note was changed.
 
 ### Remaining work
 
-WS-0.4, WS-0.5, and WS-0.6 remain pending. Do not begin EPIC 1 until their evidence is recorded and EPIC 0 is complete.
+WS-0.5 and WS-0.6 remain pending. Do not begin EPIC 1 until their evidence is recorded and EPIC 0 is complete.
