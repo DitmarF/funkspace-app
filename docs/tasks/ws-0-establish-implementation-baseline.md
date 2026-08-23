@@ -1,6 +1,6 @@
 # Task WS-0 — Establish the implementation baseline
 
-> Shared execution record for WS-0.3 through WS-0.6. WS-0.3 scaffold inspection and WS-0.4 package validation are complete; WS-0.5 and WS-0.6 remain pending.
+> Shared execution record for WS-0.3 through WS-0.6. WS-0.3 scaffold inspection, WS-0.4 package validation, and WS-0.5 frontend validation are complete; WS-0.6 remains pending.
 
 ## Task metadata
 
@@ -38,7 +38,7 @@ Record the actual Wave Survivor package and portfolio-integration baseline witho
 - [x] WS-0.3 left WS-0.4, WS-0.5, and WS-0.6 visibly pending at its completion.
 - [x] WS-0.3 changes documentation only.
 - [x] WS-0.4 package validation is complete.
-- [ ] WS-0.5 frontend validation is complete.
+- [x] WS-0.5 frontend validation is complete.
 - [ ] WS-0.6 scope-firewall audit and EPIC 0 status are complete.
 
 ## Context and repository evidence
@@ -72,6 +72,18 @@ Record the actual Wave Survivor package and portfolio-integration baseline witho
 | HEAD                        | `b0205d866a9ff3a68c52fdac1f82b63ff6cb2627`                                                           |
 | HEAD change since WS-0.3    | Advanced from `3508d8900ba7e41ab55ff381b6cb83ae19adea1f` through the committed WS-0.3 execution note |
 | Initial WS-0.4 working tree | Clean; no tracked or visible untracked changes                                                       |
+| Node                        | `v22.22.0`; unchanged                                                                                |
+| PNPM                        | `10.30.3`; unchanged                                                                                 |
+
+### WS-0.5 environment confirmation
+
+| Item                        | Verified WS-0.5 value                                                                                |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Execution date              | `2026-08-23`                                                                                         |
+| Branch                      | `feature/wave-survivor`; unchanged from WS-0.4                                                       |
+| HEAD                        | `64801a3020c87e6534640e5b12c3785d594e77cf`                                                           |
+| HEAD change since WS-0.4    | Advanced from `b0205d866a9ff3a68c52fdac1f82b63ff6cb2627` through the committed WS-0.4 execution note |
+| Initial WS-0.5 working tree | Clean; no tracked or visible untracked changes                                                       |
 | Node                        | `v22.22.0`; unchanged                                                                                |
 | PNPM                        | `10.30.3`; unchanged                                                                                 |
 
@@ -237,7 +249,7 @@ The loader itself is the only frontend code that imports the game package, and i
 - No test asserts behavior for unmount while the lazy import is still pending.
 - No route or end-to-end test covers a hosted game because no route currently renders the host.
 - No drawing, resize, simulation, input, combat, wave, audio, or persistence tests exist because those systems are absent.
-- Passing status for existing tests and builds is deliberately unverified until WS-0.4 and WS-0.5.
+- WS-0.4 and WS-0.5 now record the passing package, focused integration, frontend typecheck, and full repository test baselines.
 
 ## Existing scripts and planned baseline commands
 
@@ -284,16 +296,16 @@ pnpm --filter @funkspace/wave-survivor build
 pnpm --filter @funkspace/wave-survivor demo:build
 ```
 
-### WS-0.5 planned frontend validation
+### WS-0.5 frontend validation commands
 
-These commands are recorded but were not run during WS-0.3:
+These commands were recorded during WS-0.3 and later ran during WS-0.5:
 
 ```bash
-pnpm -F frontend exec tsc --noEmit
 pnpm exec vitest run \
   frontend/features/games/GameLoader.test.ts \
   frontend/features/games/GameHost.test.tsx \
   frontend/features/games/theme/FunkSpaceGameThemeAdapter.test.ts
+pnpm -F frontend exec tsc --noEmit
 pnpm test
 ```
 
@@ -486,12 +498,55 @@ Commands ran from the workspace root in the approved order.
 
 The package typecheck, 7-test suite, TypeScript build, and standalone demo production build all pass on the recorded toolchain. There are no exceptions, blockers, reproducibility investigations, or repair scopes to carry forward from WS-0.4.
 
-## WS-0.5 frontend validation — Pending
+## WS-0.5 frontend validation — Complete
 
-- **Status:** Pending; commands were not run during WS-0.3.
-- **Scope:** Frontend typecheck, focused loader/host/theme tests, and broader root tests.
-- **Results:** Not yet recorded.
-- **Required update:** Distinguish focused integration results from unrelated broader-suite failures.
+- **Status:** Complete.
+- **Execution environment:** Branch `feature/wave-survivor`, HEAD `64801a3020c87e6534640e5b12c3785d594e77cf`, Node `v22.22.0`, PNPM `10.30.3`.
+- **Frontend baseline:** **PASS**
+- **Failure reproduction:** Not applicable; all commands passed on their first attempt.
+
+### Command results
+
+Commands ran from the workspace root in the approved order. The focused Vitest syntax was supported as supplied, so no substitute command was needed.
+
+| Exact command                                                                                                                                                               | Result | Exit status | Relevant evidence                                                                                        | Working-tree effect                                       | Classification |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ----------: | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | -------------- |
+| `pnpm exec vitest run frontend/features/games/GameLoader.test.ts frontend/features/games/GameHost.test.tsx frontend/features/games/theme/FunkSpaceGameThemeAdapter.test.ts` | Pass   |         `0` | Vitest `v3.2.4`: 3 test files passed, 8 tests passed; theme adapter 4, loader 2, host 2; duration 679 ms | `git status --short --untracked-files=all` remained empty | pass           |
+| `pnpm -F frontend exec tsc --noEmit`                                                                                                                                        | Pass   |         `0` | TypeScript completed with no diagnostic output                                                           | `git status --short --untracked-files=all` remained empty | pass           |
+| `pnpm test`                                                                                                                                                                 | Pass   |         `0` | Root Vitest `v3.2.4`: 24 test files passed, 341 tests passed; duration 1.97 s                            | `git status --short --untracked-files=all` remained empty | pass           |
+
+### Required integration-behavior review
+
+| Required baseline behavior                                 | Verified by existing coverage and inspection                                                                                           |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Game package is lazy-loaded                                | Yes. `GameLoader.test.ts` verifies the importer is not called before `load`, and `GameLoader.ts` uses an explicit dynamic import.      |
+| Loading state is communicated                              | Yes. `GameHost.test.tsx` verifies the initial `Loading game…` status.                                                                  |
+| Load failure is communicated                               | Yes. `GameHost.test.tsx` verifies rejected loading produces `Game unavailable.`.                                                       |
+| Host supplies a Canvas and resolved theme                  | Yes. `GameHost.test.tsx` verifies both values passed to `createGame`.                                                                  |
+| Controller starts once                                     | Yes. `GameHost.test.tsx` verifies one `start` call.                                                                                    |
+| Theme changes are forwarded                                | Yes. `GameHost.test.tsx` verifies `setTheme` receives a resolved changed theme.                                                        |
+| Document visibility pauses and resumes                     | Yes. `GameHost.test.tsx` verifies hidden and visible transitions.                                                                      |
+| Unmount destroys the controller                            | Yes. `GameHost.test.tsx` verifies `destroy` on cleanup.                                                                                |
+| Theme subscriptions are cleaned up                         | Yes. `GameHost.test.tsx` and the adapter test verify unsubscribe cleanup.                                                              |
+| Every supported FunkSpace theme resolves to literal colors | Yes. The adapter test covers all four themes, five roles, hex literals, frozen results, and no `var(...)` values.                      |
+| Frontend imports through the public package boundary       | Yes. `GameLoader.ts` dynamically imports `@funkspace/wave-survivor`, and `GameLoader.test.ts` verifies its public `createGame` export. |
+
+### Documented coverage gaps
+
+No tests were added in this baseline task. Follow-up coverage remains appropriate for the real `GameHost` with the real package controller, default and overridden Canvas dimensions, initially hidden loading, unmount while loading is pending, a hosted route/end-to-end path, and the standalone demo lifecycle.
+
+### Working-tree review
+
+- The working tree was clean before the first command.
+- `git status --short --untracked-files=all` remained empty after the focused tests, frontend typecheck, and root test suite.
+- The commands generated no tracked or visible untracked output.
+- After recording results, the only intended tracked change is this execution note.
+
+### Frontend-baseline classification
+
+**Frontend baseline: PASS**
+
+The focused integration tests, frontend typecheck, and full repository test suite all pass on the recorded toolchain. There are no documented exceptions, blockers, reproducibility investigations, or repair scopes from WS-0.5.
 
 ## WS-0.6 final scope-firewall audit and EPIC status — Pending
 
@@ -517,6 +572,10 @@ The current scaffold has been inspected and recorded. It provides the approved p
 
 The Wave Survivor package baseline passes without runtime, test, manifest, dependency, TypeScript, Vite, or configuration changes. Expected ignored build outputs were refreshed and reviewed; they created no tracked or visible untracked change.
 
+### WS-0.5 outcome
+
+The frontend Wave Survivor integration baseline passes without frontend, game, test, manifest, dependency, TypeScript, Vitest, or configuration changes. Existing tests verify every behavior required by WS-0.5; the known deeper-integration gaps remain follow-up work rather than hidden changes.
+
 ### Files changed
 
 - `docs/tasks/ws-0-establish-implementation-baseline.md`
@@ -528,9 +587,10 @@ The Wave Survivor package baseline passes without runtime, test, manifest, depen
 - Scripts and tests: exact inventory and planned-command sections.
 - Existing versus absent behavior: abstraction and intentionally-absent tables.
 - Concept mismatches: classified mismatch table.
-- Pending work: dedicated WS-0.4, WS-0.5, and WS-0.6 sections.
+- Pending work: dedicated WS-0.6 section.
 - Protected scope: protected-areas section plus final Git review.
 - Package validation: complete WS-0.4 command table, generated-artifact review, and `Package baseline: PASS` classification.
+- Frontend validation: complete WS-0.5 command table, behavior-coverage review, working-tree review, and `Frontend baseline: PASS` classification.
 
 ### Validation results
 
@@ -546,6 +606,14 @@ The Wave Survivor package baseline passes without runtime, test, manifest, depen
 - WS-0.4 result-recording Prettier write and final check: passed.
 - Final WS-0.4 `git diff --check`: passed.
 - Final WS-0.4 `git status --short`: showed only this modified execution note.
+- WS-0.5 focused integration tests: passed, 3 test files and 8 tests.
+- WS-0.5 frontend typecheck: passed with no diagnostics.
+- WS-0.5 root test suite: passed, 24 test files and 341 tests.
+- Initial WS-0.5 result-recording Prettier check: failed because the expanded Markdown tables needed formatting.
+- WS-0.5 result-recording Prettier write: passed and changed formatting only.
+- Final WS-0.5 `pnpm exec prettier --check docs/tasks/ws-0-establish-implementation-baseline.md`: passed.
+- Final WS-0.5 `git diff --check`: passed.
+- Final WS-0.5 `git status --short`: showed only this modified execution note.
 
 ### Deviations from plan
 
@@ -553,4 +621,4 @@ None. No runtime, configuration, or documentation file other than this shared ex
 
 ### Remaining work
 
-WS-0.5 and WS-0.6 remain pending. Do not begin EPIC 1 until their evidence is recorded and EPIC 0 is complete.
+WS-0.6 remains pending. Do not begin EPIC 1 until its final scope-firewall audit is recorded and EPIC 0 is complete.
