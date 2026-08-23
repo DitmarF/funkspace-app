@@ -1,10 +1,10 @@
 # Task WS-0 — Establish the implementation baseline
 
-> Shared execution record for WS-0.3 through WS-0.6. WS-0.3 scaffold inspection, WS-0.4 package validation, and WS-0.5 frontend validation are complete; WS-0.6 remains pending.
+> Shared execution record for WS-0.3 through WS-0.6. The implementation baseline, package validation, frontend validation, and final scope-firewall audit are complete.
 
 ## Task metadata
 
-- **Status:** In progress
+- **Status:** Complete
 - **Task group or epic:** EPIC 0 — Establish the implementation baseline
 - **Owner:** Dimi
 - **Execution date:** 2026-08-23
@@ -39,7 +39,7 @@ Record the actual Wave Survivor package and portfolio-integration baseline witho
 - [x] WS-0.3 changes documentation only.
 - [x] WS-0.4 package validation is complete.
 - [x] WS-0.5 frontend validation is complete.
-- [ ] WS-0.6 scope-firewall audit and EPIC 0 status are complete.
+- [x] WS-0.6 scope-firewall audit and EPIC 0 status are complete.
 
 ## Context and repository evidence
 
@@ -84,6 +84,18 @@ Record the actual Wave Survivor package and portfolio-integration baseline witho
 | HEAD                        | `64801a3020c87e6534640e5b12c3785d594e77cf`                                                           |
 | HEAD change since WS-0.4    | Advanced from `b0205d866a9ff3a68c52fdac1f82b63ff6cb2627` through the committed WS-0.4 execution note |
 | Initial WS-0.5 working tree | Clean; no tracked or visible untracked changes                                                       |
+| Node                        | `v22.22.0`; unchanged                                                                                |
+| PNPM                        | `10.30.3`; unchanged                                                                                 |
+
+### WS-0.6 environment confirmation
+
+| Item                        | Verified WS-0.6 value                                                                                |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Execution date              | `2026-08-23`                                                                                         |
+| Branch                      | `feature/wave-survivor`; unchanged from WS-0.5                                                       |
+| HEAD                        | `d48d8121170baf5f0dd6ce0edf3b3c70447f9e57`                                                           |
+| HEAD change since WS-0.5    | Advanced from `64801a3020c87e6534640e5b12c3785d594e77cf` through the committed WS-0.5 execution note |
+| Initial WS-0.6 working tree | Clean; the complete tracked diff and visible untracked-file list were empty                          |
 | Node                        | `v22.22.0`; unchanged                                                                                |
 | PNPM                        | `10.30.3`; unchanged                                                                                 |
 
@@ -548,19 +560,66 @@ No tests were added in this baseline task. Follow-up coverage remains appropriat
 
 The focused integration tests, frontend typecheck, and full repository test suite all pass on the recorded toolchain. There are no documented exceptions, blockers, reproducibility investigations, or repair scopes from WS-0.5.
 
-## WS-0.6 final scope-firewall audit and EPIC status — Pending
+## WS-0.6 final scope-firewall audit and EPIC status — Complete
 
-- **Status:** Pending.
-- **Audit targets:**
-  - no game framework;
-  - no backend;
-  - no generic engine or ECS;
-  - no parallel theme system;
-  - no frontend source imported by the game;
-  - no per-frame React state;
-  - no hand-edited generated token output;
-  - no unrelated frontend refactor.
-- **EPIC 0 completion rule:** Keep this note `In progress` until WS-0.4 and WS-0.5 evidence is recorded and the final scope audit passes.
+- **Status:** Complete.
+- **EPIC 0 status:** **PASS**
+- **Exceptions:** None.
+- **Blocking findings:** None.
+
+### Repository and change-boundary audit
+
+- The working tree was clean at WS-0.6 inspection start. The complete tracked diff and visible untracked-file list were empty.
+- The EPIC 0 commit range from pre-EPIC commit `15c0f1c43a976fb345dbf642ceb7445cf70fcabd` through HEAD adds only:
+  - `docs/features/wave-survivor.md`;
+  - `docs/features/wave-survivor-implementation-plan.md`;
+  - `docs/tasks/ws-0-establish-implementation-baseline.md`.
+- That range contains 2,720 documentation insertions across those three files and no other path.
+- From the initial WS-0.3 HEAD `3508d8900ba7e41ab55ff381b6cb83ae19adea1f` through the inspected WS-0.6 HEAD, only the shared execution note changed.
+- Root, frontend, common, and game manifests; `pnpm-workspace.yaml`; `pnpm-lock.yaml`; token sources; generated token output; Style Dictionary configuration; runtime code; tests; and standalone-demo source are unchanged by EPIC 0.
+- The ignored `games/wave-survivor/dist/` and `games/wave-survivor/demo/dist/` directories remain expected validation output and are absent from the tracked and visible untracked diff.
+
+### Scope-firewall results
+
+|   # | Required firewall condition                                                                           | Result and evidence                                                                                                                                                                                                                                 |
+| --: | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|   1 | No gameplay behavior was introduced.                                                                  | Pass. The EPIC 0 diff contains documentation only; the controller still explicitly owns no gameplay and the renderer still draws nothing.                                                                                                           |
+|   2 | No simulation loop was introduced.                                                                    | Pass. No runtime file changed, and current game/frontend source contains no `requestAnimationFrame` loop.                                                                                                                                           |
+|   3 | No input, movement, enemies, combat, waves, upgrades, boss, audio, or persistence was introduced.     | Pass. Those systems remain absent from implementation and are still listed as intentionally absent.                                                                                                                                                 |
+|   4 | No game framework was added.                                                                          | Pass. Manifests and lockfile are unchanged; no Phaser, PixiJS, Matter.js, Three.js, or other game-engine dependency is declared.                                                                                                                    |
+|   5 | No backend or account work was introduced.                                                            | Pass. No backend or account path changed in the EPIC 0 range.                                                                                                                                                                                       |
+|   6 | No generic engine, ECS, scene graph, plugin system, or speculative shared abstraction was introduced. | Pass. Only documentation changed; the private lifecycle and Canvas boundaries remain unchanged.                                                                                                                                                     |
+|   7 | No workspace package or cross-package dependency was introduced.                                      | Pass. Workspace declarations, manifests, and lockfile are unchanged.                                                                                                                                                                                |
+|   8 | No package manifest or lockfile was changed by EPIC 0.                                                | Pass. Explicit range diff across every relevant manifest and `pnpm-lock.yaml` is empty.                                                                                                                                                             |
+|   9 | No parallel theme manager, token source, or theme adapter was added.                                  | Pass. Theme, token, generated-output, and frontend integration code are unchanged.                                                                                                                                                                  |
+|  10 | No generated token output was hand-edited.                                                            | Pass. `common/generated/` and `styles/tokens.css` are unchanged in the EPIC 0 diff.                                                                                                                                                                 |
+|  11 | No unrelated frontend refactor occurred.                                                              | Pass. No frontend file changed.                                                                                                                                                                                                                     |
+|  12 | No existing public game lifecycle method was changed.                                                 | Pass. `start`, `pause`, `resume`, `restart`, `setTheme`, and `destroy` remain unchanged.                                                                                                                                                            |
+|  13 | The game package still imports no frontend source.                                                    | Pass. Current package source/demo imports no `frontend/`, frontend alias, React, or Next.js module.                                                                                                                                                 |
+|  14 | React still owns no per-frame game state.                                                             | Pass. `GameHost` retains only loading/ready/error host state and contains no frame scheduler.                                                                                                                                                       |
+|  15 | The standalone demo boundary remains intact.                                                          | Pass. Demo source is unchanged, still imports the built public package entry, and its recorded production build passed.                                                                                                                             |
+|  16 | Historical material was not promoted above current authority.                                         | Pass. The execution note records the user request, `AGENTS.md`, approved concept, accepted ADRs, current code/configuration, approved plan, and current Markdown as authority; historical PDFs and editor files were not used as current authority. |
+|  17 | Known scaffold mismatches were documented rather than fixed outside later epics.                      | Pass. Landscape sizing, duplicated frontend contracts, lifecycle-only states, and no-drawing Canvas ownership remain classified and deferred in the mismatch table.                                                                                 |
+
+### Validation-evidence review
+
+| Required evidence                  | Recorded result                                                                           |
+| ---------------------------------- | ----------------------------------------------------------------------------------------- |
+| Game typecheck                     | Pass, exit `0`; no diagnostics.                                                           |
+| Game tests                         | Pass, exit `0`; 2 files and 7 tests.                                                      |
+| Game build                         | Pass, exit `0`; expected ignored `games/wave-survivor/dist/` output only.                 |
+| Standalone demo build              | Pass, exit `0`; Vite transformed 8 modules and refreshed two expected ignored demo files. |
+| Focused frontend integration tests | Pass, exit `0`; 3 files and 8 tests.                                                      |
+| Frontend typecheck                 | Pass, exit `0`; no diagnostics.                                                           |
+| Full repository tests              | Pass, exit `0`; 24 files and 341 tests.                                                   |
+
+The only repository change after the WS-0.5 runtime validations was the committed WS-0.5 documentation update. No runtime, test, manifest, dependency, lockfile, generated output, or configuration change invalidated the recorded evidence, so the commands were not rerun merely for repetition.
+
+### EPIC 0 decision
+
+**EPIC 0: PASS**
+
+Both feature documents are present, their concept and ADR links resolve, all required validation evidence passes, the complete EPIC 0 change range contains only the three expected documentation files, the scope firewall has no violation, and the package/frontend boundaries are documented sufficiently for the next slice.
 
 ## Completion record
 
@@ -576,9 +635,17 @@ The Wave Survivor package baseline passes without runtime, test, manifest, depen
 
 The frontend Wave Survivor integration baseline passes without frontend, game, test, manifest, dependency, TypeScript, Vitest, or configuration changes. Existing tests verify every behavior required by WS-0.5; the known deeper-integration gaps remain follow-up work rather than hidden changes.
 
+### WS-0.6 outcome
+
+The final documentation, repository-history, working-tree, manifest, lockfile, generated-output, runtime-boundary, and validation-evidence audit passes without exceptions. EPIC 0 is complete and no repair task is required.
+
 ### Files changed
 
+- `docs/features/wave-survivor.md`
+- `docs/features/wave-survivor-implementation-plan.md`
 - `docs/tasks/ws-0-establish-implementation-baseline.md`
+
+Those are the complete EPIC 0 file changes. WS-0.6 itself modifies only this shared execution note.
 
 ### Acceptance evidence
 
@@ -587,10 +654,11 @@ The frontend Wave Survivor integration baseline passes without frontend, game, t
 - Scripts and tests: exact inventory and planned-command sections.
 - Existing versus absent behavior: abstraction and intentionally-absent tables.
 - Concept mismatches: classified mismatch table.
-- Pending work: dedicated WS-0.6 section.
+- Final scope audit: complete 17-point WS-0.6 firewall and repository-boundary review.
 - Protected scope: protected-areas section plus final Git review.
 - Package validation: complete WS-0.4 command table, generated-artifact review, and `Package baseline: PASS` classification.
 - Frontend validation: complete WS-0.5 command table, behavior-coverage review, working-tree review, and `Frontend baseline: PASS` classification.
+- EPIC result: `EPIC 0: PASS`, with no exceptions or blockers.
 
 ### Validation results
 
@@ -614,11 +682,23 @@ The frontend Wave Survivor integration baseline passes without frontend, game, t
 - Final WS-0.5 `pnpm exec prettier --check docs/tasks/ws-0-establish-implementation-baseline.md`: passed.
 - Final WS-0.5 `git diff --check`: passed.
 - Final WS-0.5 `git status --short`: showed only this modified execution note.
+- Initial WS-0.6 three-document Prettier check: failed because the new execution-note tables needed formatting; both feature documents already matched.
+- WS-0.6 `pnpm exec prettier --write docs/tasks/ws-0-establish-implementation-baseline.md`: passed and changed formatting only.
+- Final WS-0.6 `pnpm exec prettier --check docs/features/wave-survivor.md docs/features/wave-survivor-implementation-plan.md docs/tasks/ws-0-establish-implementation-baseline.md`: passed.
+- Final WS-0.6 `git diff --check`: passed.
+- Final WS-0.6 `git status --short`: showed only this modified execution note.
+- Final WS-0.6 `git diff --stat` and `git diff --name-only`: showed only this modified execution note.
+- Manifest, workspace, lockfile, token-source, generated-output, and configuration diff inspection: empty for EPIC 0.
+- Required documentation presence, concept/ADR relative links, commit-range attribution, ignored build-output, runtime-boundary, and scope-firewall review: passed.
 
 ### Deviations from plan
 
-None. No runtime, configuration, or documentation file other than this shared execution note was changed.
+None. During WS-0.6, no runtime, configuration, or documentation file other than this shared execution note was changed.
 
-### Remaining work
+### Known exceptions
 
-WS-0.6 remains pending. Do not begin EPIC 1 until its final scope-firewall audit is recorded and EPIC 0 is complete.
+None.
+
+### Remaining work and recommended next task
+
+Begin EPIC 1 with **WS-1.1 through WS-1.4**: logical arena constants, bounds contracts, pure aspect-fit calculations, and device-pixel-ratio calculation. Do not include drawing, responsive host integration, gameplay, input, or other later EPIC 1 work in that first slice.
