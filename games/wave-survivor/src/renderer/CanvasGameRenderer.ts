@@ -19,6 +19,7 @@ function getBrowserDevicePixelRatio(): number {
 export class CanvasGameRenderer implements GamePresentationPort {
   private canvas: HTMLCanvasElement | null;
   private context: CanvasRenderingContext2D | null;
+  private resizeObserver: ResizeObserver | null = null;
   private theme: GameTheme | null;
 
   constructor(
@@ -32,6 +33,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
     const displayWidth = options.canvas.clientWidth || options.canvas.width;
     const displayHeight = options.canvas.clientHeight || options.canvas.height;
     this.resize(displayWidth, displayHeight, devicePixelRatio);
+    this.observeResize(options.canvas.parentElement ?? options.canvas);
   }
 
   get mountedCanvas(): HTMLCanvasElement | null {
@@ -89,7 +91,21 @@ export class CanvasGameRenderer implements GamePresentationPort {
     this.context.strokeRect(0.5, 0.5, ARENA.width - 1, ARENA.height - 1);
   }
 
+  private observeResize(target: Element): void {
+    if (typeof ResizeObserver === "undefined") return;
+
+    this.resizeObserver = new ResizeObserver((entries) => {
+      const [entry] = entries;
+      if (!entry) return;
+
+      this.resize(entry.contentRect.width, entry.contentRect.height);
+    });
+    this.resizeObserver.observe(target);
+  }
+
   destroy(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
     this.context = null;
     this.canvas = null;
     this.theme = null;

@@ -1,5 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameTheme } from "../GameTheme.js";
+import { GameControllerImpl } from "../application/GameControllerImpl.js";
 import { CanvasGameRenderer } from "./CanvasGameRenderer.js";
 
 const initialTheme: GameTheme = {
@@ -12,6 +13,29 @@ const initialTheme: GameTheme = {
   },
 };
 
+const resizeObservers: ResizeObserverMock[] = [];
+
+class ResizeObserverMock {
+  readonly disconnect = vi.fn();
+  readonly observe = vi.fn();
+
+  constructor(private readonly callback: ResizeObserverCallback) {
+    resizeObservers.push(this);
+  }
+
+  emit(width: number, height: number): void {
+    this.callback(
+      [{ contentRect: { width, height } } as ResizeObserverEntry],
+      this as unknown as ResizeObserver,
+    );
+  }
+}
+
+afterEach(() => {
+  resizeObservers.length = 0;
+  vi.unstubAllGlobals();
+});
+
 function createCanvas(displayWidth: number, displayHeight: number) {
   const context = {
     fillRect: vi.fn(),
@@ -21,11 +45,16 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     strokeRect: vi.fn(),
     strokeStyle: "",
   } as unknown as CanvasRenderingContext2D;
+  const container = {
+    clientHeight: displayHeight,
+    clientWidth: displayWidth,
+  } as HTMLElement;
   const canvas = {
     clientHeight: displayHeight,
     clientWidth: displayWidth,
     getContext: vi.fn(() => context),
     height: displayHeight,
+    parentElement: container,
     style: {
       display: "",
       height: "",
@@ -35,7 +64,7 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     width: displayWidth,
   } as unknown as HTMLCanvasElement;
 
-  return { canvas, context };
+  return { canvas, container, context };
 }
 
 describe("CanvasGameRenderer", () => {
@@ -117,6 +146,48 @@ describe("CanvasGameRenderer", () => {
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);
     expect(context.fillRect).toHaveBeenLastCalledWith(0, 0, 360, 640);
+  });
+
+  it("observes repeated container resizes without replacing game state", () => {
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    vi.stubGlobal("window", { devicePixelRatio: 2 });
+    const { canvas, container, context } = createCanvas(320, 568);
+    const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme });
+    const controller = new GameControllerImpl(renderer);
+    const observer = resizeObservers[0];
+    if (!observer) throw new Error("Resize observer was not created.");
+    controller.start();
+
+    expect(observer.observe).toHaveBeenCalledWith(container);
+
+    observer.emit(600, 800);
+
+    expect(canvas.style.width).toBe("450px");
+    expect(canvas.style.height).toBe("800px");
+    expect(canvas.style.margin).toBe("0px 75px");
+    expect(canvas.width).toBe(900);
+    expect(canvas.height).toBe(1600);
+    expect(context.setTransform).toHaveBeenLastCalledWith(2.5, 0, 0, 2.5, 0, 0);
+
+    observer.emit(1920, 1080);
+
+    expect(canvas.style.width).toBe("540px");
+    expect(canvas.style.height).toBe("960px");
+    expect(canvas.style.margin).toBe("60px 690px");
+    expect(canvas.width).toBe(1080);
+    expect(canvas.height).toBe(1920);
+    expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);
+    expect(context.fillRect).toHaveBeenLastCalledWith(0, 0, 360, 640);
+    expect(renderer.mountedCanvas).toBe(canvas);
+    expect(renderer.currentTheme).toBe(initialTheme);
+    expect(controller.lifecycleState).toBe("running");
+
+    const drawsBeforeDestroy = vi.mocked(context.fillRect).mock.calls.length;
+    controller.destroy();
+    observer.emit(390, 844);
+
+    expect(observer.disconnect).toHaveBeenCalledOnce();
+    expect(context.fillRect).toHaveBeenCalledTimes(drawsBeforeDestroy);
   });
 
   it("releases host resources and ignores later theme changes", () => {
