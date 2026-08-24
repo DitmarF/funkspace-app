@@ -261,10 +261,10 @@ resolved game color token layer into an immutable `GameTheme` object and maps
 values through its integration contract; it does not read portfolio CSS
 variables, DOM theme attributes, or frontend services. `GameLoader` lazily
 imports explicit game package entry points, while `GameHost` mounts the canvas,
-provides a generic placement container, starts the controller, pauses or resumes
-it with document visibility, forwards theme updates, and destroys it on
-unmount. The game renderer owns Canvas presentation and backing dimensions.
-React owns none of the simulation or rendering loop.
+passes an independently sized generic viewport boundary, starts the controller,
+pauses or resumes it with document visibility, forwards theme updates, and
+destroys it on unmount. The game renderer owns Canvas presentation and backing
+dimensions. React owns none of the simulation or rendering loop.
 
 Portfolio routes and components depend on a frontend-owned adapter interface, not on game types. The adapter must provide teardown and must not expose the game's engine, renderer, or mutable state to the rest of `frontend`.
 

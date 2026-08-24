@@ -78,6 +78,10 @@ describe("GameHost", () => {
     expect(canvas).not.toHaveAttribute("width");
     expect(canvas).not.toHaveAttribute("height");
     expect(canvas.parentElement).toHaveClass("game-placement");
+    expect(canvas.parentElement).toHaveStyle({
+      overflow: "hidden",
+      position: "relative",
+    });
     expect(screen.getByRole("status")).toHaveTextContent("Loading game…");
 
     await waitFor(() => expect(createGame).toHaveBeenCalledOnce());
@@ -85,6 +89,7 @@ describe("GameHost", () => {
     expect(loader.load).toHaveBeenCalledWith("wave-survivor");
     expect(createGame).toHaveBeenCalledWith({
       canvas,
+      viewport: canvas.parentElement,
       theme: {
         colors: {
           background: "#e6e6e6",

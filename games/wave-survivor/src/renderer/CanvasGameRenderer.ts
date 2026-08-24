@@ -33,10 +33,8 @@ export class CanvasGameRenderer implements GamePresentationPort {
     this.context = options.canvas.getContext("2d");
     this.theme = options.theme;
 
-    const displayWidth = options.canvas.clientWidth || options.canvas.width;
-    const displayHeight = options.canvas.clientHeight || options.canvas.height;
-    this.resize(displayWidth, displayHeight, devicePixelRatio);
-    this.observeResize(options.canvas.parentElement ?? options.canvas);
+    this.resizeToViewport(options.viewport, devicePixelRatio);
+    this.observeResize(options.viewport);
   }
 
   get mountedCanvas(): HTMLCanvasElement | null {
@@ -70,6 +68,9 @@ export class CanvasGameRenderer implements GamePresentationPort {
     );
 
     this.canvas.style.display = "block";
+    this.canvas.style.position = "absolute";
+    this.canvas.style.left = "0px";
+    this.canvas.style.top = "0px";
     this.canvas.style.width = `${fit.displayWidth}px`;
     this.canvas.style.height = `${fit.displayHeight}px`;
     // Layout margins can resize the observed parent and create resize feedback.
@@ -107,14 +108,18 @@ export class CanvasGameRenderer implements GamePresentationPort {
     this.context.fill();
   }
 
-  private observeResize(target: Element): void {
+  private resizeToViewport(
+    viewport: HTMLElement,
+    devicePixelRatio?: number,
+  ): void {
+    this.resize(viewport.clientWidth, viewport.clientHeight, devicePixelRatio);
+  }
+
+  private observeResize(target: HTMLElement): void {
     if (typeof ResizeObserver === "undefined") return;
 
-    this.resizeObserver = new ResizeObserver((entries) => {
-      const [entry] = entries;
-      if (!entry) return;
-
-      this.resize(entry.contentRect.width, entry.contentRect.height);
+    this.resizeObserver = new ResizeObserver(() => {
+      this.resizeToViewport(target);
     });
     this.resizeObserver.observe(target);
   }

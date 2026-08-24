@@ -9,7 +9,7 @@ responsive grey-box arena without gameplay.
 ```ts
 import { createGame } from "@funkspace/wave-survivor";
 
-const game = createGame({ canvas, theme });
+const game = createGame({ canvas, viewport, theme });
 game.start();
 game.pause();
 game.resume();
@@ -20,10 +20,11 @@ game.destroy();
 
 `createGame()` returns a fresh `GameController`. Lifecycle calls are
 idempotent. `restart()` starts a new session from any non-destroyed state, and
-`destroy()` is terminal and safe to repeat. Gameplay and drawing capabilities
-will be composed inside the factory when those layers are implemented. A host
-may supply a canvas and resolved `GameTheme` values through `GameMountOptions`;
-theme changes are forwarded with `setTheme()`.
+`destroy()` is terminal and safe to repeat. When mount options are supplied,
+the factory composes the current responsive Canvas renderer; gameplay remains
+absent. A host supplies a canvas, an independently sized viewport boundary, and
+resolved `GameTheme` values through `GameMountOptions`; theme changes are
+forwarded with `setTheme()`.
 
 ## Package boundaries
 

@@ -1,10 +1,12 @@
 import { createGame } from "../dist/index.js";
 
 const canvas = document.querySelector("#game-canvas");
+const viewport = document.querySelector("#game-viewport");
 const status = document.querySelector("#game-status");
 
 if (
   !(canvas instanceof HTMLCanvasElement) ||
+  !(viewport instanceof HTMLElement) ||
   !(status instanceof HTMLElement)
 ) {
   throw new Error("The Wave Survivor demo markup is incomplete.");
@@ -14,6 +16,7 @@ const canvasStyle = getComputedStyle(canvas);
 const foreground = canvasStyle.color;
 const game = createGame({
   canvas,
+  viewport,
   theme: {
     colors: {
       background: canvasStyle.backgroundColor,

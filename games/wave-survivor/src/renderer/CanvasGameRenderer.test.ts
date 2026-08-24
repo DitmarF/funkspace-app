@@ -17,13 +17,22 @@ const resizeObservers: ResizeObserverMock[] = [];
 
 class ResizeObserverMock {
   readonly disconnect = vi.fn();
-  readonly observe = vi.fn();
+  readonly observe = vi.fn((target: Element) => {
+    this.target = target;
+  });
+  private target: Element | null = null;
 
   constructor(private readonly callback: ResizeObserverCallback) {
     resizeObservers.push(this);
   }
 
   emit(width: number, height: number): void {
+    if (this.target) {
+      Object.defineProperties(this.target, {
+        clientHeight: { configurable: true, value: height },
+        clientWidth: { configurable: true, value: width },
+      });
+    }
     this.callback(
       [{ contentRect: { width, height } } as ResizeObserverEntry],
       this as unknown as ResizeObserver,
@@ -69,7 +78,10 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     style: {
       display: "",
       height: "",
+      left: "",
       margin: "",
+      position: "",
+      top: "",
       transform: "",
       width: "",
     },
@@ -81,12 +93,22 @@ function createCanvas(displayWidth: number, displayHeight: number) {
 
 describe("CanvasGameRenderer", () => {
   it("initializes a centered DPR-aware canvas in logical coordinates", () => {
-    const { canvas, context, fillStyles } = createCanvas(390, 844);
-    const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme }, 2);
+    const { canvas, container, context, fillStyles } = createCanvas(390, 844);
+    Object.defineProperties(canvas, {
+      clientHeight: { value: 540 },
+      clientWidth: { value: 960 },
+    });
+    const renderer = new CanvasGameRenderer(
+      { canvas, viewport: container, theme: initialTheme },
+      2,
+    );
 
     expect(renderer.mountedCanvas).toBe(canvas);
     expect(renderer.currentTheme).toBe(initialTheme);
     expect(canvas.style.display).toBe("block");
+    expect(canvas.style.position).toBe("absolute");
+    expect(canvas.style.left).toBe("0px");
+    expect(canvas.style.top).toBe("0px");
     expect(Number.parseFloat(canvas.style.width)).toBeCloseTo(390);
     expect(Number.parseFloat(canvas.style.height)).toBeCloseTo(
       640 * (390 / 360),
@@ -120,8 +142,11 @@ describe("CanvasGameRenderer", () => {
   });
 
   it("applies the desktop cap without stretching", () => {
-    const { canvas, context } = createCanvas(1920, 1080);
-    const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme }, 3);
+    const { canvas, container, context } = createCanvas(1920, 1080);
+    const renderer = new CanvasGameRenderer(
+      { canvas, viewport: container, theme: initialTheme },
+      3,
+    );
 
     expect(Number.parseFloat(canvas.style.width)).toBe(540);
     expect(Number.parseFloat(canvas.style.height)).toBe(960);
@@ -135,8 +160,12 @@ describe("CanvasGameRenderer", () => {
   });
 
   it("redraws with host theme changes", () => {
-    const { canvas, context, fillStyles } = createCanvas(360, 640);
-    const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme });
+    const { canvas, container, context, fillStyles } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
     const replacementTheme: GameTheme = {
       colors: {
         ...initialTheme.colors,
@@ -161,8 +190,12 @@ describe("CanvasGameRenderer", () => {
   });
 
   it("can recalculate the transform without changing logical coordinates", () => {
-    const { canvas, context } = createCanvas(320, 568);
-    const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme });
+    const { canvas, container, context } = createCanvas(320, 568);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
 
     renderer.resize(1920, 1080, 2);
 
@@ -180,7 +213,11 @@ describe("CanvasGameRenderer", () => {
     vi.stubGlobal("ResizeObserver", ResizeObserverMock);
     vi.stubGlobal("window", { devicePixelRatio: 2 });
     const { canvas, container, context } = createCanvas(320, 568);
-    const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme });
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
     const controller = new GameControllerImpl(renderer);
     const observer = resizeObservers[0];
     if (!observer) throw new Error("Resize observer was not created.");
@@ -208,6 +245,7 @@ describe("CanvasGameRenderer", () => {
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);
     expect(context.fillRect).toHaveBeenLastCalledWith(0, 0, 360, 640);
+    expect(context.arc).toHaveBeenLastCalledWith(180, 320, 12, 0, Math.PI * 2);
     expect(renderer.mountedCanvas).toBe(canvas);
     expect(renderer.currentTheme).toBe(initialTheme);
     expect(controller.lifecycleState).toBe("running");
@@ -224,8 +262,12 @@ describe("CanvasGameRenderer", () => {
     vi.stubGlobal("ResizeObserver", ResizeObserverMock);
     vi.stubGlobal("window", { devicePixelRatio: 2 });
     const mounts = Array.from({ length: 3 }, () => {
-      const { canvas, context } = createCanvas(390, 844);
-      const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme });
+      const { canvas, container, context } = createCanvas(390, 844);
+      const renderer = new CanvasGameRenderer({
+        canvas,
+        viewport: container,
+        theme: initialTheme,
+      });
       const observer = resizeObservers.at(-1);
       if (!observer) throw new Error("Resize observer was not created.");
 
@@ -254,9 +296,10 @@ describe("CanvasGameRenderer", () => {
   });
 
   it("releases host resources and ignores later theme changes", () => {
-    const { canvas, context } = createCanvas(360, 640);
+    const { canvas, container, context } = createCanvas(360, 640);
     const renderer = new CanvasGameRenderer({
       canvas,
+      viewport: container,
       theme: initialTheme,
     });
     const drawsBeforeDestroy = vi.mocked(context.fillRect).mock.calls.length;

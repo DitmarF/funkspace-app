@@ -13,6 +13,7 @@ export interface HostedGameController {
 
 export interface GameMountOptions {
   readonly canvas: HTMLCanvasElement;
+  readonly viewport: HTMLElement;
   readonly theme: GameTheme;
 }
 

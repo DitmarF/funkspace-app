@@ -33,6 +33,8 @@
       }
 
       .game-frame {
+        position: relative;
+        overflow: hidden;
         width: min(calc(100% - 2rem), 44vh, 33.75rem);
         width: min(calc(100% - 2rem), 44dvh, 33.75rem);
         aspect-ratio: 9 / 16;
@@ -50,7 +52,7 @@
   <body>
     <main>
       <h1>Wave Survivor</h1>
-      <div class="game-frame">
+      <div id="game-viewport" class="game-frame">
         <canvas
           id="game-canvas"
           width="360"

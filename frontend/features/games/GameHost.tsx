@@ -37,13 +37,15 @@ export function GameHost({
   className,
   loader = gameLoader,
 }: GameHostProps) {
+  const viewportRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<GameHostStatus>("loading");
   const { themeService } = useServices();
 
   useEffect(() => {
+    const viewport = viewportRef.current;
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!viewport || !canvas) return;
 
     let cancelled = false;
     let controller: HostedGameController | null = null;
@@ -72,7 +74,11 @@ export function GameHost({
       .then((gameModule) => {
         if (cancelled) return;
 
-        controller = gameModule.createGame({ canvas, theme: currentTheme });
+        controller = gameModule.createGame({
+          canvas,
+          viewport,
+          theme: currentTheme,
+        });
         controller.start();
         if (document.hidden) {
           controller.pause();
@@ -97,7 +103,12 @@ export function GameHost({
   }, [gameId, loader, themeService]);
 
   return (
-    <div className={className} data-game-status={status}>
+    <div
+      ref={viewportRef}
+      className={className}
+      data-game-status={status}
+      style={{ overflow: "hidden", position: "relative" }}
+    >
       <canvas ref={canvasRef} aria-label={label}>
         Your browser does not support the canvas element.
       </canvas>
