@@ -37,9 +37,20 @@ afterEach(() => {
 });
 
 function createCanvas(displayWidth: number, displayHeight: number) {
+  const fillStyles: string[] = [];
+  let fillStyle = "";
   const context = {
+    arc: vi.fn(),
+    beginPath: vi.fn(),
+    fill: vi.fn(),
     fillRect: vi.fn(),
-    fillStyle: "",
+    get fillStyle() {
+      return fillStyle;
+    },
+    set fillStyle(value: string) {
+      fillStyle = value;
+      fillStyles.push(value);
+    },
     lineWidth: 0,
     setTransform: vi.fn(),
     strokeRect: vi.fn(),
@@ -64,12 +75,12 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     width: displayWidth,
   } as unknown as HTMLCanvasElement;
 
-  return { canvas, container, context };
+  return { canvas, container, context, fillStyles };
 }
 
 describe("CanvasGameRenderer", () => {
   it("initializes a centered DPR-aware canvas in logical coordinates", () => {
-    const { canvas, context } = createCanvas(390, 844);
+    const { canvas, context, fillStyles } = createCanvas(390, 844);
     const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme }, 2);
 
     expect(renderer.mountedCanvas).toBe(canvas);
@@ -92,11 +103,17 @@ describe("CanvasGameRenderer", () => {
       0,
       0,
     );
-    expect(context.fillStyle).toBe(initialTheme.colors.background);
+    expect(fillStyles).toEqual([
+      initialTheme.colors.background,
+      initialTheme.colors.player,
+    ]);
     expect(context.fillRect).toHaveBeenCalledWith(0, 0, 360, 640);
     expect(context.strokeStyle).toBe(initialTheme.colors.effect);
     expect(context.lineWidth).toBe(1);
     expect(context.strokeRect).toHaveBeenCalledWith(0.5, 0.5, 359, 639);
+    expect(context.beginPath).toHaveBeenCalledOnce();
+    expect(context.arc).toHaveBeenCalledWith(180, 320, 12, 0, Math.PI * 2);
+    expect(context.fill).toHaveBeenCalledOnce();
   });
 
   it("applies the desktop cap without stretching", () => {
@@ -114,23 +131,29 @@ describe("CanvasGameRenderer", () => {
   });
 
   it("redraws with host theme changes", () => {
-    const { canvas, context } = createCanvas(360, 640);
+    const { canvas, context, fillStyles } = createCanvas(360, 640);
     const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme });
     const replacementTheme: GameTheme = {
       colors: {
         ...initialTheme.colors,
         background: "replacement-background",
         effect: "replacement-effect",
+        player: "replacement-player",
       },
     };
 
     renderer.setTheme(replacementTheme);
 
     expect(renderer.currentTheme).toBe(replacementTheme);
-    expect(context.fillStyle).toBe("replacement-background");
+    expect(fillStyles.slice(-2)).toEqual([
+      "replacement-background",
+      "replacement-player",
+    ]);
     expect(context.strokeStyle).toBe("replacement-effect");
     expect(context.fillRect).toHaveBeenCalledTimes(2);
     expect(context.strokeRect).toHaveBeenCalledTimes(2);
+    expect(context.arc).toHaveBeenCalledTimes(2);
+    expect(context.fill).toHaveBeenCalledTimes(2);
   });
 
   it("can recalculate the transform without changing logical coordinates", () => {

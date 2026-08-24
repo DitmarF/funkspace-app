@@ -5,6 +5,8 @@ import { ARENA } from "../domain/arena/index.js";
 import { calculateAspectFit } from "./AspectFit.js";
 import { calculateBackingResolution } from "./BackingResolution.js";
 
+const PLAYER_MARKER_RADIUS = 12;
+
 function getBrowserDevicePixelRatio(): number {
   return typeof window === "undefined" ? 1 : window.devicePixelRatio;
 }
@@ -90,6 +92,17 @@ export class CanvasGameRenderer implements GamePresentationPort {
     this.context.strokeStyle = this.theme.colors.effect;
     this.context.lineWidth = 1;
     this.context.strokeRect(0.5, 0.5, ARENA.width - 1, ARENA.height - 1);
+
+    this.context.fillStyle = this.theme.colors.player;
+    this.context.beginPath();
+    this.context.arc(
+      ARENA.width / 2,
+      ARENA.height / 2,
+      PLAYER_MARKER_RADIUS,
+      0,
+      Math.PI * 2,
+    );
+    this.context.fill();
   }
 
   private observeResize(target: Element): void {
