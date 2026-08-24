@@ -20,8 +20,6 @@ const statusMessages: Record<GameHostStatus, string> = {
 
 export interface GameHostProps {
   readonly gameId?: GameId;
-  readonly width?: number;
-  readonly height?: number;
   readonly label?: string;
   readonly className?: string;
   readonly loader?: GameModuleLoader;
@@ -35,8 +33,6 @@ export interface GameHostProps {
  */
 export function GameHost({
   gameId = "wave-survivor",
-  width = 960,
-  height = 540,
   label = "Wave Survivor game canvas",
   className,
   loader = gameLoader,
@@ -102,7 +98,7 @@ export function GameHost({
 
   return (
     <div className={className} data-game-status={status}>
-      <canvas ref={canvasRef} width={width} height={height} aria-label={label}>
+      <canvas ref={canvasRef} aria-label={label}>
         Your browser does not support the canvas element.
       </canvas>
       <p className="sr-only" role="status" aria-live="polite">

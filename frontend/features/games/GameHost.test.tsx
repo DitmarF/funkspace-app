@@ -69,10 +69,15 @@ describe("GameHost", () => {
     const createGame = vi.fn(() => controller);
     const loader = createLoader({ createGame });
 
-    const { unmount } = render(<GameHost loader={loader} />);
+    const { unmount } = render(
+      <GameHost loader={loader} className="game-placement" />,
+    );
     const canvas = screen.getByLabelText("Wave Survivor game canvas");
 
     expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+    expect(canvas).not.toHaveAttribute("width");
+    expect(canvas).not.toHaveAttribute("height");
+    expect(canvas.parentElement).toHaveClass("game-placement");
     expect(screen.getByRole("status")).toHaveTextContent("Loading game…");
 
     await waitFor(() => expect(createGame).toHaveBeenCalledOnce());

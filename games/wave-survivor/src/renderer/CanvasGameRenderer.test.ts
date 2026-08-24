@@ -70,6 +70,7 @@ function createCanvas(displayWidth: number, displayHeight: number) {
       display: "",
       height: "",
       margin: "",
+      transform: "",
       width: "",
     },
     width: displayWidth,
@@ -90,9 +91,11 @@ describe("CanvasGameRenderer", () => {
     expect(Number.parseFloat(canvas.style.height)).toBeCloseTo(
       640 * (390 / 360),
     );
-    expect(Number.parseFloat(canvas.style.margin)).toBeCloseTo(
-      (844 - 640 * (390 / 360)) / 2,
+    expect(canvas.style.margin).toBe("0px");
+    const verticalOffset = Number.parseFloat(
+      canvas.style.transform.replace("translate(0px, ", ""),
     );
+    expect(verticalOffset).toBeCloseTo((844 - 640 * (390 / 360)) / 2);
     expect(canvas.width).toBe(780);
     expect(canvas.height).toBe(1387);
     expect(context.setTransform).toHaveBeenCalledWith(
@@ -122,7 +125,8 @@ describe("CanvasGameRenderer", () => {
 
     expect(Number.parseFloat(canvas.style.width)).toBe(540);
     expect(Number.parseFloat(canvas.style.height)).toBe(960);
-    expect(canvas.style.margin).toBe("60px 690px");
+    expect(canvas.style.margin).toBe("0px");
+    expect(canvas.style.transform).toBe("translate(690px, 60px)");
     expect(canvas.width).toBe(1080);
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenCalledWith(3, 0, 0, 3, 0, 0);
@@ -164,7 +168,8 @@ describe("CanvasGameRenderer", () => {
 
     expect(canvas.style.width).toBe("540px");
     expect(canvas.style.height).toBe("960px");
-    expect(canvas.style.margin).toBe("60px 690px");
+    expect(canvas.style.margin).toBe("0px");
+    expect(canvas.style.transform).toBe("translate(690px, 60px)");
     expect(canvas.width).toBe(1080);
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);
@@ -187,7 +192,8 @@ describe("CanvasGameRenderer", () => {
 
     expect(canvas.style.width).toBe("450px");
     expect(canvas.style.height).toBe("800px");
-    expect(canvas.style.margin).toBe("0px 75px");
+    expect(canvas.style.margin).toBe("0px");
+    expect(canvas.style.transform).toBe("translate(75px, 0px)");
     expect(canvas.width).toBe(900);
     expect(canvas.height).toBe(1600);
     expect(context.setTransform).toHaveBeenLastCalledWith(2.5, 0, 0, 2.5, 0, 0);
@@ -196,7 +202,8 @@ describe("CanvasGameRenderer", () => {
 
     expect(canvas.style.width).toBe("540px");
     expect(canvas.style.height).toBe("960px");
-    expect(canvas.style.margin).toBe("60px 690px");
+    expect(canvas.style.margin).toBe("0px");
+    expect(canvas.style.transform).toBe("translate(690px, 60px)");
     expect(canvas.width).toBe(1080);
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);

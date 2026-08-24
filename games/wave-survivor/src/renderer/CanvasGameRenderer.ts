@@ -72,7 +72,9 @@ export class CanvasGameRenderer implements GamePresentationPort {
     this.canvas.style.display = "block";
     this.canvas.style.width = `${fit.displayWidth}px`;
     this.canvas.style.height = `${fit.displayHeight}px`;
-    this.canvas.style.margin = `${fit.verticalOffset}px ${fit.horizontalOffset}px`;
+    // Layout margins can resize the observed parent and create resize feedback.
+    this.canvas.style.margin = "0px";
+    this.canvas.style.transform = `translate(${fit.horizontalOffset}px, ${fit.verticalOffset}px)`;
     this.canvas.width = resolution.backingWidth;
     this.canvas.height = resolution.backingHeight;
 
