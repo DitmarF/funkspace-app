@@ -13,6 +13,7 @@
       body {
         display: grid;
         min-height: 100vh;
+        min-height: 100dvh;
         margin: 0;
         place-items: center;
         background: Canvas;
@@ -20,14 +21,27 @@
       }
 
       main {
-        width: min(60rem, calc(100% - 2rem));
+        display: grid;
+        width: 100%;
+        gap: 1rem;
+        justify-items: center;
+      }
+
+      h1,
+      p {
+        margin: 0;
+      }
+
+      .game-frame {
+        width: min(calc(100% - 2rem), 44vh, 33.75rem);
+        width: min(calc(100% - 2rem), 44dvh, 33.75rem);
+        aspect-ratio: 9 / 16;
       }
 
       canvas {
         display: block;
         width: 100%;
-        height: auto;
-        border: 1px solid currentColor;
+        height: 100%;
         background: Canvas;
         color: CanvasText;
       }
@@ -36,17 +50,17 @@
   <body>
     <main>
       <h1>Wave Survivor</h1>
-      <canvas
-        id="game-canvas"
-        width="960"
-        height="540"
-        aria-label="Wave Survivor game canvas"
-      >
-        Your browser does not support the canvas element.
-      </canvas>
-      <p id="game-status" role="status" aria-live="polite">
-        Starting empty game…
-      </p>
+      <div class="game-frame">
+        <canvas
+          id="game-canvas"
+          width="360"
+          height="640"
+          aria-label="Wave Survivor game canvas"
+        >
+          Your browser does not support the canvas element.
+        </canvas>
+      </div>
+      <p id="game-status" role="status" aria-live="polite">Starting arena…</p>
     </main>
     <script type="module" src="./main.js"></script>
   </body>

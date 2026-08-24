@@ -1,8 +1,8 @@
 # Wave Survivor
 
 Wave Survivor is the first standalone FunkSpace game package. It exposes a
-minimal lifecycle API for portfolio integration but does not contain gameplay
-or drawing code yet.
+minimal lifecycle API for portfolio integration and currently renders a
+responsive grey-box arena without gameplay.
 
 ## Public API
 
@@ -59,6 +59,6 @@ Build output is emitted to `dist/` and is not source-controlled.
 
 `demo/` is a framework-free HTML entry point that proves the game can run
 without the portfolio or Next.js. The demo builds and imports the package's
-public JavaScript entry point, creates a game controller, and starts the empty
-game. It contains a canvas for future rendering but deliberately has no
-gameplay or renderer integration yet.
+public JavaScript entry point, creates a game controller, and renders the same
+responsive 360 × 640 logical arena as the portfolio host. It has no separate
+gameplay or renderer implementation.

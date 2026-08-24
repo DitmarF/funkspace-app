@@ -27,6 +27,6 @@ const game = createGame({
 
 game.start();
 canvas.dataset.gameState = "started";
-status.textContent = "Empty game started.";
+status.textContent = "Arena ready.";
 
 window.addEventListener("pagehide", () => game.destroy(), { once: true });
