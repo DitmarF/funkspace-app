@@ -19,6 +19,7 @@ function getBrowserDevicePixelRatio(): number {
 export class CanvasGameRenderer implements GamePresentationPort {
   private canvas: HTMLCanvasElement | null;
   private context: CanvasRenderingContext2D | null;
+  private destroyed = false;
   private resizeObserver: ResizeObserver | null = null;
   private theme: GameTheme | null;
 
@@ -45,7 +46,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
   }
 
   setTheme(theme: GameTheme): void {
-    if (this.canvas) {
+    if (!this.destroyed && this.canvas) {
       this.theme = theme;
       this.drawArena();
     }
@@ -57,7 +58,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
     availableHeight: number,
     devicePixelRatio = getBrowserDevicePixelRatio(),
   ): void {
-    if (!this.canvas || !this.context) return;
+    if (this.destroyed || !this.canvas || !this.context) return;
 
     const fit = calculateAspectFit(availableWidth, availableHeight);
     const resolution = calculateBackingResolution(
@@ -104,6 +105,9 @@ export class CanvasGameRenderer implements GamePresentationPort {
   }
 
   destroy(): void {
+    if (this.destroyed) return;
+
+    this.destroyed = true;
     this.resizeObserver?.disconnect();
     this.resizeObserver = null;
     this.context = null;

@@ -190,6 +190,39 @@ describe("CanvasGameRenderer", () => {
     expect(context.fillRect).toHaveBeenCalledTimes(drawsBeforeDestroy);
   });
 
+  it("does not accumulate observers across repeated mounts and destroys", () => {
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    vi.stubGlobal("window", { devicePixelRatio: 2 });
+    const mounts = Array.from({ length: 3 }, () => {
+      const { canvas, context } = createCanvas(390, 844);
+      const renderer = new CanvasGameRenderer({ canvas, theme: initialTheme });
+      const observer = resizeObservers.at(-1);
+      if (!observer) throw new Error("Resize observer was not created.");
+
+      renderer.destroy();
+      renderer.destroy();
+
+      return {
+        context,
+        drawsAfterDestroy: vi.mocked(context.fillRect).mock.calls.length,
+        observer,
+      };
+    });
+
+    expect(resizeObservers).toHaveLength(3);
+
+    for (const mount of mounts) {
+      expect(mount.observer.observe).toHaveBeenCalledOnce();
+      expect(mount.observer.disconnect).toHaveBeenCalledOnce();
+
+      mount.observer.emit(600, 800);
+
+      expect(mount.context.fillRect).toHaveBeenCalledTimes(
+        mount.drawsAfterDestroy,
+      );
+    }
+  });
+
   it("releases host resources and ignores later theme changes", () => {
     const { canvas, context } = createCanvas(360, 640);
     const renderer = new CanvasGameRenderer({
