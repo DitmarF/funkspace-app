@@ -6,6 +6,13 @@ export interface Bounds {
   readonly height: number;
 }
 
+/** Named logical regions consumed by future arena-based gameplay systems. */
+export interface ArenaRegions {
+  readonly playerArea: Bounds;
+  readonly spawnBounds: Bounds;
+  readonly despawnBounds: Bounds;
+}
+
 /** Create immutable logical bounds without depending on a rendering surface. */
 export function createBounds(
   x: number,

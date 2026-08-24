@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
+import type { ArenaRegions, Bounds } from "./Arena.js";
 import { ARENA, createBounds, VISIBLE_ARENA_BOUNDS } from "./Arena.js";
 
 describe("logical arena", () => {
@@ -24,5 +25,13 @@ describe("createBounds", () => {
 
     expect(bounds).toEqual({ x: -24, y: 16, width: 408, height: 672 });
     expect(Object.isFrozen(bounds)).toBe(true);
+  });
+});
+
+describe("arena regions", () => {
+  it("exposes logical bounds for future gameplay systems", () => {
+    expectTypeOf<ArenaRegions["playerArea"]>().toEqualTypeOf<Bounds>();
+    expectTypeOf<ArenaRegions["spawnBounds"]>().toEqualTypeOf<Bounds>();
+    expectTypeOf<ArenaRegions["despawnBounds"]>().toEqualTypeOf<Bounds>();
   });
 });
