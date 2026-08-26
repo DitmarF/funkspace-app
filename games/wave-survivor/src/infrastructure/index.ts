@@ -2,7 +2,13 @@
  * Browser clocks, input, persistence, audio, and other external adapters
  * belong here.
  */
-export { BrowserKeyboardInput, ZeroMovementInput } from "./input/index.js";
+export {
+  BrowserKeyboardInput,
+  BrowserVirtualJoystickInput,
+  VIRTUAL_JOYSTICK_GEOMETRY,
+  ZeroMovementInput,
+} from "./input/index.js";
+export type { VirtualJoystickPresentationSnapshot } from "./input/index.js";
 export {
   BrowserFrameScheduler,
   BrowserMonotonicClock,
