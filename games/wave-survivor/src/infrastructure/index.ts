@@ -5,6 +5,7 @@
 export {
   BrowserKeyboardInput,
   BrowserVirtualJoystickInput,
+  CompositeMovementInput,
   VIRTUAL_JOYSTICK_GEOMETRY,
   ZeroMovementInput,
 } from "./input/index.js";
