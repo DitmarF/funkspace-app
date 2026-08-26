@@ -26,8 +26,9 @@ The configured locations are not all active packages. A pnpm workspace package r
 `pnpm list -r --depth -1` recognizes the root package, `frontend`,
 `@funkspace/common`, and `@funkspace/wave-survivor`. `backend` remains a
 README-only placeholder. The first game package is buildable TypeScript
-with no gameplay systems or external runtime dependencies. Its current renderer
-draws a responsive grey-box arena and stationary player marker.
+with a deterministic fixed-step runtime and no external runtime dependencies.
+Its current renderer draws the responsive grey-box arena, moving player, and
+fixed virtual joystick from immutable logical-coordinate snapshots.
 
 The current dependency shape is:
 
@@ -44,7 +45,7 @@ wave-survivor      -> independent TypeScript build
 
 common  [active private package; explicit motion and token exports]
 backend [placeholder; no runtime or deployment]
-games/* [active collection; wave-survivor arena foundation]
+games/* [active collection; wave-survivor deterministic movement slice]
 ```
 
 The root production build type-checks `common` before building the frontend.
@@ -204,14 +205,17 @@ Organize exports by explicit areas such as `tokens`, `motion`, `utilities`, and 
 
 `games/*` is a configured workspace collection. It currently contains the
 private `@funkspace/wave-survivor` TypeScript package. The package has no
-gameplay systems or external runtime dependencies. Its renderer owns responsive
-Canvas presentation, draws the themed arena, border, and stationary player
-marker in fixed `360 × 640` logical coordinates, and observes an independently
-sized viewport boundary. The public entry point exposes `createGame()` and the
-`GameController` lifecycle contract (`start`, `pause`, `resume`, `restart`, and
-`destroy`) plus a canvas/viewport/theme mount contract so a portfolio adapter
-can own an instance without accessing game internals. Theme changes cross the
-same public boundary through `setTheme()`. The parent
+external runtime dependencies. It owns deterministic runtime state, normalized
+keyboard and virtual-joystick input, bounded fixed-step scheduling, pure player
+movement and arena clamping, interruption cleanup, and immutable render
+snapshots. Its renderer owns responsive Canvas presentation, draws the themed
+arena, border, moving player, and fixed joystick in `360 × 640` logical
+coordinates, and observes an independently sized viewport boundary. The public
+entry point exposes `createGame()` and the `GameController` lifecycle contract
+(`start`, `pause`, `resume`, `restart`, and `destroy`) plus a
+canvas/viewport/theme mount contract so a portfolio adapter can own an instance
+without accessing game internals. Theme changes cross the same public boundary
+through `setTheme()`. The parent
 [`games/README.md`](../../games/README.md) defines creation and isolation
 requirements.
 

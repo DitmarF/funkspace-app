@@ -4,11 +4,11 @@
 
 ## Document metadata
 
-- **Status:** Ready for review
+- **Status:** In progress — EPICs 0–2 complete
 - **Owner:** Dimi
 - **Product:** FunkSpace Wave Survivor
 - **Planning level:** Epic and implementation-task roadmap
-- **Last updated:** 2026-08-23
+- **Last updated:** 2026-08-26
 - **Concept source:** [`docs/features/wave-survivor.md`](./wave-survivor.md)
 - **Game package:** `games/wave-survivor/`
 - **Portfolio integration:** `frontend/features/games/`
@@ -199,6 +199,9 @@ EPIC 10 ── Gate 4 / release candidate
 
 EPICs 1–4 should not be parallelized because each one validates foundations required by the next. Visual exploration may occur separately, but final assets must not enter the production renderer before Gate 1 approval.
 
+Current delivery status: EPICs 0, 1, and 2 are complete and accepted. EPIC 3 is
+the next implementation boundary.
+
 ---
 
 # EPIC 0 — Establish the implementation baseline
@@ -354,6 +357,16 @@ Exact filenames should follow nearby conventions after inspection. Do not reorga
 ---
 
 # EPIC 2 — Deterministic runtime, input, and player movement
+
+**Status:** Complete and accepted on 2026-08-26.
+
+All eleven EPIC 2 work items are implemented. Desktop and smartphone review
+approved deterministic keyboard and touch movement, arena bounds, interruption
+reset, and the initial control feel for enemy testing. The current tuning
+baseline is `120` logical units per second for player speed, with a `52` CSS-pixel
+joystick base radius, `22` CSS-pixel knob radius, `20` CSS-pixel safe inset, and
+`12%` dead zone. These remain balance values that later pursuit playtesting may
+adjust without changing the runtime or input architecture.
 
 ## Goal
 

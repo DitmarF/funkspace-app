@@ -11,7 +11,7 @@
 - **Target platform:** Modern web browsers
 - **Primary form factor:** Mobile, portrait orientation
 - **Secondary form factors:** Tablet and desktop
-- **Last updated:** 2026-08-21
+- **Last updated:** 2026-08-26
 - **Game package:** `games/wave-survivor/`
 - **Related decisions:**
   - [`ADR-002: Design tokens as the source of truth`](../decisions/ADR-002-design-token-source-of-truth.md)
@@ -752,9 +752,9 @@ These decisions are intentionally deferred and do not block Gate 1:
 
 Each deferred decision should be resolved immediately before the first development gate that requires it, using the smallest option that supports the current game.
 
-## 22. Recommended first implementation slice
+## 22. Initial implementation slices
 
-The next development task should implement only the responsive arena foundation:
+The responsive arena foundation below was completed in EPIC 1:
 
 1. Replace the temporary landscape dimensions with a `360 × 640` logical world.
 2. Add responsive CSS sizing without changing simulation coordinates.
@@ -762,4 +762,8 @@ The next development task should implement only the responsive arena foundation:
 4. Draw the arena border and one stationary player marker.
 5. Verify resize, pause, restart, and destroy do not recreate or leak host resources.
 
-This creates the coordinate and rendering contract required by every later system while keeping the first change small, reversible, and independently testable.
+This established the coordinate and rendering contract required by every later
+system. EPIC 2 then added the accepted deterministic runtime, keyboard and fixed
+virtual-joystick input, bounded player movement, state-driven rendering, and
+interruption cleanup. EPIC 3 is the next implementation slice and must remain
+limited to fair offscreen enemy entry and direct pursuit.
