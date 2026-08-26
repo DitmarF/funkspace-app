@@ -3,6 +3,7 @@ import type { GameMountOptions } from "./GameMountOptions.js";
 import { GameControllerImpl } from "./application/GameControllerImpl.js";
 import { GameRuntimeSession } from "./application/GameRuntimeSession.js";
 import { createInitialRuntimeState } from "./domain/state/RuntimeState.js";
+import { BrowserKeyboardInput } from "./infrastructure/input/BrowserKeyboardInput.js";
 import { ZeroMovementInput } from "./infrastructure/input/ZeroMovementInput.js";
 import {
   BrowserFrameScheduler,
@@ -20,7 +21,9 @@ import { CanvasGameRenderer } from "./renderer/CanvasGameRenderer.js";
  */
 export function createGame(options?: GameMountOptions): GameController {
   const presentation = options ? new CanvasGameRenderer(options) : null;
-  const input = new ZeroMovementInput();
+  const input = options
+    ? new BrowserKeyboardInput(options.canvas)
+    : new ZeroMovementInput();
   const session = new GameRuntimeSession(
     createInitialRuntimeState(),
     input,
