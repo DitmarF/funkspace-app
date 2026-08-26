@@ -1,7 +1,11 @@
 /**
  * Deterministic game state, rules, actions, and port contracts belong here.
  */
-export type { GamePresentationPort } from "./GamePresentationPort.js";
+export type {
+  GamePresentationPort,
+  GameRenderSnapshot,
+} from "./GamePresentationPort.js";
+export type { MovementInputPort } from "./MovementInputPort.js";
 export type { FrameScheduler, MonotonicClock } from "./RuntimeTimingPort.js";
 export { ARENA, createBounds, VISIBLE_ARENA_BOUNDS } from "./arena/index.js";
 export type { ArenaRegions, Bounds } from "./arena/index.js";
@@ -19,5 +23,6 @@ export {
 export type {
   LogicalPosition,
   PlayerMovementState,
+  RuntimePhase,
   RuntimeState,
 } from "./state/index.js";

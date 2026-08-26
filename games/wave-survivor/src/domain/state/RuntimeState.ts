@@ -9,6 +9,9 @@ export const PLAYER_COLLISION_RADIUS = 12;
 /** Initial movement tuning value; subject to playtesting and balance changes. */
 export const PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND = 120;
 
+/** Session lifecycle phases that affect deterministic runtime updates. */
+export type RuntimePhase = "idle" | "playing" | "paused";
+
 /** Logical arena coordinates, independent from display and Canvas dimensions. */
 export interface LogicalPosition {
   x: number;
@@ -24,12 +27,8 @@ export interface PlayerMovementState {
 
 /** Minimal deterministic state owned by one Wave Survivor game session. */
 export interface RuntimeState {
-  /**
-   * Domain run progression, currently represented by its initial phase only.
-   * GameControllerImpl remains the lifecycle authority until WS-2.4 owns and
-   * coordinates this session data.
-   */
-  phase: "idle";
+  /** Single lifecycle authority for the current game session. */
+  phase: RuntimePhase;
   simulationTimeSeconds: number;
   movementIntent: MovementIntent;
   player: PlayerMovementState;

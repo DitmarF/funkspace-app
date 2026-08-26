@@ -1,59 +1,66 @@
 import type { GameController } from "../GameController.js";
 import type { GameTheme } from "../GameTheme.js";
-import type { GamePresentationPort } from "../domain/GamePresentationPort.js";
+import { GameRuntimeSession } from "./GameRuntimeSession.js";
 
 export type GameLifecycleState = "idle" | "running" | "paused" | "destroyed";
 
-/**
- * Application-level lifecycle state machine.
- *
- * It deliberately owns no gameplay or rendering behavior yet. Methods are
- * idempotent, and destroy is terminal so repeated host cleanup is safe.
- */
-export class GameControllerImpl implements GameController {
-  private state: GameLifecycleState = "idle";
+/** Scheduling controls needed by the public lifecycle coordinator. */
+export interface RuntimeLoopControl {
+  start(): void;
+  stop(): void;
+  destroy(): void;
+}
 
-  constructor(private presentation: GamePresentationPort | null = null) {}
+/** Public lifecycle adapter over the current session and its single loop. */
+export class GameControllerImpl implements GameController {
+  constructor(
+    private session: GameRuntimeSession | null,
+    private loop: RuntimeLoopControl | null = null,
+  ) {}
 
   get lifecycleState(): GameLifecycleState {
-    return this.state;
+    if (!this.session) return "destroyed";
+
+    return this.session.phase === "playing" ? "running" : this.session.phase;
   }
 
   start(): void {
-    if (this.state === "idle") {
-      this.state = "running";
+    if (this.session?.start()) {
+      this.loop?.start();
     }
   }
 
   pause(): void {
-    if (this.state === "running") {
-      this.state = "paused";
-    }
+    if (!this.session || this.session.phase !== "playing") return;
+
+    this.loop?.stop();
+    this.session.pause();
   }
 
   resume(): void {
-    if (this.state === "paused") {
-      this.state = "running";
+    if (this.session?.resume()) {
+      this.loop?.start();
     }
   }
 
   restart(): void {
-    if (this.state !== "destroyed") {
-      this.state = "running";
-    }
+    if (!this.session) return;
+
+    this.loop?.stop();
+    this.session.restart();
+    this.loop?.start();
   }
 
   setTheme(theme: GameTheme): void {
-    if (this.state !== "destroyed") {
-      this.presentation?.setTheme(theme);
-    }
+    this.session?.setTheme(theme);
   }
 
   destroy(): void {
-    if (this.state === "destroyed") return;
+    if (!this.session) return;
 
-    this.state = "destroyed";
-    this.presentation?.destroy();
-    this.presentation = null;
+    this.loop?.destroy();
+    this.loop = null;
+    this.session.destroy();
+    this.session = null;
   }
 }

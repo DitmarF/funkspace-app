@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameTheme } from "../GameTheme.js";
 import { GameControllerImpl } from "../application/GameControllerImpl.js";
+import { GameRuntimeSession } from "../application/GameRuntimeSession.js";
+import { createInitialRuntimeState } from "../domain/state/RuntimeState.js";
+import { ZeroMovementInput } from "../infrastructure/input/ZeroMovementInput.js";
 import { CanvasGameRenderer } from "./CanvasGameRenderer.js";
 
 const initialTheme: GameTheme = {
@@ -218,7 +221,13 @@ describe("CanvasGameRenderer", () => {
       viewport: container,
       theme: initialTheme,
     });
-    const controller = new GameControllerImpl(renderer);
+    const controller = new GameControllerImpl(
+      new GameRuntimeSession(
+        createInitialRuntimeState(),
+        new ZeroMovementInput(),
+        renderer,
+      ),
+    );
     const observer = resizeObservers[0];
     if (!observer) throw new Error("Resize observer was not created.");
     controller.start();

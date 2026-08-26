@@ -44,6 +44,12 @@ export class CanvasGameRenderer implements GamePresentationPort {
     return this.theme;
   }
 
+  render(): void {
+    if (!this.destroyed) {
+      this.drawArena();
+    }
+  }
+
   setTheme(theme: GameTheme): void {
     if (!this.destroyed && this.canvas) {
       this.theme = theme;

@@ -1,6 +1,14 @@
 import type { GameController } from "./GameController.js";
 import type { GameMountOptions } from "./GameMountOptions.js";
 import { GameControllerImpl } from "./application/GameControllerImpl.js";
+import { GameRuntimeSession } from "./application/GameRuntimeSession.js";
+import { createInitialRuntimeState } from "./domain/state/RuntimeState.js";
+import { ZeroMovementInput } from "./infrastructure/input/ZeroMovementInput.js";
+import {
+  BrowserFrameScheduler,
+  BrowserMonotonicClock,
+} from "./infrastructure/loop/BrowserRuntimeTiming.js";
+import { FixedStepLoop } from "./infrastructure/loop/FixedStepLoop.js";
 import { CanvasGameRenderer } from "./renderer/CanvasGameRenderer.js";
 
 /**
@@ -11,6 +19,23 @@ import { CanvasGameRenderer } from "./renderer/CanvasGameRenderer.js";
  * use, but portfolio hosts provide them when embedding the game.
  */
 export function createGame(options?: GameMountOptions): GameController {
-  const renderer = options ? new CanvasGameRenderer(options) : null;
-  return new GameControllerImpl(renderer);
+  const presentation = options ? new CanvasGameRenderer(options) : null;
+  const input = new ZeroMovementInput();
+  const session = new GameRuntimeSession(
+    createInitialRuntimeState(),
+    input,
+    presentation,
+  );
+  const loop = options
+    ? new FixedStepLoop(
+        new BrowserMonotonicClock(),
+        new BrowserFrameScheduler(),
+        {
+          fixedUpdate: (deltaSeconds) => session.fixedUpdate(deltaSeconds),
+          render: () => session.render(),
+        },
+      )
+    : null;
+
+  return new GameControllerImpl(session, loop);
 }

@@ -6,5 +6,6 @@ export {
 export type {
   LogicalPosition,
   PlayerMovementState,
+  RuntimePhase,
   RuntimeState,
 } from "./RuntimeState.js";
