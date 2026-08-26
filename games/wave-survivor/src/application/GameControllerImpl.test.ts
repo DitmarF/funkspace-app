@@ -4,6 +4,7 @@ import type { GameTheme } from "../GameTheme.js";
 import type {
   GamePresentationPort,
   GameRenderSnapshot,
+  JoystickRenderSnapshot,
 } from "../domain/GamePresentationPort.js";
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
 import type {
@@ -80,7 +81,9 @@ class FakeFrameScheduler implements FrameScheduler {
   }
 }
 
-function createHarness() {
+function createHarness(
+  readJoystickSnapshot: (() => JoystickRenderSnapshot | null) | null = null,
+) {
   const clock = new FakeMonotonicClock();
   const frameScheduler = new FakeFrameScheduler();
   const snapshots: GameRenderSnapshot[] = [];
@@ -99,6 +102,7 @@ function createHarness() {
     createInitialRuntimeState(),
     input,
     presentation,
+    readJoystickSnapshot,
   );
   const loop = new FixedStepLoop(clock, frameScheduler, {
     fixedUpdate: (deltaSeconds) => session.fixedUpdate(deltaSeconds),
@@ -113,6 +117,7 @@ function createHarness() {
     input,
     presentation,
     readMovementIntent,
+    session,
     snapshots,
   };
 }
@@ -206,6 +211,7 @@ describe("GameController runtime lifecycle", () => {
         playerX: 180,
         playerY: 320,
         playerCollisionRadius: 12,
+        joystick: null,
       });
     },
   );
@@ -244,6 +250,25 @@ describe("GameController runtime lifecycle", () => {
       playerY: 320,
       simulationTimeSeconds: FIXED_SIMULATION_STEP_SECONDS,
     });
+  });
+
+  it("includes the current joystick presentation in each render snapshot", () => {
+    const joystick: JoystickRenderSnapshot = {
+      active: true,
+      centerX: 72,
+      centerY: 568,
+      baseRadius: 52,
+      knobX: 97,
+      knobY: 544,
+      knobRadius: 22,
+    };
+    const readJoystickSnapshot = vi.fn(() => joystick);
+    const { session, snapshots } = createHarness(readJoystickSnapshot);
+
+    session.render();
+
+    expect(readJoystickSnapshot).toHaveBeenCalledOnce();
+    expect(snapshots.at(-1)?.joystick).toEqual(joystick);
   });
 
   it("forwards themes only before terminal destruction", () => {

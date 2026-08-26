@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { ZERO_MOVEMENT_INTENT } from "../../domain/movement/MovementIntent.js";
 import { BrowserVirtualJoystickInput } from "./BrowserVirtualJoystickInput.js";
 import { VIRTUAL_JOYSTICK_GEOMETRY } from "./VirtualJoystickConfig.js";
@@ -12,11 +12,32 @@ interface ClientRectValues {
   readonly height: number;
 }
 
+const resizeObservers: ResizeObserverMock[] = [];
+
+class ResizeObserverMock {
+  readonly disconnect = vi.fn();
+  readonly observe = vi.fn();
+
+  constructor(private readonly callback: ResizeObserverCallback) {
+    resizeObservers.push(this);
+  }
+
+  emit(): void {
+    this.callback([], this as unknown as ResizeObserver);
+  }
+}
+
+afterEach(() => {
+  resizeObservers.length = 0;
+  vi.unstubAllGlobals();
+});
+
 class FakePointerSurface {
   readonly capturedPointerIds = new Set<number>();
   readonly releasePointerCaptureCalls: number[] = [];
   readonly setPointerCaptureCalls: number[] = [];
   readonly style = { touchAction: "" };
+  getBoundingClientRectCalls = 0;
   private readonly listeners = new Map<string, Set<FakeListener>>();
 
   constructor(private clientRect: ClientRectValues = createClientRect()) {}
@@ -38,6 +59,7 @@ class FakePointerSurface {
   }
 
   getBoundingClientRect(): DOMRect {
+    this.getBoundingClientRectCalls += 1;
     return this.clientRect as DOMRect;
   }
 
@@ -287,6 +309,37 @@ describe("BrowserVirtualJoystickInput analog movement", () => {
 });
 
 describe("BrowserVirtualJoystickInput coordinate mapping", () => {
+  it("returns cached presentation data without per-frame DOM reads", () => {
+    const { input, surface } = createHarness();
+    const readsAfterConstruction = surface.getBoundingClientRectCalls;
+
+    input.readPresentationSnapshot();
+    input.readPresentationSnapshot();
+
+    expect(surface.getBoundingClientRectCalls).toBe(readsAfterConstruction);
+  });
+
+  it("refreshes cached logical geometry when the Canvas resizes", () => {
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { input, surface } = createHarness();
+    const observer = resizeObservers[0];
+    if (!observer) throw new Error("Resize observer was not created.");
+    surface.setClientRect(
+      createClientRect({ width: 720, height: 1280, left: 120, top: 80 }),
+    );
+
+    observer.emit();
+
+    expect(input.readPresentationSnapshot()).toMatchObject({
+      centerX: 36,
+      centerY: 604,
+      baseRadius: 26,
+      knobRadius: 11,
+    });
+    input.destroy();
+    expect(observer.disconnect).toHaveBeenCalledOnce();
+  });
+
   it("accounts for a translated Canvas rectangle", () => {
     const clientRect = createClientRect({ left: 120, top: 80 });
     const { emitPointer, input } = createHarness(clientRect);

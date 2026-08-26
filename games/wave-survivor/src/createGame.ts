@@ -23,16 +23,21 @@ import { CanvasGameRenderer } from "./renderer/CanvasGameRenderer.js";
  */
 export function createGame(options?: GameMountOptions): GameController {
   const presentation = options ? new CanvasGameRenderer(options) : null;
-  const input = options
-    ? new CompositeMovementInput(
-        new BrowserKeyboardInput(options.canvas),
-        new BrowserVirtualJoystickInput(options.canvas),
-      )
-    : new ZeroMovementInput();
+  const joystickInput = options
+    ? new BrowserVirtualJoystickInput(options.canvas)
+    : null;
+  const input =
+    options && joystickInput
+      ? new CompositeMovementInput(
+          new BrowserKeyboardInput(options.canvas),
+          joystickInput,
+        )
+      : new ZeroMovementInput();
   const session = new GameRuntimeSession(
     createInitialRuntimeState(),
     input,
     presentation,
+    joystickInput ? () => joystickInput.readPresentationSnapshot() : null,
   );
   const loop = options
     ? new FixedStepLoop(

@@ -4,6 +4,7 @@
 export type {
   GamePresentationPort,
   GameRenderSnapshot,
+  JoystickRenderSnapshot,
 } from "./GamePresentationPort.js";
 export type { MovementInputPort } from "./MovementInputPort.js";
 export type { FrameScheduler, MonotonicClock } from "./RuntimeTimingPort.js";

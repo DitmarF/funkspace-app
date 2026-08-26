@@ -2,6 +2,7 @@ import type { GameTheme } from "../GameTheme.js";
 import type {
   GamePresentationPort,
   GameRenderSnapshot,
+  JoystickRenderSnapshot,
 } from "../domain/GamePresentationPort.js";
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
 import { calculateNextPlayerPosition } from "../domain/movement/PlayerMovement.js";
@@ -17,6 +18,9 @@ export class GameRuntimeSession {
     private state: RuntimeState,
     private input: MovementInputPort | null,
     private presentation: GamePresentationPort | null,
+    private readJoystickSnapshot:
+      | (() => JoystickRenderSnapshot | null)
+      | null = null,
   ) {}
 
   get phase(): RuntimePhase {
@@ -73,6 +77,7 @@ export class GameRuntimeSession {
       playerX: this.state.player.position.x,
       playerY: this.state.player.position.y,
       playerCollisionRadius: this.state.player.collisionRadius,
+      joystick: this.readJoystickSnapshot?.() ?? null,
     };
     this.presentation.render(snapshot);
   }
@@ -85,6 +90,7 @@ export class GameRuntimeSession {
     this.input?.reset();
     this.input?.destroy();
     this.input = null;
+    this.readJoystickSnapshot = null;
 
     this.presentation?.destroy();
     this.presentation = null;

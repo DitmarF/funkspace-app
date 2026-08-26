@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { GameTheme } from "../GameTheme.js";
 import { GameControllerImpl } from "../application/GameControllerImpl.js";
 import { GameRuntimeSession } from "../application/GameRuntimeSession.js";
+import type { GameRenderSnapshot } from "../domain/GamePresentationPort.js";
 import { createInitialRuntimeState } from "../domain/state/RuntimeState.js";
 import { ZeroMovementInput } from "../infrastructure/input/ZeroMovementInput.js";
 import { CanvasGameRenderer } from "./CanvasGameRenderer.js";
@@ -15,6 +16,28 @@ const initialTheme: GameTheme = {
     effect: "effect",
   },
 };
+
+function createRenderSnapshot(
+  overrides: Partial<GameRenderSnapshot> = {},
+): GameRenderSnapshot {
+  return {
+    phase: "playing",
+    simulationTimeSeconds: 0,
+    playerX: 180,
+    playerY: 320,
+    playerCollisionRadius: 12,
+    joystick: {
+      active: false,
+      centerX: 72,
+      centerY: 568,
+      baseRadius: 52,
+      knobX: 72,
+      knobY: 568,
+      knobRadius: 22,
+    },
+    ...overrides,
+  };
+}
 
 const resizeObservers: ResizeObserverMock[] = [];
 
@@ -50,7 +73,9 @@ afterEach(() => {
 
 function createCanvas(displayWidth: number, displayHeight: number) {
   const fillStyles: string[] = [];
+  const globalAlphas: number[] = [];
   let fillStyle = "";
+  let globalAlpha = 1;
   const context = {
     arc: vi.fn(),
     beginPath: vi.fn(),
@@ -62,6 +87,13 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     set fillStyle(value: string) {
       fillStyle = value;
       fillStyles.push(value);
+    },
+    get globalAlpha() {
+      return globalAlpha;
+    },
+    set globalAlpha(value: number) {
+      globalAlpha = value;
+      globalAlphas.push(value);
     },
     lineWidth: 0,
     setTransform: vi.fn(),
@@ -91,7 +123,7 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     width: displayWidth,
   } as unknown as HTMLCanvasElement;
 
-  return { canvas, container, context, fillStyles };
+  return { canvas, container, context, fillStyles, globalAlphas };
 }
 
 describe("CanvasGameRenderer", () => {
@@ -105,6 +137,7 @@ describe("CanvasGameRenderer", () => {
       { canvas, viewport: container, theme: initialTheme },
       2,
     );
+    renderer.render(createRenderSnapshot());
 
     expect(renderer.mountedCanvas).toBe(canvas);
     expect(renderer.currentTheme).toBe(initialTheme);
@@ -133,16 +166,98 @@ describe("CanvasGameRenderer", () => {
     );
     expect(fillStyles).toEqual([
       initialTheme.colors.background,
+      initialTheme.colors.background,
       initialTheme.colors.player,
+      initialTheme.colors.effect,
     ]);
     expect(context.fillRect).toHaveBeenCalledWith(0, 0, 360, 640);
     expect(context.strokeStyle).toBe(initialTheme.colors.effect);
     expect(context.lineWidth).toBe(1);
     expect(context.strokeRect).toHaveBeenCalledWith(0.5, 0.5, 359, 639);
-    expect(context.beginPath).toHaveBeenCalledOnce();
-    expect(context.arc).toHaveBeenCalledWith(180, 320, 12, 0, Math.PI * 2);
-    expect(context.fill).toHaveBeenCalledOnce();
+    expect(context.beginPath).toHaveBeenCalledTimes(3);
+    expect(context.arc).toHaveBeenNthCalledWith(
+      1,
+      180,
+      320,
+      12,
+      0,
+      Math.PI * 2,
+    );
+    expect(context.arc).toHaveBeenNthCalledWith(2, 72, 568, 52, 0, Math.PI * 2);
+    expect(context.arc).toHaveBeenNthCalledWith(3, 72, 568, 22, 0, Math.PI * 2);
+    expect(context.fill).toHaveBeenCalledTimes(3);
   });
+
+  it("draws the player at its runtime position and configured radius", () => {
+    const { canvas, container, context } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+
+    renderer.render(
+      createRenderSnapshot({
+        playerX: 247,
+        playerY: 193,
+        playerCollisionRadius: 9,
+        joystick: null,
+      }),
+    );
+
+    expect(context.arc).toHaveBeenLastCalledWith(247, 193, 9, 0, Math.PI * 2);
+  });
+
+  it.each([
+    [false, 72, 568, [0.18, 0.35, 1]],
+    [true, 105, 544, [0.3, 0.7, 1]],
+  ] as const)(
+    "draws the joystick base and knob for active=%s",
+    (active, knobX, knobY, expectedAlphas) => {
+      const { canvas, container, context, globalAlphas } = createCanvas(
+        360,
+        640,
+      );
+      const renderer = new CanvasGameRenderer({
+        canvas,
+        viewport: container,
+        theme: initialTheme,
+      });
+
+      renderer.render(
+        createRenderSnapshot({
+          joystick: {
+            active,
+            centerX: 72,
+            centerY: 568,
+            baseRadius: 52,
+            knobX,
+            knobY,
+            knobRadius: 22,
+          },
+        }),
+      );
+
+      expect(context.arc).toHaveBeenNthCalledWith(
+        2,
+        72,
+        568,
+        52,
+        0,
+        Math.PI * 2,
+      );
+      expect(context.arc).toHaveBeenNthCalledWith(
+        3,
+        knobX,
+        knobY,
+        22,
+        0,
+        Math.PI * 2,
+      );
+      expect(globalAlphas).toEqual(expectedAlphas);
+      expect(context.globalAlpha).toBe(1);
+    },
+  );
 
   it("applies the desktop cap without stretching", () => {
     const { canvas, container, context } = createCanvas(1920, 1080);
@@ -169,6 +284,13 @@ describe("CanvasGameRenderer", () => {
       viewport: container,
       theme: initialTheme,
     });
+    renderer.render(
+      createRenderSnapshot({
+        playerX: 244,
+        playerY: 171,
+        joystick: null,
+      }),
+    );
     const replacementTheme: GameTheme = {
       colors: {
         ...initialTheme.colors,
@@ -186,10 +308,7 @@ describe("CanvasGameRenderer", () => {
       "replacement-player",
     ]);
     expect(context.strokeStyle).toBe("replacement-effect");
-    expect(context.fillRect).toHaveBeenCalledTimes(2);
-    expect(context.strokeRect).toHaveBeenCalledTimes(2);
-    expect(context.arc).toHaveBeenCalledTimes(2);
-    expect(context.fill).toHaveBeenCalledTimes(2);
+    expect(context.arc).toHaveBeenLastCalledWith(244, 171, 12, 0, Math.PI * 2);
   });
 
   it("can recalculate the transform without changing logical coordinates", () => {
@@ -199,6 +318,13 @@ describe("CanvasGameRenderer", () => {
       viewport: container,
       theme: initialTheme,
     });
+    renderer.render(
+      createRenderSnapshot({
+        playerX: 91,
+        playerY: 447,
+        joystick: null,
+      }),
+    );
 
     renderer.resize(1920, 1080, 2);
 
@@ -210,6 +336,7 @@ describe("CanvasGameRenderer", () => {
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);
     expect(context.fillRect).toHaveBeenLastCalledWith(0, 0, 360, 640);
+    expect(context.arc).toHaveBeenLastCalledWith(91, 447, 12, 0, Math.PI * 2);
   });
 
   it("observes repeated container resizes without replacing game state", () => {
@@ -221,16 +348,18 @@ describe("CanvasGameRenderer", () => {
       viewport: container,
       theme: initialTheme,
     });
-    const controller = new GameControllerImpl(
-      new GameRuntimeSession(
-        createInitialRuntimeState(),
-        new ZeroMovementInput(),
-        renderer,
-      ),
+    const state = createInitialRuntimeState();
+    state.player.position = { x: 129, y: 411 };
+    const session = new GameRuntimeSession(
+      state,
+      new ZeroMovementInput(),
+      renderer,
     );
+    const controller = new GameControllerImpl(session);
     const observer = resizeObservers[0];
     if (!observer) throw new Error("Resize observer was not created.");
     controller.start();
+    session.render();
 
     expect(observer.observe).toHaveBeenCalledWith(container);
 
@@ -254,7 +383,7 @@ describe("CanvasGameRenderer", () => {
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);
     expect(context.fillRect).toHaveBeenLastCalledWith(0, 0, 360, 640);
-    expect(context.arc).toHaveBeenLastCalledWith(180, 320, 12, 0, Math.PI * 2);
+    expect(context.arc).toHaveBeenLastCalledWith(129, 411, 12, 0, Math.PI * 2);
     expect(renderer.mountedCanvas).toBe(canvas);
     expect(renderer.currentTheme).toBe(initialTheme);
     expect(controller.lifecycleState).toBe("running");

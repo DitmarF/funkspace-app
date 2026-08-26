@@ -1,4 +1,5 @@
 import type { MovementInputPort } from "../../domain/MovementInputPort.js";
+import type { JoystickRenderSnapshot } from "../../domain/GamePresentationPort.js";
 import { ARENA } from "../../domain/arena/Arena.js";
 import {
   createMovementIntent,
@@ -16,16 +17,7 @@ interface ClientJoystickGeometry {
   readonly rectTop: number;
 }
 
-/** Renderer-facing fixed-joystick geometry expressed only in logical units. */
-export interface VirtualJoystickPresentationSnapshot {
-  readonly active: boolean;
-  readonly centerX: number;
-  readonly centerY: number;
-  readonly baseRadius: number;
-  readonly knobX: number;
-  readonly knobY: number;
-  readonly knobRadius: number;
-}
+export type VirtualJoystickPresentationSnapshot = JoystickRenderSnapshot;
 
 /** Canvas-owned Pointer Events adapter for one fixed virtual joystick. */
 export class BrowserVirtualJoystickInput implements MovementInputPort {
@@ -35,7 +27,9 @@ export class BrowserVirtualJoystickInput implements MovementInputPort {
   private movementIntent: MovementIntent = ZERO_MOVEMENT_INTENT;
   private knobOffsetLogicalX = 0;
   private knobOffsetLogicalY = 0;
+  private presentationSnapshot: JoystickRenderSnapshot | null = null;
   private readonly previousTouchAction: string;
+  private resizeObserver: ResizeObserver | null = null;
   private surface: HTMLCanvasElement | null;
 
   constructor(surface: HTMLCanvasElement) {
@@ -55,6 +49,8 @@ export class BrowserVirtualJoystickInput implements MovementInputPort {
       "lostpointercapture",
       this.handleLostPointerCapture,
     );
+    this.refreshPresentationSnapshot();
+    this.observeResize(surface);
   }
 
   readMovementIntent(): MovementIntent {
@@ -62,33 +58,7 @@ export class BrowserVirtualJoystickInput implements MovementInputPort {
   }
 
   readPresentationSnapshot(): VirtualJoystickPresentationSnapshot | null {
-    if (this.destroyed) return null;
-
-    const geometry = this.readClientGeometry();
-    if (!geometry) return null;
-
-    const logicalRadiusScale = Math.min(
-      geometry.logicalUnitsPerCssPixelX,
-      geometry.logicalUnitsPerCssPixelY,
-    );
-    const centerX =
-      (geometry.centerClientX - geometry.rectLeft) *
-      geometry.logicalUnitsPerCssPixelX;
-    const centerY =
-      (geometry.centerClientY - geometry.rectTop) *
-      geometry.logicalUnitsPerCssPixelY;
-
-    return {
-      active: this.activePointerId !== null,
-      centerX,
-      centerY,
-      baseRadius:
-        VIRTUAL_JOYSTICK_GEOMETRY.baseRadiusCssPixels * logicalRadiusScale,
-      knobX: centerX + this.knobOffsetLogicalX,
-      knobY: centerY + this.knobOffsetLogicalY,
-      knobRadius:
-        VIRTUAL_JOYSTICK_GEOMETRY.knobRadiusCssPixels * logicalRadiusScale,
-    };
+    return this.destroyed ? null : this.presentationSnapshot;
   }
 
   reset(): void {
@@ -111,11 +81,14 @@ export class BrowserVirtualJoystickInput implements MovementInputPort {
       "lostpointercapture",
       this.handleLostPointerCapture,
     );
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
 
     if (this.surface && this.didModifyTouchAction) {
       this.surface.style.touchAction = this.previousTouchAction;
     }
 
+    this.presentationSnapshot = null;
     this.surface = null;
   }
 
@@ -189,6 +162,7 @@ export class BrowserVirtualJoystickInput implements MovementInputPort {
   ): void {
     if (!geometry || !Number.isFinite(clientX) || !Number.isFinite(clientY)) {
       this.setNeutralGesture();
+      this.presentationSnapshot = null;
       return;
     }
 
@@ -199,6 +173,7 @@ export class BrowserVirtualJoystickInput implements MovementInputPort {
     const distance = Math.hypot(displacementX, displacementY);
     if (!Number.isFinite(distance) || distance === 0) {
       this.setNeutralGesture();
+      this.updatePresentationSnapshot(geometry);
       return;
     }
 
@@ -217,6 +192,7 @@ export class BrowserVirtualJoystickInput implements MovementInputPort {
     const deadZoneRadius = baseRadius * VIRTUAL_JOYSTICK_GEOMETRY.deadZoneRatio;
     if (distance <= deadZoneRadius) {
       this.movementIntent = ZERO_MOVEMENT_INTENT;
+      this.updatePresentationSnapshot(geometry);
       return;
     }
 
@@ -228,12 +204,14 @@ export class BrowserVirtualJoystickInput implements MovementInputPort {
       directionX * analogMagnitude,
       directionY * analogMagnitude,
     );
+    this.updatePresentationSnapshot(geometry);
   }
 
   private endGesture(releaseCapture: boolean): void {
     const pointerId = this.activePointerId;
     this.activePointerId = null;
     this.setNeutralGesture();
+    this.refreshPresentationSnapshot();
 
     if (
       releaseCapture &&
@@ -252,6 +230,51 @@ export class BrowserVirtualJoystickInput implements MovementInputPort {
     this.movementIntent = ZERO_MOVEMENT_INTENT;
     this.knobOffsetLogicalX = 0;
     this.knobOffsetLogicalY = 0;
+  }
+
+  private updatePresentationSnapshot(geometry: ClientJoystickGeometry): void {
+    const logicalRadiusScale = Math.min(
+      geometry.logicalUnitsPerCssPixelX,
+      geometry.logicalUnitsPerCssPixelY,
+    );
+    const centerX =
+      (geometry.centerClientX - geometry.rectLeft) *
+      geometry.logicalUnitsPerCssPixelX;
+    const centerY =
+      (geometry.centerClientY - geometry.rectTop) *
+      geometry.logicalUnitsPerCssPixelY;
+
+    this.presentationSnapshot = {
+      active: this.activePointerId !== null,
+      centerX,
+      centerY,
+      baseRadius:
+        VIRTUAL_JOYSTICK_GEOMETRY.baseRadiusCssPixels * logicalRadiusScale,
+      knobX: centerX + this.knobOffsetLogicalX,
+      knobY: centerY + this.knobOffsetLogicalY,
+      knobRadius:
+        VIRTUAL_JOYSTICK_GEOMETRY.knobRadiusCssPixels * logicalRadiusScale,
+    };
+  }
+
+  private refreshPresentationSnapshot(): void {
+    if (this.destroyed) return;
+
+    const geometry = this.readClientGeometry();
+    if (geometry) {
+      this.updatePresentationSnapshot(geometry);
+    } else {
+      this.presentationSnapshot = null;
+    }
+  }
+
+  private observeResize(surface: HTMLCanvasElement): void {
+    if (typeof ResizeObserver === "undefined") return;
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.refreshPresentationSnapshot();
+    });
+    this.resizeObserver.observe(surface);
   }
 
   private readClientGeometry(): ClientJoystickGeometry | null {

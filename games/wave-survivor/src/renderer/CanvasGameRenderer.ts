@@ -1,10 +1,18 @@
 import type { GameMountOptions } from "../GameMountOptions.js";
 import type { GameTheme } from "../GameTheme.js";
-import type { GamePresentationPort } from "../domain/GamePresentationPort.js";
+import type {
+  GamePresentationPort,
+  GameRenderSnapshot,
+  JoystickRenderSnapshot,
+} from "../domain/GamePresentationPort.js";
 import { ARENA } from "../domain/arena/index.js";
-import { PLAYER_COLLISION_RADIUS } from "../domain/state/index.js";
 import { calculateAspectFit } from "./AspectFit.js";
 import { calculateBackingResolution } from "./BackingResolution.js";
+
+const INACTIVE_JOYSTICK_BASE_ALPHA = 0.18;
+const ACTIVE_JOYSTICK_BASE_ALPHA = 0.3;
+const INACTIVE_JOYSTICK_KNOB_ALPHA = 0.35;
+const ACTIVE_JOYSTICK_KNOB_ALPHA = 0.7;
 
 function getBrowserDevicePixelRatio(): number {
   return typeof window === "undefined" ? 1 : window.devicePixelRatio;
@@ -13,14 +21,15 @@ function getBrowserDevicePixelRatio(): number {
 /**
  * Canvas ownership boundary for Wave Survivor.
  *
- * It owns responsive Canvas sizing and the static arena shell. Gameplay and
- * per-frame drawing remain absent, and browser rendering concerns stay out of
- * the application controller.
+ * It owns responsive Canvas sizing and draws immutable logical snapshots.
+ * Gameplay rules and browser rendering concerns remain on opposite sides of
+ * the presentation boundary.
  */
 export class CanvasGameRenderer implements GamePresentationPort {
   private canvas: HTMLCanvasElement | null;
   private context: CanvasRenderingContext2D | null;
   private destroyed = false;
+  private latestSnapshot: GameRenderSnapshot | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private theme: GameTheme | null;
 
@@ -44,16 +53,17 @@ export class CanvasGameRenderer implements GamePresentationPort {
     return this.theme;
   }
 
-  render(): void {
-    if (!this.destroyed) {
-      this.drawArena();
-    }
+  render(snapshot: GameRenderSnapshot): void {
+    if (this.destroyed) return;
+
+    this.latestSnapshot = snapshot;
+    this.drawFrame();
   }
 
   setTheme(theme: GameTheme): void {
     if (!this.destroyed && this.canvas) {
       this.theme = theme;
-      this.drawArena();
+      this.drawFrame();
     }
   }
 
@@ -88,10 +98,10 @@ export class CanvasGameRenderer implements GamePresentationPort {
 
     const renderScale = fit.scale * resolution.effectiveDpr;
     this.context.setTransform(renderScale, 0, 0, renderScale, 0, 0);
-    this.drawArena();
+    this.drawFrame();
   }
 
-  private drawArena(): void {
+  private drawFrame(): void {
     if (!this.context || !this.theme) return;
 
     this.context.fillStyle = this.theme.colors.background;
@@ -101,16 +111,59 @@ export class CanvasGameRenderer implements GamePresentationPort {
     this.context.lineWidth = 1;
     this.context.strokeRect(0.5, 0.5, ARENA.width - 1, ARENA.height - 1);
 
+    if (!this.latestSnapshot) return;
+
     this.context.fillStyle = this.theme.colors.player;
     this.context.beginPath();
     this.context.arc(
-      ARENA.width / 2,
-      ARENA.height / 2,
-      PLAYER_COLLISION_RADIUS,
+      this.latestSnapshot.playerX,
+      this.latestSnapshot.playerY,
+      this.latestSnapshot.playerCollisionRadius,
       0,
       Math.PI * 2,
     );
     this.context.fill();
+
+    if (this.latestSnapshot.joystick) {
+      this.drawJoystick(this.latestSnapshot.joystick);
+    }
+  }
+
+  private drawJoystick(snapshot: JoystickRenderSnapshot): void {
+    if (!this.context || !this.theme) return;
+
+    const previousGlobalAlpha = this.context.globalAlpha;
+    this.context.fillStyle = this.theme.colors.effect;
+
+    try {
+      this.context.globalAlpha = snapshot.active
+        ? ACTIVE_JOYSTICK_BASE_ALPHA
+        : INACTIVE_JOYSTICK_BASE_ALPHA;
+      this.context.beginPath();
+      this.context.arc(
+        snapshot.centerX,
+        snapshot.centerY,
+        snapshot.baseRadius,
+        0,
+        Math.PI * 2,
+      );
+      this.context.fill();
+
+      this.context.globalAlpha = snapshot.active
+        ? ACTIVE_JOYSTICK_KNOB_ALPHA
+        : INACTIVE_JOYSTICK_KNOB_ALPHA;
+      this.context.beginPath();
+      this.context.arc(
+        snapshot.knobX,
+        snapshot.knobY,
+        snapshot.knobRadius,
+        0,
+        Math.PI * 2,
+      );
+      this.context.fill();
+    } finally {
+      this.context.globalAlpha = previousGlobalAlpha;
+    }
   }
 
   private resizeToViewport(
@@ -137,6 +190,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
     this.resizeObserver = null;
     this.context = null;
     this.canvas = null;
+    this.latestSnapshot = null;
     this.theme = null;
   }
 }
