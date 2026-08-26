@@ -1,0 +1,61 @@
+import { describe, expect, it } from "vitest";
+import { ARENA } from "../arena/index.js";
+import { ZERO_MOVEMENT_INTENT } from "../movement/index.js";
+import {
+  createInitialRuntimeState,
+  PLAYER_COLLISION_RADIUS,
+  PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
+} from "./RuntimeState.js";
+
+describe("createInitialRuntimeState", () => {
+  it("centers the player in the logical arena", () => {
+    expect(createInitialRuntimeState().player.position).toEqual({
+      x: ARENA.width / 2,
+      y: ARENA.height / 2,
+    });
+  });
+
+  it("starts in the idle phase", () => {
+    expect(createInitialRuntimeState().phase).toBe("idle");
+  });
+
+  it("starts at zero simulation seconds", () => {
+    expect(createInitialRuntimeState().simulationTimeSeconds).toBe(0);
+  });
+
+  it("starts with zero movement intention", () => {
+    expect(createInitialRuntimeState().movementIntent).toBe(
+      ZERO_MOVEMENT_INTENT,
+    );
+  });
+
+  it("uses the marker radius and provisional movement speed", () => {
+    const state = createInitialRuntimeState();
+
+    expect(PLAYER_COLLISION_RADIUS).toBe(12);
+    expect(PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND).toBe(120);
+    expect(state.player.collisionRadius).toBe(PLAYER_COLLISION_RADIUS);
+    expect(state.player.movementSpeedUnitsPerSecond).toBe(
+      PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
+    );
+  });
+
+  it("creates independent state and player instances", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first).not.toBe(second);
+    expect(first.player).not.toBe(second.player);
+  });
+
+  it("does not share player positions between sessions", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first.player.position).not.toBe(second.player.position);
+
+    first.player.position.x = 0;
+
+    expect(second.player.position.x).toBe(ARENA.width / 2);
+  });
+});

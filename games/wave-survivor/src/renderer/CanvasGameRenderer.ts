@@ -2,10 +2,9 @@ import type { GameMountOptions } from "../GameMountOptions.js";
 import type { GameTheme } from "../GameTheme.js";
 import type { GamePresentationPort } from "../domain/GamePresentationPort.js";
 import { ARENA } from "../domain/arena/index.js";
+import { PLAYER_COLLISION_RADIUS } from "../domain/state/index.js";
 import { calculateAspectFit } from "./AspectFit.js";
 import { calculateBackingResolution } from "./BackingResolution.js";
-
-const PLAYER_MARKER_RADIUS = 12;
 
 function getBrowserDevicePixelRatio(): number {
   return typeof window === "undefined" ? 1 : window.devicePixelRatio;
@@ -101,7 +100,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
     this.context.arc(
       ARENA.width / 2,
       ARENA.height / 2,
-      PLAYER_MARKER_RADIUS,
+      PLAYER_COLLISION_RADIUS,
       0,
       Math.PI * 2,
     );

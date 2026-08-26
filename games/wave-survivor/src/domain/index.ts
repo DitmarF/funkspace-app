@@ -9,3 +9,13 @@ export {
   ZERO_MOVEMENT_INTENT,
 } from "./movement/index.js";
 export type { MovementIntent } from "./movement/index.js";
+export {
+  createInitialRuntimeState,
+  PLAYER_COLLISION_RADIUS,
+  PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
+} from "./state/index.js";
+export type {
+  LogicalPosition,
+  PlayerMovementState,
+  RuntimeState,
+} from "./state/index.js";
