@@ -2,7 +2,8 @@
 
 Wave Survivor is the first standalone FunkSpace game package. It exposes a
 minimal lifecycle API for portfolio integration and currently renders a
-responsive grey-box arena without gameplay.
+responsive grey-box arena with deterministic player movement, keyboard input,
+and a fixed virtual joystick.
 
 ## Public API
 
@@ -21,10 +22,16 @@ game.destroy();
 `createGame()` returns a fresh `GameController`. Lifecycle calls are
 idempotent. `restart()` starts a new session from any non-destroyed state, and
 `destroy()` is terminal and safe to repeat. When mount options are supplied,
-the factory composes the current responsive Canvas renderer; gameplay remains
-absent. A host supplies a canvas, an independently sized viewport boundary, and
-resolved `GameTheme` values through `GameMountOptions`; theme changes are
-forwarded with `setTheme()`.
+the factory composes the deterministic runtime, movement input, and responsive
+Canvas renderer. A host supplies a canvas, an independently sized viewport
+boundary, and resolved `GameTheme` values through `GameMountOptions`; theme
+changes are forwarded with `setTheme()`.
+
+The game clears all movement input on pause, restart, window blur, document
+visibility loss, pointer interruption, and destruction. Hosts pause and resume
+the controller when their page visibility changes so hidden time is never
+simulated on return; both the portfolio `GameHost` and standalone demo follow
+that lifecycle contract.
 
 ## Package boundaries
 

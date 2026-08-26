@@ -1,3 +1,4 @@
+export { BrowserInputInterruptionGuard } from "./BrowserInputInterruptionGuard.js";
 export { BrowserKeyboardInput } from "./BrowserKeyboardInput.js";
 export { BrowserVirtualJoystickInput } from "./BrowserVirtualJoystickInput.js";
 export type { VirtualJoystickPresentationSnapshot } from "./BrowserVirtualJoystickInput.js";

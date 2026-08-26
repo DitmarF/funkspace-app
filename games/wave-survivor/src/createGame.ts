@@ -3,6 +3,7 @@ import type { GameMountOptions } from "./GameMountOptions.js";
 import { GameControllerImpl } from "./application/GameControllerImpl.js";
 import { GameRuntimeSession } from "./application/GameRuntimeSession.js";
 import { createInitialRuntimeState } from "./domain/state/RuntimeState.js";
+import { BrowserInputInterruptionGuard } from "./infrastructure/input/BrowserInputInterruptionGuard.js";
 import { BrowserKeyboardInput } from "./infrastructure/input/BrowserKeyboardInput.js";
 import { BrowserVirtualJoystickInput } from "./infrastructure/input/BrowserVirtualJoystickInput.js";
 import { CompositeMovementInput } from "./infrastructure/input/CompositeMovementInput.js";
@@ -26,13 +27,17 @@ export function createGame(options?: GameMountOptions): GameController {
   const joystickInput = options
     ? new BrowserVirtualJoystickInput(options.canvas)
     : null;
-  const input =
+  const deviceInput =
     options && joystickInput
       ? new CompositeMovementInput(
-          new BrowserKeyboardInput(options.canvas),
+          // The interruption guard owns the production window-blur listener.
+          new BrowserKeyboardInput(options.canvas, null),
           joystickInput,
         )
       : new ZeroMovementInput();
+  const input = options
+    ? new BrowserInputInterruptionGuard(deviceInput)
+    : deviceInput;
   const session = new GameRuntimeSession(
     createInitialRuntimeState(),
     input,

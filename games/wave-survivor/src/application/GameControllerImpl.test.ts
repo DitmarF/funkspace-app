@@ -11,7 +11,11 @@ import type {
   FrameScheduler,
   MonotonicClock,
 } from "../domain/RuntimeTimingPort.js";
-import { createMovementIntent } from "../domain/movement/MovementIntent.js";
+import {
+  createMovementIntent,
+  ZERO_MOVEMENT_INTENT,
+  type MovementIntent,
+} from "../domain/movement/MovementIntent.js";
 import { createInitialRuntimeState } from "../domain/state/RuntimeState.js";
 import {
   FIXED_SIMULATION_STEP_SECONDS,
@@ -87,11 +91,16 @@ function createHarness(
   const clock = new FakeMonotonicClock();
   const frameScheduler = new FakeFrameScheduler();
   const snapshots: GameRenderSnapshot[] = [];
-  const readMovementIntent = vi.fn(() => createMovementIntent(1, 0));
+  let movementIntent: MovementIntent = createMovementIntent(1, 0);
+  const readMovementIntent = vi.fn(() => movementIntent);
   const input: MovementInputPort = {
     readMovementIntent,
-    reset: vi.fn(),
-    destroy: vi.fn(),
+    reset: vi.fn(() => {
+      movementIntent = ZERO_MOVEMENT_INTENT;
+    }),
+    destroy: vi.fn(() => {
+      movementIntent = ZERO_MOVEMENT_INTENT;
+    }),
   };
   const presentation: GamePresentationPort = {
     render: vi.fn((snapshot) => snapshots.push(snapshot)),
@@ -118,6 +127,9 @@ function createHarness(
     presentation,
     readMovementIntent,
     session,
+    setMovementIntent(nextIntent: MovementIntent) {
+      movementIntent = nextIntent;
+    },
     snapshots,
   };
 }
@@ -193,6 +205,29 @@ describe("GameController runtime lifecycle", () => {
     expect(readMovementIntent).toHaveBeenCalledOnce();
   });
 
+  it("requires new input after pause and resume", () => {
+    const { clock, controller, frameScheduler, setMovementIntent, snapshots } =
+      createHarness();
+    controller.start();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    frameScheduler.runNextFrame();
+    expect(snapshots.at(-1)?.playerX).toBeCloseTo(182);
+
+    controller.pause();
+    clock.advanceByMilliseconds(10_000);
+    controller.resume();
+    frameScheduler.runNextFrame();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    frameScheduler.runNextFrame();
+    expect(snapshots.at(-1)?.playerX).toBeCloseTo(182);
+
+    setMovementIntent(createMovementIntent(1, 0));
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    frameScheduler.runNextFrame();
+    expect(snapshots.at(-1)?.playerX).toBeCloseTo(184);
+    expect(frameScheduler.pendingFrameCount).toBe(1);
+  });
+
   it.each(["idle", "running", "paused"] as const)(
     "restarts from %s with one clean running session",
     (startingState) => {
@@ -233,6 +268,25 @@ describe("GameController runtime lifecycle", () => {
     frameScheduler.runNextFrame();
     expect(snapshots.at(-1)?.playerX).toBe(180);
     expect(snapshots.at(-1)?.simulationTimeSeconds).toBe(0);
+  });
+
+  it("requires new input after restarting an active session", () => {
+    const { clock, controller, frameScheduler, snapshots } = createHarness();
+    controller.start();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    frameScheduler.runNextFrame();
+    expect(snapshots.at(-1)?.playerX).toBeCloseTo(182);
+
+    controller.restart();
+    frameScheduler.runNextFrame();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    frameScheduler.runNextFrame();
+
+    expect(snapshots.at(-1)).toMatchObject({
+      playerX: 180,
+      simulationTimeSeconds: FIXED_SIMULATION_STEP_SECONDS,
+    });
+    expect(frameScheduler.pendingFrameCount).toBe(1);
   });
 
   it("samples input once per fixed update and moves the player", () => {
@@ -314,5 +368,21 @@ describe("GameController runtime lifecycle", () => {
     expect(presentation.destroy).toHaveBeenCalledOnce();
     expect(presentation.setTheme).not.toHaveBeenCalled();
     expect(readMovementIntent).not.toHaveBeenCalled();
+  });
+
+  it("destroys safely from a paused session without restoring scheduling", () => {
+    const { controller, frameScheduler, input, presentation } = createHarness();
+    controller.start();
+    controller.pause();
+
+    controller.destroy();
+    controller.destroy();
+    controller.resume();
+
+    expect(controller.lifecycleState).toBe("destroyed");
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+    expect(input.destroy).toHaveBeenCalledOnce();
+    expect(presentation.destroy).toHaveBeenCalledOnce();
   });
 });

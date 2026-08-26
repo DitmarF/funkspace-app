@@ -29,7 +29,25 @@ const game = createGame({
 });
 
 game.start();
+if (document.hidden) {
+  game.pause();
+}
 canvas.dataset.gameState = "started";
 status.textContent = "Arena ready.";
 
-window.addEventListener("pagehide", () => game.destroy(), { once: true });
+const handleVisibilityChange = () => {
+  if (document.hidden) {
+    game.pause();
+  } else {
+    game.resume();
+  }
+};
+
+const destroyGame = () => {
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+  window.removeEventListener("pagehide", destroyGame);
+  game.destroy();
+};
+
+document.addEventListener("visibilitychange", handleVisibilityChange);
+window.addEventListener("pagehide", destroyGame, { once: true });

@@ -128,6 +128,10 @@ describe("GameHost", () => {
     unmount();
     expect(theme.unsubscribe).toHaveBeenCalledOnce();
     expect(controller.destroy).toHaveBeenCalledOnce();
+
+    hidden.mockReturnValue(true);
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(controller.pause).toHaveBeenCalledOnce();
   });
 
   it("reports a lazy-load failure without creating a game", async () => {
