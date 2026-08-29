@@ -32,6 +32,11 @@ export {
 } from "./movement/index.js";
 export type { MovementIntent } from "./movement/index.js";
 export {
+  mapPerimeterDistance,
+  samplePerimeterPoint,
+} from "./spawning/index.js";
+export type { PerimeterEdge, PerimeterSample } from "./spawning/index.js";
+export {
   createInitialRuntimeState,
   PLAYER_COLLISION_RADIUS,
   PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
