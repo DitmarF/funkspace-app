@@ -17,6 +17,7 @@ export {
   canEnemyDealContactDamage,
   canEnemyPursue,
   createBasicEnemyState,
+  getEnemyPhaseAfterBoundsIntersection,
   isEnemyTargetable,
 } from "./enemies/index.js";
 export type {
@@ -25,6 +26,7 @@ export type {
   EnemyPhase,
   EnemyState,
 } from "./enemies/index.js";
+export { doesCircleIntersectBounds } from "./geometry/index.js";
 export type { LogicalPosition } from "./geometry/index.js";
 export {
   calculateNextPlayerPosition,

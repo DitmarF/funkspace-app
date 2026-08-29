@@ -11,6 +11,7 @@ import {
   BASIC_ENEMY_DEFINITION,
   calculateNextEnemyPosition,
   createBasicEnemyState,
+  getEnemyPhaseAfterBoundsIntersection,
 } from "../domain/enemies/index.js";
 import { calculateNextPlayerPosition } from "../domain/movement/PlayerMovement.js";
 import {
@@ -91,6 +92,7 @@ export class GameRuntimeSession {
     );
     this.spawnEnemyIfDue(nextSimulationTimeSeconds);
     this.moveEnemiesTowardPlayer(deltaSeconds);
+    this.activateEnemiesIntersectingVisibleArena();
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
   }
 
@@ -168,6 +170,15 @@ export class GameRuntimeSession {
         enemy,
         this.state.player.position,
         deltaSeconds,
+      );
+    }
+  }
+
+  private activateEnemiesIntersectingVisibleArena(): void {
+    for (const enemy of this.state.enemies) {
+      enemy.phase = getEnemyPhaseAfterBoundsIntersection(
+        enemy,
+        VISIBLE_ARENA_BOUNDS,
       );
     }
   }

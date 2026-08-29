@@ -1,9 +1,11 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
+import { VISIBLE_ARENA_BOUNDS } from "../arena/index.js";
 import { BASIC_ENEMY_DEFINITION } from "./EnemyDefinition.js";
 import {
   canEnemyDealContactDamage,
   canEnemyPursue,
   createBasicEnemyState,
+  getEnemyPhaseAfterBoundsIntersection,
   isEnemyTargetable,
   type EnemyPhase,
 } from "./EnemyState.js";
@@ -57,4 +59,66 @@ describe("enemy phase eligibility", () => {
       expect(canEnemyDealContactDamage(enemy)).toBe(canDealContactDamage);
     },
   );
+
+  it("keeps a fully invisible entering enemy entering", () => {
+    const enemy = createBasicEnemyState(1, { x: -13, y: 320 });
+
+    expect(
+      getEnemyPhaseAfterBoundsIntersection(enemy, VISIBLE_ARENA_BOUNDS),
+    ).toBe("entering");
+  });
+
+  it("activates an entering enemy on partial entry", () => {
+    const enemy = createBasicEnemyState(1, { x: -11, y: 320 });
+
+    expect(
+      getEnemyPhaseAfterBoundsIntersection(enemy, VISIBLE_ARENA_BOUNDS),
+    ).toBe("active");
+  });
+
+  it("activates an entering enemy at exact tangency", () => {
+    const enemy = createBasicEnemyState(1, { x: -12, y: 320 });
+
+    expect(
+      getEnemyPhaseAfterBoundsIntersection(enemy, VISIBLE_ARENA_BOUNDS),
+    ).toBe("active");
+  });
+
+  it("does not return an active enemy to entering when outside", () => {
+    const enemy = createBasicEnemyState(1, { x: -100, y: 320 });
+    enemy.phase = "active";
+
+    expect(
+      getEnemyPhaseAfterBoundsIntersection(enemy, VISIBLE_ARENA_BOUNDS),
+    ).toBe("active");
+  });
+
+  it("preserves a dying enemy phase", () => {
+    const enemy = createBasicEnemyState(1, { x: 180, y: 320 });
+    enemy.phase = "dying";
+
+    expect(
+      getEnemyPhaseAfterBoundsIntersection(enemy, VISIBLE_ARENA_BOUNDS),
+    ).toBe("dying");
+  });
+
+  it("becomes combat-eligible only after activation", () => {
+    const enemy = createBasicEnemyState(1, { x: -13, y: 320 });
+    enemy.phase = getEnemyPhaseAfterBoundsIntersection(
+      enemy,
+      VISIBLE_ARENA_BOUNDS,
+    );
+
+    expect(isEnemyTargetable(enemy)).toBe(false);
+    expect(canEnemyDealContactDamage(enemy)).toBe(false);
+
+    enemy.position = { x: -12, y: 320 };
+    enemy.phase = getEnemyPhaseAfterBoundsIntersection(
+      enemy,
+      VISIBLE_ARENA_BOUNDS,
+    );
+
+    expect(isEnemyTargetable(enemy)).toBe(true);
+    expect(canEnemyDealContactDamage(enemy)).toBe(true);
+  });
 });

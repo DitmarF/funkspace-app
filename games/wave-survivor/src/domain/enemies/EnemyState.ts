@@ -1,4 +1,8 @@
-import type { LogicalPosition } from "../geometry/index.js";
+import type { Bounds } from "../arena/index.js";
+import {
+  doesCircleIntersectBounds,
+  type LogicalPosition,
+} from "../geometry/index.js";
 import { BASIC_ENEMY_DEFINITION, type EnemyKind } from "./EnemyDefinition.js";
 
 /** Complete lifecycle phases for an enemy runtime instance. */
@@ -49,4 +53,20 @@ export function canEnemyDealContactDamage(
   enemy: Readonly<EnemyState>,
 ): boolean {
   return enemy.phase === "active";
+}
+
+/** Activate an entering enemy once its collision circle reaches the bounds. */
+export function getEnemyPhaseAfterBoundsIntersection(
+  enemy: Readonly<EnemyState>,
+  bounds: Bounds,
+): EnemyPhase {
+  if (enemy.phase !== "entering") return enemy.phase;
+
+  return doesCircleIntersectBounds(
+    enemy.position,
+    enemy.collisionRadius,
+    bounds,
+  )
+    ? "active"
+    : "entering";
 }

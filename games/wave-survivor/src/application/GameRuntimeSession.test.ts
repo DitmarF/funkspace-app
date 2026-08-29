@@ -178,6 +178,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
     expect(state.enemies).toHaveLength(1);
     expect(state.enemies[0]?.position).toEqual({ x: 180, y: 670 });
+    expect(state.enemies[0]?.phase).toBe("entering");
   });
 
   it("pursues the player's newly updated position", () => {
@@ -202,6 +203,21 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     );
   });
 
+  it("activates an entering enemy after pursuit reaches the visible arena", () => {
+    const state = createInitialRuntimeState();
+    state.player.position = { x: 100, y: 320 };
+    state.nextEnemySpawnAtSeconds = 100;
+    state.enemies.push(createBasicEnemyState(1, { x: -20, y: 320 }));
+    state.nextEnemyId = 2;
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const { session } = createSession(state, randomSource);
+
+    session.fixedUpdate(0.125);
+
+    expect(state.enemies[0]?.position).toEqual({ x: -11, y: 320 });
+    expect(state.enemies[0]?.phase).toBe("active");
+  });
+
   it("consumes neither simulation time nor random values while paused", () => {
     const state = createInitialRuntimeState();
     state.enemies.push(createBasicEnemyState(1, { x: 0, y: 0 }));
@@ -216,6 +232,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     expect(state.simulationTimeSeconds).toBe(0);
     expect(state.nextEnemySpawnAtSeconds).toBe(FIRST_SPAWN_DELAY_SECONDS);
     expect(state.enemies[0]?.position).toEqual(initialEnemyPosition);
+    expect(state.enemies[0]?.phase).toBe("entering");
     expect(randomSource.calls).toHaveLength(0);
   });
 
@@ -256,6 +273,9 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
     expect(firstState.enemies.map((enemy) => enemy.position)).toEqual(
       secondState.enemies.map((enemy) => enemy.position),
+    );
+    expect(firstState.enemies.map((enemy) => enemy.phase)).toEqual(
+      secondState.enemies.map((enemy) => enemy.phase),
     );
     expect(firstState.enemies.map((enemy) => enemy.id)).toEqual([1, 2, 3]);
     expect(secondState.enemies.map((enemy) => enemy.id)).toEqual([1, 2, 3]);
