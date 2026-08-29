@@ -32,12 +32,19 @@ export {
 } from "./movement/index.js";
 export type { MovementIntent } from "./movement/index.js";
 export {
+  calculateEnemyContactTimeSeconds,
   calculateEnemySpawnOffset,
   createEnemySpawnCandidate,
   ENTRY_LEAD_SECONDS,
   expandBoundsByOffset,
+  FIRST_SPAWN_DELAY_SECONDS,
   mapPerimeterDistance,
+  MAX_LIVE_ENEMIES,
+  MAX_SPAWN_ATTEMPTS,
+  MINIMUM_CONTACT_TIME_SECONDS,
   samplePerimeterPoint,
+  SPAWN_INTERVAL_SECONDS,
+  tryCreateFairEnemySpawnCandidate,
 } from "./spawning/index.js";
 export type { PerimeterEdge, PerimeterSample } from "./spawning/index.js";
 export {

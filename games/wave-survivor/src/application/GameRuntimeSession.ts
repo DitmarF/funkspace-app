@@ -5,12 +5,28 @@ import type {
   JoystickRenderSnapshot,
 } from "../domain/GamePresentationPort.js";
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
+import type { RandomSource } from "../domain/RandomSource.js";
+import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
+import {
+  BASIC_ENEMY_DEFINITION,
+  createBasicEnemyState,
+} from "../domain/enemies/index.js";
 import { calculateNextPlayerPosition } from "../domain/movement/PlayerMovement.js";
+import {
+  ENTRY_LEAD_SECONDS,
+  MAX_LIVE_ENEMIES,
+  MAX_SPAWN_ATTEMPTS,
+  MINIMUM_CONTACT_TIME_SECONDS,
+  SPAWN_INTERVAL_SECONDS,
+  tryCreateFairEnemySpawnCandidate,
+} from "../domain/spawning/index.js";
 import {
   createInitialRuntimeState,
   type RuntimePhase,
   type RuntimeState,
 } from "../domain/state/RuntimeState.js";
+
+const SPAWN_TIME_EPSILON_SECONDS = 1e-9;
 
 /** Owns the current deterministic session and coordinates one fixed update. */
 export class GameRuntimeSession {
@@ -18,6 +34,7 @@ export class GameRuntimeSession {
     private state: RuntimeState,
     private input: MovementInputPort | null,
     private presentation: GamePresentationPort | null,
+    private readonly randomSource: RandomSource,
     private readJoystickSnapshot:
       | (() => JoystickRenderSnapshot | null)
       | null = null,
@@ -51,12 +68,18 @@ export class GameRuntimeSession {
 
   restart(): void {
     this.input?.reset();
+    this.randomSource.reset();
     this.state = createInitialRuntimeState();
     this.state.phase = "playing";
   }
 
   fixedUpdate(deltaSeconds: number): void {
     if (this.state.phase !== "playing" || !this.input) return;
+    if (!Number.isFinite(deltaSeconds) || deltaSeconds <= 0) return;
+
+    const nextSimulationTimeSeconds =
+      this.state.simulationTimeSeconds + deltaSeconds;
+    if (!Number.isFinite(nextSimulationTimeSeconds)) return;
 
     const movementIntent = this.input.readMovementIntent();
     this.state.movementIntent = movementIntent;
@@ -65,7 +88,8 @@ export class GameRuntimeSession {
       movementIntent,
       deltaSeconds,
     );
-    this.state.simulationTimeSeconds += deltaSeconds;
+    this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
+    this.spawnEnemyIfDue();
   }
 
   render(): void {
@@ -94,5 +118,44 @@ export class GameRuntimeSession {
 
     this.presentation?.destroy();
     this.presentation = null;
+  }
+
+  private spawnEnemyIfDue(): void {
+    if (
+      this.state.simulationTimeSeconds + SPAWN_TIME_EPSILON_SECONDS <
+      this.state.nextEnemySpawnAtSeconds
+    ) {
+      return;
+    }
+
+    const nextEnemySpawnAtSeconds =
+      this.state.simulationTimeSeconds + SPAWN_INTERVAL_SECONDS;
+    if (!Number.isFinite(nextEnemySpawnAtSeconds)) return;
+
+    // A due opportunity is always consumed, preventing cap or failed-sampling
+    // conditions from accumulating a backlog across fixed updates.
+    this.state.nextEnemySpawnAtSeconds = nextEnemySpawnAtSeconds;
+
+    const liveEnemyCount = this.state.enemies.filter(
+      (enemy) => enemy.phase === "entering" || enemy.phase === "active",
+    ).length;
+    if (liveEnemyCount >= MAX_LIVE_ENEMIES) return;
+
+    const candidate = tryCreateFairEnemySpawnCandidate(
+      VISIBLE_ARENA_BOUNDS,
+      BASIC_ENEMY_DEFINITION,
+      ENTRY_LEAD_SECONDS,
+      this.state.player.position,
+      this.state.player.collisionRadius,
+      MINIMUM_CONTACT_TIME_SECONDS,
+      MAX_SPAWN_ATTEMPTS,
+      this.randomSource,
+    );
+    if (!candidate) return;
+
+    this.state.enemies.push(
+      createBasicEnemyState(this.state.nextEnemyId, candidate.position),
+    );
+    this.state.nextEnemyId += 1;
   }
 }

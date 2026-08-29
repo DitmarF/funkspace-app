@@ -13,7 +13,10 @@ import {
   BrowserMonotonicClock,
 } from "./infrastructure/loop/BrowserRuntimeTiming.js";
 import { FixedStepLoop } from "./infrastructure/loop/FixedStepLoop.js";
+import { SeededRandomSource } from "./infrastructure/random/SeededRandomSource.js";
 import { CanvasGameRenderer } from "./renderer/CanvasGameRenderer.js";
+
+const DEFAULT_GAMEPLAY_RANDOM_SEED = 0x5eed_c0de;
 
 /**
  * Create an isolated Wave Survivor game instance.
@@ -42,6 +45,7 @@ export function createGame(options?: GameMountOptions): GameController {
     createInitialRuntimeState(),
     input,
     presentation,
+    new SeededRandomSource(DEFAULT_GAMEPLAY_RANDOM_SEED),
     joystickInput ? () => joystickInput.readPresentationSnapshot() : null,
   );
   const loop = options

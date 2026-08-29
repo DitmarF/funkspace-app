@@ -5,6 +5,7 @@ import { GameRuntimeSession } from "../application/GameRuntimeSession.js";
 import type { GameRenderSnapshot } from "../domain/GamePresentationPort.js";
 import { createInitialRuntimeState } from "../domain/state/RuntimeState.js";
 import { ZeroMovementInput } from "../infrastructure/input/ZeroMovementInput.js";
+import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { CanvasGameRenderer } from "./CanvasGameRenderer.js";
 
 const initialTheme: GameTheme = {
@@ -354,6 +355,7 @@ describe("CanvasGameRenderer", () => {
       state,
       new ZeroMovementInput(),
       renderer,
+      new SeededRandomSource(1),
     );
     const controller = new GameControllerImpl(session);
     const observer = resizeObservers[0];

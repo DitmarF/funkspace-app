@@ -21,6 +21,7 @@ import {
   FIXED_SIMULATION_STEP_SECONDS,
   FixedStepLoop,
 } from "../infrastructure/loop/FixedStepLoop.js";
+import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameControllerImpl } from "./GameControllerImpl.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
 
@@ -111,6 +112,7 @@ function createHarness(
     createInitialRuntimeState(),
     input,
     presentation,
+    new SeededRandomSource(1),
     readJoystickSnapshot,
   );
   const loop = new FixedStepLoop(clock, frameScheduler, {

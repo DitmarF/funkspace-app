@@ -11,6 +11,7 @@ import { BrowserVirtualJoystickInput } from "../infrastructure/input/BrowserVirt
 import { CompositeMovementInput } from "../infrastructure/input/CompositeMovementInput.js";
 import { VIRTUAL_JOYSTICK_GEOMETRY } from "../infrastructure/input/VirtualJoystickConfig.js";
 import { FIXED_SIMULATION_STEP_SECONDS } from "../infrastructure/loop/FixedStepLoop.js";
+import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import {
   GameControllerImpl,
   type RuntimeLoopControl,
@@ -143,6 +144,7 @@ function createHarness() {
     createInitialRuntimeState(),
     input,
     presentation,
+    new SeededRandomSource(1),
     () => joystick.readPresentationSnapshot(),
   );
   const loop: RuntimeLoopControl = {

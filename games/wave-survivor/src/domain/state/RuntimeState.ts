@@ -5,6 +5,7 @@ import {
   ZERO_MOVEMENT_INTENT,
   type MovementIntent,
 } from "../movement/index.js";
+import { FIRST_SPAWN_DELAY_SECONDS } from "../spawning/index.js";
 
 export const PLAYER_COLLISION_RADIUS = 12;
 
@@ -30,6 +31,7 @@ export interface RuntimeState {
   player: PlayerMovementState;
   enemies: EnemyState[];
   nextEnemyId: number;
+  nextEnemySpawnAtSeconds: number;
 }
 
 /** Create a fresh session ready to be owned by the application controller. */
@@ -48,5 +50,6 @@ export function createInitialRuntimeState(): RuntimeState {
     },
     enemies: [],
     nextEnemyId: 1,
+    nextEnemySpawnAtSeconds: FIRST_SPAWN_DELAY_SECONDS,
   };
 }

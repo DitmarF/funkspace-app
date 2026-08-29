@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ARENA } from "../arena/index.js";
 import { createBasicEnemyState } from "../enemies/index.js";
 import { ZERO_MOVEMENT_INTENT } from "../movement/index.js";
+import { FIRST_SPAWN_DELAY_SECONDS } from "../spawning/index.js";
 import {
   createInitialRuntimeState,
   PLAYER_COLLISION_RADIUS,
@@ -35,6 +36,7 @@ describe("createInitialRuntimeState", () => {
 
     expect(state.enemies).toEqual([]);
     expect(state.nextEnemyId).toBe(1);
+    expect(state.nextEnemySpawnAtSeconds).toBe(FIRST_SPAWN_DELAY_SECONDS);
   });
 
   it("uses the marker radius and provisional movement speed", () => {
@@ -86,10 +88,14 @@ describe("createInitialRuntimeState", () => {
       createBasicEnemyState(progressedState.nextEnemyId, { x: -12, y: 320 }),
     );
     progressedState.nextEnemyId += 1;
+    progressedState.nextEnemySpawnAtSeconds = 99;
 
     const restartedState = createInitialRuntimeState();
 
     expect(restartedState.enemies).toEqual([]);
     expect(restartedState.nextEnemyId).toBe(1);
+    expect(restartedState.nextEnemySpawnAtSeconds).toBe(
+      FIRST_SPAWN_DELAY_SECONDS,
+    );
   });
 });
