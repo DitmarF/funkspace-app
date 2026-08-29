@@ -19,3 +19,4 @@ export {
   MAX_FRAME_GAP_MILLISECONDS,
 } from "./loop/index.js";
 export type { FixedStepLoopCallbacks } from "./loop/index.js";
+export { SeededRandomSource } from "./random/index.js";
