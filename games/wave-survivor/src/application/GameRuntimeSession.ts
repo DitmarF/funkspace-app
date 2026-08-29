@@ -9,6 +9,7 @@ import type { RandomSource } from "../domain/RandomSource.js";
 import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
 import {
   BASIC_ENEMY_DEFINITION,
+  calculateNextEnemyPosition,
   createBasicEnemyState,
 } from "../domain/enemies/index.js";
 import { calculateNextPlayerPosition } from "../domain/movement/PlayerMovement.js";
@@ -88,8 +89,9 @@ export class GameRuntimeSession {
       movementIntent,
       deltaSeconds,
     );
+    this.spawnEnemyIfDue(nextSimulationTimeSeconds);
+    this.moveEnemiesTowardPlayer(deltaSeconds);
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
-    this.spawnEnemyIfDue();
   }
 
   render(): void {
@@ -120,16 +122,16 @@ export class GameRuntimeSession {
     this.presentation = null;
   }
 
-  private spawnEnemyIfDue(): void {
+  private spawnEnemyIfDue(simulationTimeSeconds: number): void {
     if (
-      this.state.simulationTimeSeconds + SPAWN_TIME_EPSILON_SECONDS <
+      simulationTimeSeconds + SPAWN_TIME_EPSILON_SECONDS <
       this.state.nextEnemySpawnAtSeconds
     ) {
       return;
     }
 
     const nextEnemySpawnAtSeconds =
-      this.state.simulationTimeSeconds + SPAWN_INTERVAL_SECONDS;
+      simulationTimeSeconds + SPAWN_INTERVAL_SECONDS;
     if (!Number.isFinite(nextEnemySpawnAtSeconds)) return;
 
     // A due opportunity is always consumed, preventing cap or failed-sampling
@@ -157,5 +159,16 @@ export class GameRuntimeSession {
       createBasicEnemyState(this.state.nextEnemyId, candidate.position),
     );
     this.state.nextEnemyId += 1;
+  }
+
+  /** Newly spawned enemies participate in pursuit during their spawn update. */
+  private moveEnemiesTowardPlayer(deltaSeconds: number): void {
+    for (const enemy of this.state.enemies) {
+      enemy.position = calculateNextEnemyPosition(
+        enemy,
+        this.state.player.position,
+        deltaSeconds,
+      );
+    }
   }
 }

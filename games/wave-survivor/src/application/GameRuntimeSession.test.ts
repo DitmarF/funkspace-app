@@ -93,7 +93,7 @@ function createSession(
   return { input, session };
 }
 
-describe("GameRuntimeSession enemy spawning", () => {
+describe("GameRuntimeSession enemy spawning and pursuit", () => {
   it("moves the player before validating a due candidate", () => {
     const state = createInitialRuntimeState();
     state.player.position = { x: 180, y: 100 };
@@ -169,8 +169,44 @@ describe("GameRuntimeSession enemy spawning", () => {
     expect(state.nextEnemySpawnAtSeconds).toBe(10 + SPAWN_INTERVAL_SECONDS);
   });
 
+  it("moves a newly spawned enemy during the same fixed update", () => {
+    const state = createInitialRuntimeState();
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const { session } = createSession(state, randomSource);
+
+    session.fixedUpdate(FIRST_SPAWN_DELAY_SECONDS);
+
+    expect(state.enemies).toHaveLength(1);
+    expect(state.enemies[0]?.position).toEqual({ x: 180, y: 670 });
+  });
+
+  it("pursues the player's newly updated position", () => {
+    const state = createInitialRuntimeState();
+    state.player.position = { x: 100, y: 100 };
+    state.nextEnemySpawnAtSeconds = 100;
+    state.enemies.push(createBasicEnemyState(1, { x: 0, y: 0 }));
+    state.nextEnemyId = 2;
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const { input, session } = createSession(state, randomSource);
+    input.movementIntent = createMovementIntent(1, 0);
+
+    session.fixedUpdate(0.5);
+
+    const targetDistance = Math.hypot(160, 100);
+    expect(state.player.position).toEqual({ x: 160, y: 100 });
+    expect(state.enemies[0]?.position.x).toBeCloseTo(
+      (160 / targetDistance) * 36,
+    );
+    expect(state.enemies[0]?.position.y).toBeCloseTo(
+      (100 / targetDistance) * 36,
+    );
+  });
+
   it("consumes neither simulation time nor random values while paused", () => {
     const state = createInitialRuntimeState();
+    state.enemies.push(createBasicEnemyState(1, { x: 0, y: 0 }));
+    state.nextEnemyId = 2;
+    const initialEnemyPosition = { ...state.enemies[0]!.position };
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
 
@@ -179,7 +215,7 @@ describe("GameRuntimeSession enemy spawning", () => {
 
     expect(state.simulationTimeSeconds).toBe(0);
     expect(state.nextEnemySpawnAtSeconds).toBe(FIRST_SPAWN_DELAY_SECONDS);
-    expect(state.enemies).toEqual([]);
+    expect(state.enemies[0]?.position).toEqual(initialEnemyPosition);
     expect(randomSource.calls).toHaveLength(0);
   });
 
@@ -200,7 +236,7 @@ describe("GameRuntimeSession enemy spawning", () => {
     expect(randomSource.calls).toHaveLength(2);
   });
 
-  it("reproduces accepted spawn positions for the same seed and actions", () => {
+  it("reproduces enemy positions for the same seed and input sequence", () => {
     const firstState = createInitialRuntimeState();
     const secondState = createInitialRuntimeState();
     const first = createSession(firstState, new SeededRandomSource(42));

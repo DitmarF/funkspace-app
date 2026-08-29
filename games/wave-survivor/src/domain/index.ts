@@ -13,6 +13,7 @@ export { ARENA, createBounds, VISIBLE_ARENA_BOUNDS } from "./arena/index.js";
 export type { ArenaRegions, Bounds } from "./arena/index.js";
 export {
   BASIC_ENEMY_DEFINITION,
+  calculateNextEnemyPosition,
   canEnemyDealContactDamage,
   canEnemyPursue,
   createBasicEnemyState,
