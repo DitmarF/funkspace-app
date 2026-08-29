@@ -7,6 +7,7 @@ export type {
   JoystickRenderSnapshot,
 } from "./GamePresentationPort.js";
 export type { MovementInputPort } from "./MovementInputPort.js";
+export type { RandomSource } from "./RandomSource.js";
 export type { FrameScheduler, MonotonicClock } from "./RuntimeTimingPort.js";
 export { ARENA, createBounds, VISIBLE_ARENA_BOUNDS } from "./arena/index.js";
 export type { ArenaRegions, Bounds } from "./arena/index.js";
