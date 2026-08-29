@@ -1,4 +1,5 @@
 import { ARENA } from "../arena/index.js";
+import type { LogicalPosition } from "../geometry/index.js";
 import {
   ZERO_MOVEMENT_INTENT,
   type MovementIntent,
@@ -11,12 +12,6 @@ export const PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND = 120;
 
 /** Session lifecycle phases that affect deterministic runtime updates. */
 export type RuntimePhase = "idle" | "playing" | "paused";
-
-/** Logical arena coordinates, independent from display and Canvas dimensions. */
-export interface LogicalPosition {
-  x: number;
-  y: number;
-}
 
 /** Player data required by the EPIC 2 movement slice. */
 export interface PlayerMovementState {

@@ -1,8 +1,6 @@
 import { ARENA } from "../arena/index.js";
-import type {
-  LogicalPosition,
-  PlayerMovementState,
-} from "../state/RuntimeState.js";
+import type { LogicalPosition } from "../geometry/index.js";
+import type { PlayerMovementState } from "../state/RuntimeState.js";
 import { createMovementIntent, type MovementIntent } from "./MovementIntent.js";
 
 function clampPlayerPosition(

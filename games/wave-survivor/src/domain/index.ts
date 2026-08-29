@@ -11,6 +11,9 @@ export type { RandomSource } from "./RandomSource.js";
 export type { FrameScheduler, MonotonicClock } from "./RuntimeTimingPort.js";
 export { ARENA, createBounds, VISIBLE_ARENA_BOUNDS } from "./arena/index.js";
 export type { ArenaRegions, Bounds } from "./arena/index.js";
+export { BASIC_ENEMY_DEFINITION } from "./enemies/index.js";
+export type { EnemyDefinition, EnemyKind } from "./enemies/index.js";
+export type { LogicalPosition } from "./geometry/index.js";
 export {
   calculateNextPlayerPosition,
   createMovementIntent,
@@ -23,7 +26,6 @@ export {
   PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
 } from "./state/index.js";
 export type {
-  LogicalPosition,
   PlayerMovementState,
   RuntimePhase,
   RuntimeState,
