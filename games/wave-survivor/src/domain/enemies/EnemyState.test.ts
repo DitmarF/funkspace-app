@@ -1,12 +1,15 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
-import { VISIBLE_ARENA_BOUNDS } from "../arena/index.js";
+import { VISIBLE_ARENA_BOUNDS, createBounds } from "../arena/index.js";
 import { BASIC_ENEMY_DEFINITION } from "./EnemyDefinition.js";
 import {
   canEnemyDealContactDamage,
   canEnemyPursue,
   createBasicEnemyState,
   getEnemyPhaseAfterBoundsIntersection,
+  isEnemyStateValid,
   isEnemyTargetable,
+  shouldRetainEnemyWithinBounds,
+  type EnemyState,
   type EnemyPhase,
 } from "./EnemyState.js";
 
@@ -120,5 +123,78 @@ describe("enemy phase eligibility", () => {
 
     expect(isEnemyTargetable(enemy)).toBe(true);
     expect(canEnemyDealContactDamage(enemy)).toBe(true);
+  });
+});
+
+describe("enemy cleanup eligibility", () => {
+  const despawnBounds = createBounds(-100, -100, 560, 840);
+
+  it("retains a circle crossing the visible border", () => {
+    const enemy = createBasicEnemyState(1, { x: -5, y: 320 });
+    enemy.phase = "active";
+
+    expect(shouldRetainEnemyWithinBounds(enemy, VISIBLE_ARENA_BOUNDS)).toBe(
+      true,
+    );
+    expect(shouldRetainEnemyWithinBounds(enemy, despawnBounds)).toBe(true);
+  });
+
+  it("retains an active enemy fully outside visible bounds within safety bounds", () => {
+    const enemy = createBasicEnemyState(1, { x: -20, y: 320 });
+    enemy.phase = "active";
+
+    expect(shouldRetainEnemyWithinBounds(enemy, VISIBLE_ARENA_BOUNDS)).toBe(
+      false,
+    );
+    expect(shouldRetainEnemyWithinBounds(enemy, despawnBounds)).toBe(true);
+  });
+
+  it("retains exact despawn-boundary tangency", () => {
+    const enemy = createBasicEnemyState(1, { x: -112, y: 320 });
+
+    expect(shouldRetainEnemyWithinBounds(enemy, despawnBounds)).toBe(true);
+  });
+
+  it("removes a circle fully outside the despawn bounds", () => {
+    const enemy = createBasicEnemyState(1, { x: -112.01, y: 320 });
+
+    expect(shouldRetainEnemyWithinBounds(enemy, despawnBounds)).toBe(false);
+  });
+
+  it.each([
+    { ...createBasicEnemyState(0, { x: 0, y: 0 }) },
+    createBasicEnemyState(1, { x: Number.NaN, y: 0 }),
+    createBasicEnemyState(1, { x: 0, y: Number.POSITIVE_INFINITY }),
+    {
+      ...createBasicEnemyState(1, { x: 0, y: 0 }),
+      collisionRadius: -1,
+    },
+    {
+      ...createBasicEnemyState(1, { x: 0, y: 0 }),
+      movementSpeedUnitsPerSecond: Number.NaN,
+    },
+    {
+      ...createBasicEnemyState(1, { x: 0, y: 0 }),
+      currentHealth: Number.POSITIVE_INFINITY,
+    },
+    {
+      ...createBasicEnemyState(1, { x: 0, y: 0 }),
+      contactDamage: -1,
+    },
+  ] satisfies EnemyState[])(
+    "rejects invalid enemy numeric state %#",
+    (enemy) => {
+      expect(isEnemyStateValid(enemy)).toBe(false);
+      expect(shouldRetainEnemyWithinBounds(enemy, despawnBounds)).toBe(false);
+    },
+  );
+
+  it("does not treat a dying enemy or non-positive health as invalid", () => {
+    const enemy = createBasicEnemyState(1, { x: 180, y: 320 });
+    enemy.phase = "dying";
+    enemy.currentHealth = 0;
+
+    expect(isEnemyStateValid(enemy)).toBe(true);
+    expect(shouldRetainEnemyWithinBounds(enemy, despawnBounds)).toBe(true);
   });
 });

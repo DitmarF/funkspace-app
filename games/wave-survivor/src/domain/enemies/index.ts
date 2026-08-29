@@ -6,6 +6,8 @@ export {
   canEnemyPursue,
   createBasicEnemyState,
   getEnemyPhaseAfterBoundsIntersection,
+  isEnemyStateValid,
   isEnemyTargetable,
+  shouldRetainEnemyWithinBounds,
 } from "./EnemyState.js";
 export type { EnemyPhase, EnemyState } from "./EnemyState.js";

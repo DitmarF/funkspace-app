@@ -377,7 +377,11 @@ describe("GameController runtime lifecycle", () => {
       input,
       presentation,
       readMovementIntent,
+      session,
+      snapshots,
+      state,
     } = createHarness();
+    state.enemies.push(createBasicEnemyState(1, { x: -20, y: 320 }));
     controller.start();
     const pendingFrameId = frameScheduler.requestedFrameIds[0];
     if (pendingFrameId === undefined)
@@ -393,8 +397,12 @@ describe("GameController runtime lifecycle", () => {
     controller.resume();
     controller.restart();
     controller.setTheme(initialTheme);
+    session.fixedUpdate(10);
+    session.render();
 
     expect(controller.lifecycleState).toBe("destroyed");
+    expect(state.enemies).toEqual([]);
+    expect(snapshots).toEqual([]);
     expect(frameScheduler.pendingFrameCount).toBe(0);
     expect(frameScheduler.requestedFrameIds).toHaveLength(1);
     expect(input.reset).toHaveBeenCalledOnce();

@@ -11,8 +11,11 @@ import {
 } from "../enemies/index.js";
 import type { LogicalPosition } from "../geometry/index.js";
 import {
+  calculateEnemyDespawnOffset,
   calculateEnemySpawnOffset,
+  createEnemyDespawnBounds,
   createEnemySpawnCandidate,
+  DESPAWN_EXTRA_MARGIN,
   ENTRY_LEAD_SECONDS,
   expandBoundsByOffset,
 } from "./SpawnGeometry.js";
@@ -102,6 +105,70 @@ describe("calculateEnemySpawnOffset", () => {
       );
     },
   );
+});
+
+describe("enemy despawn geometry", () => {
+  it("derives the basic enemy offset from spawn distance plus safety margin", () => {
+    expect(DESPAWN_EXTRA_MARGIN).toBe(64);
+    expect(
+      calculateEnemyDespawnOffset(
+        BASIC_ENEMY_DEFINITION.collisionRadius,
+        BASIC_ENEMY_DEFINITION.movementSpeedUnitsPerSecond,
+        ENTRY_LEAD_SECONDS,
+        DESPAWN_EXTRA_MARGIN,
+      ),
+    ).toBe(130);
+  });
+
+  it("fully contains the expanded spawn perimeter on every side", () => {
+    const spawnOffset = calculateEnemySpawnOffset(
+      BASIC_ENEMY_DEFINITION.collisionRadius,
+      BASIC_ENEMY_DEFINITION.movementSpeedUnitsPerSecond,
+      ENTRY_LEAD_SECONDS,
+    );
+    const spawnBounds = expandBoundsByOffset(VISIBLE_ARENA_BOUNDS, spawnOffset);
+    const despawnBounds = createEnemyDespawnBounds(
+      VISIBLE_ARENA_BOUNDS,
+      BASIC_ENEMY_DEFINITION,
+      ENTRY_LEAD_SECONDS,
+      DESPAWN_EXTRA_MARGIN,
+    );
+
+    expect(despawnBounds).toEqual({
+      x: -130,
+      y: -130,
+      width: 620,
+      height: 900,
+    });
+    expect(despawnBounds.x).toBeLessThan(spawnBounds.x);
+    expect(despawnBounds.y).toBeLessThan(spawnBounds.y);
+    expect(despawnBounds.x + despawnBounds.width).toBeGreaterThan(
+      spawnBounds.x + spawnBounds.width,
+    );
+    expect(despawnBounds.y + despawnBounds.height).toBeGreaterThan(
+      spawnBounds.y + spawnBounds.height,
+    );
+  });
+
+  it.each([Number.NaN, Number.POSITIVE_INFINITY, -1])(
+    "rejects invalid despawn margin %s",
+    (despawnExtraMargin) => {
+      expect(() =>
+        calculateEnemyDespawnOffset(
+          12,
+          72,
+          ENTRY_LEAD_SECONDS,
+          despawnExtraMargin,
+        ),
+      ).toThrow(RangeError);
+    },
+  );
+
+  it("rejects a despawn offset that overflows", () => {
+    expect(() =>
+      calculateEnemyDespawnOffset(Number.MAX_VALUE, 0, 0, Number.MAX_VALUE),
+    ).toThrow(RangeError);
+  });
 });
 
 describe("expandBoundsByOffset", () => {

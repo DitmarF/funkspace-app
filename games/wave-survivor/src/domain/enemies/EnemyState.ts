@@ -55,6 +55,48 @@ export function canEnemyDealContactDamage(
   return enemy.phase === "active";
 }
 
+/**
+ * Check the numeric invariants required to simulate and render an enemy.
+ * Current health may be zero or negative so future dying-state behavior is not
+ * treated as invalid cleanup.
+ */
+export function isEnemyStateValid(enemy: Readonly<EnemyState>): boolean {
+  return (
+    Number.isSafeInteger(enemy.id) &&
+    enemy.id > 0 &&
+    Number.isFinite(enemy.position.x) &&
+    Number.isFinite(enemy.position.y) &&
+    Number.isFinite(
+      enemy.position.x * enemy.position.x + enemy.position.y * enemy.position.y,
+    ) &&
+    Number.isFinite(enemy.collisionRadius) &&
+    enemy.collisionRadius >= 0 &&
+    Number.isFinite(enemy.collisionRadius * enemy.collisionRadius) &&
+    Number.isFinite(enemy.movementSpeedUnitsPerSecond) &&
+    enemy.movementSpeedUnitsPerSecond >= 0 &&
+    Number.isFinite(enemy.currentHealth) &&
+    Number.isFinite(enemy.contactDamage) &&
+    enemy.contactDamage >= 0
+  );
+}
+
+/**
+ * Retain valid enemies while their collision circles touch or overlap the
+ * despawn bounds. Exact boundary tangency is retained.
+ */
+export function shouldRetainEnemyWithinBounds(
+  enemy: Readonly<EnemyState>,
+  despawnBounds: Bounds,
+): boolean {
+  if (!isEnemyStateValid(enemy)) return false;
+
+  return doesCircleIntersectBounds(
+    enemy.position,
+    enemy.collisionRadius,
+    despawnBounds,
+  );
+}
+
 /** Activate an entering enemy once its collision circle reaches the bounds. */
 export function getEnemyPhaseAfterBoundsIntersection(
   enemy: Readonly<EnemyState>,

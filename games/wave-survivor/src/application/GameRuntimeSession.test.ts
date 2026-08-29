@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
 import type { RandomSource } from "../domain/RandomSource.js";
+import type {
+  GamePresentationPort,
+  GameRenderSnapshot,
+} from "../domain/GamePresentationPort.js";
 import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
 import {
   BASIC_ENEMY_DEFINITION,
@@ -13,6 +17,8 @@ import {
 } from "../domain/movement/index.js";
 import {
   calculateEnemySpawnOffset,
+  createEnemyDespawnBounds,
+  DESPAWN_EXTRA_MARGIN,
   ENTRY_LEAD_SECONDS,
   expandBoundsByOffset,
   FIRST_SPAWN_DELAY_SECONDS,
@@ -38,6 +44,12 @@ const SPAWN_BOUNDS = expandBoundsByOffset(
 const TOP_CENTER_DISTANCE = SPAWN_BOUNDS.width / 2;
 const BOTTOM_CENTER_DISTANCE =
   SPAWN_BOUNDS.width + SPAWN_BOUNDS.height + SPAWN_BOUNDS.width / 2;
+const DESPAWN_BOUNDS = createEnemyDespawnBounds(
+  VISIBLE_ARENA_BOUNDS,
+  BASIC_ENEMY_DEFINITION,
+  ENTRY_LEAD_SECONDS,
+  DESPAWN_EXTRA_MARGIN,
+);
 
 class ControlledMovementInput implements MovementInputPort {
   movementIntent: MovementIntent = ZERO_MOVEMENT_INTENT;
@@ -218,10 +230,101 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     expect(state.enemies[0]?.phase).toBe("active");
   });
 
+  it("retains an active enemy while its circle remains outside the visible arena", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    const enemy = createBasicEnemyState(1, { x: -20, y: 320 });
+    enemy.phase = "active";
+    state.enemies.push(enemy);
+    state.nextEnemyId = 2;
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(1 / 120);
+
+    expect(state.enemies).toHaveLength(1);
+    expect(state.enemies[0]?.position.x).toBeLessThan(
+      -BASIC_ENEMY_DEFINITION.collisionRadius,
+    );
+    expect(state.enemies[0]?.phase).toBe("active");
+  });
+
+  it("retains exact despawn-boundary tangency", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    const enemy = createBasicEnemyState(1, {
+      x: DESPAWN_BOUNDS.x - BASIC_ENEMY_DEFINITION.collisionRadius,
+      y: 320,
+    });
+    enemy.phase = "dying";
+    state.enemies.push(enemy);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(1 / 60);
+
+    expect(state.enemies).toEqual([enemy]);
+  });
+
+  it("removes an enemy whose circle is fully outside the despawn bounds", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    const enemy = createBasicEnemyState(1, {
+      x: DESPAWN_BOUNDS.x - BASIC_ENEMY_DEFINITION.collisionRadius - 10,
+      y: 320,
+    });
+    enemy.phase = "active";
+    state.enemies.push(enemy);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(1 / 60);
+
+    expect(state.enemies).toEqual([]);
+  });
+
+  it("removes invalid enemy coordinates without simulating or rendering them", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.enemies.push(createBasicEnemyState(1, { x: Number.NaN, y: 320 }));
+    const snapshots: GameRenderSnapshot[] = [];
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const input = new ControlledMovementInput();
+    const session = new GameRuntimeSession(
+      state,
+      input,
+      presentation,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.start();
+
+    expect(() => session.fixedUpdate(1 / 60)).not.toThrow();
+    session.render();
+
+    expect(state.enemies).toEqual([]);
+    expect(snapshots.at(-1)?.enemies).toEqual([]);
+  });
+
   it("consumes neither simulation time nor random values while paused", () => {
     const state = createInitialRuntimeState();
     state.enemies.push(createBasicEnemyState(1, { x: 0, y: 0 }));
-    state.nextEnemyId = 2;
+    const escapedEnemy = createBasicEnemyState(2, {
+      x: DESPAWN_BOUNDS.x - BASIC_ENEMY_DEFINITION.collisionRadius - 1,
+      y: 320,
+    });
+    escapedEnemy.phase = "dying";
+    state.enemies.push(escapedEnemy);
+    state.nextEnemyId = 3;
     const initialEnemyPosition = { ...state.enemies[0]!.position };
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
@@ -233,7 +336,14 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     expect(state.nextEnemySpawnAtSeconds).toBe(FIRST_SPAWN_DELAY_SECONDS);
     expect(state.enemies[0]?.position).toEqual(initialEnemyPosition);
     expect(state.enemies[0]?.phase).toBe("entering");
+    expect(state.enemies).toContain(escapedEnemy);
     expect(randomSource.calls).toHaveLength(0);
+
+    session.resume();
+    session.fixedUpdate(1 / 60);
+
+    expect(state.enemies).not.toContain(escapedEnemy);
+    expect(state.simulationTimeSeconds).toBeCloseTo(1 / 60);
   });
 
   it("restart resets the random sequence and initial spawn timing", () => {
@@ -279,5 +389,49 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     );
     expect(firstState.enemies.map((enemy) => enemy.id)).toEqual([1, 2, 3]);
     expect(secondState.enemies.map((enemy) => enemy.id)).toEqual([1, 2, 3]);
+  });
+
+  it("replays the same spawn positions, IDs, and schedule after restart", () => {
+    const snapshots: GameRenderSnapshot[] = [];
+    const input = new ControlledMovementInput();
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const session = new GameRuntimeSession(
+      createInitialRuntimeState(),
+      input,
+      presentation,
+      new SeededRandomSource(42),
+    );
+    const steps = [
+      [createMovementIntent(-1, 0), FIRST_SPAWN_DELAY_SECONDS],
+      [createMovementIntent(0, 1), SPAWN_INTERVAL_SECONDS],
+      [createMovementIntent(1, 0), SPAWN_INTERVAL_SECONDS],
+    ] as const;
+    session.start();
+
+    for (const [intent, deltaSeconds] of steps) {
+      input.movementIntent = intent;
+      session.fixedUpdate(deltaSeconds);
+    }
+    session.render();
+    const firstRun = snapshots.at(-1);
+
+    session.restart();
+    for (const [intent, deltaSeconds] of steps) {
+      input.movementIntent = intent;
+      session.fixedUpdate(deltaSeconds);
+    }
+    session.render();
+    const restartedRun = snapshots.at(-1);
+
+    expect(restartedRun?.enemies).toEqual(firstRun?.enemies);
+    expect(restartedRun?.simulationTimeSeconds).toBe(
+      firstRun?.simulationTimeSeconds,
+    );
+    expect(restartedRun?.playerX).toBe(firstRun?.playerX);
+    expect(restartedRun?.playerY).toBe(firstRun?.playerY);
   });
 });

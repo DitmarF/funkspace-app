@@ -12,14 +12,18 @@ import {
   calculateNextEnemyPosition,
   createBasicEnemyState,
   getEnemyPhaseAfterBoundsIntersection,
+  isEnemyStateValid,
+  shouldRetainEnemyWithinBounds,
 } from "../domain/enemies/index.js";
 import { calculateNextPlayerPosition } from "../domain/movement/PlayerMovement.js";
 import {
   ENTRY_LEAD_SECONDS,
+  DESPAWN_EXTRA_MARGIN,
   MAX_LIVE_ENEMIES,
   MAX_SPAWN_ATTEMPTS,
   MINIMUM_CONTACT_TIME_SECONDS,
   SPAWN_INTERVAL_SECONDS,
+  createEnemyDespawnBounds,
   tryCreateFairEnemySpawnCandidate,
 } from "../domain/spawning/index.js";
 import {
@@ -29,6 +33,12 @@ import {
 } from "../domain/state/RuntimeState.js";
 
 const SPAWN_TIME_EPSILON_SECONDS = 1e-9;
+const ENEMY_DESPAWN_BOUNDS = createEnemyDespawnBounds(
+  VISIBLE_ARENA_BOUNDS,
+  BASIC_ENEMY_DEFINITION,
+  ENTRY_LEAD_SECONDS,
+  DESPAWN_EXTRA_MARGIN,
+);
 
 /** Owns the current deterministic session and coordinates one fixed update. */
 export class GameRuntimeSession {
@@ -93,6 +103,7 @@ export class GameRuntimeSession {
     this.spawnEnemyIfDue(nextSimulationTimeSeconds);
     this.moveEnemiesTowardPlayer(deltaSeconds);
     this.activateEnemiesIntersectingVisibleArena();
+    this.removeInvalidOrEscapedEnemies();
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
   }
 
@@ -100,7 +111,7 @@ export class GameRuntimeSession {
     if (!this.presentation) return;
 
     const enemies = Object.freeze(
-      this.state.enemies.map((enemy) =>
+      this.state.enemies.filter(isEnemyStateValid).map((enemy) =>
         Object.freeze({
           id: enemy.id,
           phase: enemy.phase,
@@ -127,6 +138,8 @@ export class GameRuntimeSession {
   }
 
   destroy(): void {
+    this.state.enemies = [];
+
     this.input?.reset();
     this.input?.destroy();
     this.input = null;
@@ -153,7 +166,9 @@ export class GameRuntimeSession {
     this.state.nextEnemySpawnAtSeconds = nextEnemySpawnAtSeconds;
 
     const liveEnemyCount = this.state.enemies.filter(
-      (enemy) => enemy.phase === "entering" || enemy.phase === "active",
+      (enemy) =>
+        isEnemyStateValid(enemy) &&
+        (enemy.phase === "entering" || enemy.phase === "active"),
     ).length;
     if (liveEnemyCount >= MAX_LIVE_ENEMIES) return;
 
@@ -178,6 +193,8 @@ export class GameRuntimeSession {
   /** Newly spawned enemies participate in pursuit during their spawn update. */
   private moveEnemiesTowardPlayer(deltaSeconds: number): void {
     for (const enemy of this.state.enemies) {
+      if (!isEnemyStateValid(enemy)) continue;
+
       enemy.position = calculateNextEnemyPosition(
         enemy,
         this.state.player.position,
@@ -188,10 +205,18 @@ export class GameRuntimeSession {
 
   private activateEnemiesIntersectingVisibleArena(): void {
     for (const enemy of this.state.enemies) {
+      if (!isEnemyStateValid(enemy)) continue;
+
       enemy.phase = getEnemyPhaseAfterBoundsIntersection(
         enemy,
         VISIBLE_ARENA_BOUNDS,
       );
     }
+  }
+
+  private removeInvalidOrEscapedEnemies(): void {
+    this.state.enemies = this.state.enemies.filter((enemy) =>
+      shouldRetainEnemyWithinBounds(enemy, ENEMY_DESPAWN_BOUNDS),
+    );
   }
 }

@@ -4,8 +4,11 @@ export {
 } from "./PerimeterSampling.js";
 export type { PerimeterEdge, PerimeterSample } from "./PerimeterSampling.js";
 export {
+  calculateEnemyDespawnOffset,
   calculateEnemySpawnOffset,
+  createEnemyDespawnBounds,
   createEnemySpawnCandidate,
+  DESPAWN_EXTRA_MARGIN,
   ENTRY_LEAD_SECONDS,
   expandBoundsByOffset,
 } from "./SpawnGeometry.js";

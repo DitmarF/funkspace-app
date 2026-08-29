@@ -19,7 +19,9 @@ export {
   canEnemyPursue,
   createBasicEnemyState,
   getEnemyPhaseAfterBoundsIntersection,
+  isEnemyStateValid,
   isEnemyTargetable,
+  shouldRetainEnemyWithinBounds,
 } from "./enemies/index.js";
 export type {
   EnemyDefinition,
@@ -37,8 +39,11 @@ export {
 export type { MovementIntent } from "./movement/index.js";
 export {
   calculateEnemyContactTimeSeconds,
+  calculateEnemyDespawnOffset,
   calculateEnemySpawnOffset,
+  createEnemyDespawnBounds,
   createEnemySpawnCandidate,
+  DESPAWN_EXTRA_MARGIN,
   ENTRY_LEAD_SECONDS,
   expandBoundsByOffset,
   FIRST_SPAWN_DELAY_SECONDS,
