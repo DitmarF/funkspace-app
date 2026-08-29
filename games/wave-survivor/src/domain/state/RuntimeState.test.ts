@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ARENA } from "../arena/index.js";
+import { createBasicEnemyState } from "../enemies/index.js";
 import { ZERO_MOVEMENT_INTENT } from "../movement/index.js";
 import {
   createInitialRuntimeState,
@@ -27,6 +28,13 @@ describe("createInitialRuntimeState", () => {
     expect(createInitialRuntimeState().movementIntent).toBe(
       ZERO_MOVEMENT_INTENT,
     );
+  });
+
+  it("starts with deterministic empty enemy state", () => {
+    const state = createInitialRuntimeState();
+
+    expect(state.enemies).toEqual([]);
+    expect(state.nextEnemyId).toBe(1);
   });
 
   it("uses the marker radius and provisional movement speed", () => {
@@ -57,5 +65,31 @@ describe("createInitialRuntimeState", () => {
     first.player.position.x = 0;
 
     expect(second.player.position.x).toBe(ARENA.width / 2);
+  });
+
+  it("does not share mutable enemy collections between sessions", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first.enemies).not.toBe(second.enemies);
+
+    first.enemies.push(
+      createBasicEnemyState(first.nextEnemyId, { x: 0, y: 0 }),
+    );
+
+    expect(second.enemies).toEqual([]);
+  });
+
+  it("creates clean enemy state for a restarted session", () => {
+    const progressedState = createInitialRuntimeState();
+    progressedState.enemies.push(
+      createBasicEnemyState(progressedState.nextEnemyId, { x: -12, y: 320 }),
+    );
+    progressedState.nextEnemyId += 1;
+
+    const restartedState = createInitialRuntimeState();
+
+    expect(restartedState.enemies).toEqual([]);
+    expect(restartedState.nextEnemyId).toBe(1);
   });
 });

@@ -1,4 +1,5 @@
 import { ARENA } from "../arena/index.js";
+import type { EnemyState } from "../enemies/index.js";
 import type { LogicalPosition } from "../geometry/index.js";
 import {
   ZERO_MOVEMENT_INTENT,
@@ -27,6 +28,8 @@ export interface RuntimeState {
   simulationTimeSeconds: number;
   movementIntent: MovementIntent;
   player: PlayerMovementState;
+  enemies: EnemyState[];
+  nextEnemyId: number;
 }
 
 /** Create a fresh session ready to be owned by the application controller. */
@@ -43,5 +46,7 @@ export function createInitialRuntimeState(): RuntimeState {
       collisionRadius: PLAYER_COLLISION_RADIUS,
       movementSpeedUnitsPerSecond: PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
     },
+    enemies: [],
+    nextEnemyId: 1,
   };
 }
