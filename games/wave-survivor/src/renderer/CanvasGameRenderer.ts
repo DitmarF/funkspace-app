@@ -1,18 +1,28 @@
 import type { GameMountOptions } from "../GameMountOptions.js";
 import type { GameTheme } from "../GameTheme.js";
 import type {
+  EnemyRenderSnapshot,
   GamePresentationPort,
   GameRenderSnapshot,
   JoystickRenderSnapshot,
 } from "../domain/GamePresentationPort.js";
-import { ARENA } from "../domain/arena/index.js";
+import { ARENA, VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
+import { doesCircleIntersectBounds } from "../domain/geometry/index.js";
 import { calculateAspectFit } from "./AspectFit.js";
 import { calculateBackingResolution } from "./BackingResolution.js";
+import {
+  calculateEntryWarningGeometry,
+  type EntryWarningGeometry,
+} from "./EntryWarningGeometry.js";
 
 const INACTIVE_JOYSTICK_BASE_ALPHA = 0.18;
 const ACTIVE_JOYSTICK_BASE_ALPHA = 0.3;
 const INACTIVE_JOYSTICK_KNOB_ALPHA = 0.35;
 const ACTIVE_JOYSTICK_KNOB_ALPHA = 0.7;
+const ENTRY_WARNING_BORDER_INSET = 2;
+const ENTRY_WARNING_DEPTH = 12;
+const ENTRY_WARNING_HALF_BASE = 6;
+const ENEMY_LINE_WIDTH = 2;
 
 function getBrowserDevicePixelRatio(): number {
   return typeof window === "undefined" ? 1 : window.devicePixelRatio;
@@ -113,6 +123,9 @@ export class CanvasGameRenderer implements GamePresentationPort {
 
     if (!this.latestSnapshot) return;
 
+    this.drawEntryWarnings(this.latestSnapshot);
+    this.drawEnemies(this.latestSnapshot.enemies);
+
     this.context.fillStyle = this.theme.colors.player;
     this.context.beginPath();
     this.context.arc(
@@ -126,6 +139,92 @@ export class CanvasGameRenderer implements GamePresentationPort {
 
     if (this.latestSnapshot.joystick) {
       this.drawJoystick(this.latestSnapshot.joystick);
+    }
+  }
+
+  private drawEntryWarnings(snapshot: GameRenderSnapshot): void {
+    if (!this.context || !this.theme) return;
+
+    for (const enemy of snapshot.enemies) {
+      if (
+        enemy.phase !== "entering" ||
+        doesCircleIntersectBounds(
+          { x: enemy.x, y: enemy.y },
+          enemy.collisionRadius,
+          VISIBLE_ARENA_BOUNDS,
+        )
+      ) {
+        continue;
+      }
+
+      const warning = calculateEntryWarningGeometry(
+        { x: enemy.x, y: enemy.y },
+        { x: snapshot.playerX, y: snapshot.playerY },
+        VISIBLE_ARENA_BOUNDS,
+      );
+      if (warning) {
+        this.context.fillStyle = this.theme.colors.effect;
+        this.drawEntryWarning(warning);
+      }
+    }
+  }
+
+  private drawEntryWarning(warning: EntryWarningGeometry): void {
+    if (!this.context) return;
+
+    const isHorizontalEdge =
+      warning.edge === "top" || warning.edge === "bottom";
+    const anchorX = isHorizontalEdge
+      ? Math.max(
+          ENTRY_WARNING_HALF_BASE,
+          Math.min(warning.x, ARENA.width - ENTRY_WARNING_HALF_BASE),
+        )
+      : warning.x;
+    const anchorY = isHorizontalEdge
+      ? warning.y
+      : Math.max(
+          ENTRY_WARNING_HALF_BASE,
+          Math.min(warning.y, ARENA.height - ENTRY_WARNING_HALF_BASE),
+        );
+    const tangentX = -warning.inwardDirectionY;
+    const tangentY = warning.inwardDirectionX;
+    const baseCenterX =
+      anchorX + warning.inwardDirectionX * ENTRY_WARNING_BORDER_INSET;
+    const baseCenterY =
+      anchorY + warning.inwardDirectionY * ENTRY_WARNING_BORDER_INSET;
+
+    this.context.beginPath();
+    this.context.moveTo(
+      baseCenterX + tangentX * ENTRY_WARNING_HALF_BASE,
+      baseCenterY + tangentY * ENTRY_WARNING_HALF_BASE,
+    );
+    this.context.lineTo(
+      baseCenterX - tangentX * ENTRY_WARNING_HALF_BASE,
+      baseCenterY - tangentY * ENTRY_WARNING_HALF_BASE,
+    );
+    this.context.lineTo(
+      anchorX + warning.inwardDirectionX * ENTRY_WARNING_DEPTH,
+      anchorY + warning.inwardDirectionY * ENTRY_WARNING_DEPTH,
+    );
+    this.context.closePath();
+    this.context.fill();
+  }
+
+  private drawEnemies(enemies: readonly EnemyRenderSnapshot[]): void {
+    if (!this.context || !this.theme) return;
+
+    for (const enemy of enemies) {
+      if (enemy.phase === "entering") continue;
+
+      this.context.strokeStyle = this.theme.colors.enemy;
+      this.context.lineWidth = ENEMY_LINE_WIDTH;
+      this.context.beginPath();
+      this.context.moveTo(enemy.x, enemy.y - enemy.collisionRadius);
+      this.context.lineTo(enemy.x + enemy.collisionRadius, enemy.y);
+      this.context.lineTo(enemy.x, enemy.y + enemy.collisionRadius);
+      this.context.lineTo(enemy.x - enemy.collisionRadius, enemy.y);
+      this.context.closePath();
+      this.context.stroke();
     }
   }
 

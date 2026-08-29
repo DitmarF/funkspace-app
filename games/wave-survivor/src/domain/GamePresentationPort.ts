@@ -1,5 +1,15 @@
 import type { GameTheme } from "../GameTheme.js";
+import type { EnemyPhase } from "./enemies/EnemyState.js";
 import type { RuntimePhase } from "./state/RuntimeState.js";
+
+/** Immutable enemy data required by the Canvas renderer. */
+export interface EnemyRenderSnapshot {
+  readonly id: number;
+  readonly phase: EnemyPhase;
+  readonly x: number;
+  readonly y: number;
+  readonly collisionRadius: number;
+}
 
 /** Fixed virtual-joystick geometry expressed in logical arena units. */
 export interface JoystickRenderSnapshot {
@@ -19,6 +29,7 @@ export interface GameRenderSnapshot {
   readonly playerX: number;
   readonly playerY: number;
   readonly playerCollisionRadius: number;
+  readonly enemies: readonly EnemyRenderSnapshot[];
   readonly joystick: JoystickRenderSnapshot | null;
 }
 

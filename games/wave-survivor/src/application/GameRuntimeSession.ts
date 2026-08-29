@@ -99,12 +99,24 @@ export class GameRuntimeSession {
   render(): void {
     if (!this.presentation) return;
 
+    const enemies = Object.freeze(
+      this.state.enemies.map((enemy) =>
+        Object.freeze({
+          id: enemy.id,
+          phase: enemy.phase,
+          x: enemy.position.x,
+          y: enemy.position.y,
+          collisionRadius: enemy.collisionRadius,
+        }),
+      ),
+    );
     const snapshot: GameRenderSnapshot = {
       phase: this.state.phase,
       simulationTimeSeconds: this.state.simulationTimeSeconds,
       playerX: this.state.player.position.x,
       playerY: this.state.player.position.y,
       playerCollisionRadius: this.state.player.collisionRadius,
+      enemies,
       joystick: this.readJoystickSnapshot?.() ?? null,
     };
     this.presentation.render(snapshot);

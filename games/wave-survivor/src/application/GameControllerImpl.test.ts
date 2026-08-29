@@ -7,6 +7,7 @@ import type {
   JoystickRenderSnapshot,
 } from "../domain/GamePresentationPort.js";
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
+import { createBasicEnemyState } from "../domain/enemies/index.js";
 import type {
   FrameScheduler,
   MonotonicClock,
@@ -108,8 +109,9 @@ function createHarness(
     setTheme: vi.fn(),
     destroy: vi.fn(),
   };
+  const state = createInitialRuntimeState();
   const session = new GameRuntimeSession(
-    createInitialRuntimeState(),
+    state,
     input,
     presentation,
     new SeededRandomSource(1),
@@ -129,6 +131,7 @@ function createHarness(
     presentation,
     readMovementIntent,
     session,
+    state,
     setMovementIntent(nextIntent: MovementIntent) {
       movementIntent = nextIntent;
     },
@@ -248,6 +251,7 @@ describe("GameController runtime lifecycle", () => {
         playerX: 180,
         playerY: 320,
         playerCollisionRadius: 12,
+        enemies: [],
         joystick: null,
       });
     },
@@ -325,6 +329,34 @@ describe("GameController runtime lifecycle", () => {
 
     expect(readJoystickSnapshot).toHaveBeenCalledOnce();
     expect(snapshots.at(-1)?.joystick).toEqual(joystick);
+  });
+
+  it("copies immutable renderer-facing enemy values from runtime state", () => {
+    const { session, snapshots, state } = createHarness();
+    const enemy = createBasicEnemyState(7, { x: -24, y: 288 });
+    state.enemies.push(enemy);
+
+    session.render();
+
+    const renderedEnemies = snapshots.at(-1)?.enemies;
+    const renderedEnemy = renderedEnemies?.[0];
+    expect(renderedEnemy).toEqual({
+      id: 7,
+      phase: "entering",
+      x: -24,
+      y: 288,
+      collisionRadius: 12,
+    });
+    expect(renderedEnemy).not.toBe(enemy);
+    expect(Object.isFrozen(renderedEnemies)).toBe(true);
+    expect(Object.isFrozen(renderedEnemy)).toBe(true);
+    expect(renderedEnemy).not.toHaveProperty("currentHealth");
+    expect(renderedEnemy).not.toHaveProperty("contactDamage");
+
+    enemy.phase = "active";
+    enemy.position.x = 99;
+
+    expect(renderedEnemy).toMatchObject({ phase: "entering", x: -24 });
   });
 
   it("forwards themes only before terminal destruction", () => {

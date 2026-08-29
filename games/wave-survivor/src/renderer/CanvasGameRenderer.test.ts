@@ -27,6 +27,7 @@ function createRenderSnapshot(
     playerX: 180,
     playerY: 320,
     playerCollisionRadius: 12,
+    enemies: [],
     joystick: {
       active: false,
       centerX: 72,
@@ -75,11 +76,14 @@ afterEach(() => {
 function createCanvas(displayWidth: number, displayHeight: number) {
   const fillStyles: string[] = [];
   const globalAlphas: number[] = [];
+  const strokeStyles: string[] = [];
   let fillStyle = "";
   let globalAlpha = 1;
+  let strokeStyle = "";
   const context = {
     arc: vi.fn(),
     beginPath: vi.fn(),
+    closePath: vi.fn(),
     fill: vi.fn(),
     fillRect: vi.fn(),
     get fillStyle() {
@@ -97,9 +101,18 @@ function createCanvas(displayWidth: number, displayHeight: number) {
       globalAlphas.push(value);
     },
     lineWidth: 0,
+    lineTo: vi.fn(),
+    moveTo: vi.fn(),
     setTransform: vi.fn(),
+    stroke: vi.fn(),
     strokeRect: vi.fn(),
-    strokeStyle: "",
+    get strokeStyle() {
+      return strokeStyle;
+    },
+    set strokeStyle(value: string) {
+      strokeStyle = value;
+      strokeStyles.push(value);
+    },
   } as unknown as CanvasRenderingContext2D;
   const container = {
     clientHeight: displayHeight,
@@ -124,7 +137,14 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     width: displayWidth,
   } as unknown as HTMLCanvasElement;
 
-  return { canvas, container, context, fillStyles, globalAlphas };
+  return {
+    canvas,
+    container,
+    context,
+    fillStyles,
+    globalAlphas,
+    strokeStyles,
+  };
 }
 
 describe("CanvasGameRenderer", () => {
@@ -207,6 +227,73 @@ describe("CanvasGameRenderer", () => {
     );
 
     expect(context.arc).toHaveBeenLastCalledWith(247, 193, 9, 0, Math.PI * 2);
+  });
+
+  it("draws an inward border warning instead of an entering enemy shape", () => {
+    const { canvas, container, context } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+
+    renderer.render(
+      createRenderSnapshot({
+        enemies: [
+          {
+            id: 1,
+            phase: "entering",
+            x: 180,
+            y: -66,
+            collisionRadius: 12,
+          },
+        ],
+        joystick: null,
+      }),
+    );
+
+    expect(context.moveTo).toHaveBeenCalledWith(174, 2);
+    expect(context.lineTo).toHaveBeenNthCalledWith(1, 186, 2);
+    expect(context.lineTo).toHaveBeenNthCalledWith(2, 180, 12);
+    expect(context.closePath).toHaveBeenCalledOnce();
+    expect(context.stroke).not.toHaveBeenCalled();
+    expect(context.arc).toHaveBeenCalledOnce();
+    expect(context.fill).toHaveBeenCalledTimes(2);
+  });
+
+  it("draws a partially entered active enemy as a diamond without a warning", () => {
+    const { canvas, container, context } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+
+    renderer.render(
+      createRenderSnapshot({
+        enemies: [
+          {
+            id: 1,
+            phase: "active",
+            x: -11,
+            y: 320,
+            collisionRadius: 12,
+          },
+        ],
+        joystick: null,
+      }),
+    );
+
+    expect(context.moveTo).toHaveBeenCalledWith(-11, 308);
+    expect(context.lineTo).toHaveBeenNthCalledWith(1, 1, 320);
+    expect(context.lineTo).toHaveBeenNthCalledWith(2, -11, 332);
+    expect(context.lineTo).toHaveBeenNthCalledWith(3, -23, 320);
+    expect(context.stroke).toHaveBeenCalledOnce();
+    expect(context.fill).toHaveBeenCalledOnce();
+    expect(context.arc).toHaveBeenCalledWith(180, 320, 12, 0, Math.PI * 2);
+    expect(vi.mocked(context.moveTo).mock.invocationCallOrder[0]!).toBeLessThan(
+      vi.mocked(context.arc).mock.invocationCallOrder[0]!,
+    );
   });
 
   it.each([
@@ -312,6 +399,60 @@ describe("CanvasGameRenderer", () => {
     expect(context.arc).toHaveBeenLastCalledWith(244, 171, 12, 0, Math.PI * 2);
   });
 
+  it("redraws current warnings and enemies with replacement theme roles", () => {
+    const { canvas, container, fillStyles, strokeStyles } = createCanvas(
+      360,
+      640,
+    );
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+    renderer.render(
+      createRenderSnapshot({
+        enemies: [
+          {
+            id: 1,
+            phase: "entering",
+            x: 180,
+            y: -66,
+            collisionRadius: 12,
+          },
+          {
+            id: 2,
+            phase: "active",
+            x: 120,
+            y: 200,
+            collisionRadius: 12,
+          },
+        ],
+        joystick: null,
+      }),
+    );
+    const replacementTheme: GameTheme = {
+      colors: {
+        ...initialTheme.colors,
+        background: "replacement-background",
+        effect: "replacement-effect",
+        enemy: "replacement-enemy",
+        player: "replacement-player",
+      },
+    };
+
+    renderer.setTheme(replacementTheme);
+
+    expect(fillStyles.slice(-3)).toEqual([
+      "replacement-background",
+      "replacement-effect",
+      "replacement-player",
+    ]);
+    expect(strokeStyles.slice(-2)).toEqual([
+      "replacement-effect",
+      "replacement-enemy",
+    ]);
+  });
+
   it("can recalculate the transform without changing logical coordinates", () => {
     const { canvas, container, context } = createCanvas(320, 568);
     const renderer = new CanvasGameRenderer({
@@ -321,6 +462,15 @@ describe("CanvasGameRenderer", () => {
     });
     renderer.render(
       createRenderSnapshot({
+        enemies: [
+          {
+            id: 1,
+            phase: "active",
+            x: 91,
+            y: 447,
+            collisionRadius: 9,
+          },
+        ],
         playerX: 91,
         playerY: 447,
         joystick: null,
@@ -337,6 +487,7 @@ describe("CanvasGameRenderer", () => {
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);
     expect(context.fillRect).toHaveBeenLastCalledWith(0, 0, 360, 640);
+    expect(context.moveTo).toHaveBeenLastCalledWith(91, 438);
     expect(context.arc).toHaveBeenLastCalledWith(91, 447, 12, 0, Math.PI * 2);
   });
 
@@ -442,14 +593,29 @@ describe("CanvasGameRenderer", () => {
       viewport: container,
       theme: initialTheme,
     });
+    const snapshot = createRenderSnapshot({
+      enemies: [
+        {
+          id: 1,
+          phase: "active",
+          x: 100,
+          y: 200,
+          collisionRadius: 12,
+        },
+      ],
+    });
+    renderer.render(snapshot);
     const drawsBeforeDestroy = vi.mocked(context.fillRect).mock.calls.length;
+    const enemyDrawsBeforeDestroy = vi.mocked(context.stroke).mock.calls.length;
 
     renderer.destroy();
+    renderer.render(snapshot);
     renderer.setTheme(initialTheme);
     renderer.resize(390, 844, 2);
 
     expect(renderer.mountedCanvas).toBeNull();
     expect(renderer.currentTheme).toBeNull();
     expect(context.fillRect).toHaveBeenCalledTimes(drawsBeforeDestroy);
+    expect(context.stroke).toHaveBeenCalledTimes(enemyDrawsBeforeDestroy);
   });
 });
