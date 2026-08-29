@@ -32,6 +32,10 @@ export {
 } from "./movement/index.js";
 export type { MovementIntent } from "./movement/index.js";
 export {
+  calculateEnemySpawnOffset,
+  createEnemySpawnCandidate,
+  ENTRY_LEAD_SECONDS,
+  expandBoundsByOffset,
   mapPerimeterDistance,
   samplePerimeterPoint,
 } from "./spawning/index.js";
