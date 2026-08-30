@@ -11,6 +11,7 @@ import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
 import {
   BASIC_ATTACK_DEFINITION,
   findNearestTargetableEnemy,
+  resolveProjectileHit,
 } from "../domain/combat/index.js";
 import {
   BASIC_ENEMY_DEFINITION,
@@ -285,7 +286,11 @@ export class GameRuntimeSession {
     this.state.nextAttackAtSeconds = nextAttackAtSeconds;
   }
 
-  /** Newly emitted projectiles move during their emission update. */
+  /**
+   * Projectile IDs are appended monotonically, so this in-place traversal is
+   * stable ID order without sorting. Newly emitted projectiles move during
+   * their emission update.
+   */
   private updateProjectiles(
     deltaSeconds: number,
     simulationTimeSeconds: number,
@@ -305,6 +310,8 @@ export class GameRuntimeSession {
       ) {
         continue;
       }
+
+      if (resolveProjectileHit(projectile, this.state.enemies)) continue;
 
       this.state.projectiles[retainedProjectileCount] = projectile;
       retainedProjectileCount += 1;

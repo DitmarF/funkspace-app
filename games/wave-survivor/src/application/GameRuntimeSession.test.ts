@@ -125,6 +125,22 @@ function addEnemy(
   state.nextEnemyId = Math.max(state.nextEnemyId, id + 1);
 }
 
+function addProjectile(
+  state: RuntimeState,
+  id: number,
+  position: Readonly<LogicalPosition>,
+): void {
+  state.projectiles.push(
+    createBasicProjectileState(
+      id,
+      position,
+      { x: position.x + 1, y: position.y },
+      state.simulationTimeSeconds,
+    ),
+  );
+  state.nextProjectileId = Math.max(state.nextProjectileId, id + 1);
+}
+
 describe("GameRuntimeSession enemy spawning and pursuit", () => {
   it("moves the player before validating a due candidate", () => {
     const state = createInitialRuntimeState();
@@ -494,7 +510,7 @@ describe("GameRuntimeSession automatic attack", () => {
   it("fires immediately at an active target and advances the cooldown", () => {
     const state = createInitialRuntimeState();
     state.nextEnemySpawnAtSeconds = 100;
-    addEnemy(state, 1, { x: 220, y: 320 }, "active");
+    addEnemy(state, 1, { x: 300, y: 320 }, "active");
     const { session } = createSession(
       state,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
@@ -663,6 +679,76 @@ describe("GameRuntimeSession automatic attack", () => {
     ]);
     expect(randomSource.resetCount).toBe(1);
     expect(restartedRun).toEqual(firstRun);
+  });
+});
+
+describe("GameRuntimeSession projectile hit resolution", () => {
+  it("retires a hitting projectile before the next renderer snapshot", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    addProjectile(state, 1, state.player.position);
+    const snapshots: GameRenderSnapshot[] = [];
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const session = new GameRuntimeSession(
+      state,
+      new ControlledMovementInput(),
+      presentation,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.start();
+
+    session.fixedUpdate(0.01);
+    session.render();
+
+    expect(state.enemies[0]?.currentHealth).toBe(0);
+    expect(state.enemies[0]?.phase).toBe("active");
+    expect(state.projectiles).toEqual([]);
+    expect(snapshots.at(-1)?.projectiles).toEqual([]);
+  });
+
+  it("does not apply damage again on the next fixed update", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    state.enemies[0]!.currentHealth = 3;
+    addProjectile(state, 1, state.player.position);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.01);
+    expect(state.enemies[0]?.currentHealth).toBe(2);
+    expect(state.projectiles).toEqual([]);
+
+    session.fixedUpdate(0.01);
+    expect(state.enemies[0]?.currentHealth).toBe(2);
+  });
+
+  it("allows two projectiles to damage the same active enemy in one update", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    addProjectile(state, 1, state.player.position);
+    addProjectile(state, 2, state.player.position);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.01);
+
+    expect(state.enemies[0]?.currentHealth).toBe(-1);
+    expect(state.enemies[0]?.phase).toBe("active");
+    expect(state.projectiles).toEqual([]);
   });
 });
 

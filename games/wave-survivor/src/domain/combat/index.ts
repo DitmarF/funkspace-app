@@ -4,3 +4,4 @@ export {
 } from "./BasicAttackDefinition.js";
 export type { BasicAttackDefinition } from "./BasicAttackDefinition.js";
 export { findNearestTargetableEnemy } from "./NearestEnemyTarget.js";
+export { resolveProjectileHit } from "./ProjectileHitResolution.js";
