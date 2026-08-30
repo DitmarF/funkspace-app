@@ -35,6 +35,7 @@ export interface RuntimeState {
   nextEnemySpawnAtSeconds: number;
   projectiles: ProjectileState[];
   nextProjectileId: number;
+  nextAttackAtSeconds: number;
 }
 
 /** Create a fresh session ready to be owned by the application controller. */
@@ -56,5 +57,6 @@ export function createInitialRuntimeState(): RuntimeState {
     nextEnemySpawnAtSeconds: FIRST_SPAWN_DELAY_SECONDS,
     projectiles: [],
     nextProjectileId: 1,
+    nextAttackAtSeconds: 0,
   };
 }

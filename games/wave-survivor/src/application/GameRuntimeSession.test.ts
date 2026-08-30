@@ -10,7 +10,9 @@ import { BASIC_ATTACK_DEFINITION } from "../domain/combat/index.js";
 import {
   BASIC_ENEMY_DEFINITION,
   createBasicEnemyState,
+  type EnemyPhase,
 } from "../domain/enemies/index.js";
+import type { LogicalPosition } from "../domain/geometry/index.js";
 import {
   createMovementIntent,
   ZERO_MOVEMENT_INTENT,
@@ -109,6 +111,18 @@ function createSession(
   session.start();
 
   return { input, session };
+}
+
+function addEnemy(
+  state: RuntimeState,
+  id: number,
+  position: Readonly<LogicalPosition>,
+  phase: EnemyPhase,
+): void {
+  const enemy = createBasicEnemyState(id, position);
+  enemy.phase = phase;
+  state.enemies.push(enemy);
+  state.nextEnemyId = Math.max(state.nextEnemyId, id + 1);
 }
 
 describe("GameRuntimeSession enemy spawning and pursuit", () => {
@@ -442,8 +456,218 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
   });
 });
 
+describe("GameRuntimeSession automatic attack", () => {
+  it("keeps an immediately ready attack ready when no target exists", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.25);
+
+    expect(state.projectiles).toEqual([]);
+    expect(state.nextProjectileId).toBe(1);
+    expect(state.nextAttackAtSeconds).toBe(0);
+  });
+
+  it.each([
+    ["entering", { x: 180, y: -66 }],
+    ["dying", { x: 180, y: 300 }],
+  ] as const)("does not fire at an %s enemy", (phase, position) => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    addEnemy(state, 1, position, phase);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.01);
+
+    expect(state.enemies[0]?.phase).toBe(phase);
+    expect(state.projectiles).toEqual([]);
+    expect(state.nextAttackAtSeconds).toBe(0);
+  });
+
+  it("fires immediately at an active target and advances the cooldown", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    addEnemy(state, 1, { x: 220, y: 320 }, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.1);
+
+    expect(state.projectiles).toHaveLength(1);
+    expect(state.projectiles[0]).toMatchObject({
+      id: 1,
+      position: { x: 212, y: 320 },
+      velocity: { x: 320, y: 0 },
+      expiresAtSimulationSeconds: 2.6,
+    });
+    expect(state.nextProjectileId).toBe(2);
+    expect(state.nextAttackAtSeconds).toBe(1);
+  });
+
+  it("does not fire before the cooldown deadline", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 0.5;
+    addEnemy(state, 1, { x: 180, y: 300 }, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.25);
+
+    expect(state.projectiles).toEqual([]);
+    expect(state.nextProjectileId).toBe(1);
+    expect(state.nextAttackAtSeconds).toBe(0.5);
+  });
+
+  it("fires at the exact cooldown deadline", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.simulationTimeSeconds = 0.25;
+    state.nextAttackAtSeconds = 0.5;
+    addEnemy(state, 1, { x: 180, y: 300 }, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.25);
+
+    expect(state.projectiles).toHaveLength(1);
+    expect(state.nextProjectileId).toBe(2);
+    expect(state.nextAttackAtSeconds).toBe(
+      0.5 + BASIC_ATTACK_DEFINITION.cooldownSeconds,
+    );
+  });
+
+  it("fires as soon as a target appears without consuming no-target time", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.fixedUpdate(0.5);
+
+    addEnemy(state, 1, { x: 180, y: 300 }, "active");
+    session.fixedUpdate(0.25);
+
+    expect(state.projectiles).toHaveLength(1);
+    expect(state.nextProjectileId).toBe(2);
+    expect(state.nextAttackAtSeconds).toBe(
+      0.75 + BASIC_ATTACK_DEFINITION.cooldownSeconds,
+    );
+  });
+
+  it("freezes the attack deadline relationship while paused", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 0.5;
+    addEnemy(state, 1, { x: 180, y: 300 }, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.pause();
+    session.fixedUpdate(10);
+
+    expect(state.simulationTimeSeconds).toBe(0);
+    expect(state.nextAttackAtSeconds).toBe(0.5);
+    expect(state.nextProjectileId).toBe(1);
+
+    session.resume();
+    session.fixedUpdate(0.25);
+    expect(state.nextProjectileId).toBe(1);
+
+    session.fixedUpdate(0.25);
+    expect(state.nextProjectileId).toBe(2);
+    expect(state.nextAttackAtSeconds).toBe(
+      0.5 + BASIC_ATTACK_DEFINITION.cooldownSeconds,
+    );
+  });
+
+  it("emits at most one projectile after a large delta", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(10);
+
+    expect(state.nextProjectileId).toBe(2);
+    expect(state.nextAttackAtSeconds).toBe(
+      10 + BASIC_ATTACK_DEFINITION.cooldownSeconds,
+    );
+    expect(state.projectiles).toEqual([]);
+  });
+
+  it("aims at the nearest active enemy after enemy movement", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    addEnemy(state, 1, { x: 300, y: 320 }, "active");
+    addEnemy(state, 2, { x: 180, y: 300 }, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.000001);
+
+    expect(state.projectiles).toHaveLength(1);
+    expect(state.projectiles[0]?.velocity).toEqual({ x: 0, y: -320 });
+  });
+
+  it("replays the same first attack and projectile ID after restart", () => {
+    const snapshots: GameRenderSnapshot[] = [];
+    const input = new ControlledMovementInput();
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const session = new GameRuntimeSession(
+      createInitialRuntimeState(),
+      input,
+      presentation,
+      randomSource,
+    );
+    const steps = [FIRST_SPAWN_DELAY_SECONDS, 0.25] as const;
+    session.start();
+
+    for (const deltaSeconds of steps) session.fixedUpdate(deltaSeconds);
+    session.render();
+    const firstRun = snapshots.at(-1);
+
+    session.restart();
+    for (const deltaSeconds of steps) session.fixedUpdate(deltaSeconds);
+    session.render();
+    const restartedRun = snapshots.at(-1);
+
+    expect(firstRun?.projectiles).toEqual([
+      { id: 1, x: 180, y: 400, collisionRadius: 4 },
+    ]);
+    expect(randomSource.resetCount).toBe(1);
+    expect(restartedRun).toEqual(firstRun);
+  });
+});
+
 describe("GameRuntimeSession projectile movement and presentation", () => {
-  it("moves a seeded projectile without firing another projectile", () => {
+  it("moves a seeded projectile without an eligible target", () => {
     const state = createInitialRuntimeState();
     state.nextEnemySpawnAtSeconds = 100;
     state.projectiles.push(

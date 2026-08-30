@@ -8,7 +8,10 @@ import type {
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
 import type { RandomSource } from "../domain/RandomSource.js";
 import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
-import { BASIC_ATTACK_DEFINITION } from "../domain/combat/index.js";
+import {
+  BASIC_ATTACK_DEFINITION,
+  findNearestTargetableEnemy,
+} from "../domain/combat/index.js";
 import {
   BASIC_ENEMY_DEFINITION,
   calculateNextEnemyPosition,
@@ -19,6 +22,7 @@ import {
 } from "../domain/enemies/index.js";
 import { calculateNextPlayerPosition } from "../domain/movement/PlayerMovement.js";
 import {
+  createBasicProjectileState,
   hasProjectileExpired,
   isProjectileStateValid,
   moveProjectile,
@@ -117,6 +121,7 @@ export class GameRuntimeSession {
     this.moveEnemiesTowardPlayer(deltaSeconds);
     this.activateEnemiesIntersectingVisibleArena();
     this.removeInvalidOrEscapedEnemies();
+    this.emitBasicProjectileIfReady(nextSimulationTimeSeconds);
     this.updateProjectiles(deltaSeconds, nextSimulationTimeSeconds);
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
   }
@@ -249,6 +254,38 @@ export class GameRuntimeSession {
     );
   }
 
+  private emitBasicProjectileIfReady(simulationTimeSeconds: number): void {
+    if (
+      !Number.isFinite(this.state.nextAttackAtSeconds) ||
+      this.state.nextAttackAtSeconds < 0 ||
+      simulationTimeSeconds < this.state.nextAttackAtSeconds
+    ) {
+      return;
+    }
+
+    const target = findNearestTargetableEnemy(
+      this.state.player.position,
+      this.state.enemies,
+    );
+    if (!target) return;
+
+    const nextAttackAtSeconds =
+      simulationTimeSeconds + BASIC_ATTACK_DEFINITION.cooldownSeconds;
+    if (!Number.isFinite(nextAttackAtSeconds)) return;
+
+    this.state.projectiles.push(
+      createBasicProjectileState(
+        this.state.nextProjectileId,
+        this.state.player.position,
+        target.position,
+        simulationTimeSeconds,
+      ),
+    );
+    this.state.nextProjectileId += 1;
+    this.state.nextAttackAtSeconds = nextAttackAtSeconds;
+  }
+
+  /** Newly emitted projectiles move during their emission update. */
   private updateProjectiles(
     deltaSeconds: number,
     simulationTimeSeconds: number,

@@ -45,6 +45,7 @@ describe("createInitialRuntimeState", () => {
 
     expect(state.projectiles).toEqual([]);
     expect(state.nextProjectileId).toBe(1);
+    expect(state.nextAttackAtSeconds).toBe(0);
   });
 
   it("uses the marker radius and provisional movement speed", () => {
@@ -139,10 +140,12 @@ describe("createInitialRuntimeState", () => {
       ),
     );
     progressedState.nextProjectileId += 1;
+    progressedState.nextAttackAtSeconds = 99;
 
     const restartedState = createInitialRuntimeState();
 
     expect(restartedState.projectiles).toEqual([]);
     expect(restartedState.nextProjectileId).toBe(1);
+    expect(restartedState.nextAttackAtSeconds).toBe(0);
   });
 });
