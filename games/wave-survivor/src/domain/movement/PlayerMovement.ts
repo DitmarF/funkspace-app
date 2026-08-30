@@ -1,6 +1,6 @@
 import { ARENA } from "../arena/index.js";
 import type { LogicalPosition } from "../geometry/index.js";
-import type { PlayerMovementState } from "../state/RuntimeState.js";
+import type { PlayerState } from "../state/RuntimeState.js";
 import { createMovementIntent, type MovementIntent } from "./MovementIntent.js";
 
 function clampPlayerPosition(
@@ -21,7 +21,7 @@ function clampPlayerPosition(
  * always clamped far enough from each arena edge to contain the player circle.
  */
 export function calculateNextPlayerPosition(
-  player: Readonly<PlayerMovementState>,
+  player: Readonly<PlayerState>,
   movementIntent: MovementIntent,
   deltaSeconds: number,
 ): LogicalPosition {

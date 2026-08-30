@@ -872,6 +872,41 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
   });
 });
 
+describe("GameRuntimeSession player contact damage", () => {
+  it("applies one active-enemy contact hit after enemy movement", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.01);
+
+    expect(state.player.currentHealth).toBe(2);
+    expect(state.enemies[0]?.phase).toBe("active");
+  });
+
+  it("does not take contact damage from an enemy defeated earlier in the update", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    addProjectile(state, 1, state.player.position);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.01);
+
+    expect(state.enemies[0]?.phase).toBe("dying");
+    expect(state.player.currentHealth).toBe(state.player.maximumHealth);
+  });
+});
+
 describe("GameRuntimeSession projectile movement and presentation", () => {
   it("moves a seeded projectile without an eligible target", () => {
     const state = createInitialRuntimeState();

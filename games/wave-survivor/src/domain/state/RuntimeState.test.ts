@@ -7,6 +7,7 @@ import { FIRST_SPAWN_DELAY_SECONDS } from "../spawning/index.js";
 import {
   createInitialRuntimeState,
   PLAYER_COLLISION_RADIUS,
+  PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
   PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
 } from "./RuntimeState.js";
 
@@ -58,6 +59,14 @@ describe("createInitialRuntimeState", () => {
     expect(state.player.movementSpeedUnitsPerSecond).toBe(
       PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
     );
+  });
+
+  it("starts the player at full provisional health", () => {
+    const state = createInitialRuntimeState();
+
+    expect(PROVISIONAL_PLAYER_MAXIMUM_HEALTH).toBe(3);
+    expect(state.player.maximumHealth).toBe(PROVISIONAL_PLAYER_MAXIMUM_HEALTH);
+    expect(state.player.currentHealth).toBe(state.player.maximumHealth);
   });
 
   it("creates independent state and player instances", () => {
@@ -152,5 +161,19 @@ describe("createInitialRuntimeState", () => {
     expect(restartedState.projectiles).toEqual([]);
     expect(restartedState.nextProjectileId).toBe(1);
     expect(restartedState.nextAttackAtSeconds).toBe(0);
+  });
+
+  it("restores full player health for a restarted session", () => {
+    const progressedState = createInitialRuntimeState();
+    progressedState.player.currentHealth = 0;
+
+    const restartedState = createInitialRuntimeState();
+
+    expect(restartedState.player.currentHealth).toBe(
+      restartedState.player.maximumHealth,
+    );
+    expect(restartedState.player.currentHealth).toBe(
+      PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
+    );
   });
 });

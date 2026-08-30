@@ -13,14 +13,19 @@ export const PLAYER_COLLISION_RADIUS = 12;
 /** Initial movement tuning value; subject to playtesting and balance changes. */
 export const PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND = 120;
 
+/** Provisional Gate 1 player-health tuning; subject to playtesting. */
+export const PROVISIONAL_PLAYER_MAXIMUM_HEALTH = 3;
+
 /** Session lifecycle phases that affect deterministic runtime updates. */
 export type RuntimePhase = "idle" | "playing" | "paused";
 
-/** Player data required by the EPIC 2 movement slice. */
-export interface PlayerMovementState {
+/** Complete mutable runtime state for the single player. */
+export interface PlayerState {
   position: LogicalPosition;
   collisionRadius: number;
   movementSpeedUnitsPerSecond: number;
+  maximumHealth: number;
+  currentHealth: number;
 }
 
 /** Minimal deterministic state owned by one Wave Survivor game session. */
@@ -29,7 +34,7 @@ export interface RuntimeState {
   phase: RuntimePhase;
   simulationTimeSeconds: number;
   movementIntent: MovementIntent;
-  player: PlayerMovementState;
+  player: PlayerState;
   enemies: EnemyState[];
   nextEnemyId: number;
   nextEnemySpawnAtSeconds: number;
@@ -52,6 +57,8 @@ export function createInitialRuntimeState(): RuntimeState {
       },
       collisionRadius: PLAYER_COLLISION_RADIUS,
       movementSpeedUnitsPerSecond: PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
+      maximumHealth: PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
+      currentHealth: PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
     },
     enemies: [],
     nextEnemyId: 1,

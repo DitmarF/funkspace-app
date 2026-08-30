@@ -60,10 +60,7 @@ export type { PerimeterEdge, PerimeterSample } from "./spawning/index.js";
 export {
   createInitialRuntimeState,
   PLAYER_COLLISION_RADIUS,
+  PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
   PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
 } from "./state/index.js";
-export type {
-  PlayerMovementState,
-  RuntimePhase,
-  RuntimeState,
-} from "./state/index.js";
+export type { PlayerState, RuntimePhase, RuntimeState } from "./state/index.js";

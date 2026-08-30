@@ -11,6 +11,7 @@ import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
 import {
   BASIC_ATTACK_DEFINITION,
   findNearestTargetableEnemy,
+  resolvePlayerContactDamage,
   resolveProjectileHit,
 } from "../domain/combat/index.js";
 import {
@@ -127,6 +128,9 @@ export class GameRuntimeSession {
     this.removeInvalidEscapedOrExpiredEnemies(nextSimulationTimeSeconds);
     this.emitBasicProjectileIfReady(nextSimulationTimeSeconds);
     this.updateProjectiles(deltaSeconds, nextSimulationTimeSeconds);
+    // Projectile hits transition defeated enemies before contact eligibility is
+    // evaluated, so a same-update defeat cannot damage the player.
+    this.resolvePlayerEnemyContact();
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
   }
 
@@ -337,5 +341,9 @@ export class GameRuntimeSession {
     }
 
     this.state.projectiles.length = retainedProjectileCount;
+  }
+
+  private resolvePlayerEnemyContact(): void {
+    resolvePlayerContactDamage(this.state.player, this.state.enemies);
   }
 }
