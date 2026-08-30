@@ -180,7 +180,7 @@ describe("GameRuntimeSession loss transition", () => {
     expect(state.movementIntent).toBe(ZERO_MOVEMENT_INTENT);
     expect(input.movementIntent).toBe(ZERO_MOVEMENT_INTENT);
     expect(input.resetCount).toBe(1);
-    expect(state.simulationTimeSeconds).toBe(0);
+    expect(state.simulationTimeSeconds).toBe(0.01);
 
     const frozenState = structuredClone(state);
     input.movementIntent = createMovementIntent(0, 1);

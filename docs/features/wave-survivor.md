@@ -5,13 +5,13 @@
 ## Document metadata
 
 - **Status:** Approved starting concept
-- **Product stage:** Pre-production / Gate 1 ready
+- **Product stage:** Gate 1 approved / Gate 2 ready
 - **Owner:** Dimi
 - **Working title:** Wave Survivor
 - **Target platform:** Modern web browsers
 - **Primary form factor:** Mobile, portrait orientation
 - **Secondary form factors:** Tablet and desktop
-- **Last updated:** 2026-08-26
+- **Last updated:** 2026-08-30
 - **Game package:** `games/wave-survivor/`
 - **Related decisions:**
   - [`ADR-002: Design tokens as the source of truth`](../decisions/ADR-002-design-token-source-of-truth.md)
@@ -768,6 +768,8 @@ virtual-joystick input, bounded player movement, state-driven rendering, and
 interruption cleanup. EPIC 3 added the accepted seeded spawning, bounded
 contact-time fairness, offscreen entry warnings, direct pursuit, visible-border
 activation, and despawn safety cleanup. Its PC and smartphone manual gate passed
-on August 29, 2026. EPIC 4 is the next implementation slice and adds automatic
-combat, player and enemy health, damage and death behavior, and clean restart
-coverage required to complete Gate 1.
+on August 29, 2026. EPIC 4 then completed automatic projectile combat, player
+and enemy health, contact damage, invulnerability, defeat and loss states,
+discrete status UI, and deterministic restart. Gate 1 passed on August 30, 2026
+after successful PC and real-smartphone manual reviews and the complete
+automated validation suite. EPIC 5 is the next implementation boundary.

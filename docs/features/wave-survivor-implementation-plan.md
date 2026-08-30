@@ -4,11 +4,11 @@
 
 ## Document metadata
 
-- **Status:** In progress — EPICs 0–3 complete
+- **Status:** In progress — EPICs 0–4 complete; Gate 1 approved
 - **Owner:** Dimi
 - **Product:** FunkSpace Wave Survivor
 - **Planning level:** Epic and implementation-task roadmap
-- **Last updated:** 2026-08-29
+- **Last updated:** 2026-08-30
 - **Concept source:** [`docs/features/wave-survivor.md`](./wave-survivor.md)
 - **Game package:** `games/wave-survivor/`
 - **Portfolio integration:** `frontend/features/games/`
@@ -199,9 +199,9 @@ EPIC 10 ── Gate 4 / release candidate
 
 EPICs 1–4 should not be parallelized because each one validates foundations required by the next. Visual exploration may occur separately, but final assets must not enter the production renderer before Gate 1 approval.
 
-Current delivery status: EPICs 0–3 are complete and accepted. The EPIC 3 PC and
-smartphone manual gate passed on 2026-08-29. EPIC 4 is the next implementation
-boundary.
+Current delivery status: EPICs 0–4 are complete and accepted. Gate 1 passed on
+2026-08-30 after successful PC and real-smartphone manual reviews and the full
+automated validation suite. EPIC 5 is the next implementation boundary.
 
 ---
 
@@ -670,6 +670,16 @@ Evaluate:
 - Does immediate restart feel reliable?
 - Is the toy enjoyable without upgrades, lore, art, or audio?
 
+Recorded evidence from 2026-08-30:
+
+- PC manual Gate 1 review: PASS.
+- Real-smartphone manual Gate 1 review: PASS.
+- Movement, enemy entry, automatic combat, damage, invulnerability, loss, and
+  restart were understandable and functional on both input families.
+- Repeated restart and lifecycle checks passed without a reported surviving
+  loop, listener, observer, entity, or timer.
+- The full package and workspace validation suite passed.
+
 ## Gate 1 decision
 
 Proceed only when all conditions are met:
@@ -680,6 +690,22 @@ Proceed only when all conditions are met:
 - No architecture leak or lifecycle defect remains known in the core loop.
 
 If the gate fails, revise EPICs 1–4. Do not continue to waves or upgrades as a workaround.
+
+### Accepted Gate 1 result — 2026-08-30
+
+**Decision:** PASS. EPIC 4 and Gate 1 are complete; EPIC 5 is unblocked.
+
+Accepted centralized tuning values:
+
+| Relationship    | Accepted values                                                               |
+| --------------- | ----------------------------------------------------------------------------- |
+| Movement        | Player speed `120`; enemy speed `72`; player and enemy collision radii `12`   |
+| Arena pressure  | First spawn `0.5s`; spawn interval `0.75s`; maximum live enemies `4`          |
+| Entry fairness  | Entry lead `0.75s`; minimum contact time `1.25s`; maximum spawn attempts `12` |
+| Kill rate       | Attack cooldown `1.5s`; enemy health `1`; projectile damage `1`               |
+| Punishment      | Player health `3`; contact damage `1`; post-hit invulnerability `0.65s`       |
+| Readability     | Projectile speed `320`; radius `4`; lifetime `2.5s`; dying duration `0.125s`  |
+| Cleanup margins | Projectile despawn margin `32`; enemy extra despawn margin `64` logical units |
 
 ---
 

@@ -150,12 +150,12 @@ export class GameRuntimeSession {
     // Projectile hits transition defeated enemies before contact eligibility is
     // evaluated, so a same-update defeat cannot damage the player.
     this.resolvePlayerEnemyContact(nextSimulationTimeSeconds);
+    this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
     if (this.transitionToLostIfPlayerDefeated()) {
       this.emitStatusIfChanged();
       return;
     }
 
-    this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
     this.emitStatusIfChanged();
   }
 

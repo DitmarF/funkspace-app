@@ -58,6 +58,7 @@ if (document.hidden) {
 
 const handleRestart = () => {
   game.restart();
+  canvas.focus({ preventScroll: true });
 };
 
 const handleVisibilityChange = () => {

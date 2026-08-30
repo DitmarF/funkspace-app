@@ -14,6 +14,33 @@ The runtime caps live enemies, rejects candidates with insufficient contact
 time, and removes invalid or fully escaped enemies only beyond a larger logical
 despawn boundary. Enemy runtime phases are `entering`, `active`, and `dying`.
 
+## Gate 1 status
+
+Gate 1 passed on August 30, 2026 after successful PC and real-smartphone manual
+reviews and the complete automated validation suite. The accepted grey-box loop
+includes movement, enemy pressure, automatic projectile combat, enemy defeat
+and kill count, player health and invulnerability, terminal loss, semantic
+status, and clean restart. EPIC 5 is the next gameplay boundary.
+
+### Current Gate 1 tuning
+
+| Value                         | Accepted setting |
+| ----------------------------- | ---------------: |
+| Player speed                  |    `120 units/s` |
+| Enemy speed                   |     `72 units/s` |
+| Player health                 |              `3` |
+| Enemy health                  |              `1` |
+| Contact and projectile damage |              `1` |
+| First spawn delay             |           `0.5s` |
+| Spawn interval                |          `0.75s` |
+| Maximum live enemies          |              `4` |
+| Minimum contact warning       |          `1.25s` |
+| Attack cooldown               |           `1.5s` |
+| Projectile speed              |    `320 units/s` |
+| Projectile radius             |        `4 units` |
+| Player invulnerability        |          `0.65s` |
+| Enemy dying display           |         `0.125s` |
+
 ## Public API
 
 ```ts

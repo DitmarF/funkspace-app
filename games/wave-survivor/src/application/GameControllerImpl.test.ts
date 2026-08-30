@@ -184,7 +184,7 @@ describe("GameController runtime lifecycle", () => {
     expect(snapshots).toHaveLength(1);
     expect(snapshots[0]).toMatchObject({
       phase: "lost",
-      simulationTimeSeconds: 0,
+      simulationTimeSeconds: FIXED_SIMULATION_STEP_SECONDS,
     });
     expect(frameScheduler.pendingFrameCount).toBe(0);
     expect(frameScheduler.requestedFrameIds).toHaveLength(1);
