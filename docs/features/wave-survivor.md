@@ -765,5 +765,9 @@ The responsive arena foundation below was completed in EPIC 1:
 This established the coordinate and rendering contract required by every later
 system. EPIC 2 then added the accepted deterministic runtime, keyboard and fixed
 virtual-joystick input, bounded player movement, state-driven rendering, and
-interruption cleanup. EPIC 3 is the next implementation slice and must remain
-limited to fair offscreen enemy entry and direct pursuit.
+interruption cleanup. EPIC 3 added the accepted seeded spawning, bounded
+contact-time fairness, offscreen entry warnings, direct pursuit, visible-border
+activation, and despawn safety cleanup. Its PC and smartphone manual gate passed
+on August 29, 2026. EPIC 4 is the next implementation slice and adds automatic
+combat, player and enemy health, damage and death behavior, and clean restart
+coverage required to complete Gate 1.

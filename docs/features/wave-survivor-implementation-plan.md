@@ -4,11 +4,11 @@
 
 ## Document metadata
 
-- **Status:** In progress — EPICs 0–2 complete
+- **Status:** In progress — EPICs 0–3 complete
 - **Owner:** Dimi
 - **Product:** FunkSpace Wave Survivor
 - **Planning level:** Epic and implementation-task roadmap
-- **Last updated:** 2026-08-26
+- **Last updated:** 2026-08-29
 - **Concept source:** [`docs/features/wave-survivor.md`](./wave-survivor.md)
 - **Game package:** `games/wave-survivor/`
 - **Portfolio integration:** `frontend/features/games/`
@@ -199,8 +199,9 @@ EPIC 10 ── Gate 4 / release candidate
 
 EPICs 1–4 should not be parallelized because each one validates foundations required by the next. Visual exploration may occur separately, but final assets must not enter the production renderer before Gate 1 approval.
 
-Current delivery status: EPICs 0, 1, and 2 are complete and accepted. EPIC 3 is
-the next implementation boundary.
+Current delivery status: EPICs 0–3 are complete and accepted. The EPIC 3 PC and
+smartphone manual gate passed on 2026-08-29. EPIC 4 is the next implementation
+boundary.
 
 ---
 
@@ -471,6 +472,14 @@ EPIC 1.
 ---
 
 # EPIC 3 — Enemy spawning, entry, and pursuit
+
+**Status:** Complete and accepted on 2026-08-29.
+
+All eleven EPIC 3 work items are implemented. Automated coverage verifies
+seeded spawning, fairness, pursuit, activation, rendering snapshots, cleanup,
+and deterministic lifecycle behavior. PC and smartphone manual review approved
+offscreen entry, directional warnings, pursuit readability, visible-border
+retention, pause and resume, restart, resizing, and the live-enemy cap.
 
 ## Goal
 
