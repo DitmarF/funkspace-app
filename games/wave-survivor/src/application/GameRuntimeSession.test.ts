@@ -6,6 +6,7 @@ import type {
   GameRenderSnapshot,
 } from "../domain/GamePresentationPort.js";
 import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
+import { BASIC_ATTACK_DEFINITION } from "../domain/combat/index.js";
 import {
   BASIC_ENEMY_DEFINITION,
   createBasicEnemyState,
@@ -15,6 +16,7 @@ import {
   ZERO_MOVEMENT_INTENT,
   type MovementIntent,
 } from "../domain/movement/index.js";
+import { createBasicProjectileState } from "../domain/projectiles/index.js";
 import {
   calculateEnemySpawnOffset,
   createEnemyDespawnBounds,
@@ -49,6 +51,10 @@ const DESPAWN_BOUNDS = createEnemyDespawnBounds(
   BASIC_ENEMY_DEFINITION,
   ENTRY_LEAD_SECONDS,
   DESPAWN_EXTRA_MARGIN,
+);
+const PROJECTILE_DESPAWN_BOUNDS = expandBoundsByOffset(
+  VISIBLE_ARENA_BOUNDS,
+  BASIC_ATTACK_DEFINITION.projectileDespawnMargin,
 );
 
 class ControlledMovementInput implements MovementInputPort {
@@ -433,5 +439,183 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     );
     expect(restartedRun?.playerX).toBe(firstRun?.playerX);
     expect(restartedRun?.playerY).toBe(firstRun?.playerY);
+  });
+});
+
+describe("GameRuntimeSession projectile movement and presentation", () => {
+  it("moves a seeded projectile without firing another projectile", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.projectiles.push(
+      createBasicProjectileState(
+        state.nextProjectileId,
+        state.player.position,
+        { x: state.player.position.x + 1, y: state.player.position.y },
+        state.simulationTimeSeconds,
+      ),
+    );
+    state.nextProjectileId += 1;
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.25);
+
+    expect(state.projectiles).toHaveLength(1);
+    expect(state.projectiles[0]?.position).toEqual({ x: 260, y: 320 });
+    expect(state.nextProjectileId).toBe(2);
+  });
+
+  it("removes a projectile at its exact expiration boundary", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.simulationTimeSeconds =
+      BASIC_ATTACK_DEFINITION.projectileLifetimeSeconds - 0.01;
+    state.projectiles.push(
+      createBasicProjectileState(
+        state.nextProjectileId,
+        { x: 180, y: 320 },
+        { x: 181, y: 320 },
+        0,
+      ),
+    );
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.01);
+
+    expect(state.simulationTimeSeconds).toBe(
+      BASIC_ATTACK_DEFINITION.projectileLifetimeSeconds,
+    );
+    expect(state.projectiles).toEqual([]);
+  });
+
+  it("removes invalid and fully escaped projectiles safely", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    const invalid = createBasicProjectileState(
+      1,
+      { x: 180, y: 320 },
+      { x: 181, y: 320 },
+      0,
+    );
+    invalid.position.x = Number.NaN;
+    const escaped = createBasicProjectileState(
+      2,
+      {
+        x:
+          PROJECTILE_DESPAWN_BOUNDS.x -
+          BASIC_ATTACK_DEFINITION.projectileCollisionRadius -
+          1,
+        y: 320,
+      },
+      { x: PROJECTILE_DESPAWN_BOUNDS.x - 100, y: 320 },
+      0,
+    );
+    state.projectiles.push(invalid, escaped);
+    state.nextProjectileId = 3;
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    expect(() => session.fixedUpdate(1 / 60)).not.toThrow();
+
+    expect(state.projectiles).toEqual([]);
+  });
+
+  it("freezes projectile movement while paused", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    const projectile = createBasicProjectileState(
+      1,
+      { x: 180, y: 320 },
+      { x: 181, y: 320 },
+      0,
+    );
+    state.projectiles.push(projectile);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.pause();
+    session.fixedUpdate(1);
+
+    expect(projectile.position).toEqual({ x: 180, y: 320 });
+    expect(state.simulationTimeSeconds).toBe(0);
+
+    session.resume();
+    session.fixedUpdate(0.1);
+
+    expect(projectile.position).toEqual({ x: 212, y: 320 });
+  });
+
+  it("renders immutable projectile snapshots copied from runtime state", () => {
+    const state = createInitialRuntimeState();
+    const projectile = createBasicProjectileState(
+      1,
+      { x: 180, y: 320 },
+      { x: 181, y: 320 },
+      0,
+    );
+    state.projectiles.push(projectile);
+    const snapshots: GameRenderSnapshot[] = [];
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const session = new GameRuntimeSession(
+      state,
+      new ControlledMovementInput(),
+      presentation,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.render();
+
+    const snapshotProjectiles = snapshots.at(-1)?.projectiles;
+    expect(snapshotProjectiles).toEqual([
+      { id: 1, x: 180, y: 320, collisionRadius: 4 },
+    ]);
+    expect(Object.isFrozen(snapshotProjectiles)).toBe(true);
+    expect(Object.isFrozen(snapshotProjectiles?.[0])).toBe(true);
+    expect(snapshotProjectiles?.[0]).not.toBe(projectile);
+
+    projectile.position.x = 999;
+
+    expect(snapshotProjectiles?.[0]?.x).toBe(180);
+  });
+
+  it("renders an empty projectile collection after restart", () => {
+    const state = createInitialRuntimeState();
+    state.projectiles.push(
+      createBasicProjectileState(1, { x: 180, y: 320 }, { x: 181, y: 320 }, 0),
+    );
+    state.nextProjectileId = 2;
+    const snapshots: GameRenderSnapshot[] = [];
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const session = new GameRuntimeSession(
+      state,
+      new ControlledMovementInput(),
+      presentation,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.start();
+    session.render();
+    expect(snapshots.at(-1)?.projectiles).toHaveLength(1);
+
+    session.restart();
+    session.render();
+
+    expect(snapshots.at(-1)?.projectiles).toEqual([]);
   });
 });

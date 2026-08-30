@@ -3,10 +3,12 @@ import type {
   GamePresentationPort,
   GameRenderSnapshot,
   JoystickRenderSnapshot,
+  ProjectileRenderSnapshot,
 } from "../domain/GamePresentationPort.js";
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
 import type { RandomSource } from "../domain/RandomSource.js";
 import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
+import { BASIC_ATTACK_DEFINITION } from "../domain/combat/index.js";
 import {
   BASIC_ENEMY_DEFINITION,
   calculateNextEnemyPosition,
@@ -17,6 +19,12 @@ import {
 } from "../domain/enemies/index.js";
 import { calculateNextPlayerPosition } from "../domain/movement/PlayerMovement.js";
 import {
+  hasProjectileExpired,
+  isProjectileStateValid,
+  moveProjectile,
+  shouldRetainProjectileWithinBounds,
+} from "../domain/projectiles/index.js";
+import {
   ENTRY_LEAD_SECONDS,
   DESPAWN_EXTRA_MARGIN,
   MAX_LIVE_ENEMIES,
@@ -24,6 +32,7 @@ import {
   MINIMUM_CONTACT_TIME_SECONDS,
   SPAWN_INTERVAL_SECONDS,
   createEnemyDespawnBounds,
+  expandBoundsByOffset,
   tryCreateFairEnemySpawnCandidate,
 } from "../domain/spawning/index.js";
 import {
@@ -38,6 +47,10 @@ const ENEMY_DESPAWN_BOUNDS = createEnemyDespawnBounds(
   BASIC_ENEMY_DEFINITION,
   ENTRY_LEAD_SECONDS,
   DESPAWN_EXTRA_MARGIN,
+);
+const PROJECTILE_DESPAWN_BOUNDS = expandBoundsByOffset(
+  VISIBLE_ARENA_BOUNDS,
+  BASIC_ATTACK_DEFINITION.projectileDespawnMargin,
 );
 
 /** Owns the current deterministic session and coordinates one fixed update. */
@@ -104,6 +117,7 @@ export class GameRuntimeSession {
     this.moveEnemiesTowardPlayer(deltaSeconds);
     this.activateEnemiesIntersectingVisibleArena();
     this.removeInvalidOrEscapedEnemies();
+    this.updateProjectiles(deltaSeconds, nextSimulationTimeSeconds);
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
   }
 
@@ -121,6 +135,19 @@ export class GameRuntimeSession {
         }),
       ),
     );
+    const projectileSnapshots: ProjectileRenderSnapshot[] = [];
+    for (const projectile of this.state.projectiles) {
+      if (!isProjectileStateValid(projectile)) continue;
+
+      projectileSnapshots.push(
+        Object.freeze({
+          id: projectile.id,
+          x: projectile.position.x,
+          y: projectile.position.y,
+          collisionRadius: projectile.collisionRadius,
+        }),
+      );
+    }
     const snapshot: GameRenderSnapshot = {
       phase: this.state.phase,
       simulationTimeSeconds: this.state.simulationTimeSeconds,
@@ -128,6 +155,7 @@ export class GameRuntimeSession {
       playerY: this.state.player.position.y,
       playerCollisionRadius: this.state.player.collisionRadius,
       enemies,
+      projectiles: Object.freeze(projectileSnapshots),
       joystick: this.readJoystickSnapshot?.() ?? null,
     };
     this.presentation.render(snapshot);
@@ -139,6 +167,7 @@ export class GameRuntimeSession {
 
   destroy(): void {
     this.state.enemies = [];
+    this.state.projectiles = [];
 
     this.input?.reset();
     this.input?.destroy();
@@ -218,5 +247,32 @@ export class GameRuntimeSession {
     this.state.enemies = this.state.enemies.filter((enemy) =>
       shouldRetainEnemyWithinBounds(enemy, ENEMY_DESPAWN_BOUNDS),
     );
+  }
+
+  private updateProjectiles(
+    deltaSeconds: number,
+    simulationTimeSeconds: number,
+  ): void {
+    let retainedProjectileCount = 0;
+
+    for (const projectile of this.state.projectiles) {
+      moveProjectile(projectile, deltaSeconds);
+
+      if (
+        !isProjectileStateValid(projectile) ||
+        hasProjectileExpired(projectile, simulationTimeSeconds) ||
+        !shouldRetainProjectileWithinBounds(
+          projectile,
+          PROJECTILE_DESPAWN_BOUNDS,
+        )
+      ) {
+        continue;
+      }
+
+      this.state.projectiles[retainedProjectileCount] = projectile;
+      retainedProjectileCount += 1;
+    }
+
+    this.state.projectiles.length = retainedProjectileCount;
   }
 }

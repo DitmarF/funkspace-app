@@ -6,6 +6,7 @@ export type {
   GamePresentationPort,
   GameRenderSnapshot,
   JoystickRenderSnapshot,
+  ProjectileRenderSnapshot,
 } from "./GamePresentationPort.js";
 export type { MovementInputPort } from "./MovementInputPort.js";
 export type { RandomSource } from "./RandomSource.js";

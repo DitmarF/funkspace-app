@@ -11,6 +11,14 @@ export interface EnemyRenderSnapshot {
   readonly collisionRadius: number;
 }
 
+/** Immutable projectile data required by the Canvas renderer. */
+export interface ProjectileRenderSnapshot {
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  readonly collisionRadius: number;
+}
+
 /** Fixed virtual-joystick geometry expressed in logical arena units. */
 export interface JoystickRenderSnapshot {
   readonly active: boolean;
@@ -30,6 +38,7 @@ export interface GameRenderSnapshot {
   readonly playerY: number;
   readonly playerCollisionRadius: number;
   readonly enemies: readonly EnemyRenderSnapshot[];
+  readonly projectiles: readonly ProjectileRenderSnapshot[];
   readonly joystick: JoystickRenderSnapshot | null;
 }
 

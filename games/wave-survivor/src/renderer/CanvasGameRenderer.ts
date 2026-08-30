@@ -5,6 +5,7 @@ import type {
   GamePresentationPort,
   GameRenderSnapshot,
   JoystickRenderSnapshot,
+  ProjectileRenderSnapshot,
 } from "../domain/GamePresentationPort.js";
 import { ARENA, VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
 import { doesCircleIntersectBounds } from "../domain/geometry/index.js";
@@ -137,6 +138,8 @@ export class CanvasGameRenderer implements GamePresentationPort {
     );
     this.context.fill();
 
+    this.drawProjectiles(this.latestSnapshot.projectiles);
+
     if (this.latestSnapshot.joystick) {
       this.drawJoystick(this.latestSnapshot.joystick);
     }
@@ -225,6 +228,26 @@ export class CanvasGameRenderer implements GamePresentationPort {
       this.context.lineTo(enemy.x - enemy.collisionRadius, enemy.y);
       this.context.closePath();
       this.context.stroke();
+    }
+  }
+
+  private drawProjectiles(
+    projectiles: readonly ProjectileRenderSnapshot[],
+  ): void {
+    if (!this.context || !this.theme || projectiles.length === 0) return;
+
+    this.context.fillStyle = this.theme.colors.projectile;
+
+    for (const projectile of projectiles) {
+      this.context.beginPath();
+      this.context.arc(
+        projectile.x,
+        projectile.y,
+        projectile.collisionRadius,
+        0,
+        Math.PI * 2,
+      );
+      this.context.fill();
     }
   }
 

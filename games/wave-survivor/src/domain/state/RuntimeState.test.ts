@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ARENA } from "../arena/index.js";
 import { createBasicEnemyState } from "../enemies/index.js";
 import { ZERO_MOVEMENT_INTENT } from "../movement/index.js";
+import { createBasicProjectileState } from "../projectiles/index.js";
 import { FIRST_SPAWN_DELAY_SECONDS } from "../spawning/index.js";
 import {
   createInitialRuntimeState,
@@ -37,6 +38,13 @@ describe("createInitialRuntimeState", () => {
     expect(state.enemies).toEqual([]);
     expect(state.nextEnemyId).toBe(1);
     expect(state.nextEnemySpawnAtSeconds).toBe(FIRST_SPAWN_DELAY_SECONDS);
+  });
+
+  it("starts with deterministic empty projectile state", () => {
+    const state = createInitialRuntimeState();
+
+    expect(state.projectiles).toEqual([]);
+    expect(state.nextProjectileId).toBe(1);
   });
 
   it("uses the marker radius and provisional movement speed", () => {
@@ -82,6 +90,24 @@ describe("createInitialRuntimeState", () => {
     expect(second.enemies).toEqual([]);
   });
 
+  it("does not share mutable projectile collections between sessions", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first.projectiles).not.toBe(second.projectiles);
+
+    first.projectiles.push(
+      createBasicProjectileState(
+        first.nextProjectileId,
+        first.player.position,
+        { x: first.player.position.x + 1, y: first.player.position.y },
+        first.simulationTimeSeconds,
+      ),
+    );
+
+    expect(second.projectiles).toEqual([]);
+  });
+
   it("creates clean enemy state for a restarted session", () => {
     const progressedState = createInitialRuntimeState();
     progressedState.enemies.push(
@@ -97,5 +123,26 @@ describe("createInitialRuntimeState", () => {
     expect(restartedState.nextEnemySpawnAtSeconds).toBe(
       FIRST_SPAWN_DELAY_SECONDS,
     );
+  });
+
+  it("creates clean projectile state for a restarted session", () => {
+    const progressedState = createInitialRuntimeState();
+    progressedState.projectiles.push(
+      createBasicProjectileState(
+        progressedState.nextProjectileId,
+        progressedState.player.position,
+        {
+          x: progressedState.player.position.x + 1,
+          y: progressedState.player.position.y,
+        },
+        progressedState.simulationTimeSeconds,
+      ),
+    );
+    progressedState.nextProjectileId += 1;
+
+    const restartedState = createInitialRuntimeState();
+
+    expect(restartedState.projectiles).toEqual([]);
+    expect(restartedState.nextProjectileId).toBe(1);
   });
 });

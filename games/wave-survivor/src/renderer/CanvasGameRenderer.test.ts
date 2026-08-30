@@ -28,6 +28,7 @@ function createRenderSnapshot(
     playerY: 320,
     playerCollisionRadius: 12,
     enemies: [],
+    projectiles: [],
     joystick: {
       active: false,
       centerX: 72,
@@ -227,6 +228,41 @@ describe("CanvasGameRenderer", () => {
     );
 
     expect(context.arc).toHaveBeenLastCalledWith(247, 193, 9, 0, Math.PI * 2);
+  });
+
+  it("draws projectile snapshot circles after the player", () => {
+    const { canvas, container, context, fillStyles } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+
+    renderer.render(
+      createRenderSnapshot({
+        projectiles: [
+          { id: 7, x: 210, y: 300, collisionRadius: 4 },
+          { id: 8, x: 220, y: 310, collisionRadius: 3 },
+        ],
+        joystick: null,
+      }),
+    );
+
+    expect(fillStyles.slice(-2)).toEqual([
+      initialTheme.colors.player,
+      initialTheme.colors.projectile,
+    ]);
+    expect(context.arc).toHaveBeenNthCalledWith(
+      1,
+      180,
+      320,
+      12,
+      0,
+      Math.PI * 2,
+    );
+    expect(context.arc).toHaveBeenNthCalledWith(2, 210, 300, 4, 0, Math.PI * 2);
+    expect(context.arc).toHaveBeenNthCalledWith(3, 220, 310, 3, 0, Math.PI * 2);
+    expect(context.fill).toHaveBeenCalledTimes(3);
   });
 
   it("draws an inward border warning instead of an entering enemy shape", () => {

@@ -252,6 +252,7 @@ describe("GameController runtime lifecycle", () => {
         playerY: 320,
         playerCollisionRadius: 12,
         enemies: [],
+        projectiles: [],
         joystick: null,
       });
     },
