@@ -21,7 +21,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "demo": "pnpm build && vite demo",
+    "demo": "pnpm build && vite demo --host localhost --port 5173 --strictPort",
     "demo:build": "pnpm build && vite build demo",
     "demo:preview": "vite preview demo",
     "test": "vitest run --config vitest.config.ts",

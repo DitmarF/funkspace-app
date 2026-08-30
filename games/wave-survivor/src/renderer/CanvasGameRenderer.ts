@@ -26,6 +26,11 @@ const ENTRY_WARNING_HALF_BASE = 6;
 const ENEMY_LINE_WIDTH = 2;
 const PLAYER_INVULNERABILITY_RING_GAP = 4;
 const PLAYER_INVULNERABILITY_RING_LINE_WIDTH = 2;
+const HEALTH_BAR_X = 10;
+const HEALTH_BAR_Y = 10;
+const HEALTH_BAR_WIDTH = 84;
+const HEALTH_BAR_HEIGHT = 8;
+const HEALTH_BAR_INSET = 1;
 const KILL_COUNT_RIGHT_INSET = 10;
 const KILL_COUNT_TOP_INSET = 10;
 const KILL_COUNT_FONT = "600 12px sans-serif";
@@ -154,6 +159,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
       this.drawJoystick(this.latestSnapshot.joystick);
     }
 
+    this.drawHealth(this.latestSnapshot);
     this.drawKillCount(this.latestSnapshot.killCount);
 
     if (this.latestSnapshot.phase === "lost") {
@@ -318,6 +324,40 @@ export class CanvasGameRenderer implements GamePresentationPort {
       `Kills: ${killCount}`,
       ARENA.width - KILL_COUNT_RIGHT_INSET,
       KILL_COUNT_TOP_INSET,
+    );
+  }
+
+  private drawHealth(snapshot: GameRenderSnapshot): void {
+    if (!this.context || !this.theme) return;
+
+    const healthRatio =
+      snapshot.playerMaximumHealth > 0
+        ? Math.max(
+            0,
+            Math.min(
+              1,
+              snapshot.playerCurrentHealth / snapshot.playerMaximumHealth,
+            ),
+          )
+        : 0;
+
+    this.context.strokeStyle = this.theme.colors.effect;
+    this.context.lineWidth = 1;
+    this.context.strokeRect(
+      HEALTH_BAR_X + 0.5,
+      HEALTH_BAR_Y + 0.5,
+      HEALTH_BAR_WIDTH - 1,
+      HEALTH_BAR_HEIGHT - 1,
+    );
+
+    if (healthRatio <= 0) return;
+
+    this.context.fillStyle = this.theme.colors.player;
+    this.context.fillRect(
+      HEALTH_BAR_X + HEALTH_BAR_INSET,
+      HEALTH_BAR_Y + HEALTH_BAR_INSET,
+      (HEALTH_BAR_WIDTH - HEALTH_BAR_INSET * 2) * healthRatio,
+      HEALTH_BAR_HEIGHT - HEALTH_BAR_INSET * 2,
     );
   }
 

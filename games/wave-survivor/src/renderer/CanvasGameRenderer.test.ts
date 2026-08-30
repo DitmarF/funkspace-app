@@ -27,6 +27,8 @@ function createRenderSnapshot(
     playerX: 180,
     playerY: 320,
     playerCollisionRadius: 12,
+    playerCurrentHealth: 3,
+    playerMaximumHealth: 3,
     isPlayerInvulnerable: false,
     killCount: 0,
     enemies: [],
@@ -79,9 +81,11 @@ afterEach(() => {
 function createCanvas(displayWidth: number, displayHeight: number) {
   const fillStyles: string[] = [];
   const globalAlphas: number[] = [];
+  const lineWidths: number[] = [];
   const strokeStyles: string[] = [];
   let fillStyle = "";
   let globalAlpha = 1;
+  let lineWidth = 0;
   let strokeStyle = "";
   const context = {
     arc: vi.fn(),
@@ -105,7 +109,13 @@ function createCanvas(displayWidth: number, displayHeight: number) {
       globalAlpha = value;
       globalAlphas.push(value);
     },
-    lineWidth: 0,
+    get lineWidth() {
+      return lineWidth;
+    },
+    set lineWidth(value: number) {
+      lineWidth = value;
+      lineWidths.push(value);
+    },
     lineTo: vi.fn(),
     moveTo: vi.fn(),
     setTransform: vi.fn(),
@@ -150,6 +160,7 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     context,
     fillStyles,
     globalAlphas,
+    lineWidths,
     strokeStyles,
   };
 }
@@ -197,6 +208,7 @@ describe("CanvasGameRenderer", () => {
       initialTheme.colors.background,
       initialTheme.colors.player,
       initialTheme.colors.effect,
+      initialTheme.colors.player,
       initialTheme.colors.effect,
     ]);
     expect(context.fillRect).toHaveBeenCalledWith(0, 0, 360, 640);
@@ -238,7 +250,8 @@ describe("CanvasGameRenderer", () => {
   });
 
   it("draws a static effect-colored ring while the player is invulnerable", () => {
-    const { canvas, container, context, strokeStyles } = createCanvas(360, 640);
+    const { canvas, container, context, lineWidths, strokeStyles } =
+      createCanvas(360, 640);
     const renderer = new CanvasGameRenderer({
       canvas,
       viewport: container,
@@ -265,7 +278,7 @@ describe("CanvasGameRenderer", () => {
       Math.PI * 2,
     );
     expect(strokeStyles.at(-1)).toBe(initialTheme.colors.effect);
-    expect(context.lineWidth).toBe(2);
+    expect(lineWidths).toContain(2);
     expect(context.stroke).toHaveBeenCalledOnce();
   });
 
@@ -289,6 +302,29 @@ describe("CanvasGameRenderer", () => {
     expect(context.textAlign).toBe("right");
     expect(context.textBaseline).toBe("top");
     expect(context.fillText).toHaveBeenCalledWith("Kills: 7", 350, 10);
+  });
+
+  it("draws current health as a clamped geometric bar", () => {
+    const { canvas, container, context, fillStyles, strokeStyles } =
+      createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+
+    renderer.render(
+      createRenderSnapshot({
+        playerCurrentHealth: 2,
+        playerMaximumHealth: 3,
+        joystick: null,
+      }),
+    );
+
+    expect(context.strokeRect).toHaveBeenLastCalledWith(10.5, 10.5, 83, 7);
+    expect(context.fillRect).toHaveBeenLastCalledWith(11, 11, (82 * 2) / 3, 6);
+    expect(strokeStyles.at(-1)).toBe(initialTheme.colors.effect);
+    expect(fillStyles).toContain(initialTheme.colors.player);
   });
 
   it("draws a static centered lost state from the terminal snapshot", () => {
@@ -331,9 +367,10 @@ describe("CanvasGameRenderer", () => {
       }),
     );
 
-    expect(fillStyles.slice(-3)).toEqual([
+    expect(fillStyles.slice(-4)).toEqual([
       initialTheme.colors.player,
       initialTheme.colors.projectile,
+      initialTheme.colors.player,
       initialTheme.colors.effect,
     ]);
     expect(context.arc).toHaveBeenNthCalledWith(
@@ -543,8 +580,9 @@ describe("CanvasGameRenderer", () => {
     renderer.setTheme(replacementTheme);
 
     expect(renderer.currentTheme).toBe(replacementTheme);
-    expect(fillStyles.slice(-3)).toEqual([
+    expect(fillStyles.slice(-4)).toEqual([
       "replacement-background",
+      "replacement-player",
       "replacement-player",
       "replacement-effect",
     ]);
@@ -595,15 +633,16 @@ describe("CanvasGameRenderer", () => {
 
     renderer.setTheme(replacementTheme);
 
-    expect(fillStyles.slice(-4)).toEqual([
+    expect(fillStyles.slice(-5)).toEqual([
       "replacement-background",
       "replacement-effect",
+      "replacement-player",
       "replacement-player",
       "replacement-effect",
     ]);
     expect(strokeStyles.slice(-2)).toEqual([
-      "replacement-effect",
       "replacement-enemy",
+      "replacement-effect",
     ]);
   });
 
@@ -640,7 +679,7 @@ describe("CanvasGameRenderer", () => {
     expect(canvas.width).toBe(1080);
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);
-    expect(context.fillRect).toHaveBeenLastCalledWith(0, 0, 360, 640);
+    expect(context.fillRect).toHaveBeenCalledWith(0, 0, 360, 640);
     expect(context.moveTo).toHaveBeenLastCalledWith(91, 438);
     expect(context.arc).toHaveBeenLastCalledWith(91, 447, 12, 0, Math.PI * 2);
   });
@@ -689,7 +728,7 @@ describe("CanvasGameRenderer", () => {
     expect(canvas.width).toBe(1080);
     expect(canvas.height).toBe(1920);
     expect(context.setTransform).toHaveBeenLastCalledWith(3, 0, 0, 3, 0, 0);
-    expect(context.fillRect).toHaveBeenLastCalledWith(0, 0, 360, 640);
+    expect(context.fillRect).toHaveBeenCalledWith(0, 0, 360, 640);
     expect(context.arc).toHaveBeenLastCalledWith(129, 411, 12, 0, Math.PI * 2);
     expect(renderer.mountedCanvas).toBe(canvas);
     expect(renderer.currentTheme).toBe(initialTheme);

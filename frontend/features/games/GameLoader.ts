@@ -11,10 +11,18 @@ export interface HostedGameController {
   destroy(): void;
 }
 
+export interface GameStatusSnapshot {
+  readonly phase: "idle" | "playing" | "paused" | "lost";
+  readonly currentHealth: number;
+  readonly maximumHealth: number;
+  readonly killCount: number;
+}
+
 export interface GameMountOptions {
   readonly canvas: HTMLCanvasElement;
   readonly viewport: HTMLElement;
   readonly theme: GameTheme;
+  readonly onStatusChange?: (snapshot: GameStatusSnapshot) => void;
 }
 
 export interface GameModule {

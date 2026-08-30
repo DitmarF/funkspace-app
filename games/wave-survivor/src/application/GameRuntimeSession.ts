@@ -1,4 +1,5 @@
 import type { GameTheme } from "../GameTheme.js";
+import type { GameStatusSnapshot } from "../GameStatusSnapshot.js";
 import type {
   GamePresentationPort,
   GameRenderSnapshot,
@@ -65,6 +66,8 @@ const PROJECTILE_DESPAWN_BOUNDS = expandBoundsByOffset(
 
 /** Owns the current deterministic session and coordinates one fixed update. */
 export class GameRuntimeSession {
+  private lastStatusSnapshot: GameStatusSnapshot | null = null;
+
   constructor(
     private state: RuntimeState,
     private input: MovementInputPort | null,
@@ -73,7 +76,12 @@ export class GameRuntimeSession {
     private readJoystickSnapshot:
       | (() => JoystickRenderSnapshot | null)
       | null = null,
-  ) {}
+    private onStatusChange:
+      | ((snapshot: GameStatusSnapshot) => void)
+      | null = null,
+  ) {
+    this.emitStatusIfChanged();
+  }
 
   get phase(): RuntimePhase {
     return this.state.phase;
@@ -83,6 +91,7 @@ export class GameRuntimeSession {
     if (this.state.phase !== "idle") return false;
 
     this.state.phase = "playing";
+    this.emitStatusIfChanged();
     return true;
   }
 
@@ -91,6 +100,7 @@ export class GameRuntimeSession {
 
     this.state.phase = "paused";
     this.input?.reset();
+    this.emitStatusIfChanged();
     return true;
   }
 
@@ -98,6 +108,7 @@ export class GameRuntimeSession {
     if (this.state.phase !== "paused") return false;
 
     this.state.phase = "playing";
+    this.emitStatusIfChanged();
     return true;
   }
 
@@ -106,11 +117,16 @@ export class GameRuntimeSession {
     this.randomSource.reset();
     this.state = createInitialRuntimeState();
     this.state.phase = "playing";
+    this.lastStatusSnapshot = null;
+    this.emitStatusIfChanged();
   }
 
   fixedUpdate(deltaSeconds: number): void {
     if (this.state.phase !== "playing" || !this.input) return;
-    if (this.transitionToLostIfPlayerDefeated()) return;
+    if (this.transitionToLostIfPlayerDefeated()) {
+      this.emitStatusIfChanged();
+      return;
+    }
     if (!Number.isFinite(deltaSeconds) || deltaSeconds <= 0) return;
 
     const nextSimulationTimeSeconds =
@@ -134,9 +150,13 @@ export class GameRuntimeSession {
     // Projectile hits transition defeated enemies before contact eligibility is
     // evaluated, so a same-update defeat cannot damage the player.
     this.resolvePlayerEnemyContact(nextSimulationTimeSeconds);
-    if (this.transitionToLostIfPlayerDefeated()) return;
+    if (this.transitionToLostIfPlayerDefeated()) {
+      this.emitStatusIfChanged();
+      return;
+    }
 
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
+    this.emitStatusIfChanged();
   }
 
   render(): void {
@@ -173,6 +193,8 @@ export class GameRuntimeSession {
       playerX: this.state.player.position.x,
       playerY: this.state.player.position.y,
       playerCollisionRadius: this.state.player.collisionRadius,
+      playerCurrentHealth: this.state.player.currentHealth,
+      playerMaximumHealth: this.state.player.maximumHealth,
       isPlayerInvulnerable: isPlayerInvulnerable(
         this.state.player,
         this.state.simulationTimeSeconds,
@@ -197,6 +219,8 @@ export class GameRuntimeSession {
     this.input?.destroy();
     this.input = null;
     this.readJoystickSnapshot = null;
+    this.lastStatusSnapshot = null;
+    this.onStatusChange = null;
 
     this.presentation?.destroy();
     this.presentation = null;
@@ -375,5 +399,28 @@ export class GameRuntimeSession {
     this.state.phase = "lost";
     this.input?.reset();
     return true;
+  }
+
+  private emitStatusIfChanged(): void {
+    if (!this.onStatusChange) return;
+
+    const previous = this.lastStatusSnapshot;
+    if (
+      previous?.phase === this.state.phase &&
+      previous.currentHealth === this.state.player.currentHealth &&
+      previous.maximumHealth === this.state.player.maximumHealth &&
+      previous.killCount === this.state.killCount
+    ) {
+      return;
+    }
+
+    const snapshot: GameStatusSnapshot = Object.freeze({
+      phase: this.state.phase,
+      currentHealth: this.state.player.currentHealth,
+      maximumHealth: this.state.player.maximumHealth,
+      killCount: this.state.killCount,
+    });
+    this.lastStatusSnapshot = snapshot;
+    this.onStatusChange(snapshot);
   }
 }

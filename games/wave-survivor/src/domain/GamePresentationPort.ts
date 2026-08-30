@@ -37,6 +37,8 @@ export interface GameRenderSnapshot {
   readonly playerX: number;
   readonly playerY: number;
   readonly playerCollisionRadius: number;
+  readonly playerCurrentHealth: number;
+  readonly playerMaximumHealth: number;
   readonly isPlayerInvulnerable: boolean;
   readonly killCount: number;
   readonly enemies: readonly EnemyRenderSnapshot[];

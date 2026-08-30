@@ -371,6 +371,8 @@ describe("GameController runtime lifecycle", () => {
         playerX: 180,
         playerY: 320,
         playerCollisionRadius: 12,
+        playerCurrentHealth: 3,
+        playerMaximumHealth: 3,
         isPlayerInvulnerable: false,
         killCount: 0,
         enemies: [],

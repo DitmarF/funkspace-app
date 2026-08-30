@@ -47,6 +47,7 @@ export function createGame(options?: GameMountOptions): GameController {
     presentation,
     new SeededRandomSource(DEFAULT_GAMEPLAY_RANDOM_SEED),
     joystickInput ? () => joystickInput.readPresentationSnapshot() : null,
+    options?.onStatusChange ?? null,
   );
   const loop = options
     ? new FixedStepLoop(

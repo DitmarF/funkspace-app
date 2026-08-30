@@ -6,5 +6,6 @@ export type {
   GameModule,
   GameModuleLoader,
   GameMountOptions,
+  GameStatusSnapshot,
   HostedGameController,
 } from "./GameLoader";

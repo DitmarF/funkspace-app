@@ -3,7 +3,8 @@
 Wave Survivor is the first standalone FunkSpace game package. It exposes a
 minimal lifecycle API for portfolio integration and currently renders a
 responsive grey-box arena with deterministic player movement, keyboard and
-virtual-joystick input, and one pursuing enemy type.
+virtual-joystick input, automatic projectile combat, health, enemy defeat,
+loss, and clean restart.
 
 The current gameplay slice uses seeded randomness to sample fair offscreen
 spawn candidates by perimeter length. Entering enemies receive static
@@ -11,15 +12,17 @@ directional border warnings, become active when their collision circles first
 intersect the visible arena, and then continue direct deterministic pursuit.
 The runtime caps live enemies, rejects candidates with insufficient contact
 time, and removes invalid or fully escaped enemies only beyond a larger logical
-despawn boundary. Enemy runtime phases are `entering`, `active`, and `dying`;
-combat and death behavior remain scheduled for EPIC 4.
+despawn boundary. Enemy runtime phases are `entering`, `active`, and `dying`.
 
 ## Public API
 
 ```ts
-import { createGame } from "@funkspace/wave-survivor";
+import { createGame, type GameStatusSnapshot } from "@funkspace/wave-survivor";
 
-const game = createGame({ canvas, viewport, theme });
+const onStatusChange = (status: GameStatusSnapshot) => {
+  // Update semantic DOM only when phase, health, or kill count changes.
+};
+const game = createGame({ canvas, viewport, theme, onStatusChange });
 game.start();
 game.pause();
 game.resume();
@@ -35,6 +38,12 @@ the factory composes the deterministic runtime, seeded random source, movement
 input, and responsive Canvas renderer. A host supplies a canvas, an
 independently sized viewport boundary, and resolved `GameTheme` values through
 `GameMountOptions`; theme changes are forwarded with `setTheme()`.
+
+Hosts may also supply `onStatusChange`. It receives immutable snapshots with
+only `phase`, `currentHealth`, `maximumHealth`, and `killCount`. The callback
+receives the initial idle state, then runs only when one of those discrete
+values changes. Per-frame positions and entity state remain private to the game
+and Canvas renderer.
 
 The game clears all movement input on pause, restart, window blur, document
 visibility loss, pointer interruption, and destruction. Hosts pause and resume
@@ -78,4 +87,6 @@ Build output is emitted to `dist/` and is not source-controlled.
 without the portfolio or Next.js. The demo builds and imports the package's
 public JavaScript entry point, creates a game controller, and renders the same
 responsive 360 × 640 logical arena as the portfolio host. It has no separate
-gameplay or renderer implementation.
+gameplay or renderer implementation. Semantic health and kill text accompany
+the Canvas, loss is announced politely, and a native restart button appears
+only after loss.
