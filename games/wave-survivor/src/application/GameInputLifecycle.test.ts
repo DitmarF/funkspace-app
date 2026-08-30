@@ -244,6 +244,47 @@ describe("game input lifecycle integration", () => {
     },
   );
 
+  it.each([
+    [
+      "keyboard",
+      (harness: ReturnType<typeof createHarness>) => harness.activateKeyboard(),
+    ],
+    [
+      "joystick",
+      (harness: ReturnType<typeof createHarness>) => harness.activateJoystick(),
+    ],
+  ] as const)(
+    "keeps the same %s adapters and listener set across three restarts",
+    (_source, activate) => {
+      const harness = createHarness();
+      harness.controller.start();
+
+      for (let restartCount = 0; restartCount < 3; restartCount += 1) {
+        activate(harness);
+        harness.session.fixedUpdate(FIXED_SIMULATION_STEP_SECONDS);
+        harness.controller.restart();
+      }
+
+      expect(harness.input.readMovementIntent()).toBe(ZERO_MOVEMENT_INTENT);
+      expect(harness.surface.capturedPointerIds.size).toBe(0);
+      expect(harness.surface.listenerCount("keydown")).toBe(1);
+      expect(harness.surface.listenerCount("keyup")).toBe(1);
+      expect(harness.surface.listenerCount("blur")).toBe(1);
+      expect(harness.surface.listenerCount("pointerdown")).toBe(1);
+      expect(harness.surface.listenerCount("pointermove")).toBe(1);
+      expect(harness.surface.listenerCount("pointerup")).toBe(1);
+      expect(harness.surface.listenerCount("pointercancel")).toBe(1);
+      expect(harness.surface.listenerCount("lostpointercapture")).toBe(1);
+      expect(harness.windowTarget.listenerCount("blur")).toBe(1);
+      expect(harness.documentTarget.listenerCount("visibilitychange")).toBe(1);
+      expect(harness.loop.stop).toHaveBeenCalledTimes(3);
+      expect(harness.loop.start).toHaveBeenCalledTimes(4);
+      expect(harness.presentation.destroy).not.toHaveBeenCalled();
+
+      harness.controller.destroy();
+    },
+  );
+
   it("resets all input on window blur or hidden-document interruption", () => {
     const harness = createHarness();
     harness.activateKeyboard();

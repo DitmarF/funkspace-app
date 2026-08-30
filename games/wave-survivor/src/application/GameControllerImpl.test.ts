@@ -120,6 +120,7 @@ function createHarness(
   const loop = new FixedStepLoop(clock, frameScheduler, {
     fixedUpdate: (deltaSeconds) => session.fixedUpdate(deltaSeconds),
     render: () => session.render(),
+    isTerminal: () => session.phase === "lost",
   });
   const controller = new GameControllerImpl(session, loop);
 
@@ -158,6 +159,125 @@ describe("createGame", () => {
 });
 
 describe("GameController runtime lifecycle", () => {
+  it("renders one lost frame, stops scheduling, and ignores pause or resume", () => {
+    const {
+      clock,
+      controller,
+      frameScheduler,
+      input,
+      readMovementIntent,
+      snapshots,
+      state,
+    } = createHarness();
+    state.player.currentHealth = 1;
+    state.nextAttackAtSeconds = 100;
+    state.nextEnemySpawnAtSeconds = 100;
+    const enemy = createBasicEnemyState(1, state.player.position);
+    enemy.phase = "active";
+    state.enemies.push(enemy);
+    controller.start();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS * 3);
+
+    frameScheduler.runNextFrame();
+
+    expect(controller.lifecycleState).toBe("lost");
+    expect(snapshots).toHaveLength(1);
+    expect(snapshots[0]).toMatchObject({
+      phase: "lost",
+      simulationTimeSeconds: 0,
+    });
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+    expect(readMovementIntent).toHaveBeenCalledOnce();
+    expect(input.reset).toHaveBeenCalledOnce();
+
+    controller.pause();
+    controller.resume();
+
+    expect(controller.lifecycleState).toBe("lost");
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+    expect(input.reset).toHaveBeenCalledOnce();
+  });
+
+  it("keeps restart available after loss without creating a second loop", () => {
+    const { clock, controller, frameScheduler, snapshots, state } =
+      createHarness();
+    state.player.currentHealth = 0;
+    controller.start();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    frameScheduler.runNextFrame();
+    expect(controller.lifecycleState).toBe("lost");
+
+    controller.restart();
+
+    expect(controller.lifecycleState).toBe("running");
+    expect(frameScheduler.pendingFrameCount).toBe(1);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(2);
+    frameScheduler.runNextFrame();
+    expect(snapshots.at(-1)).toMatchObject({
+      phase: "playing",
+      simulationTimeSeconds: 0,
+      enemies: [],
+      projectiles: [],
+    });
+  });
+
+  it.each(["playing", "paused", "lost"] as const)(
+    "keeps exactly one pending frame after repeated restart from %s",
+    (startingPhase) => {
+      const { clock, controller, frameScheduler, snapshots, state } =
+        createHarness();
+      controller.start();
+      if (startingPhase === "paused") controller.pause();
+      if (startingPhase === "lost") {
+        state.player.currentHealth = 0;
+        clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+        frameScheduler.runNextFrame();
+        expect(controller.lifecycleState).toBe("lost");
+      }
+
+      controller.restart();
+      controller.restart();
+      controller.restart();
+
+      expect(controller.lifecycleState).toBe("running");
+      expect(frameScheduler.pendingFrameCount).toBe(1);
+      expect(frameScheduler.requestedFrameIds).toHaveLength(4);
+      frameScheduler.runNextFrame();
+      expect(snapshots.at(-1)).toMatchObject({
+        phase: "playing",
+        simulationTimeSeconds: 0,
+        playerX: 180,
+        playerY: 320,
+        isPlayerInvulnerable: false,
+        killCount: 0,
+        enemies: [],
+        projectiles: [],
+      });
+      expect(frameScheduler.pendingFrameCount).toBe(1);
+    },
+  );
+
+  it("destroys idempotently from lost without restoring scheduling", () => {
+    const { clock, controller, frameScheduler, input, presentation, state } =
+      createHarness();
+    state.player.currentHealth = 0;
+    controller.start();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    frameScheduler.runNextFrame();
+
+    controller.destroy();
+    controller.destroy();
+    controller.resume();
+
+    expect(controller.lifecycleState).toBe("destroyed");
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+    expect(input.destroy).toHaveBeenCalledOnce();
+    expect(presentation.destroy).toHaveBeenCalledOnce();
+  });
+
   it("starts exactly one loop and makes repeated start idempotent", () => {
     const { controller, frameScheduler } = createHarness();
 
@@ -332,6 +452,9 @@ describe("GameController runtime lifecycle", () => {
 
     expect(readJoystickSnapshot).toHaveBeenCalledOnce();
     expect(snapshots.at(-1)?.joystick).toEqual(joystick);
+    expect(snapshots.at(-1)?.joystick).not.toBe(joystick);
+    expect(Object.isFrozen(snapshots.at(-1))).toBe(true);
+    expect(Object.isFrozen(snapshots.at(-1)?.joystick)).toBe(true);
   });
 
   it("copies immutable renderer-facing enemy values from runtime state", () => {

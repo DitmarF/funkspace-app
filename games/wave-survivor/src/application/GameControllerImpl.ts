@@ -2,7 +2,12 @@ import type { GameController } from "../GameController.js";
 import type { GameTheme } from "../GameTheme.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
 
-export type GameLifecycleState = "idle" | "running" | "paused" | "destroyed";
+export type GameLifecycleState =
+  | "idle"
+  | "running"
+  | "paused"
+  | "lost"
+  | "destroyed";
 
 /** Scheduling controls needed by the public lifecycle coordinator. */
 export interface RuntimeLoopControl {

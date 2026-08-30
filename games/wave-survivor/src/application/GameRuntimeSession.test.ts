@@ -65,6 +65,7 @@ const PROJECTILE_DESPAWN_BOUNDS = expandBoundsByOffset(
 
 class ControlledMovementInput implements MovementInputPort {
   movementIntent: MovementIntent = ZERO_MOVEMENT_INTENT;
+  resetCount = 0;
 
   readMovementIntent(): MovementIntent {
     return this.movementIntent;
@@ -72,6 +73,7 @@ class ControlledMovementInput implements MovementInputPort {
 
   reset(): void {
     this.movementIntent = ZERO_MOVEMENT_INTENT;
+    this.resetCount += 1;
   }
 
   destroy(): void {
@@ -117,6 +119,16 @@ function createSession(
   return { input, session };
 }
 
+function readOwnedRuntimeState(session: GameRuntimeSession): RuntimeState {
+  return (session as unknown as { readonly state: RuntimeState }).state;
+}
+
+function createExpectedPlayingState(): RuntimeState {
+  const state = createInitialRuntimeState();
+  state.phase = "playing";
+  return state;
+}
+
 function addEnemy(
   state: RuntimeState,
   id: number,
@@ -145,6 +157,196 @@ function addProjectile(
   );
   state.nextProjectileId = Math.max(state.nextProjectileId, id + 1);
 }
+
+describe("GameRuntimeSession loss transition", () => {
+  it("enters lost once after lethal contact and freezes all progression", () => {
+    const state = createInitialRuntimeState();
+    state.player.currentHealth = 1;
+    state.nextAttackAtSeconds = 100;
+    state.nextEnemySpawnAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const input = new ControlledMovementInput();
+    input.movementIntent = createMovementIntent(1, 0);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      input,
+    );
+
+    session.fixedUpdate(0.01);
+
+    expect(state.phase).toBe("lost");
+    expect(state.player.currentHealth).toBe(0);
+    expect(state.movementIntent).toBe(ZERO_MOVEMENT_INTENT);
+    expect(input.movementIntent).toBe(ZERO_MOVEMENT_INTENT);
+    expect(input.resetCount).toBe(1);
+    expect(state.simulationTimeSeconds).toBe(0);
+
+    const frozenState = structuredClone(state);
+    input.movementIntent = createMovementIntent(0, 1);
+    session.fixedUpdate(10);
+    session.fixedUpdate(10);
+
+    expect(state).toEqual(frozenState);
+    expect(input.resetCount).toBe(1);
+    expect(session.pause()).toBe(false);
+    expect(session.resume()).toBe(false);
+    expect(state).toEqual(frozenState);
+  });
+
+  it("transitions a pre-defeated player before moving or spawning", () => {
+    const state = createInitialRuntimeState();
+    state.player.currentHealth = 0;
+    state.nextEnemySpawnAtSeconds = 0;
+    const input = new ControlledMovementInput();
+    input.movementIntent = createMovementIntent(1, 0);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      input,
+    );
+
+    session.fixedUpdate(1);
+
+    expect(state).toMatchObject({
+      phase: "lost",
+      simulationTimeSeconds: 0,
+      enemies: [],
+    });
+    expect(state.player.position).toEqual({ x: 180, y: 320 });
+    expect(input.resetCount).toBe(1);
+  });
+
+  it("renders the final lost snapshot and restarts through fresh state", () => {
+    const state = createInitialRuntimeState();
+    state.player.currentHealth = 0;
+    const snapshots: GameRenderSnapshot[] = [];
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const session = new GameRuntimeSession(
+      state,
+      new ControlledMovementInput(),
+      presentation,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.start();
+    session.fixedUpdate(0.01);
+    session.render();
+
+    const lostSnapshot = snapshots.at(-1);
+    expect(lostSnapshot).toMatchObject({
+      phase: "lost",
+      simulationTimeSeconds: 0,
+    });
+    expect(Object.isFrozen(lostSnapshot)).toBe(true);
+    expect(Object.isFrozen(lostSnapshot?.enemies)).toBe(true);
+    expect(Object.isFrozen(lostSnapshot?.projectiles)).toBe(true);
+
+    session.restart();
+
+    expect(session.phase).toBe("playing");
+    session.render();
+    expect(snapshots.at(-1)).toMatchObject({
+      phase: "playing",
+      simulationTimeSeconds: 0,
+      enemies: [],
+      projectiles: [],
+    });
+  });
+});
+
+describe("GameRuntimeSession complete restart reset", () => {
+  it("replaces every transient field from the initial-state source", () => {
+    const input = new ControlledMovementInput();
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const { session } = createSession(
+      createInitialRuntimeState(),
+      randomSource,
+      input,
+    );
+
+    for (let runNumber = 1; runNumber <= 3; runNumber += 1) {
+      const progressedState = readOwnedRuntimeState(session);
+      progressedState.phase = runNumber === 1 ? "playing" : "lost";
+      progressedState.simulationTimeSeconds = 90 + runNumber;
+      progressedState.movementIntent = createMovementIntent(1, 0);
+      progressedState.player.position = { x: 24, y: 48 };
+      progressedState.player.collisionRadius = 99;
+      progressedState.player.movementSpeedUnitsPerSecond = 1;
+      progressedState.player.maximumHealth = 99;
+      progressedState.player.currentHealth = 0;
+      progressedState.player.invulnerableUntilSeconds = 100;
+      addEnemy(progressedState, 8, { x: 12, y: 12 }, "dying");
+      progressedState.enemies[0]!.removeAtSimulationSeconds = 100;
+      progressedState.nextEnemyId = 9;
+      progressedState.nextEnemySpawnAtSeconds = 99;
+      addProjectile(progressedState, 7, { x: 50, y: 50 });
+      progressedState.nextProjectileId = 8;
+      progressedState.nextAttackAtSeconds = 99;
+      progressedState.killCount = 7;
+      input.movementIntent = createMovementIntent(0, 1);
+
+      session.restart();
+
+      const restartedState = readOwnedRuntimeState(session);
+      expect(restartedState).toEqual(createExpectedPlayingState());
+      expect(restartedState).not.toBe(progressedState);
+      expect(restartedState.player).not.toBe(progressedState.player);
+      expect(restartedState.enemies).not.toBe(progressedState.enemies);
+      expect(restartedState.projectiles).not.toBe(progressedState.projectiles);
+      expect(input.movementIntent).toBe(ZERO_MOVEMENT_INTENT);
+      expect(input.resetCount).toBe(runNumber);
+      expect(randomSource.resetCount).toBe(runNumber);
+    }
+  });
+
+  it("replays the same complete runtime state across three runs", () => {
+    const input = new ControlledMovementInput();
+    const session = new GameRuntimeSession(
+      createInitialRuntimeState(),
+      input,
+      null,
+      new SeededRandomSource(42),
+    );
+    const steps = [
+      [createMovementIntent(-1, 0), FIRST_SPAWN_DELAY_SECONDS],
+      [createMovementIntent(0, 1), SPAWN_INTERVAL_SECONDS],
+      [createMovementIntent(1, 0), SPAWN_INTERVAL_SECONDS],
+    ] as const;
+    const completedRuns: RuntimeState[] = [];
+    session.start();
+
+    for (let runNumber = 0; runNumber < 3; runNumber += 1) {
+      for (const [intent, deltaSeconds] of steps) {
+        input.movementIntent = intent;
+        session.fixedUpdate(deltaSeconds);
+      }
+      completedRuns.push(structuredClone(readOwnedRuntimeState(session)));
+      if (runNumber < 2) session.restart();
+    }
+
+    expect(completedRuns[1]).toEqual(completedRuns[0]);
+    expect(completedRuns[2]).toEqual(completedRuns[0]);
+    expect(completedRuns[0]).toMatchObject({
+      phase: "playing",
+      player: {
+        maximumHealth: 3,
+        currentHealth: 3,
+        invulnerableUntilSeconds: 0,
+      },
+      nextEnemyId: 4,
+      nextProjectileId: 2,
+      killCount: 0,
+    });
+    expect(completedRuns[0]?.enemies.map((enemy) => enemy.id)).toEqual([
+      1, 2, 3,
+    ]);
+    expect(completedRuns[0]?.projectiles).toEqual([]);
+  });
+});
 
 describe("GameRuntimeSession enemy spawning and pursuit", () => {
   it("moves the player before validating a due candidate", () => {
@@ -656,7 +858,7 @@ describe("GameRuntimeSession automatic attack", () => {
     expect(state.projectiles[0]?.velocity).toEqual({ x: 0, y: -320 });
   });
 
-  it("replays the same first attack and projectile ID after restart", () => {
+  it("replays the same first attack and projectile ID across three runs", () => {
     const snapshots: GameRenderSnapshot[] = [];
     const input = new ControlledMovementInput();
     const presentation: GamePresentationPort = {
@@ -681,13 +883,19 @@ describe("GameRuntimeSession automatic attack", () => {
     session.restart();
     for (const deltaSeconds of steps) session.fixedUpdate(deltaSeconds);
     session.render();
-    const restartedRun = snapshots.at(-1);
+    const secondRun = snapshots.at(-1);
+
+    session.restart();
+    for (const deltaSeconds of steps) session.fixedUpdate(deltaSeconds);
+    session.render();
+    const thirdRun = snapshots.at(-1);
 
     expect(firstRun?.projectiles).toEqual([
       { id: 1, x: 180, y: 400, collisionRadius: 4 },
     ]);
-    expect(randomSource.resetCount).toBe(1);
-    expect(restartedRun).toEqual(firstRun);
+    expect(randomSource.resetCount).toBe(2);
+    expect(secondRun).toEqual(firstRun);
+    expect(thirdRun).toEqual(firstRun);
   });
 });
 

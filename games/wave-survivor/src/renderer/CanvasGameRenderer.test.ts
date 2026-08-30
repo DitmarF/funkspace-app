@@ -291,6 +291,28 @@ describe("CanvasGameRenderer", () => {
     expect(context.fillText).toHaveBeenCalledWith("Kills: 7", 350, 10);
   });
 
+  it("draws a static centered lost state from the terminal snapshot", () => {
+    const { canvas, container, context } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+
+    renderer.render(
+      createRenderSnapshot({
+        phase: "lost",
+        joystick: null,
+      }),
+    );
+
+    expect(context.fillStyle).toBe(initialTheme.colors.effect);
+    expect(context.font).toBe("700 32px sans-serif");
+    expect(context.textAlign).toBe("center");
+    expect(context.textBaseline).toBe("middle");
+    expect(context.fillText).toHaveBeenLastCalledWith("LOST", 180, 320);
+  });
+
   it("draws projectile snapshot circles after the player", () => {
     const { canvas, container, context, fillStyles } = createCanvas(360, 640);
     const renderer = new CanvasGameRenderer({
@@ -679,6 +701,41 @@ describe("CanvasGameRenderer", () => {
 
     expect(observer.disconnect).toHaveBeenCalledOnce();
     expect(context.fillRect).toHaveBeenCalledTimes(drawsBeforeDestroy);
+  });
+
+  it("reuses its Canvas and observer across repeated session restarts", () => {
+    vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+    const { canvas, container } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+    const session = new GameRuntimeSession(
+      createInitialRuntimeState(),
+      new ZeroMovementInput(),
+      renderer,
+      new SeededRandomSource(1),
+    );
+    const controller = new GameControllerImpl(session);
+    const observer = resizeObservers[0];
+    if (!observer) throw new Error("Resize observer was not created.");
+    controller.start();
+
+    controller.restart();
+    controller.restart();
+    controller.restart();
+    session.render();
+
+    expect(resizeObservers).toHaveLength(1);
+    expect(observer.observe).toHaveBeenCalledOnce();
+    expect(observer.disconnect).not.toHaveBeenCalled();
+    expect(renderer.mountedCanvas).toBe(canvas);
+    expect(renderer.currentTheme).toBe(initialTheme);
+    expect(controller.lifecycleState).toBe("running");
+
+    controller.destroy();
+    expect(observer.disconnect).toHaveBeenCalledOnce();
   });
 
   it("does not accumulate observers across repeated mounts and destroys", () => {

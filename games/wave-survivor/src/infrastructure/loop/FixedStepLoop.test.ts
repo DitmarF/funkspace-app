@@ -64,12 +64,14 @@ function createLoop() {
   const frameScheduler = new FakeFrameScheduler();
   const fixedUpdate = vi.fn();
   const render = vi.fn();
+  const isTerminal = vi.fn(() => false);
   const loop = new FixedStepLoop(clock, frameScheduler, {
     fixedUpdate,
     render,
+    isTerminal,
   });
 
-  return { clock, fixedUpdate, frameScheduler, loop, render };
+  return { clock, fixedUpdate, frameScheduler, isTerminal, loop, render };
 }
 
 const FIXED_SIMULATION_STEP_MILLISECONDS = FIXED_SIMULATION_STEP_SECONDS * 1000;
@@ -135,6 +137,28 @@ describe("FixedStepLoop scheduling", () => {
 });
 
 describe("FixedStepLoop advancement", () => {
+  it("renders a terminal update once before stopping scheduling", () => {
+    const { clock, fixedUpdate, frameScheduler, isTerminal, loop, render } =
+      createLoop();
+    let terminal = false;
+    fixedUpdate.mockImplementation(() => {
+      terminal = true;
+    });
+    isTerminal.mockImplementation(() => terminal);
+    loop.start();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS * 3);
+
+    frameScheduler.runNextFrame();
+
+    expect(fixedUpdate).toHaveBeenCalledOnce();
+    expect(render).toHaveBeenCalledOnce();
+    expect(fixedUpdate.mock.invocationCallOrder[0]).toBeLessThan(
+      render.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
+    );
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+  });
+
   it("renders even when no fixed update is ready", () => {
     const { fixedUpdate, frameScheduler, loop, render } = createLoop();
     loop.start();

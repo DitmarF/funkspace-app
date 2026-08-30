@@ -26,6 +26,7 @@ import {
   transitionEnemyToDying,
 } from "../domain/enemies/index.js";
 import { calculateNextPlayerPosition } from "../domain/movement/PlayerMovement.js";
+import { ZERO_MOVEMENT_INTENT } from "../domain/movement/index.js";
 import {
   createBasicProjectileState,
   hasProjectileExpired,
@@ -109,6 +110,7 @@ export class GameRuntimeSession {
 
   fixedUpdate(deltaSeconds: number): void {
     if (this.state.phase !== "playing" || !this.input) return;
+    if (this.transitionToLostIfPlayerDefeated()) return;
     if (!Number.isFinite(deltaSeconds) || deltaSeconds <= 0) return;
 
     const nextSimulationTimeSeconds =
@@ -132,6 +134,8 @@ export class GameRuntimeSession {
     // Projectile hits transition defeated enemies before contact eligibility is
     // evaluated, so a same-update defeat cannot damage the player.
     this.resolvePlayerEnemyContact(nextSimulationTimeSeconds);
+    if (this.transitionToLostIfPlayerDefeated()) return;
+
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
   }
 
@@ -162,7 +166,8 @@ export class GameRuntimeSession {
         }),
       );
     }
-    const snapshot: GameRenderSnapshot = {
+    const joystick = this.readJoystickSnapshot?.() ?? null;
+    const snapshot: GameRenderSnapshot = Object.freeze({
       phase: this.state.phase,
       simulationTimeSeconds: this.state.simulationTimeSeconds,
       playerX: this.state.player.position.x,
@@ -175,8 +180,8 @@ export class GameRuntimeSession {
       killCount: this.state.killCount,
       enemies,
       projectiles: Object.freeze(projectileSnapshots),
-      joystick: this.readJoystickSnapshot?.() ?? null,
-    };
+      joystick: joystick ? Object.freeze({ ...joystick }) : null,
+    });
     this.presentation.render(snapshot);
   }
 
@@ -354,5 +359,21 @@ export class GameRuntimeSession {
       this.state.enemies,
       simulationTimeSeconds,
     );
+  }
+
+  private transitionToLostIfPlayerDefeated(): boolean {
+    if (
+      this.state.phase !== "playing" ||
+      !Number.isFinite(this.state.player.currentHealth) ||
+      this.state.player.currentHealth > 0
+    ) {
+      return false;
+    }
+
+    this.state.player.currentHealth = 0;
+    this.state.movementIntent = ZERO_MOVEMENT_INTENT;
+    this.state.phase = "lost";
+    this.input?.reset();
+    return true;
   }
 }
