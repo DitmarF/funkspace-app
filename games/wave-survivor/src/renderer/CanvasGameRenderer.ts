@@ -24,6 +24,8 @@ const ENTRY_WARNING_BORDER_INSET = 2;
 const ENTRY_WARNING_DEPTH = 12;
 const ENTRY_WARNING_HALF_BASE = 6;
 const ENEMY_LINE_WIDTH = 2;
+const PLAYER_INVULNERABILITY_RING_GAP = 4;
+const PLAYER_INVULNERABILITY_RING_LINE_WIDTH = 2;
 const KILL_COUNT_RIGHT_INSET = 10;
 const KILL_COUNT_TOP_INSET = 10;
 const KILL_COUNT_FONT = "600 12px sans-serif";
@@ -140,6 +142,10 @@ export class CanvasGameRenderer implements GamePresentationPort {
       Math.PI * 2,
     );
     this.context.fill();
+
+    if (this.latestSnapshot.isPlayerInvulnerable) {
+      this.drawPlayerInvulnerabilityRing(this.latestSnapshot);
+    }
 
     this.drawProjectiles(this.latestSnapshot.projectiles);
 
@@ -278,6 +284,22 @@ export class CanvasGameRenderer implements GamePresentationPort {
       );
       this.context.fill();
     }
+  }
+
+  private drawPlayerInvulnerabilityRing(snapshot: GameRenderSnapshot): void {
+    if (!this.context || !this.theme) return;
+
+    this.context.strokeStyle = this.theme.colors.effect;
+    this.context.lineWidth = PLAYER_INVULNERABILITY_RING_LINE_WIDTH;
+    this.context.beginPath();
+    this.context.arc(
+      snapshot.playerX,
+      snapshot.playerY,
+      snapshot.playerCollisionRadius + PLAYER_INVULNERABILITY_RING_GAP,
+      0,
+      Math.PI * 2,
+    );
+    this.context.stroke();
   }
 
   private drawKillCount(killCount: number): void {

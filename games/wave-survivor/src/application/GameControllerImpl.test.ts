@@ -251,6 +251,7 @@ describe("GameController runtime lifecycle", () => {
         playerX: 180,
         playerY: 320,
         playerCollisionRadius: 12,
+        isPlayerInvulnerable: false,
         killCount: 0,
         enemies: [],
         projectiles: [],

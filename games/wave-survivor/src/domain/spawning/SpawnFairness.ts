@@ -9,10 +9,10 @@ import { createEnemySpawnCandidate } from "./SpawnGeometry.js";
 export const FIRST_SPAWN_DELAY_SECONDS = 0.5;
 
 /** Provisional fixed delay between EPIC 3 spawn opportunities. */
-export const SPAWN_INTERVAL_SECONDS = 1.75;
+export const SPAWN_INTERVAL_SECONDS = 0.75;
 
 /** Provisional cap for enemies that are entering or active. */
-export const MAX_LIVE_ENEMIES = 3;
+export const MAX_LIVE_ENEMIES = 4;
 
 /** Minimum warning time from a candidate center to player-circle contact. */
 export const MINIMUM_CONTACT_TIME_SECONDS = 1.25;

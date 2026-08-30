@@ -6,7 +6,10 @@ import type {
   GameRenderSnapshot,
 } from "../domain/GamePresentationPort.js";
 import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
-import { BASIC_ATTACK_DEFINITION } from "../domain/combat/index.js";
+import {
+  BASIC_ATTACK_DEFINITION,
+  PROVISIONAL_PLAYER_INVULNERABILITY_DURATION_SECONDS,
+} from "../domain/combat/index.js";
 import {
   BASIC_ENEMY_DEFINITION,
   createBasicEnemyState,
@@ -189,17 +192,17 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
       createBasicEnemyState(1, { x: -66, y: 100 }),
       createBasicEnemyState(2, { x: -66, y: 200 }),
       createBasicEnemyState(3, { x: -66, y: 300 }),
+      createBasicEnemyState(4, { x: -66, y: 400 }),
     );
     state.enemies[1]!.phase = "active";
-    state.nextEnemyId = 4;
+    state.nextEnemyId = 5;
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
 
     session.fixedUpdate(FIRST_SPAWN_DELAY_SECONDS);
 
-    expect(MAX_LIVE_ENEMIES).toBe(3);
     expect(state.enemies).toHaveLength(MAX_LIVE_ENEMIES);
-    expect(state.nextEnemyId).toBe(4);
+    expect(state.nextEnemyId).toBe(5);
     expect(randomSource.calls).toHaveLength(0);
     expect(state.nextEnemySpawnAtSeconds).toBe(
       FIRST_SPAWN_DELAY_SECONDS + SPAWN_INTERVAL_SECONDS,
@@ -530,7 +533,9 @@ describe("GameRuntimeSession automatic attack", () => {
       expiresAtSimulationSeconds: 2.6,
     });
     expect(state.nextProjectileId).toBe(2);
-    expect(state.nextAttackAtSeconds).toBe(1);
+    expect(state.nextAttackAtSeconds).toBe(
+      0.1 + BASIC_ATTACK_DEFINITION.cooldownSeconds,
+    );
   });
 
   it("does not fire before the cooldown deadline", () => {
@@ -873,6 +878,26 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 });
 
 describe("GameRuntimeSession player contact damage", () => {
+  it("allows default spawn pressure to reach a stationary player", () => {
+    const state = createInitialRuntimeState();
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    for (
+      let updateCount = 0;
+      updateCount < 720 &&
+      state.player.currentHealth === state.player.maximumHealth;
+      updateCount += 1
+    ) {
+      session.fixedUpdate(1 / 60);
+    }
+
+    expect(state.player.currentHealth).toBeLessThan(state.player.maximumHealth);
+    expect(state.simulationTimeSeconds).toBeLessThan(12);
+  });
+
   it("applies one active-enemy contact hit after enemy movement", () => {
     const state = createInitialRuntimeState();
     state.nextEnemySpawnAtSeconds = 100;
@@ -886,7 +911,222 @@ describe("GameRuntimeSession player contact damage", () => {
     session.fixedUpdate(0.01);
 
     expect(state.player.currentHealth).toBe(2);
+    expect(state.player.invulnerableUntilSeconds).toBe(
+      0.01 + PROVISIONAL_PLAYER_INVULNERABILITY_DURATION_SECONDS,
+    );
     expect(state.enemies[0]?.phase).toBe("active");
+  });
+
+  it("ignores continued overlap during invulnerability", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.01);
+    session.fixedUpdate(0.1);
+
+    expect(state.player.currentHealth).toBe(2);
+  });
+
+  it("does not let another overlapping enemy bypass invulnerability", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.fixedUpdate(0.01);
+    addEnemy(state, 2, state.player.position, "active");
+
+    session.fixedUpdate(0.1);
+
+    expect(state.player.currentHealth).toBe(2);
+  });
+
+  it("ignores contact just before invulnerability expires", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.fixedUpdate(0.01);
+    const deadline = state.player.invulnerableUntilSeconds;
+
+    session.fixedUpdate(deadline - state.simulationTimeSeconds - 0.001);
+
+    expect(state.simulationTimeSeconds).toBeCloseTo(deadline - 0.001);
+    expect(state.player.currentHealth).toBe(2);
+  });
+
+  it("allows contact at exact invulnerability expiration", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.fixedUpdate(0.01);
+    const deadline = state.player.invulnerableUntilSeconds;
+
+    session.fixedUpdate(deadline - state.simulationTimeSeconds);
+
+    expect(state.simulationTimeSeconds).toBe(deadline);
+    expect(state.player.currentHealth).toBe(1);
+  });
+
+  it("freezes the invulnerability relationship while paused", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.fixedUpdate(0.01);
+    const deadline = state.player.invulnerableUntilSeconds;
+
+    session.pause();
+    session.fixedUpdate(10);
+
+    expect(state.simulationTimeSeconds).toBe(0.01);
+    expect(state.player.invulnerableUntilSeconds).toBe(deadline);
+    expect(state.player.currentHealth).toBe(2);
+  });
+
+  it("resumes with the remaining simulation-time immunity intact", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.fixedUpdate(0.01);
+    const deadline = state.player.invulnerableUntilSeconds;
+    session.pause();
+    session.fixedUpdate(10);
+    session.resume();
+
+    session.fixedUpdate(deadline - state.simulationTimeSeconds - 0.001);
+    expect(state.player.currentHealth).toBe(2);
+
+    session.fixedUpdate(0.001);
+    expect(state.player.currentHealth).toBe(1);
+  });
+
+  it("does not advance immunity for invalid deltas", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.fixedUpdate(0.01);
+    const deadline = state.player.invulnerableUntilSeconds;
+
+    for (const deltaSeconds of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+      session.fixedUpdate(deltaSeconds);
+    }
+
+    expect(state.simulationTimeSeconds).toBe(0.01);
+    expect(state.player.invulnerableUntilSeconds).toBe(deadline);
+    expect(state.player.currentHealth).toBe(2);
+  });
+
+  it("restart reports a fresh vulnerable player", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const snapshots: GameRenderSnapshot[] = [];
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const session = new GameRuntimeSession(
+      state,
+      new ControlledMovementInput(),
+      presentation,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.start();
+    session.fixedUpdate(0.01);
+    session.render();
+    expect(snapshots.at(-1)?.isPlayerInvulnerable).toBe(true);
+
+    session.restart();
+    session.render();
+
+    expect(snapshots.at(-1)?.isPlayerInvulnerable).toBe(false);
+  });
+
+  it("allows contact damage to reduce health to zero", () => {
+    const state = createInitialRuntimeState();
+    state.player.currentHealth = 1;
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.01);
+
+    expect(state.player.currentHealth).toBe(0);
+    expect(state.player.invulnerableUntilSeconds).toBeGreaterThan(
+      state.simulationTimeSeconds,
+    );
+  });
+
+  it("reports invulnerability only before its renderer-snapshot deadline", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    const snapshots: GameRenderSnapshot[] = [];
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const session = new GameRuntimeSession(
+      state,
+      new ControlledMovementInput(),
+      presentation,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.start();
+    session.render();
+    expect(snapshots.at(-1)?.isPlayerInvulnerable).toBe(false);
+
+    session.fixedUpdate(0.01);
+    session.render();
+    expect(snapshots.at(-1)?.isPlayerInvulnerable).toBe(true);
+
+    state.enemies = [];
+    session.fixedUpdate(
+      state.player.invulnerableUntilSeconds - state.simulationTimeSeconds,
+    );
+    session.render();
+    expect(snapshots.at(-1)?.isPlayerInvulnerable).toBe(false);
   });
 
   it("does not take contact damage from an enemy defeated earlier in the update", () => {

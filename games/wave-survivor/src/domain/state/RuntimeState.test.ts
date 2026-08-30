@@ -67,6 +67,7 @@ describe("createInitialRuntimeState", () => {
     expect(PROVISIONAL_PLAYER_MAXIMUM_HEALTH).toBe(3);
     expect(state.player.maximumHealth).toBe(PROVISIONAL_PLAYER_MAXIMUM_HEALTH);
     expect(state.player.currentHealth).toBe(state.player.maximumHealth);
+    expect(state.player.invulnerableUntilSeconds).toBe(0);
   });
 
   it("creates independent state and player instances", () => {
@@ -166,6 +167,7 @@ describe("createInitialRuntimeState", () => {
   it("restores full player health for a restarted session", () => {
     const progressedState = createInitialRuntimeState();
     progressedState.player.currentHealth = 0;
+    progressedState.player.invulnerableUntilSeconds = 99;
 
     const restartedState = createInitialRuntimeState();
 
@@ -175,5 +177,6 @@ describe("createInitialRuntimeState", () => {
     expect(restartedState.player.currentHealth).toBe(
       PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
     );
+    expect(restartedState.player.invulnerableUntilSeconds).toBe(0);
   });
 });

@@ -48,7 +48,7 @@ export function createBasicAttackDefinition(
 
 /** Provisional Gate 1 tuning for the automatic projectile attack. */
 export const BASIC_ATTACK_DEFINITION = createBasicAttackDefinition({
-  cooldownSeconds: 0.9,
+  cooldownSeconds: 1.5,
   projectileSpeedUnitsPerSecond: 320,
   projectileDamage: 1,
   projectileCollisionRadius: 4,

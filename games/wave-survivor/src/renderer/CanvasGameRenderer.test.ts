@@ -27,6 +27,7 @@ function createRenderSnapshot(
     playerX: 180,
     playerY: 320,
     playerCollisionRadius: 12,
+    isPlayerInvulnerable: false,
     killCount: 0,
     enemies: [],
     projectiles: [],
@@ -234,6 +235,38 @@ describe("CanvasGameRenderer", () => {
     );
 
     expect(context.arc).toHaveBeenLastCalledWith(247, 193, 9, 0, Math.PI * 2);
+  });
+
+  it("draws a static effect-colored ring while the player is invulnerable", () => {
+    const { canvas, container, context, strokeStyles } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+
+    renderer.render(
+      createRenderSnapshot({
+        playerX: 247,
+        playerY: 193,
+        playerCollisionRadius: 9,
+        isPlayerInvulnerable: true,
+        joystick: null,
+      }),
+    );
+
+    expect(context.arc).toHaveBeenNthCalledWith(1, 247, 193, 9, 0, Math.PI * 2);
+    expect(context.arc).toHaveBeenNthCalledWith(
+      2,
+      247,
+      193,
+      13,
+      0,
+      Math.PI * 2,
+    );
+    expect(strokeStyles.at(-1)).toBe(initialTheme.colors.effect);
+    expect(context.lineWidth).toBe(2);
+    expect(context.stroke).toHaveBeenCalledOnce();
   });
 
   it("draws the kill count in the top-right corner", () => {

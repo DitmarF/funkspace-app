@@ -26,6 +26,7 @@ export interface PlayerState {
   movementSpeedUnitsPerSecond: number;
   maximumHealth: number;
   currentHealth: number;
+  invulnerableUntilSeconds: number;
 }
 
 /** Minimal deterministic state owned by one Wave Survivor game session. */
@@ -59,6 +60,7 @@ export function createInitialRuntimeState(): RuntimeState {
       movementSpeedUnitsPerSecond: PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
       maximumHealth: PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
       currentHealth: PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
+      invulnerableUntilSeconds: 0,
     },
     enemies: [],
     nextEnemyId: 1,

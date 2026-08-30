@@ -6,7 +6,11 @@ import {
 } from "../enemies/index.js";
 import type { LogicalPosition } from "../geometry/index.js";
 import { createInitialRuntimeState, type PlayerState } from "../state/index.js";
-import { resolvePlayerContactDamage } from "./PlayerContactDamage.js";
+import {
+  isPlayerInvulnerable,
+  PROVISIONAL_PLAYER_INVULNERABILITY_DURATION_SECONDS,
+  resolvePlayerContactDamage,
+} from "./PlayerContactDamage.js";
 
 function createEnemy(
   id: number,
@@ -28,6 +32,10 @@ function createPlayer(): PlayerState {
 }
 
 describe("resolvePlayerContactDamage", () => {
+  it("centralizes the provisional Gate 1 invulnerability duration", () => {
+    expect(PROVISIONAL_PLAYER_INVULNERABILITY_DURATION_SECONDS).toBe(0.65);
+  });
+
   it("does not damage the player without overlap", () => {
     const player = createPlayer();
     const enemy = createEnemy(1, {
@@ -35,7 +43,7 @@ describe("resolvePlayerContactDamage", () => {
       y: player.position.y,
     });
 
-    expect(resolvePlayerContactDamage(player, [enemy])).toBe(false);
+    expect(resolvePlayerContactDamage(player, [enemy], 0)).toBe(false);
     expect(player.currentHealth).toBe(player.maximumHealth);
   });
 
@@ -44,7 +52,7 @@ describe("resolvePlayerContactDamage", () => {
     const enemy = createEnemy(1, player.position);
     const initialEnemyPosition = { ...enemy.position };
 
-    expect(resolvePlayerContactDamage(player, [enemy])).toBe(true);
+    expect(resolvePlayerContactDamage(player, [enemy], 0)).toBe(true);
     expect(player.currentHealth).toBe(2);
     expect(enemy.position).toEqual(initialEnemyPosition);
     expect(enemy.phase).toBe("active");
@@ -55,7 +63,7 @@ describe("resolvePlayerContactDamage", () => {
     const enemy = createEnemy(1, player.position);
     enemy.position.x += player.collisionRadius + enemy.collisionRadius;
 
-    expect(resolvePlayerContactDamage(player, [enemy])).toBe(true);
+    expect(resolvePlayerContactDamage(player, [enemy], 0)).toBe(true);
     expect(player.currentHealth).toBe(2);
   });
 
@@ -65,7 +73,7 @@ describe("resolvePlayerContactDamage", () => {
       const player = createPlayer();
       const enemy = createEnemy(1, player.position, phase);
 
-      expect(resolvePlayerContactDamage(player, [enemy])).toBe(false);
+      expect(resolvePlayerContactDamage(player, [enemy], 0)).toBe(false);
       expect(player.currentHealth).toBe(player.maximumHealth);
     },
   );
@@ -75,7 +83,7 @@ describe("resolvePlayerContactDamage", () => {
     const enemy = createEnemy(1, player.position);
     enemy.position.x = Number.NaN;
 
-    expect(resolvePlayerContactDamage(player, [enemy])).toBe(false);
+    expect(resolvePlayerContactDamage(player, [enemy], 0)).toBe(false);
     expect(player.currentHealth).toBe(player.maximumHealth);
   });
 
@@ -85,7 +93,7 @@ describe("resolvePlayerContactDamage", () => {
     const higherIdEnemy = createEnemy(5, player.position, "active", 2);
 
     expect(
-      resolvePlayerContactDamage(player, [higherIdEnemy, lowerIdEnemy]),
+      resolvePlayerContactDamage(player, [higherIdEnemy, lowerIdEnemy], 0),
     ).toBe(true);
     expect(player.currentHealth).toBe(2);
   });
@@ -94,7 +102,7 @@ describe("resolvePlayerContactDamage", () => {
     const player = createPlayer();
     const enemy = createEnemy(1, player.position, "active", 5);
 
-    expect(resolvePlayerContactDamage(player, [enemy])).toBe(true);
+    expect(resolvePlayerContactDamage(player, [enemy], 0)).toBe(true);
     expect(player.currentHealth).toBe(0);
   });
 
@@ -103,7 +111,44 @@ describe("resolvePlayerContactDamage", () => {
     player.currentHealth = player.maximumHealth + 10;
     const enemy = createEnemy(1, player.position);
 
-    expect(resolvePlayerContactDamage(player, [enemy])).toBe(true);
+    expect(resolvePlayerContactDamage(player, [enemy], 0)).toBe(true);
     expect(player.currentHealth).toBe(player.maximumHealth - 1);
+  });
+
+  it("ignores contact before the invulnerability deadline", () => {
+    const player = createPlayer();
+    const enemy = createEnemy(1, player.position);
+
+    expect(resolvePlayerContactDamage(player, [enemy], 0)).toBe(true);
+    expect(
+      resolvePlayerContactDamage(
+        player,
+        [enemy],
+        PROVISIONAL_PLAYER_INVULNERABILITY_DURATION_SECONDS - 0.001,
+      ),
+    ).toBe(false);
+    expect(player.currentHealth).toBe(2);
+    expect(
+      isPlayerInvulnerable(
+        player,
+        PROVISIONAL_PLAYER_INVULNERABILITY_DURATION_SECONDS - 0.001,
+      ),
+    ).toBe(true);
+  });
+
+  it("allows contact at exact deadline equality", () => {
+    const player = createPlayer();
+    const enemy = createEnemy(1, player.position);
+
+    resolvePlayerContactDamage(player, [enemy], 0);
+
+    expect(
+      resolvePlayerContactDamage(
+        player,
+        [enemy],
+        PROVISIONAL_PLAYER_INVULNERABILITY_DURATION_SECONDS,
+      ),
+    ).toBe(true);
+    expect(player.currentHealth).toBe(1);
   });
 });

@@ -6,7 +6,7 @@ import {
 } from "./index.js";
 
 const VALID_DEFINITION: BasicAttackDefinition = {
-  cooldownSeconds: 0.9,
+  cooldownSeconds: 1.5,
   projectileSpeedUnitsPerSecond: 320,
   projectileDamage: 1,
   projectileCollisionRadius: 4,
@@ -24,7 +24,7 @@ describe("BASIC_ATTACK_DEFINITION", () => {
     expect(Reflect.set(BASIC_ATTACK_DEFINITION, "cooldownSeconds", 99)).toBe(
       false,
     );
-    expect(BASIC_ATTACK_DEFINITION.cooldownSeconds).toBe(0.9);
+    expect(BASIC_ATTACK_DEFINITION.cooldownSeconds).toBe(1.5);
   });
 });
 
