@@ -18,8 +18,10 @@ import {
   calculateNextEnemyPosition,
   createBasicEnemyState,
   getEnemyPhaseAfterBoundsIntersection,
+  hasEnemyDyingExpired,
   isEnemyStateValid,
   shouldRetainEnemyWithinBounds,
+  transitionEnemyToDying,
 } from "../domain/enemies/index.js";
 import { calculateNextPlayerPosition } from "../domain/movement/PlayerMovement.js";
 import {
@@ -118,10 +120,11 @@ export class GameRuntimeSession {
       movementIntent,
       deltaSeconds,
     );
+    this.transitionDefeatedEnemies(nextSimulationTimeSeconds);
     this.spawnEnemyIfDue(nextSimulationTimeSeconds);
     this.moveEnemiesTowardPlayer(deltaSeconds);
     this.activateEnemiesIntersectingVisibleArena();
-    this.removeInvalidOrEscapedEnemies();
+    this.removeInvalidEscapedOrExpiredEnemies(nextSimulationTimeSeconds);
     this.emitBasicProjectileIfReady(nextSimulationTimeSeconds);
     this.updateProjectiles(deltaSeconds, nextSimulationTimeSeconds);
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
@@ -160,6 +163,7 @@ export class GameRuntimeSession {
       playerX: this.state.player.position.x,
       playerY: this.state.player.position.y,
       playerCollisionRadius: this.state.player.collisionRadius,
+      killCount: this.state.killCount,
       enemies,
       projectiles: Object.freeze(projectileSnapshots),
       joystick: this.readJoystickSnapshot?.() ?? null,
@@ -249,9 +253,21 @@ export class GameRuntimeSession {
     }
   }
 
-  private removeInvalidOrEscapedEnemies(): void {
-    this.state.enemies = this.state.enemies.filter((enemy) =>
-      shouldRetainEnemyWithinBounds(enemy, ENEMY_DESPAWN_BOUNDS),
+  private transitionDefeatedEnemies(simulationTimeSeconds: number): void {
+    for (const enemy of this.state.enemies) {
+      if (transitionEnemyToDying(enemy, simulationTimeSeconds)) {
+        this.state.killCount += 1;
+      }
+    }
+  }
+
+  private removeInvalidEscapedOrExpiredEnemies(
+    simulationTimeSeconds: number,
+  ): void {
+    this.state.enemies = this.state.enemies.filter(
+      (enemy) =>
+        shouldRetainEnemyWithinBounds(enemy, ENEMY_DESPAWN_BOUNDS) &&
+        !hasEnemyDyingExpired(enemy, simulationTimeSeconds),
     );
   }
 
@@ -311,7 +327,10 @@ export class GameRuntimeSession {
         continue;
       }
 
-      if (resolveProjectileHit(projectile, this.state.enemies)) continue;
+      if (resolveProjectileHit(projectile, this.state.enemies)) {
+        this.transitionDefeatedEnemies(simulationTimeSeconds);
+        continue;
+      }
 
       this.state.projectiles[retainedProjectileCount] = projectile;
       retainedProjectileCount += 1;

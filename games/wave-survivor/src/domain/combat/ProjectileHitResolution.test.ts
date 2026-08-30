@@ -18,6 +18,7 @@ function createEnemy(
 ): EnemyState {
   const enemy = createBasicEnemyState(id, position);
   enemy.phase = phase;
+  if (phase === "dying") enemy.removeAtSimulationSeconds = 100;
   return enemy;
 }
 

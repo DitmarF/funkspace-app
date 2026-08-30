@@ -18,6 +18,7 @@ export interface EnemyState {
   readonly movementSpeedUnitsPerSecond: number;
   currentHealth: number;
   readonly contactDamage: number;
+  removeAtSimulationSeconds: number | null;
 }
 
 /** Create one basic enemy entering at the supplied logical position. */
@@ -35,6 +36,7 @@ export function createBasicEnemyState(
       BASIC_ENEMY_DEFINITION.movementSpeedUnitsPerSecond,
     currentHealth: BASIC_ENEMY_DEFINITION.maximumHealth,
     contactDamage: BASIC_ENEMY_DEFINITION.contactDamage,
+    removeAtSimulationSeconds: null,
   };
 }
 
@@ -76,7 +78,12 @@ export function isEnemyStateValid(enemy: Readonly<EnemyState>): boolean {
     enemy.movementSpeedUnitsPerSecond >= 0 &&
     Number.isFinite(enemy.currentHealth) &&
     Number.isFinite(enemy.contactDamage) &&
-    enemy.contactDamage >= 0
+    enemy.contactDamage >= 0 &&
+    (enemy.phase === "dying"
+      ? enemy.removeAtSimulationSeconds !== null &&
+        Number.isFinite(enemy.removeAtSimulationSeconds) &&
+        enemy.removeAtSimulationSeconds >= 0
+      : enemy.removeAtSimulationSeconds === null)
   );
 }
 

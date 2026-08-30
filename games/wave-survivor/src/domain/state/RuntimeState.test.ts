@@ -38,6 +38,7 @@ describe("createInitialRuntimeState", () => {
     expect(state.enemies).toEqual([]);
     expect(state.nextEnemyId).toBe(1);
     expect(state.nextEnemySpawnAtSeconds).toBe(FIRST_SPAWN_DELAY_SECONDS);
+    expect(state.killCount).toBe(0);
   });
 
   it("starts with deterministic empty projectile state", () => {
@@ -116,6 +117,9 @@ describe("createInitialRuntimeState", () => {
     );
     progressedState.nextEnemyId += 1;
     progressedState.nextEnemySpawnAtSeconds = 99;
+    progressedState.enemies[0]!.phase = "dying";
+    progressedState.enemies[0]!.removeAtSimulationSeconds = 99;
+    progressedState.killCount = 1;
 
     const restartedState = createInitialRuntimeState();
 
@@ -124,6 +128,7 @@ describe("createInitialRuntimeState", () => {
     expect(restartedState.nextEnemySpawnAtSeconds).toBe(
       FIRST_SPAWN_DELAY_SECONDS,
     );
+    expect(restartedState.killCount).toBe(0);
   });
 
   it("creates clean projectile state for a restarted session", () => {

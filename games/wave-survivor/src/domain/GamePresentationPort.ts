@@ -37,6 +37,7 @@ export interface GameRenderSnapshot {
   readonly playerX: number;
   readonly playerY: number;
   readonly playerCollisionRadius: number;
+  readonly killCount: number;
   readonly enemies: readonly EnemyRenderSnapshot[];
   readonly projectiles: readonly ProjectileRenderSnapshot[];
   readonly joystick: JoystickRenderSnapshot | null;

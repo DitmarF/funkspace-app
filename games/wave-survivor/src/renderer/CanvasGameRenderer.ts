@@ -24,6 +24,9 @@ const ENTRY_WARNING_BORDER_INSET = 2;
 const ENTRY_WARNING_DEPTH = 12;
 const ENTRY_WARNING_HALF_BASE = 6;
 const ENEMY_LINE_WIDTH = 2;
+const KILL_COUNT_RIGHT_INSET = 10;
+const KILL_COUNT_TOP_INSET = 10;
+const KILL_COUNT_FONT = "600 12px sans-serif";
 
 function getBrowserDevicePixelRatio(): number {
   return typeof window === "undefined" ? 1 : window.devicePixelRatio;
@@ -143,6 +146,8 @@ export class CanvasGameRenderer implements GamePresentationPort {
     if (this.latestSnapshot.joystick) {
       this.drawJoystick(this.latestSnapshot.joystick);
     }
+
+    this.drawKillCount(this.latestSnapshot.killCount);
   }
 
   private drawEntryWarnings(snapshot: GameRenderSnapshot): void {
@@ -219,6 +224,30 @@ export class CanvasGameRenderer implements GamePresentationPort {
     for (const enemy of enemies) {
       if (enemy.phase === "entering") continue;
 
+      if (enemy.phase === "dying") {
+        this.context.strokeStyle = this.theme.colors.effect;
+        this.context.lineWidth = ENEMY_LINE_WIDTH;
+        this.context.beginPath();
+        this.context.moveTo(
+          enemy.x - enemy.collisionRadius,
+          enemy.y - enemy.collisionRadius,
+        );
+        this.context.lineTo(
+          enemy.x + enemy.collisionRadius,
+          enemy.y + enemy.collisionRadius,
+        );
+        this.context.moveTo(
+          enemy.x + enemy.collisionRadius,
+          enemy.y - enemy.collisionRadius,
+        );
+        this.context.lineTo(
+          enemy.x - enemy.collisionRadius,
+          enemy.y + enemy.collisionRadius,
+        );
+        this.context.stroke();
+        continue;
+      }
+
       this.context.strokeStyle = this.theme.colors.enemy;
       this.context.lineWidth = ENEMY_LINE_WIDTH;
       this.context.beginPath();
@@ -249,6 +278,20 @@ export class CanvasGameRenderer implements GamePresentationPort {
       );
       this.context.fill();
     }
+  }
+
+  private drawKillCount(killCount: number): void {
+    if (!this.context || !this.theme) return;
+
+    this.context.fillStyle = this.theme.colors.effect;
+    this.context.font = KILL_COUNT_FONT;
+    this.context.textAlign = "right";
+    this.context.textBaseline = "top";
+    this.context.fillText(
+      `Kills: ${killCount}`,
+      ARENA.width - KILL_COUNT_RIGHT_INSET,
+      KILL_COUNT_TOP_INSET,
+    );
   }
 
   private drawJoystick(snapshot: JoystickRenderSnapshot): void {

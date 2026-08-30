@@ -27,6 +27,7 @@ describe("createBasicEnemyState", () => {
         BASIC_ENEMY_DEFINITION.movementSpeedUnitsPerSecond,
       currentHealth: BASIC_ENEMY_DEFINITION.maximumHealth,
       contactDamage: BASIC_ENEMY_DEFINITION.contactDamage,
+      removeAtSimulationSeconds: null,
     });
   });
 
@@ -181,6 +182,18 @@ describe("enemy cleanup eligibility", () => {
       ...createBasicEnemyState(1, { x: 0, y: 0 }),
       contactDamage: -1,
     },
+    {
+      ...createBasicEnemyState(1, { x: 0, y: 0 }),
+      removeAtSimulationSeconds: Number.NaN,
+    },
+    {
+      ...createBasicEnemyState(1, { x: 0, y: 0 }),
+      phase: "dying",
+    },
+    {
+      ...createBasicEnemyState(1, { x: 0, y: 0 }),
+      removeAtSimulationSeconds: 1,
+    },
   ] satisfies EnemyState[])(
     "rejects invalid enemy numeric state %#",
     (enemy) => {
@@ -193,6 +206,7 @@ describe("enemy cleanup eligibility", () => {
     const enemy = createBasicEnemyState(1, { x: 180, y: 320 });
     enemy.phase = "dying";
     enemy.currentHealth = 0;
+    enemy.removeAtSimulationSeconds = 1;
 
     expect(isEnemyStateValid(enemy)).toBe(true);
     expect(shouldRetainEnemyWithinBounds(enemy, despawnBounds)).toBe(true);

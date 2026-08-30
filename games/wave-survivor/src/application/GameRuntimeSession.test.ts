@@ -10,6 +10,7 @@ import { BASIC_ATTACK_DEFINITION } from "../domain/combat/index.js";
 import {
   BASIC_ENEMY_DEFINITION,
   createBasicEnemyState,
+  PROVISIONAL_ENEMY_DYING_DURATION_SECONDS,
   type EnemyPhase,
 } from "../domain/enemies/index.js";
 import type { LogicalPosition } from "../domain/geometry/index.js";
@@ -121,6 +122,7 @@ function addEnemy(
 ): void {
   const enemy = createBasicEnemyState(id, position);
   enemy.phase = phase;
+  if (phase === "dying") enemy.removeAtSimulationSeconds = 100;
   state.enemies.push(enemy);
   state.nextEnemyId = Math.max(state.nextEnemyId, id + 1);
 }
@@ -295,6 +297,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
       y: 320,
     });
     enemy.phase = "dying";
+    enemy.removeAtSimulationSeconds = 100;
     state.enemies.push(enemy);
     const { session } = createSession(
       state,
@@ -359,6 +362,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
       y: 320,
     });
     escapedEnemy.phase = "dying";
+    escapedEnemy.removeAtSimulationSeconds = 100;
     state.enemies.push(escapedEnemy);
     state.nextEnemyId = 3;
     const initialEnemyPosition = { ...state.enemies[0]!.position };
@@ -707,9 +711,17 @@ describe("GameRuntimeSession projectile hit resolution", () => {
     session.render();
 
     expect(state.enemies[0]?.currentHealth).toBe(0);
-    expect(state.enemies[0]?.phase).toBe("active");
+    expect(state.enemies[0]?.phase).toBe("dying");
+    expect(state.killCount).toBe(1);
     expect(state.projectiles).toEqual([]);
     expect(snapshots.at(-1)?.projectiles).toEqual([]);
+
+    const renderedEnemies = snapshots.at(-1)?.enemies;
+    expect(snapshots.at(-1)?.killCount).toBe(1);
+    expect(renderedEnemies?.[0]?.phase).toBe("dying");
+    expect(renderedEnemies?.[0]).not.toBe(state.enemies[0]);
+    expect(Object.isFrozen(renderedEnemies)).toBe(true);
+    expect(Object.isFrozen(renderedEnemies?.[0])).toBe(true);
   });
 
   it("does not apply damage again on the next fixed update", () => {
@@ -726,6 +738,7 @@ describe("GameRuntimeSession projectile hit resolution", () => {
 
     session.fixedUpdate(0.01);
     expect(state.enemies[0]?.currentHealth).toBe(2);
+    expect(state.killCount).toBe(0);
     expect(state.projectiles).toEqual([]);
 
     session.fixedUpdate(0.01);
@@ -737,6 +750,7 @@ describe("GameRuntimeSession projectile hit resolution", () => {
     state.nextEnemySpawnAtSeconds = 100;
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
+    state.enemies[0]!.currentHealth = 3;
     addProjectile(state, 1, state.player.position);
     addProjectile(state, 2, state.player.position);
     const { session } = createSession(
@@ -746,9 +760,115 @@ describe("GameRuntimeSession projectile hit resolution", () => {
 
     session.fixedUpdate(0.01);
 
-    expect(state.enemies[0]?.currentHealth).toBe(-1);
+    expect(state.enemies[0]?.currentHealth).toBe(1);
     expect(state.enemies[0]?.phase).toBe("active");
+    expect(state.killCount).toBe(0);
     expect(state.projectiles).toEqual([]);
+  });
+});
+
+describe("GameRuntimeSession enemy defeat lifecycle", () => {
+  const FIXED_TEST_STEP_SECONDS = 1 / 64;
+
+  it("does not score or damage a dying enemy again", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    addProjectile(state, 1, state.player.position);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(FIXED_TEST_STEP_SECONDS);
+    const dyingPosition = { ...state.enemies[0]!.position };
+    addProjectile(state, 2, state.player.position);
+
+    session.fixedUpdate(FIXED_TEST_STEP_SECONDS);
+
+    expect(state.enemies[0]?.phase).toBe("dying");
+    expect(state.enemies[0]?.currentHealth).toBe(0);
+    expect(state.enemies[0]?.position).toEqual(dyingPosition);
+    expect(state.killCount).toBe(1);
+    expect(state.projectiles.map((projectile) => projectile.id)).toEqual([2]);
+  });
+
+  it("removes a dying enemy at the exact simulation-time deadline", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    state.enemies[0]!.currentHealth = 0;
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(FIXED_TEST_STEP_SECONDS);
+    expect(state.enemies[0]?.removeAtSimulationSeconds).toBe(
+      FIXED_TEST_STEP_SECONDS + PROVISIONAL_ENEMY_DYING_DURATION_SECONDS,
+    );
+
+    session.fixedUpdate(
+      PROVISIONAL_ENEMY_DYING_DURATION_SECONDS - FIXED_TEST_STEP_SECONDS,
+    );
+    expect(state.enemies).toHaveLength(1);
+
+    session.fixedUpdate(FIXED_TEST_STEP_SECONDS);
+    expect(state.enemies).toEqual([]);
+    expect(state.killCount).toBe(1);
+  });
+
+  it("freezes dying cleanup while paused", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    state.enemies[0]!.currentHealth = 0;
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.fixedUpdate(FIXED_TEST_STEP_SECONDS);
+    const deadline = state.enemies[0]?.removeAtSimulationSeconds;
+
+    session.pause();
+    session.fixedUpdate(10);
+
+    expect(state.simulationTimeSeconds).toBe(FIXED_TEST_STEP_SECONDS);
+    expect(state.enemies[0]?.removeAtSimulationSeconds).toBe(deadline);
+    expect(state.enemies[0]?.phase).toBe("dying");
+    expect(state.killCount).toBe(1);
+  });
+
+  it("restart clears the dying renderer state", () => {
+    const state = createInitialRuntimeState();
+    state.nextEnemySpawnAtSeconds = 100;
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    state.enemies[0]!.currentHealth = 0;
+    const snapshots: GameRenderSnapshot[] = [];
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const session = new GameRuntimeSession(
+      state,
+      new ControlledMovementInput(),
+      presentation,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.start();
+    session.fixedUpdate(FIXED_TEST_STEP_SECONDS);
+    session.render();
+    expect(snapshots.at(-1)?.enemies[0]?.phase).toBe("dying");
+
+    session.restart();
+    session.render();
+
+    expect(snapshots.at(-1)?.enemies).toEqual([]);
   });
 });
 

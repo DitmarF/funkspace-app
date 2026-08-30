@@ -27,6 +27,7 @@ function createRenderSnapshot(
     playerX: 180,
     playerY: 320,
     playerCollisionRadius: 12,
+    killCount: 0,
     enemies: [],
     projectiles: [],
     joystick: {
@@ -87,6 +88,8 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     closePath: vi.fn(),
     fill: vi.fn(),
     fillRect: vi.fn(),
+    fillText: vi.fn(),
+    font: "",
     get fillStyle() {
       return fillStyle;
     },
@@ -107,6 +110,8 @@ function createCanvas(displayWidth: number, displayHeight: number) {
     setTransform: vi.fn(),
     stroke: vi.fn(),
     strokeRect: vi.fn(),
+    textAlign: "start",
+    textBaseline: "alphabetic",
     get strokeStyle() {
       return strokeStyle;
     },
@@ -191,6 +196,7 @@ describe("CanvasGameRenderer", () => {
       initialTheme.colors.background,
       initialTheme.colors.player,
       initialTheme.colors.effect,
+      initialTheme.colors.effect,
     ]);
     expect(context.fillRect).toHaveBeenCalledWith(0, 0, 360, 640);
     expect(context.strokeStyle).toBe(initialTheme.colors.effect);
@@ -230,6 +236,28 @@ describe("CanvasGameRenderer", () => {
     expect(context.arc).toHaveBeenLastCalledWith(247, 193, 9, 0, Math.PI * 2);
   });
 
+  it("draws the kill count in the top-right corner", () => {
+    const { canvas, container, context } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+
+    renderer.render(
+      createRenderSnapshot({
+        killCount: 7,
+        joystick: null,
+      }),
+    );
+
+    expect(context.fillStyle).toBe(initialTheme.colors.effect);
+    expect(context.font).toBe("600 12px sans-serif");
+    expect(context.textAlign).toBe("right");
+    expect(context.textBaseline).toBe("top");
+    expect(context.fillText).toHaveBeenCalledWith("Kills: 7", 350, 10);
+  });
+
   it("draws projectile snapshot circles after the player", () => {
     const { canvas, container, context, fillStyles } = createCanvas(360, 640);
     const renderer = new CanvasGameRenderer({
@@ -248,9 +276,10 @@ describe("CanvasGameRenderer", () => {
       }),
     );
 
-    expect(fillStyles.slice(-2)).toEqual([
+    expect(fillStyles.slice(-3)).toEqual([
       initialTheme.colors.player,
       initialTheme.colors.projectile,
+      initialTheme.colors.effect,
     ]);
     expect(context.arc).toHaveBeenNthCalledWith(
       1,
@@ -330,6 +359,38 @@ describe("CanvasGameRenderer", () => {
     expect(vi.mocked(context.moveTo).mock.invocationCallOrder[0]!).toBeLessThan(
       vi.mocked(context.arc).mock.invocationCallOrder[0]!,
     );
+  });
+
+  it("draws a dying enemy as a static effect-colored cross", () => {
+    const { canvas, container, context, strokeStyles } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer({
+      canvas,
+      viewport: container,
+      theme: initialTheme,
+    });
+
+    renderer.render(
+      createRenderSnapshot({
+        enemies: [
+          {
+            id: 1,
+            phase: "dying",
+            x: 120,
+            y: 200,
+            collisionRadius: 12,
+          },
+        ],
+        joystick: null,
+      }),
+    );
+
+    expect(strokeStyles.at(-1)).toBe(initialTheme.colors.effect);
+    expect(context.moveTo).toHaveBeenNthCalledWith(1, 108, 188);
+    expect(context.lineTo).toHaveBeenNthCalledWith(1, 132, 212);
+    expect(context.moveTo).toHaveBeenNthCalledWith(2, 132, 188);
+    expect(context.lineTo).toHaveBeenNthCalledWith(2, 108, 212);
+    expect(context.closePath).not.toHaveBeenCalled();
+    expect(context.stroke).toHaveBeenCalledOnce();
   });
 
   it.each([
@@ -427,9 +488,10 @@ describe("CanvasGameRenderer", () => {
     renderer.setTheme(replacementTheme);
 
     expect(renderer.currentTheme).toBe(replacementTheme);
-    expect(fillStyles.slice(-2)).toEqual([
+    expect(fillStyles.slice(-3)).toEqual([
       "replacement-background",
       "replacement-player",
+      "replacement-effect",
     ]);
     expect(context.strokeStyle).toBe("replacement-effect");
     expect(context.arc).toHaveBeenLastCalledWith(244, 171, 12, 0, Math.PI * 2);
@@ -478,10 +540,11 @@ describe("CanvasGameRenderer", () => {
 
     renderer.setTheme(replacementTheme);
 
-    expect(fillStyles.slice(-3)).toEqual([
+    expect(fillStyles.slice(-4)).toEqual([
       "replacement-background",
       "replacement-effect",
       "replacement-player",
+      "replacement-effect",
     ]);
     expect(strokeStyles.slice(-2)).toEqual([
       "replacement-effect",

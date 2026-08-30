@@ -36,6 +36,7 @@ export interface RuntimeState {
   projectiles: ProjectileState[];
   nextProjectileId: number;
   nextAttackAtSeconds: number;
+  killCount: number;
 }
 
 /** Create a fresh session ready to be owned by the application controller. */
@@ -58,5 +59,6 @@ export function createInitialRuntimeState(): RuntimeState {
     projectiles: [],
     nextProjectileId: 1,
     nextAttackAtSeconds: 0,
+    killCount: 0,
   };
 }
