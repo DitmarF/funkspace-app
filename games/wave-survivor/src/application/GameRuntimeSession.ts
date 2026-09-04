@@ -533,8 +533,15 @@ export class GameRuntimeSession {
     }
 
     this.state.phase = "wave-cleared";
-    this.resetMovementInput();
+    this.clearCompletedWaveArtifacts();
     return true;
+  }
+
+  /** Establish one clean, frozen boundary between completed and future waves. */
+  private clearCompletedWaveArtifacts(): void {
+    this.state.enemies = [];
+    this.state.projectiles = [];
+    this.resetMovementInput();
   }
 
   private prepareUpgradeSelection(clearedWaveNumber: number): void {

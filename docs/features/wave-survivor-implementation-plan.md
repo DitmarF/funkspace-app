@@ -711,6 +711,9 @@ Accepted centralized tuning values:
 
 # EPIC 5 — Finite waves, upgrade choice, and phase flow
 
+**Status:** Implementation complete; final manual gameplay and real-device
+validation pending. Gate 2 has not passed.
+
 ## Goal
 
 Transform the approved grey-box toy into the central survivor loop: clear a finite wave, pause, select one upgrade, and begin a harder wave.
@@ -754,20 +757,30 @@ Gate 1 approval.
 
 ## Work items
 
-| ID          | Task                                      | Planned behavior                                                                                          | Acceptance criteria                                                                                  |
-| ----------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **WS-5.1**  | Define `SpawnGroup` and `WaveDefinition`. | Represent finite groups, offsets, intervals, enemy IDs, patterns, and active cap.                         | Definitions are validated or constructed so invalid counts and timing cannot silently enter runtime. |
-| **WS-5.2**  | Implement the wave scheduler.             | Release groups according to simulation time and configured intervals.                                     | Pause and upgrade phases freeze the schedule.                                                        |
-| **WS-5.3**  | Enforce maximum active enemies.           | Delay queued spawns while entering plus active count reaches the wave cap.                                | Backlog resumes predictably without releasing an uncontrolled burst.                                 |
-| **WS-5.4**  | Detect wave completion.                   | Complete only when queue is empty and no entering or active enemies remain.                               | Dying visual effects do not indefinitely block completion unless explicitly intended.                |
-| **WS-5.5**  | Extend the phase state machine.           | Support playing → wave-cleared → choosing-upgrade → playing.                                              | Invalid transitions are ignored or rejected deterministically.                                       |
-| **WS-5.6**  | Define the first upgrade set.             | Start with three upgrades: `+10%` fire rate, `+10%` base movement speed, and `+1` maximum/current health. | Upgrades modify existing systems; no new economy or inventory layer is created.                      |
-| **WS-5.7**  | Generate upgrade options.                 | Produce a small non-duplicate set from eligible definitions using seeded randomness.                      | Same seed and run state produce the same options.                                                    |
-| **WS-5.8**  | Apply the selected upgrade.               | Update explicit run modifiers and reject invalid IDs or repeated selections when disallowed.              | Effect is observable in the next wave and isolated to intended stats.                                |
-| **WS-5.9**  | Extend public events.                     | Emit wave changes, upgrade request, health changes if required, and relevant phase changes.               | Events contain host-facing data only, not mutable internal state.                                    |
-| **WS-5.10** | Extend `GameController`.                  | Add the smallest operation required, expected to be `chooseUpgrade(id)`.                                  | Existing lifecycle remains compatible and idempotent.                                                |
-| **WS-5.11** | Add standalone upgrade UI.                | Render accessible DOM buttons from emitted upgrade options.                                               | Standalone and portfolio integrations use the same public contract.                                  |
-| **WS-5.12** | Clean transition artifacts.               | Define whether projectiles/effects finish or clear before upgrade choice, then enforce it consistently.   | No enemy, projectile, cooldown, or spawn timer advances while choosing.                              |
+| ID          | Task                                      | Planned behavior                                                                                          | Acceptance criteria                                                                                    |
+| ----------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **WS-5.1**  | Define `SpawnGroup` and `WaveDefinition`. | Represent finite groups, offsets, intervals, enemy IDs, patterns, and active cap.                         | Definitions are validated or constructed so invalid counts and timing cannot silently enter runtime.   |
+| **WS-5.2**  | Implement the wave scheduler.             | Release groups according to simulation time and configured intervals.                                     | Pause and upgrade phases freeze the schedule.                                                          |
+| **WS-5.3**  | Enforce maximum active enemies.           | Delay queued spawns while entering plus active count reaches the wave cap.                                | Backlog resumes predictably without releasing an uncontrolled burst.                                   |
+| **WS-5.4**  | Detect wave completion.                   | Complete only when queue is empty and no entering or active enemies remain.                               | Dying visual effects do not indefinitely block completion unless explicitly intended.                  |
+| **WS-5.5**  | Extend the phase state machine.           | Support playing → wave-cleared → choosing-upgrade → playing.                                              | Invalid transitions are ignored or rejected deterministically.                                         |
+| **WS-5.6**  | Define the first upgrade set.             | Start with three upgrades: `+10%` fire rate, `+10%` base movement speed, and `+1` maximum/current health. | Upgrades modify existing systems; no new economy or inventory layer is created.                        |
+| **WS-5.7**  | Generate upgrade options.                 | Produce a small non-duplicate set from eligible definitions using seeded randomness.                      | Same seed and run state produce the same options.                                                      |
+| **WS-5.8**  | Apply the selected upgrade.               | Update explicit run modifiers and reject invalid IDs or repeated selections when disallowed.              | Effect is observable in the next wave and isolated to intended stats.                                  |
+| **WS-5.9**  | Extend public events.                     | Emit wave changes, upgrade request, health changes if required, and relevant phase changes.               | Events contain host-facing data only, not mutable internal state.                                      |
+| **WS-5.10** | Extend `GameController`.                  | Add the smallest operation required, expected to be `chooseUpgrade(id)`.                                  | Existing lifecycle remains compatible and idempotent.                                                  |
+| **WS-5.11** | Add standalone upgrade UI.                | Render accessible DOM buttons from emitted upgrade options.                                               | Standalone and portfolio integrations use the same public contract.                                    |
+| **WS-5.12** | Clean transition artifacts.               | Clear completed-wave projectiles and dying states, reset input, and freeze the clean choice state.        | No enemy, projectile, cooldown, spawn timer, gameplay clock, or random stream advances while choosing. |
+
+### Delivered transition policy
+
+Wave completion clears projectiles and remaining dying presentation states,
+then resets keyboard, joystick, and runtime movement intention through the
+existing input lifecycle. The choice phase preserves player and run progress
+but performs no fixed simulation work. Rendering and lifecycle no-ops do not
+advance time, schedules, cooldowns, entities, health, or either seeded random
+stream. A valid pending upgrade selection alone initializes the next wave and
+restarts the existing loop.
 
 ## Testing strategy
 

@@ -464,6 +464,26 @@ describe("GameController runtime lifecycle", () => {
     expect(presentation.destroy).toHaveBeenCalledOnce();
   });
 
+  it("destroys every owned resource from a pending upgrade choice", () => {
+    const harness = createHarness();
+    reachUpgradeChoice(harness);
+    expect(harness.controller.lifecycleState).toBe("choosing-upgrade");
+    expect(harness.frameScheduler.pendingFrameCount).toBe(0);
+
+    harness.controller.destroy();
+    harness.controller.destroy();
+    harness.controller.pause();
+    harness.controller.resume();
+    expect(harness.controller.chooseUpgrade("rapid-fire")).toBe(false);
+
+    expect(harness.controller.lifecycleState).toBe("destroyed");
+    expect(harness.frameScheduler.pendingFrameCount).toBe(0);
+    expect(harness.frameScheduler.requestedFrameIds).toHaveLength(1);
+    expect(harness.input.reset).toHaveBeenCalledTimes(2);
+    expect(harness.input.destroy).toHaveBeenCalledOnce();
+    expect(harness.presentation.destroy).toHaveBeenCalledOnce();
+  });
+
   it("ignores pause and resume while choosing an upgrade", () => {
     const { clock, controller, frameScheduler, input, state } = createHarness();
     state.waveSchedule.nextScheduledSpawnIndex =

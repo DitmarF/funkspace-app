@@ -4,7 +4,7 @@ Wave Survivor is the first standalone FunkSpace game package. It exposes a
 minimal lifecycle API for portfolio integration and currently renders a
 responsive grey-box arena with deterministic player movement, keyboard and
 virtual-joystick input, automatic projectile combat, health, enemy defeat,
-loss, and clean restart.
+finite waves, between-wave upgrades, loss, and clean restart.
 
 The current gameplay slice uses seeded randomness to sample fair offscreen
 spawn candidates by perimeter length. Entering enemies receive static
@@ -13,6 +13,8 @@ intersect the visible arena, and then continue direct deterministic pursuit.
 The runtime caps live enemies, rejects candidates with insufficient contact
 time, and removes invalid or fully escaped enemies only beyond a larger logical
 despawn boundary. Enemy runtime phases are `entering`, `active`, and `dying`.
+Finite schedules apply per-wave active-enemy caps, and seeded upgrade choices
+offer Rapid Fire, Swift Movement, and Vitality between waves.
 
 ## Gate 1 status
 
@@ -20,7 +22,7 @@ Gate 1 passed on August 30, 2026 after successful PC and real-smartphone manual
 reviews and the complete automated validation suite. The accepted grey-box loop
 includes movement, enemy pressure, automatic projectile combat, enemy defeat
 and kill count, player health and invulnerability, terminal loss, semantic
-status, and clean restart. EPIC 5 is the next gameplay boundary.
+status, and clean restart.
 
 ### Current Gate 1 tuning
 
@@ -40,6 +42,12 @@ status, and clean restart. EPIC 5 is the next gameplay boundary.
 | Projectile radius             |        `4 units` |
 | Player invulnerability        |          `0.65s` |
 | Enemy dying display           |         `0.125s` |
+
+## EPIC 5 implementation status
+
+Implementation is complete; the final manual gameplay and real-device review
+remains pending. The standalone demo supports the full provisional finite-wave
+flow through upgrade selection and subsequent waves. Gate 2 is not yet passed.
 
 ## Public API
 
@@ -86,6 +94,14 @@ The optional `onEvent` callback receives frozen `wave-started`, `wave-cleared`,
 and `upgrade-choice-requested` events. Upgrade-choice events contain a frozen
 array of copied `{ id, title, description }` option DTOs; effect definitions,
 runtime entities, scheduler state, and random sources remain private.
+
+Wave completion establishes a clean transition boundary: completed-wave
+projectiles and dying presentation states are removed, movement input is reset,
+and the gameplay clock, schedule, cooldowns, entities, health, and random
+streams remain frozen while an upgrade choice is pending. Player position,
+health, invulnerability deadline, kills, simulation time, and accumulated
+upgrades carry into the next wave. Only a valid `chooseUpgrade(id)` initializes
+that wave and resumes the existing loop.
 
 The game clears all movement input on pause, restart, window blur, document
 visibility loss, pointer interruption, and destruction. Hosts pause and resume

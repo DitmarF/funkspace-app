@@ -178,6 +178,11 @@ function configureTestWave(
   );
 }
 
+/** Keep unrelated behavior tests in a live wave without releasing a spawn. */
+function configureNonDueTestWave(state: RuntimeState): void {
+  configureTestWave(state, 4, 10_000, 1, 0);
+}
+
 function addEnemy(
   state: RuntimeState,
   id: number,
@@ -643,7 +648,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
   it("pursues the player's newly updated position", () => {
     const state = createInitialRuntimeState();
     state.player.position = { x: 100, y: 100 };
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
+    state.nextAttackAtSeconds = 100;
     state.enemies.push(createBasicEnemyState(1, { x: 0, y: 0 }));
     state.nextEnemyId = 2;
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
@@ -700,7 +706,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
   it("retains exact despawn-boundary tangency", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
     const enemy = createBasicEnemyState(1, {
       x: DESPAWN_BOUNDS.x - BASIC_ENEMY_DEFINITION.collisionRadius,
       y: 320,
@@ -984,7 +990,7 @@ describe("GameRuntimeSession effective run upgrades", () => {
 describe("GameRuntimeSession automatic attack", () => {
   it("keeps an immediately ready attack ready when no target exists", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
     const { session } = createSession(
       state,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
@@ -1002,7 +1008,7 @@ describe("GameRuntimeSession automatic attack", () => {
     ["dying", { x: 180, y: 300 }],
   ] as const)("does not fire at an %s enemy", (phase, position) => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
     addEnemy(state, 1, position, phase);
     const { session } = createSession(
       state,
@@ -1203,7 +1209,7 @@ describe("GameRuntimeSession automatic attack", () => {
 describe("GameRuntimeSession projectile hit resolution", () => {
   it("retires a hitting projectile before the next renderer snapshot", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     addProjectile(state, 1, state.player.position);
@@ -1298,7 +1304,8 @@ describe("GameRuntimeSession wave completion boundary", () => {
 
     session.fixedUpdate(0.01);
 
-    expect(state.enemies[0]?.phase).toBe("dying");
+    expect(state.enemies).toEqual([]);
+    expect(state.projectiles).toEqual([]);
     expect(readCurrentWaveCompletion(session)).toBe(true);
     expect(state.phase).toBe("choosing-upgrade");
   });
@@ -1362,7 +1369,7 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 
   it("does not score or damage a dying enemy again", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     addProjectile(state, 1, state.player.position);
@@ -1411,7 +1418,7 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 
   it("freezes dying cleanup while paused", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     state.enemies[0]!.currentHealth = 0;
@@ -1433,7 +1440,7 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 
   it("restart clears the dying renderer state", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     state.enemies[0]!.currentHealth = 0;
@@ -1698,7 +1705,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("does not take contact damage from an enemy defeated earlier in the update", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     addProjectile(state, 1, state.player.position);
@@ -1717,7 +1724,7 @@ describe("GameRuntimeSession player contact damage", () => {
 describe("GameRuntimeSession projectile movement and presentation", () => {
   it("moves a seeded projectile without an eligible target", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureNonDueTestWave(state);
     state.projectiles.push(
       createBasicProjectileState(
         state.nextProjectileId,

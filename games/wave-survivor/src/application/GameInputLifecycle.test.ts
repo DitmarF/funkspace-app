@@ -140,8 +140,9 @@ function createHarness() {
     render: vi.fn((snapshot) => snapshots.push(snapshot)),
     setTheme: vi.fn(),
   };
+  const state = createInitialRuntimeState();
   const session = new GameRuntimeSession(
-    createInitialRuntimeState(),
+    state,
     input,
     presentation,
     new SeededRandomSource(1),
@@ -178,6 +179,7 @@ function createHarness() {
     presentation,
     renderPlayerX,
     session,
+    state,
     surface,
     windowTarget,
   };
@@ -303,6 +305,29 @@ describe("game input lifecycle integration", () => {
 
     expect(harness.input.readMovementIntent()).toBe(ZERO_MOVEMENT_INTENT);
     expect(harness.surface.capturedPointerIds.size).toBe(0);
+
+    harness.controller.destroy();
+  });
+
+  it("clears active joystick input and presentation at the upgrade boundary", () => {
+    const harness = createHarness();
+    harness.controller.start();
+    harness.activateJoystick();
+    expect(harness.joystick.readPresentationSnapshot()?.active).toBe(true);
+    expect(harness.surface.capturedPointerIds.size).toBe(1);
+    harness.state.waveSchedule.nextScheduledSpawnIndex =
+      harness.state.waveSchedule.requests.length;
+
+    harness.session.fixedUpdate(FIXED_SIMULATION_STEP_SECONDS);
+
+    const joystick = harness.joystick.readPresentationSnapshot();
+    expect(harness.state.phase).toBe("choosing-upgrade");
+    expect(harness.state.movementIntent).toBe(ZERO_MOVEMENT_INTENT);
+    expect(harness.input.readMovementIntent()).toBe(ZERO_MOVEMENT_INTENT);
+    expect(harness.surface.capturedPointerIds.size).toBe(0);
+    expect(joystick?.active).toBe(false);
+    expect(joystick?.knobX).toBe(joystick?.centerX);
+    expect(joystick?.knobY).toBe(joystick?.centerY);
 
     harness.controller.destroy();
   });

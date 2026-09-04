@@ -11,7 +11,7 @@
 - **Target platform:** Modern web browsers
 - **Primary form factor:** Mobile, portrait orientation
 - **Secondary form factors:** Tablet and desktop
-- **Last updated:** 2026-08-30
+- **Last updated:** 2026-09-04
 - **Game package:** `games/wave-survivor/`
 - **Related decisions:**
   - [`ADR-002: Design tokens as the source of truth`](../decisions/ADR-002-design-token-source-of-truth.md)
@@ -380,10 +380,10 @@ A wave is a finite schedule of spawn groups:
 
 ```ts
 type SpawnGroup = {
-  readonly atMs: number;
+  readonly startOffsetSeconds: number;
   readonly enemyId: string;
   readonly count: number;
-  readonly intervalMs: number;
+  readonly intervalSeconds: number;
   readonly pattern: SpawnPattern;
 };
 
@@ -773,4 +773,7 @@ on August 29, 2026. EPIC 4 then completed automatic projectile combat, player
 and enemy health, contact damage, invulnerability, defeat and loss states,
 discrete status UI, and deterministic restart. Gate 1 passed on August 30, 2026
 after successful PC and real-smartphone manual reviews and the complete
-automated validation suite. EPIC 5 is the next implementation boundary.
+automated validation suite. EPIC 5 finite waves, deterministic upgrade choices,
+public events, controller selection, standalone upgrade UI, and frozen
+between-wave transition cleanup are now implemented. Final gameplay and
+real-device validation remains pending; Gate 2 has not passed.

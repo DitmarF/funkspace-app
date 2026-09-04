@@ -1,22 +1,35 @@
 import { describe, expect, it, vi } from "vitest";
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
 import type { RandomSource } from "../domain/RandomSource.js";
+import { createBasicEnemyState } from "../domain/enemies/index.js";
 import {
   ZERO_MOVEMENT_INTENT,
   createMovementIntent,
+  type MovementIntent,
 } from "../domain/movement/index.js";
+import { createBasicProjectileState } from "../domain/projectiles/index.js";
 import {
   createInitialRuntimeState,
   type RuntimeState,
 } from "../domain/state/index.js";
+import { createRunUpgradeState } from "../domain/upgrades/index.js";
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
 
 class TrackingMovementInput implements MovementInputPort {
+  readCount = 0;
   resetCount = 0;
 
+  constructor(
+    private readonly movementIntent: MovementIntent = createMovementIntent(
+      1,
+      0,
+    ),
+  ) {}
+
   readMovementIntent() {
-    return createMovementIntent(1, 0);
+    this.readCount += 1;
+    return this.movementIntent;
   }
 
   reset(): void {
@@ -171,6 +184,162 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(session.pendingUpgradeOptionIds).toBe(pendingOptions);
     expect(Object.isFrozen(pendingOptions)).toBe(true);
     expect(input.resetCount).toBe(1);
+  });
+
+  it("cleans the completed wave and freezes every gameplay authority until a valid choice", () => {
+    const spawnRandomSource = new TrackingRandomSource(31);
+    const upgradeRandomSource = new TrackingRandomSource(32);
+    const input = new TrackingMovementInput(ZERO_MOVEMENT_INTENT);
+    const presentation = {
+      destroy: vi.fn(),
+      render: vi.fn(),
+      setTheme: vi.fn(),
+    };
+    const state = createInitialRuntimeState();
+    state.phase = "playing";
+    state.simulationTimeSeconds = 10;
+    state.player.position = { x: 140, y: 260 };
+    state.player.currentHealth = 2;
+    state.player.invulnerableUntilSeconds = 14;
+    state.upgrades = createRunUpgradeState({ "rapid-fire": 1 });
+    state.killCount = 7;
+    state.nextEnemyId = 12;
+    state.nextProjectileId = 9;
+    state.nextAttackAtSeconds = 42;
+    state.waveSchedule.elapsedSeconds = 3;
+    exhaustWaveSchedule(state);
+    const dyingEnemy = createBasicEnemyState(11, { x: 80, y: 120 });
+    dyingEnemy.phase = "dying";
+    dyingEnemy.currentHealth = 0;
+    dyingEnemy.removeAtSimulationSeconds = 20;
+    state.enemies.push(dyingEnemy);
+    state.projectiles.push(
+      createBasicProjectileState(
+        8,
+        state.player.position,
+        { x: 300, y: 260 },
+        state.simulationTimeSeconds,
+      ),
+    );
+    const session = new GameRuntimeSession(
+      state,
+      input,
+      presentation,
+      spawnRandomSource,
+      upgradeRandomSource,
+    );
+
+    session.fixedUpdate(0.25);
+
+    expect(state).toMatchObject({
+      phase: "choosing-upgrade",
+      simulationTimeSeconds: 10.25,
+      movementIntent: ZERO_MOVEMENT_INTENT,
+      player: {
+        position: { x: 140, y: 260 },
+        currentHealth: 2,
+        invulnerableUntilSeconds: 14,
+      },
+      killCount: 7,
+      nextEnemyId: 12,
+      nextProjectileId: 9,
+      nextAttackAtSeconds: 42,
+    });
+    expect(state.upgrades.levels["rapid-fire"]).toBe(1);
+    expect(state.waveSchedule).toMatchObject({
+      currentWaveNumber: 1,
+      elapsedSeconds: 3.25,
+      nextScheduledSpawnIndex: state.waveSchedule.requests.length,
+    });
+    expect(state.enemies).toEqual([]);
+    expect(state.projectiles).toEqual([]);
+    expect(input.readCount).toBe(1);
+    expect(input.resetCount).toBe(1);
+    expect(spawnRandomSource.nextFloatCount).toBe(0);
+    expect(upgradeRandomSource.nextFloatCount).toBe(2);
+
+    const pendingOptions = state.pendingUpgradeOptionIds;
+    const frozenState = structuredClone(state);
+    const frozenSpawnRandomCount = spawnRandomSource.nextFloatCount;
+    const frozenUpgradeRandomCount = upgradeRandomSource.nextFloatCount;
+
+    session.fixedUpdate(1);
+    session.fixedUpdate(1);
+    session.render();
+    session.render();
+    expect(session.pause()).toBe(false);
+    expect(session.resume()).toBe(false);
+    expect(session.beginUpgradeSelection()).toBe(false);
+    expect(session.chooseUpgrade("unknown")).toBe(false);
+
+    expect(state).toEqual(frozenState);
+    expect(state.pendingUpgradeOptionIds).toBe(pendingOptions);
+    expect(input.readCount).toBe(1);
+    expect(input.resetCount).toBe(1);
+    expect(spawnRandomSource.nextFloatCount).toBe(frozenSpawnRandomCount);
+    expect(upgradeRandomSource.nextFloatCount).toBe(frozenUpgradeRandomCount);
+    expect(presentation.render).toHaveBeenCalledTimes(2);
+    expect(presentation.render).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        phase: "choosing-upgrade",
+        simulationTimeSeconds: 10.25,
+        enemies: [],
+        projectiles: [],
+      }),
+    );
+
+    expect(session.chooseUpgrade("rapid-fire")).toBe(true);
+    expect(state).toMatchObject({
+      phase: "playing",
+      simulationTimeSeconds: 10.25,
+      player: {
+        position: { x: 140, y: 260 },
+        currentHealth: 2,
+        invulnerableUntilSeconds: 14,
+      },
+      pendingUpgradeOptionIds: [],
+      killCount: 7,
+      nextEnemyId: 12,
+      nextProjectileId: 9,
+      nextAttackAtSeconds: 0,
+      waveSchedule: {
+        currentWaveNumber: 2,
+        elapsedSeconds: 0,
+        nextScheduledSpawnIndex: 0,
+      },
+    });
+    expect(state.upgrades.levels["rapid-fire"]).toBe(2);
+    expect(input.resetCount).toBe(2);
+    expect(spawnRandomSource.nextFloatCount).toBe(frozenSpawnRandomCount);
+    expect(upgradeRandomSource.nextFloatCount).toBe(frozenUpgradeRandomCount);
+  });
+
+  it("restart from upgrade choice recreates the complete fresh-run state", () => {
+    const spawnRandomSource = new TrackingRandomSource(41);
+    const upgradeRandomSource = new TrackingRandomSource(42);
+    const { session, state } = createHarness(
+      spawnRandomSource,
+      upgradeRandomSource,
+    );
+    session.start();
+    state.simulationTimeSeconds = 9;
+    state.player.currentHealth = 1;
+    state.killCount = 4;
+    state.nextEnemyId = 8;
+    state.nextProjectileId = 6;
+    state.nextAttackAtSeconds = 11;
+    state.upgrades = createRunUpgradeState({ vitality: 2 });
+    exhaustWaveSchedule(state);
+    session.fixedUpdate(0.01);
+    expect(state.phase).toBe("choosing-upgrade");
+
+    session.restart();
+
+    const expected = createInitialRuntimeState();
+    expected.phase = "playing";
+    expect(readOwnedRuntimeState(session)).toEqual(expected);
+    expect(spawnRandomSource.resetCount).toBe(1);
+    expect(upgradeRandomSource.resetCount).toBe(1);
   });
 
   it("does not reroll options during repeated reads, rendering, or status work", () => {
