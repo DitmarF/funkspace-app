@@ -30,10 +30,11 @@ export function resolvePlayerContactDamage(
   player: PlayerState,
   enemies: readonly Readonly<EnemyState>[],
   simulationTimeSeconds: number,
+  maximumHealth = player.maximumHealth,
 ): boolean {
   if (
-    !Number.isFinite(player.maximumHealth) ||
-    player.maximumHealth <= 0 ||
+    !Number.isFinite(maximumHealth) ||
+    maximumHealth <= 0 ||
     !Number.isFinite(player.currentHealth) ||
     !Number.isFinite(player.invulnerableUntilSeconds) ||
     player.invulnerableUntilSeconds < 0 ||
@@ -70,7 +71,7 @@ export function resolvePlayerContactDamage(
 
   const boundedCurrentHealth = Math.max(
     0,
-    Math.min(player.currentHealth, player.maximumHealth),
+    Math.min(player.currentHealth, maximumHealth),
   );
   player.currentHealth = Math.max(
     0,

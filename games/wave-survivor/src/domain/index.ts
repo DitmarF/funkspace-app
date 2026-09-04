@@ -62,6 +62,28 @@ export {
 } from "./state/index.js";
 export type { PlayerState, RuntimePhase, RuntimeState } from "./state/index.js";
 export {
+  calculateVitalityUpgradeHealth,
+  createInitialRunUpgradeState,
+  createRunUpgradeState,
+  getEffectiveAttackCooldownSeconds,
+  getEffectiveMaximumHealth,
+  getEffectiveMovementSpeedUnitsPerSecond,
+  getUpgradeDefinition,
+  INITIAL_UPGRADE_DEFINITIONS,
+  isUpgradeEligible,
+} from "./upgrades/index.js";
+export type {
+  FireRateUpgradeEffect,
+  MovementSpeedUpgradeEffect,
+  RunUpgradeState,
+  UpgradeDefinition,
+  UpgradeEffect,
+  UpgradeId,
+  UpgradeLevels,
+  VitalityHealthResult,
+  VitalityUpgradeEffect,
+} from "./upgrades/index.js";
+export {
   advanceWaveSchedule,
   compileWaveSchedule,
   consumeNextScheduledSpawnRequest,

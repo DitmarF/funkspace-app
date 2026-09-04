@@ -8,6 +8,10 @@ import {
   PROVISIONAL_EPIC_5_WAVES,
 } from "../waves/index.js";
 import {
+  createInitialRunUpgradeState,
+  createRunUpgradeState,
+} from "../upgrades/index.js";
+import {
   createInitialRuntimeState,
   PLAYER_COLLISION_RADIUS,
   PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
@@ -57,6 +61,15 @@ describe("createInitialRuntimeState", () => {
     expect(state.projectiles).toEqual([]);
     expect(state.nextProjectileId).toBe(1);
     expect(state.nextAttackAtSeconds).toBe(0);
+  });
+
+  it("starts with independent neutral run-upgrade state", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first.upgrades).toEqual(createInitialRunUpgradeState());
+    expect(first.upgrades).not.toBe(second.upgrades);
+    expect(first.upgrades.levels).not.toBe(second.upgrades.levels);
   });
 
   it("uses the marker radius and provisional movement speed", () => {
@@ -194,5 +207,18 @@ describe("createInitialRuntimeState", () => {
       PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
     );
     expect(restartedState.player.invulnerableUntilSeconds).toBe(0);
+  });
+
+  it("restores neutral upgrades for a restarted session", () => {
+    const progressedState = createInitialRuntimeState();
+    progressedState.upgrades = createRunUpgradeState({
+      "rapid-fire": 2,
+      "swift-movement": 3,
+      vitality: 1,
+    });
+
+    const restartedState = createInitialRuntimeState();
+
+    expect(restartedState.upgrades).toEqual(createInitialRunUpgradeState());
   });
 });

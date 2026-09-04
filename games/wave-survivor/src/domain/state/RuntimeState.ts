@@ -7,6 +7,10 @@ import {
 } from "../movement/index.js";
 import type { ProjectileState } from "../projectiles/index.js";
 import {
+  createInitialRunUpgradeState,
+  type RunUpgradeState,
+} from "../upgrades/index.js";
+import {
   createWaveScheduleProgress,
   PROVISIONAL_EPIC_5_WAVES,
   type WaveScheduleProgress,
@@ -33,8 +37,10 @@ export type RuntimePhase =
 export interface PlayerState {
   position: LogicalPosition;
   collisionRadius: number;
-  movementSpeedUnitsPerSecond: number;
-  maximumHealth: number;
+  /** Immutable run base; effective speed is derived from upgrade levels. */
+  readonly movementSpeedUnitsPerSecond: number;
+  /** Immutable run base; effective maximum is derived from upgrade levels. */
+  readonly maximumHealth: number;
   currentHealth: number;
   invulnerableUntilSeconds: number;
 }
@@ -46,6 +52,7 @@ export interface RuntimeState {
   simulationTimeSeconds: number;
   movementIntent: MovementIntent;
   player: PlayerState;
+  upgrades: Readonly<RunUpgradeState>;
   enemies: EnemyState[];
   nextEnemyId: number;
   waveSchedule: WaveScheduleProgress;
@@ -72,6 +79,7 @@ export function createInitialRuntimeState(): RuntimeState {
       currentHealth: PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
       invulnerableUntilSeconds: 0,
     },
+    upgrades: createInitialRunUpgradeState(),
     enemies: [],
     nextEnemyId: 1,
     waveSchedule: createWaveScheduleProgress(1, PROVISIONAL_EPIC_5_WAVES[0]!),

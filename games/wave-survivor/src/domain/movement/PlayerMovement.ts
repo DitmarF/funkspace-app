@@ -24,11 +24,12 @@ export function calculateNextPlayerPosition(
   player: Readonly<PlayerState>,
   movementIntent: MovementIntent,
   deltaSeconds: number,
+  movementSpeedUnitsPerSecond = player.movementSpeedUnitsPerSecond,
 ): LogicalPosition {
   const safeDeltaSeconds =
     Number.isFinite(deltaSeconds) && deltaSeconds > 0 ? deltaSeconds : 0;
   const safeIntent = createMovementIntent(movementIntent.x, movementIntent.y);
-  const travelDistance = player.movementSpeedUnitsPerSecond * safeDeltaSeconds;
+  const travelDistance = movementSpeedUnitsPerSecond * safeDeltaSeconds;
 
   return clampPlayerPosition(
     {

@@ -409,14 +409,13 @@ When the active-enemy cap is reached, queued spawns wait. This prevents uncontro
 
 After each normal wave, the player chooses one upgrade from a small set. The simulation remains paused until the choice is made.
 
-The first upgrade set should modify existing rules rather than introduce new systems. Suitable examples include:
+The initial upgrade set modifies existing rules through three focused choices:
 
-- reduced attack cooldown;
-- increased projectile damage;
-- increased movement speed;
-- increased maximum health or a small heal;
-- increased projectile size;
-- an additional projectile or simple attack variant.
+- **Rapid Fire:** increase fire rate by `10%` per level;
+- **Swift Movement:** increase movement speed by `10%` of its original base value per level;
+- **Vitality:** increase maximum health by `1` and immediately heal `1` health.
+
+Each initial upgrade has five levels. Rapid Fire retains a safe minimum cooldown of `0.6s`. Damage, recovery-only, projectile-size, and additional-projectile upgrades are deferred until playtesting demonstrates that the three-choice set needs expansion.
 
 ### 11.2 No permanent power progression
 

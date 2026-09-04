@@ -50,6 +50,11 @@ import {
   type RuntimeState,
 } from "../domain/state/RuntimeState.js";
 import {
+  getEffectiveAttackCooldownSeconds,
+  getEffectiveMaximumHealth,
+  getEffectiveMovementSpeedUnitsPerSecond,
+} from "../domain/upgrades/index.js";
+import {
   advanceWaveSchedule,
   consumeNextScheduledSpawnRequest,
   countEnemiesOccupyingWaveCapacity,
@@ -163,6 +168,10 @@ export class GameRuntimeSession {
       this.state.player,
       movementIntent,
       deltaSeconds,
+      getEffectiveMovementSpeedUnitsPerSecond(
+        this.state.player.movementSpeedUnitsPerSecond,
+        this.state.upgrades,
+      ),
     );
     this.transitionDefeatedEnemies(nextSimulationTimeSeconds);
     if (
@@ -221,6 +230,10 @@ export class GameRuntimeSession {
       );
     }
     const joystick = this.readJoystickSnapshot?.() ?? null;
+    const playerMaximumHealth = getEffectiveMaximumHealth(
+      this.state.player.maximumHealth,
+      this.state.upgrades,
+    );
     const snapshot: GameRenderSnapshot = Object.freeze({
       phase: this.state.phase,
       simulationTimeSeconds: this.state.simulationTimeSeconds,
@@ -228,7 +241,7 @@ export class GameRuntimeSession {
       playerY: this.state.player.position.y,
       playerCollisionRadius: this.state.player.collisionRadius,
       playerCurrentHealth: this.state.player.currentHealth,
-      playerMaximumHealth: this.state.player.maximumHealth,
+      playerMaximumHealth,
       isPlayerInvulnerable: isPlayerInvulnerable(
         this.state.player,
         this.state.simulationTimeSeconds,
@@ -348,7 +361,11 @@ export class GameRuntimeSession {
     if (!target) return;
 
     const nextAttackAtSeconds =
-      simulationTimeSeconds + BASIC_ATTACK_DEFINITION.cooldownSeconds;
+      simulationTimeSeconds +
+      getEffectiveAttackCooldownSeconds(
+        BASIC_ATTACK_DEFINITION.cooldownSeconds,
+        this.state.upgrades,
+      );
     if (!Number.isFinite(nextAttackAtSeconds)) return;
 
     this.state.projectiles.push(
@@ -405,6 +422,10 @@ export class GameRuntimeSession {
       this.state.player,
       this.state.enemies,
       simulationTimeSeconds,
+      getEffectiveMaximumHealth(
+        this.state.player.maximumHealth,
+        this.state.upgrades,
+      ),
     );
   }
 
@@ -444,11 +465,15 @@ export class GameRuntimeSession {
   private emitStatusIfChanged(): void {
     if (!this.onStatusChange) return;
 
+    const maximumHealth = getEffectiveMaximumHealth(
+      this.state.player.maximumHealth,
+      this.state.upgrades,
+    );
     const previous = this.lastStatusSnapshot;
     if (
       previous?.phase === this.state.phase &&
       previous.currentHealth === this.state.player.currentHealth &&
-      previous.maximumHealth === this.state.player.maximumHealth &&
+      previous.maximumHealth === maximumHealth &&
       previous.killCount === this.state.killCount
     ) {
       return;
@@ -457,7 +482,7 @@ export class GameRuntimeSession {
     const snapshot: GameStatusSnapshot = Object.freeze({
       phase: this.state.phase,
       currentHealth: this.state.player.currentHealth,
-      maximumHealth: this.state.player.maximumHealth,
+      maximumHealth,
       killCount: this.state.killCount,
     });
     this.lastStatusSnapshot = snapshot;

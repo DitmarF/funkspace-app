@@ -35,6 +35,7 @@ import {
   createInitialRuntimeState,
   type RuntimeState,
 } from "../domain/state/index.js";
+import { createRunUpgradeState } from "../domain/upgrades/index.js";
 import {
   createSpawnGroup,
   createWaveDefinition,
@@ -315,8 +316,6 @@ describe("GameRuntimeSession complete restart reset", () => {
       progressedState.movementIntent = createMovementIntent(1, 0);
       progressedState.player.position = { x: 24, y: 48 };
       progressedState.player.collisionRadius = 99;
-      progressedState.player.movementSpeedUnitsPerSecond = 1;
-      progressedState.player.maximumHealth = 99;
       progressedState.player.currentHealth = 0;
       progressedState.player.invulnerableUntilSeconds = 100;
       addEnemy(progressedState, 8, { x: 12, y: 12 }, "dying");
@@ -899,6 +898,73 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     );
     expect(restartedRun?.playerX).toBe(firstRun?.playerX);
     expect(restartedRun?.playerY).toBe(firstRun?.playerY);
+  });
+});
+
+describe("GameRuntimeSession effective run upgrades", () => {
+  it("moves with the effective swift-movement speed", () => {
+    const state = createInitialRuntimeState();
+    state.upgrades = createRunUpgradeState({ "swift-movement": 1 });
+    configureTestWave(state, 1, 100, 1, 0);
+    const { input, session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    input.movementIntent = createMovementIntent(1, 0);
+
+    session.fixedUpdate(0.1);
+
+    expect(state.player.position.x).toBeCloseTo(
+      180 + state.player.movementSpeedUnitsPerSecond * 1.1 * 0.1,
+    );
+  });
+
+  it("schedules the next attack from the effective rapid-fire cooldown", () => {
+    const state = createInitialRuntimeState();
+    state.upgrades = createRunUpgradeState({ "rapid-fire": 1 });
+    exhaustWaveSchedule(state);
+    addEnemy(state, 1, { x: 300, y: 320 }, "active");
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(0.1);
+
+    expect(state.nextAttackAtSeconds).toBeCloseTo(
+      0.1 + BASIC_ATTACK_DEFINITION.cooldownSeconds / 1.1,
+    );
+  });
+
+  it("uses effective vitality health for contact and rendering", () => {
+    const state = createInitialRuntimeState();
+    state.upgrades = createRunUpgradeState({ vitality: 1 });
+    state.player.currentHealth = 4;
+    state.nextAttackAtSeconds = 100;
+    exhaustWaveSchedule(state);
+    addEnemy(state, 1, state.player.position, "active");
+    const snapshots: GameRenderSnapshot[] = [];
+    const presentation: GamePresentationPort = {
+      render: (snapshot) => snapshots.push(snapshot),
+      setTheme: () => {},
+      destroy: () => {},
+    };
+    const session = new GameRuntimeSession(
+      state,
+      new ControlledMovementInput(),
+      presentation,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+    session.start();
+
+    session.fixedUpdate(0.01);
+    session.render();
+
+    expect(state.player.currentHealth).toBe(3);
+    expect(snapshots.at(-1)).toMatchObject({
+      playerCurrentHealth: 3,
+      playerMaximumHealth: 4,
+    });
   });
 });
 
