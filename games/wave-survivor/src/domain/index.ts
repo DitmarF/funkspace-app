@@ -65,6 +65,7 @@ export {
   advanceWaveSchedule,
   compileWaveSchedule,
   consumeNextScheduledSpawnRequest,
+  countEnemiesOccupyingWaveCapacity,
   createSpawnGroup,
   createWaveDefinition,
   createWaveScheduleProgress,

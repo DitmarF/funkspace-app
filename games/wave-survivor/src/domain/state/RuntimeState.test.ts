@@ -43,6 +43,7 @@ describe("createInitialRuntimeState", () => {
     expect(state.nextEnemyId).toBe(1);
     expect(state.waveSchedule).toEqual({
       currentWaveNumber: 1,
+      maxActiveEnemies: PROVISIONAL_EPIC_5_WAVES[0]!.maxActiveEnemies,
       elapsedSeconds: 0,
       nextScheduledSpawnIndex: 0,
       requests: compileWaveSchedule(PROVISIONAL_EPIC_5_WAVES[0]!),
@@ -145,6 +146,9 @@ describe("createInitialRuntimeState", () => {
     expect(restartedState.enemies).toEqual([]);
     expect(restartedState.nextEnemyId).toBe(1);
     expect(restartedState.waveSchedule.currentWaveNumber).toBe(1);
+    expect(restartedState.waveSchedule.maxActiveEnemies).toBe(
+      PROVISIONAL_EPIC_5_WAVES[0]!.maxActiveEnemies,
+    );
     expect(restartedState.waveSchedule.elapsedSeconds).toBe(0);
     expect(restartedState.waveSchedule.nextScheduledSpawnIndex).toBe(0);
     expect(restartedState.waveSchedule.requests).toEqual(

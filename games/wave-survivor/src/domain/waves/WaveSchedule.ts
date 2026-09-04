@@ -12,6 +12,7 @@ export interface ScheduledSpawnRequest {
 /** Minimal mutable progress through one immutable compiled wave schedule. */
 export interface WaveScheduleProgress {
   readonly currentWaveNumber: number;
+  readonly maxActiveEnemies: number;
   elapsedSeconds: number;
   nextScheduledSpawnIndex: number;
   readonly requests: readonly ScheduledSpawnRequest[];
@@ -70,6 +71,7 @@ export function createWaveScheduleProgress(
 
   return {
     currentWaveNumber,
+    maxActiveEnemies: definition.maxActiveEnemies,
     elapsedSeconds: 0,
     nextScheduledSpawnIndex: 0,
     requests: compileWaveSchedule(definition),

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { createSpawnGroup, createWaveDefinition } from "./WaveDefinition.js";
+import {
+  createSpawnGroup,
+  createWaveDefinition,
+  PROVISIONAL_EPIC_5_WAVES,
+} from "./WaveDefinition.js";
 import {
   advanceWaveSchedule,
   compileWaveSchedule,
@@ -84,6 +88,20 @@ describe("compileWaveSchedule", () => {
 });
 
 describe("wave schedule progress", () => {
+  it("uses the cap from each wave definition", () => {
+    const firstWave = createWaveScheduleProgress(
+      1,
+      PROVISIONAL_EPIC_5_WAVES[0]!,
+    );
+    const secondWave = createWaveScheduleProgress(
+      2,
+      PROVISIONAL_EPIC_5_WAVES[1]!,
+    );
+
+    expect(firstWave.maxActiveEnemies).toBe(2);
+    expect(secondWave.maxActiveEnemies).toBe(3);
+  });
+
   it("does not release before the scheduled time and releases at the exact boundary", () => {
     const progress = createWaveScheduleProgress(
       1,

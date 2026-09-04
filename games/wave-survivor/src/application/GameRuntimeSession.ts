@@ -52,6 +52,7 @@ import {
 import {
   advanceWaveSchedule,
   consumeNextScheduledSpawnRequest,
+  countEnemiesOccupyingWaveCapacity,
   getDueScheduledSpawnRequest,
   type ScheduledSpawnRequest,
 } from "../domain/waves/index.js";
@@ -144,8 +145,13 @@ export class GameRuntimeSession {
       deltaSeconds,
     );
     this.transitionDefeatedEnemies(nextSimulationTimeSeconds);
-    advanceWaveSchedule(this.state.waveSchedule, deltaSeconds);
-    this.spawnScheduledEnemyIfDue();
+    if (
+      countEnemiesOccupyingWaveCapacity(this.state.enemies) <
+      this.state.waveSchedule.maxActiveEnemies
+    ) {
+      advanceWaveSchedule(this.state.waveSchedule, deltaSeconds);
+      this.spawnScheduledEnemyIfDue();
+    }
     this.moveEnemiesTowardPlayer(deltaSeconds);
     this.activateEnemiesIntersectingVisibleArena();
     this.removeInvalidEscapedOrExpiredEnemies(nextSimulationTimeSeconds);

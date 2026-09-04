@@ -140,6 +140,30 @@ function exhaustWaveSchedule(state: RuntimeState): void {
     state.waveSchedule.requests.length;
 }
 
+function configureTestWave(
+  state: RuntimeState,
+  maxActiveEnemies: number,
+  startOffsetSeconds = 0.5,
+  count = 4,
+  intervalSeconds = 1,
+): void {
+  state.waveSchedule = createWaveScheduleProgress(
+    1,
+    createWaveDefinition({
+      groups: [
+        createSpawnGroup({
+          startOffsetSeconds,
+          enemyId: "basic",
+          count,
+          intervalSeconds,
+          pattern: "random-perimeter",
+        }),
+      ],
+      maxActiveEnemies,
+    }),
+  );
+}
+
 function addEnemy(
   state: RuntimeState,
   id: number,
@@ -348,13 +372,11 @@ describe("GameRuntimeSession complete restart reset", () => {
         currentHealth: 3,
         invulnerableUntilSeconds: 0,
       },
-      nextEnemyId: 4,
+      nextEnemyId: 3,
       nextProjectileId: 2,
       killCount: 0,
     });
-    expect(completedRuns[0]?.enemies.map((enemy) => enemy.id)).toEqual([
-      1, 2, 3,
-    ]);
+    expect(completedRuns[0]?.enemies.map((enemy) => enemy.id)).toEqual([1, 2]);
     expect(completedRuns[0]?.projectiles).toEqual([]);
   });
 });
@@ -391,6 +413,124 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
     session.fixedUpdate(0.01);
     expect(state.enemies).toHaveLength(1);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS + 1);
+  });
+
+  it("freezes wave time at capacity while movement and combat continue", () => {
+    const state = createInitialRuntimeState();
+    configureTestWave(state, 1);
+    addEnemy(state, 1, { x: 180, y: 200 }, "active");
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const { session } = createSession(state, randomSource);
+
+    session.fixedUpdate(0.1);
+
+    expect(state.simulationTimeSeconds).toBe(0.1);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(state.enemies[0]?.position).toEqual({ x: 180, y: 207.2 });
+    expect(state.projectiles).toHaveLength(1);
+    expect(randomSource.calls).toHaveLength(0);
+  });
+
+  it("preserves a pending request through several capped updates", () => {
+    const state = createInitialRuntimeState();
+    configureTestWave(state, 1);
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, { x: -66, y: 100 }, "entering");
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const { session } = createSession(state, randomSource);
+
+    session.fixedUpdate(0.25);
+    session.fixedUpdate(0.25);
+    session.fixedUpdate(0.25);
+
+    expect(state.simulationTimeSeconds).toBe(0.75);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(randomSource.calls).toHaveLength(0);
+  });
+
+  it("reopens capacity when an enemy becomes dying", () => {
+    const state = createInitialRuntimeState();
+    configureTestWave(state, 1, 0.1, 2, 0.1);
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, { x: 180, y: 200 }, "active");
+    state.enemies[0]!.currentHealth = 0;
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const { session } = createSession(state, randomSource);
+
+    session.fixedUpdate(0.1);
+
+    expect(state.enemies.map((enemy) => enemy.phase)).toEqual([
+      "dying",
+      "entering",
+    ]);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0.1);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(randomSource.calls).toHaveLength(1);
+  });
+
+  it("reopens after removal without bursting overdue requests", () => {
+    const state = createInitialRuntimeState();
+    configureTestWave(state, 1, 0.1, 3, 0.1);
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, { x: -66, y: 100 }, "entering");
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const { session } = createSession(state, randomSource);
+
+    session.fixedUpdate(0.5);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0);
+
+    state.enemies = [];
+    session.fixedUpdate(0.5);
+
+    expect(state.enemies).toHaveLength(1);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0.5);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+
+    session.fixedUpdate(0.5);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0.5);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+
+    state.enemies = [];
+    session.fixedUpdate(0.01);
+
+    expect(state.enemies).toHaveLength(1);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(2);
+    expect(randomSource.calls).toHaveLength(2);
+  });
+
+  it("combines cap backpressure with a pending failed fair spawn", () => {
+    const state = createInitialRuntimeState();
+    configureTestWave(state, 1);
+    state.player.position = { x: 180, y: 12 };
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, { x: -66, y: 100 }, "entering");
+    const randomSource = new SequenceRandomSource([
+      ...Array.from({ length: MAX_SPAWN_ATTEMPTS }, () => TOP_CENTER_DISTANCE),
+      BOTTOM_CENTER_DISTANCE,
+    ]);
+    const { session } = createSession(state, randomSource);
+
+    session.fixedUpdate(0.5);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0);
+    expect(randomSource.calls).toHaveLength(0);
+
+    state.enemies = [];
+    session.fixedUpdate(0.5);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0.5);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS);
+
+    addEnemy(state, 1, { x: -66, y: 100 }, "entering");
+    session.fixedUpdate(0.1);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0.5);
+    expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS);
+
+    state.enemies = [];
+    session.fixedUpdate(0.1);
     expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
     expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS + 1);
   });
@@ -459,6 +599,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
   it("stops spawning after the finite first-wave schedule is exhausted", () => {
     const state = createInitialRuntimeState();
+    configureTestWave(state, 4);
     state.nextAttackAtSeconds = 100;
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
@@ -670,6 +811,9 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     expect(randomSource.resetCount).toBe(1);
     const restartedState = readOwnedRuntimeState(session);
     expect(restartedState.waveSchedule.currentWaveNumber).toBe(1);
+    expect(restartedState.waveSchedule.maxActiveEnemies).toBe(
+      PROVISIONAL_EPIC_5_WAVES[0]!.maxActiveEnemies,
+    );
     expect(restartedState.waveSchedule.elapsedSeconds).toBe(0);
     expect(restartedState.waveSchedule.nextScheduledSpawnIndex).toBe(0);
     session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS - 0.01);
@@ -703,8 +847,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     expect(firstState.enemies.map((enemy) => enemy.phase)).toEqual(
       secondState.enemies.map((enemy) => enemy.phase),
     );
-    expect(firstState.enemies.map((enemy) => enemy.id)).toEqual([1, 2, 3]);
-    expect(secondState.enemies.map((enemy) => enemy.id)).toEqual([1, 2, 3]);
+    expect(firstState.enemies.map((enemy) => enemy.id)).toEqual([1, 2]);
+    expect(secondState.enemies.map((enemy) => enemy.id)).toEqual([1, 2]);
   });
 
   it("replays the same spawn positions, IDs, and schedule after restart", () => {

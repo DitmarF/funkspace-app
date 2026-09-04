@@ -8,6 +8,7 @@ export type {
   SpawnPattern,
   WaveDefinition,
 } from "./WaveDefinition.js";
+export { countEnemiesOccupyingWaveCapacity } from "./WaveCapacity.js";
 export {
   advanceWaveSchedule,
   compileWaveSchedule,
