@@ -54,6 +54,7 @@ import {
   consumeNextScheduledSpawnRequest,
   countEnemiesOccupyingWaveCapacity,
   getDueScheduledSpawnRequest,
+  isWaveComplete,
   type ScheduledSpawnRequest,
 } from "../domain/waves/index.js";
 
@@ -166,7 +167,10 @@ export class GameRuntimeSession {
       return;
     }
 
+    const currentWaveComplete = this.isCurrentWaveComplete();
     this.emitStatusIfChanged();
+    // WS-5.5 will replace this terminal return with its phase transition.
+    if (currentWaveComplete) return;
   }
 
   render(): void {
@@ -398,6 +402,10 @@ export class GameRuntimeSession {
     this.state.phase = "lost";
     this.input?.reset();
     return true;
+  }
+
+  private isCurrentWaveComplete(): boolean {
+    return isWaveComplete(this.state.waveSchedule, this.state.enemies);
   }
 
   private emitStatusIfChanged(): void {

@@ -9,6 +9,7 @@ export type {
   WaveDefinition,
 } from "./WaveDefinition.js";
 export { countEnemiesOccupyingWaveCapacity } from "./WaveCapacity.js";
+export { isWaveComplete } from "./WaveCompletion.js";
 export {
   advanceWaveSchedule,
   compileWaveSchedule,

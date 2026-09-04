@@ -70,6 +70,7 @@ export {
   createWaveDefinition,
   createWaveScheduleProgress,
   getDueScheduledSpawnRequest,
+  isWaveComplete,
   PROVISIONAL_EPIC_5_WAVES,
 } from "./waves/index.js";
 export type {

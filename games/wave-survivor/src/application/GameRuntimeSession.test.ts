@@ -129,6 +129,12 @@ function readOwnedRuntimeState(session: GameRuntimeSession): RuntimeState {
   return (session as unknown as { readonly state: RuntimeState }).state;
 }
 
+function readCurrentWaveCompletion(session: GameRuntimeSession): boolean {
+  return (
+    session as unknown as { isCurrentWaveComplete(): boolean }
+  ).isCurrentWaveComplete();
+}
+
 function createExpectedPlayingState(): RuntimeState {
   const state = createInitialRuntimeState();
   state.phase = "playing";
@@ -1192,6 +1198,79 @@ describe("GameRuntimeSession projectile hit resolution", () => {
     expect(state.enemies[0]?.phase).toBe("active");
     expect(state.killCount).toBe(0);
     expect(state.projectiles).toEqual([]);
+  });
+});
+
+describe("GameRuntimeSession wave completion boundary", () => {
+  it("detects completion on the fixed update that defeats the final enemy", () => {
+    const state = createInitialRuntimeState();
+    exhaustWaveSchedule(state);
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    addProjectile(state, 1, state.player.position);
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    expect(readCurrentWaveCompletion(session)).toBe(false);
+
+    session.fixedUpdate(0.01);
+
+    expect(state.enemies[0]?.phase).toBe("dying");
+    expect(readCurrentWaveCompletion(session)).toBe(true);
+  });
+
+  it("lets player loss win when the final enemy falls on the same update", () => {
+    const state = createInitialRuntimeState();
+    state.player.currentHealth = 1;
+    exhaustWaveSchedule(state);
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, state.player.position, "active");
+    addProjectile(state, 1, state.player.position);
+    const input = new ControlledMovementInput();
+    input.readMovementIntent = () => {
+      state.player.currentHealth = 0;
+      return ZERO_MOVEMENT_INTENT;
+    };
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      input,
+    );
+
+    session.fixedUpdate(0.01);
+
+    expect(state.enemies[0]?.phase).toBe("dying");
+    expect(readCurrentWaveCompletion(session)).toBe(true);
+    expect(state.phase).toBe("lost");
+  });
+
+  it("evaluates completion only after invalid and escaped cleanup", () => {
+    const state = createInitialRuntimeState();
+    exhaustWaveSchedule(state);
+    state.nextAttackAtSeconds = 100;
+    addEnemy(state, 1, { x: Number.NaN, y: 100 }, "active");
+    addEnemy(
+      state,
+      2,
+      {
+        x: DESPAWN_BOUNDS.x + DESPAWN_BOUNDS.width + 100,
+        y: DESPAWN_BOUNDS.y + DESPAWN_BOUNDS.height / 2,
+      },
+      "active",
+    );
+    const { session } = createSession(
+      state,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    expect(readCurrentWaveCompletion(session)).toBe(false);
+
+    session.fixedUpdate(0.01);
+
+    expect(state.enemies).toEqual([]);
+    expect(readCurrentWaveCompletion(session)).toBe(true);
   });
 });
 
