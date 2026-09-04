@@ -169,3 +169,27 @@ export const PROVISIONAL_EPIC_5_WAVES: readonly Readonly<WaveDefinition>[] =
       maxActiveEnemies: 4,
     }),
   ]);
+
+/**
+ * Resolve temporary EPIC 5 wave content.
+ *
+ * Wave numbers beyond the provisional list reuse its final definition until
+ * EPIC 6 replaces this fallback with the finished run structure.
+ */
+export function getProvisionalEpic5WaveDefinition(
+  waveNumber: number,
+): Readonly<WaveDefinition> {
+  if (!Number.isSafeInteger(waveNumber) || waveNumber <= 0) {
+    throw new RangeError("Wave number must be a positive safe integer.");
+  }
+
+  const definition =
+    PROVISIONAL_EPIC_5_WAVES[
+      Math.min(waveNumber, PROVISIONAL_EPIC_5_WAVES.length) - 1
+    ];
+  if (!definition) {
+    throw new RangeError("At least one provisional wave must be defined.");
+  }
+
+  return definition;
+}

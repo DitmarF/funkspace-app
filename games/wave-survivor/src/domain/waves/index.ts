@@ -1,6 +1,7 @@
 export {
   createSpawnGroup,
   createWaveDefinition,
+  getProvisionalEpic5WaveDefinition,
   PROVISIONAL_EPIC_5_WAVES,
 } from "./WaveDefinition.js";
 export type {

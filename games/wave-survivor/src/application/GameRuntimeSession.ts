@@ -50,6 +50,7 @@ import {
   type RuntimeState,
 } from "../domain/state/RuntimeState.js";
 import {
+  applyRunUpgrade,
   generateUpgradeOptionIds,
   getEffectiveAttackCooldownSeconds,
   getEffectiveMaximumHealth,
@@ -61,9 +62,12 @@ import {
   advanceWaveSchedule,
   consumeNextScheduledSpawnRequest,
   countEnemiesOccupyingWaveCapacity,
+  createWaveScheduleProgress,
   getDueScheduledSpawnRequest,
+  getProvisionalEpic5WaveDefinition,
   isWaveComplete,
   type ScheduledSpawnRequest,
+  type WaveScheduleProgress,
 } from "../domain/waves/index.js";
 
 const ENEMY_DESPAWN_BOUNDS = createEnemyDespawnBounds(
@@ -77,9 +81,11 @@ const PROJECTILE_DESPAWN_BOUNDS = expandBoundsByOffset(
   BASIC_ATTACK_DEFINITION.projectileDespawnMargin,
 );
 const UPGRADE_OPTION_COUNT = 3;
+const NO_PENDING_UPGRADE_OPTIONS: readonly UpgradeId[] = Object.freeze([]);
 
 /** Owns the current deterministic session and coordinates one fixed update. */
 export class GameRuntimeSession {
+  private destroyed = false;
   private lastStatusSnapshot: GameStatusSnapshot | null = null;
 
   constructor(
@@ -145,8 +151,50 @@ export class GameRuntimeSession {
     return true;
   }
 
-  /** Resume only after the application has applied a valid future selection. */
-  completeUpgradeSelection(): boolean {
+  /** Apply one pending choice and prepare the next finite wave. */
+  chooseUpgrade(upgradeId: string): boolean {
+    if (
+      this.destroyed ||
+      this.state.phase !== "choosing-upgrade" ||
+      !this.state.pendingUpgradeOptionIds.some(
+        (pendingUpgradeId) => pendingUpgradeId === upgradeId,
+      )
+    ) {
+      return false;
+    }
+
+    const applied = applyRunUpgrade(
+      upgradeId,
+      this.state.upgrades,
+      this.state.player.currentHealth,
+      this.state.player.maximumHealth,
+    );
+    if (!applied) return false;
+
+    const nextWaveNumber = this.state.waveSchedule.currentWaveNumber + 1;
+    if (!Number.isSafeInteger(nextWaveNumber)) return false;
+
+    let nextWaveSchedule: WaveScheduleProgress;
+    try {
+      nextWaveSchedule = createWaveScheduleProgress(
+        nextWaveNumber,
+        getProvisionalEpic5WaveDefinition(nextWaveNumber),
+      );
+    } catch {
+      return false;
+    }
+
+    this.state.upgrades = applied.upgrades;
+    this.state.player.currentHealth = applied.currentHealth;
+    this.state.pendingUpgradeOptionIds = NO_PENDING_UPGRADE_OPTIONS;
+    this.state.waveSchedule = nextWaveSchedule;
+    this.state.nextAttackAtSeconds = 0;
+    this.resetMovementInput();
+
+    return this.completeUpgradeSelection();
+  }
+
+  private completeUpgradeSelection(): boolean {
     if (this.state.phase !== "choosing-upgrade") return false;
 
     this.state.phase = "playing";
@@ -274,6 +322,8 @@ export class GameRuntimeSession {
   }
 
   destroy(): void {
+    if (this.destroyed) return;
+    this.destroyed = true;
     this.state.enemies = [];
     this.state.projectiles = [];
 

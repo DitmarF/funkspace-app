@@ -111,7 +111,9 @@ describe("GameRuntimeSession discrete status", () => {
 
     session.fixedUpdate(0.01);
     expect(session.phase).toBe("choosing-upgrade");
-    expect(session.completeUpgradeSelection()).toBe(true);
+    expect(session.chooseUpgrade(session.pendingUpgradeOptionIds[0]!)).toBe(
+      true,
+    );
 
     expect(statuses.map((status) => status.phase)).toEqual([
       "choosing-upgrade",

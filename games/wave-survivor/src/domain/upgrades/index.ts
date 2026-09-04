@@ -25,3 +25,5 @@ export type {
   VitalityHealthResult,
 } from "./RunUpgradeState.js";
 export { generateUpgradeOptionIds } from "./UpgradeOptions.js";
+export { applyRunUpgrade } from "./ApplyUpgrade.js";
+export type { AppliedRunUpgrade } from "./ApplyUpgrade.js";

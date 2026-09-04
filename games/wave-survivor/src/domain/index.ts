@@ -62,6 +62,7 @@ export {
 } from "./state/index.js";
 export type { PlayerState, RuntimePhase, RuntimeState } from "./state/index.js";
 export {
+  applyRunUpgrade,
   calculateVitalityUpgradeHealth,
   createInitialRunUpgradeState,
   createRunUpgradeState,
@@ -74,6 +75,7 @@ export {
   isUpgradeEligible,
 } from "./upgrades/index.js";
 export type {
+  AppliedRunUpgrade,
   FireRateUpgradeEffect,
   MovementSpeedUpgradeEffect,
   RunUpgradeState,
@@ -93,6 +95,7 @@ export {
   createWaveDefinition,
   createWaveScheduleProgress,
   getDueScheduledSpawnRequest,
+  getProvisionalEpic5WaveDefinition,
   isWaveComplete,
   PROVISIONAL_EPIC_5_WAVES,
 } from "./waves/index.js";

@@ -94,18 +94,18 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(state.movementIntent).toBe(ZERO_MOVEMENT_INTENT);
     expect(input.resetCount).toBe(2);
 
-    expect(session.completeUpgradeSelection()).toBe(true);
+    expect(session.chooseUpgrade(state.pendingUpgradeOptionIds[0]!)).toBe(true);
     expect(state.phase).toBe("playing");
 
     state.player.currentHealth = 0;
     session.fixedUpdate(0.01);
     expect(state.phase).toBe("lost");
     expect(state.movementIntent).toBe(ZERO_MOVEMENT_INTENT);
-    expect(input.resetCount).toBe(3);
+    expect(input.resetCount).toBe(4);
 
     session.restart();
     expect(session.phase).toBe("playing");
-    expect(input.resetCount).toBe(4);
+    expect(input.resetCount).toBe(5);
   });
 
   it("rejects lifecycle and upgrade transitions from the wrong phases", () => {
@@ -114,19 +114,19 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(session.pause()).toBe(false);
     expect(session.resume()).toBe(false);
     expect(session.beginUpgradeSelection()).toBe(false);
-    expect(session.completeUpgradeSelection()).toBe(false);
+    expect(session.chooseUpgrade("vitality")).toBe(false);
 
     expect(session.start()).toBe(true);
     expect(session.start()).toBe(false);
     expect(session.resume()).toBe(false);
     expect(session.beginUpgradeSelection()).toBe(false);
-    expect(session.completeUpgradeSelection()).toBe(false);
+    expect(session.chooseUpgrade("vitality")).toBe(false);
 
     expect(session.pause()).toBe(true);
     expect(session.pause()).toBe(false);
     expect(session.start()).toBe(false);
     expect(session.beginUpgradeSelection()).toBe(false);
-    expect(session.completeUpgradeSelection()).toBe(false);
+    expect(session.chooseUpgrade("vitality")).toBe(false);
 
     expect(session.resume()).toBe(true);
     state.phase = "wave-cleared";
@@ -134,7 +134,7 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(session.start()).toBe(false);
     expect(session.pause()).toBe(false);
     expect(session.resume()).toBe(false);
-    expect(session.completeUpgradeSelection()).toBe(false);
+    expect(session.chooseUpgrade("vitality")).toBe(false);
     expect(session.beginUpgradeSelection()).toBe(false);
 
     state.pendingUpgradeOptionIds = Object.freeze(["vitality"]);
@@ -144,7 +144,7 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(session.pause()).toBe(false);
     expect(session.resume()).toBe(false);
 
-    expect(session.completeUpgradeSelection()).toBe(true);
+    expect(session.chooseUpgrade("vitality")).toBe(true);
     state.player.currentHealth = 0;
     session.fixedUpdate(0.01);
     expect(state.phase).toBe("lost");
@@ -152,7 +152,7 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(session.pause()).toBe(false);
     expect(session.resume()).toBe(false);
     expect(session.beginUpgradeSelection()).toBe(false);
-    expect(session.completeUpgradeSelection()).toBe(false);
+    expect(session.chooseUpgrade("vitality")).toBe(false);
   });
 
   it("generates one option set, enters choosing-upgrade, and freezes progress", () => {

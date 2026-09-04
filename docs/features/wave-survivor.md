@@ -403,6 +403,8 @@ no entering or active enemies remain
 
 When the active-enemy cap is reached, queued spawns wait. This prevents uncontrolled accumulation while preserving a finite wave.
 
+As a temporary EPIC 5 fallback, wave numbers after the fourth provisional wave reuse Wave 4's definition while the displayed wave number continues increasing. EPIC 6 must replace this behavior with the final run length, pressure curve, and victory structure.
+
 ## 11. Upgrades and progression
 
 ### 11.1 Between-wave choice
