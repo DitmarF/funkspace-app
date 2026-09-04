@@ -70,6 +70,8 @@ describe("createInitialRuntimeState", () => {
     expect(first.upgrades).toEqual(createInitialRunUpgradeState());
     expect(first.upgrades).not.toBe(second.upgrades);
     expect(first.upgrades.levels).not.toBe(second.upgrades.levels);
+    expect(first.pendingUpgradeOptionIds).toEqual([]);
+    expect(Object.isFrozen(first.pendingUpgradeOptionIds)).toBe(true);
   });
 
   it("uses the marker radius and provisional movement speed", () => {
@@ -216,9 +218,13 @@ describe("createInitialRuntimeState", () => {
       "swift-movement": 3,
       vitality: 1,
     });
+    progressedState.pendingUpgradeOptionIds = Object.freeze([
+      "vitality" as const,
+    ]);
 
     const restartedState = createInitialRuntimeState();
 
     expect(restartedState.upgrades).toEqual(createInitialRunUpgradeState());
+    expect(restartedState.pendingUpgradeOptionIds).toEqual([]);
   });
 });

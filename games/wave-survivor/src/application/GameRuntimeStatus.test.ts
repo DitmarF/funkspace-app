@@ -32,6 +32,7 @@ function createStatusHarness() {
     new ZeroMovementInput(),
     null,
     new SeededRandomSource(1),
+    new SeededRandomSource(2),
     null,
     onStatusChange,
   );
@@ -109,11 +110,10 @@ describe("GameRuntimeSession discrete status", () => {
       state.waveSchedule.requests.length;
 
     session.fixedUpdate(0.01);
-    expect(session.beginUpgradeSelection()).toBe(true);
+    expect(session.phase).toBe("choosing-upgrade");
     expect(session.completeUpgradeSelection()).toBe(true);
 
     expect(statuses.map((status) => status.phase)).toEqual([
-      "wave-cleared",
       "choosing-upgrade",
       "playing",
     ]);
@@ -156,6 +156,7 @@ describe("GameRuntimeSession discrete status", () => {
       new ZeroMovementInput(),
       null,
       new SeededRandomSource(1),
+      new SeededRandomSource(2),
     );
 
     expect(() => {
@@ -185,6 +186,7 @@ describe("GameRuntimeSession combat render snapshot", () => {
       new ZeroMovementInput(),
       presentation,
       new SeededRandomSource(1),
+      new SeededRandomSource(2),
     );
 
     session.render();

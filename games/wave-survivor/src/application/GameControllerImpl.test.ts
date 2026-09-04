@@ -115,6 +115,7 @@ function createHarness(
     input,
     presentation,
     new SeededRandomSource(1),
+    new SeededRandomSource(2),
     readJoystickSnapshot,
   );
   const loop = new FixedStepLoop(clock, frameScheduler, {
@@ -202,7 +203,7 @@ describe("GameController runtime lifecycle", () => {
     expect(input.reset).toHaveBeenCalledOnce();
   });
 
-  it("renders one wave-cleared frame before suspending the loop", () => {
+  it("renders one choosing-upgrade frame before suspending the loop", () => {
     const {
       clock,
       controller,
@@ -219,10 +220,10 @@ describe("GameController runtime lifecycle", () => {
 
     frameScheduler.runNextFrame();
 
-    expect(controller.lifecycleState).toBe("wave-cleared");
+    expect(controller.lifecycleState).toBe("choosing-upgrade");
     expect(snapshots).toHaveLength(1);
     expect(snapshots[0]).toMatchObject({
-      phase: "wave-cleared",
+      phase: "choosing-upgrade",
       simulationTimeSeconds: FIXED_SIMULATION_STEP_SECONDS,
     });
     expect(frameScheduler.pendingFrameCount).toBe(0);
@@ -247,7 +248,7 @@ describe("GameController runtime lifecycle", () => {
     controller.start();
     clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
     frameScheduler.runNextFrame();
-    expect(session.beginUpgradeSelection()).toBe(true);
+    expect(session.beginUpgradeSelection()).toBe(false);
     readMovementIntent.mockClear();
 
     loop.start();
@@ -292,7 +293,7 @@ describe("GameController runtime lifecycle", () => {
   ] as const)(
     "keeps exactly one pending frame after repeated restart from %s",
     (startingPhase) => {
-      const { clock, controller, frameScheduler, session, snapshots, state } =
+      const { clock, controller, frameScheduler, snapshots, state } =
         createHarness();
       controller.start();
       if (startingPhase === "paused") controller.pause();
@@ -300,14 +301,8 @@ describe("GameController runtime lifecycle", () => {
         startingPhase === "wave-cleared" ||
         startingPhase === "choosing-upgrade"
       ) {
-        state.waveSchedule.nextScheduledSpawnIndex =
-          state.waveSchedule.requests.length;
-        clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
-        frameScheduler.runNextFrame();
-        expect(controller.lifecycleState).toBe("wave-cleared");
-        if (startingPhase === "choosing-upgrade") {
-          expect(session.beginUpgradeSelection()).toBe(true);
-        }
+        state.phase = startingPhase;
+        expect(controller.lifecycleState).toBe(startingPhase);
       }
       if (startingPhase === "lost") {
         state.player.currentHealth = 0;
@@ -357,32 +352,22 @@ describe("GameController runtime lifecycle", () => {
     expect(presentation.destroy).toHaveBeenCalledOnce();
   });
 
-  it("ignores pause and resume throughout the upgrade phases", () => {
-    const { clock, controller, frameScheduler, input, session, state } =
-      createHarness();
+  it("ignores pause and resume while choosing an upgrade", () => {
+    const { clock, controller, frameScheduler, input, state } = createHarness();
     state.waveSchedule.nextScheduledSpawnIndex =
       state.waveSchedule.requests.length;
     controller.start();
     clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
     frameScheduler.runNextFrame();
-    expect(controller.lifecycleState).toBe("wave-cleared");
+    expect(controller.lifecycleState).toBe("choosing-upgrade");
 
-    controller.pause();
-    controller.resume();
-
-    expect(controller.lifecycleState).toBe("wave-cleared");
-    expect(frameScheduler.pendingFrameCount).toBe(0);
-    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
-    expect(input.reset).toHaveBeenCalledOnce();
-
-    expect(session.beginUpgradeSelection()).toBe(true);
     controller.pause();
     controller.resume();
 
     expect(controller.lifecycleState).toBe("choosing-upgrade");
     expect(frameScheduler.pendingFrameCount).toBe(0);
     expect(frameScheduler.requestedFrameIds).toHaveLength(1);
-    expect(input.reset).toHaveBeenCalledTimes(2);
+    expect(input.reset).toHaveBeenCalledOnce();
   });
 
   it("starts exactly one loop and makes repeated start idempotent", () => {

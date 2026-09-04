@@ -145,6 +145,7 @@ function createHarness() {
     input,
     presentation,
     new SeededRandomSource(1),
+    new SeededRandomSource(2),
     () => joystick.readPresentationSnapshot(),
   );
   const loop: RuntimeLoopControl = {

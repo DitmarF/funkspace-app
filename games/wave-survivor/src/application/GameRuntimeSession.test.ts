@@ -118,10 +118,17 @@ class SequenceRandomSource implements RandomSource {
 
 function createSession(
   state: RuntimeState,
-  randomSource: RandomSource,
+  spawnRandomSource: RandomSource,
   input = new ControlledMovementInput(),
+  upgradeRandomSource: RandomSource = new SeededRandomSource(2),
 ) {
-  const session = new GameRuntimeSession(state, input, null, randomSource);
+  const session = new GameRuntimeSession(
+    state,
+    input,
+    null,
+    spawnRandomSource,
+    upgradeRandomSource,
+  );
   session.start();
 
   return { input, session };
@@ -272,6 +279,7 @@ describe("GameRuntimeSession loss transition", () => {
       new ControlledMovementInput(),
       presentation,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
     session.start();
     session.fixedUpdate(0.01);
@@ -350,6 +358,7 @@ describe("GameRuntimeSession complete restart reset", () => {
       input,
       null,
       new SeededRandomSource(42),
+      new SeededRandomSource(84),
     );
     const steps = [
       [createMovementIntent(-1, 0), FIRST_WAVE_FIRST_SPAWN_SECONDS],
@@ -744,6 +753,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
       input,
       presentation,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
     session.start();
 
@@ -794,6 +804,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
       new ControlledMovementInput(),
       null,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
 
     session.fixedUpdate(10);
@@ -869,6 +880,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
       input,
       presentation,
       new SeededRandomSource(42),
+      new SeededRandomSource(84),
     );
     const steps = [
       [createMovementIntent(-1, 0), FIRST_WAVE_FIRST_SPAWN_SECONDS],
@@ -954,6 +966,7 @@ describe("GameRuntimeSession effective run upgrades", () => {
       new ControlledMovementInput(),
       presentation,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
     session.start();
 
@@ -1159,6 +1172,7 @@ describe("GameRuntimeSession automatic attack", () => {
       input,
       presentation,
       randomSource,
+      new SeededRandomSource(84),
     );
     const steps = [FIRST_WAVE_FIRST_SPAWN_SECONDS, 0.25] as const;
     session.start();
@@ -1204,6 +1218,7 @@ describe("GameRuntimeSession projectile hit resolution", () => {
       new ControlledMovementInput(),
       presentation,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
     session.start();
 
@@ -1285,7 +1300,7 @@ describe("GameRuntimeSession wave completion boundary", () => {
 
     expect(state.enemies[0]?.phase).toBe("dying");
     expect(readCurrentWaveCompletion(session)).toBe(true);
-    expect(state.phase).toBe("wave-cleared");
+    expect(state.phase).toBe("choosing-upgrade");
   });
 
   it("lets player loss win when the final enemy falls on the same update", () => {
@@ -1338,7 +1353,7 @@ describe("GameRuntimeSession wave completion boundary", () => {
 
     expect(state.enemies).toEqual([]);
     expect(readCurrentWaveCompletion(session)).toBe(true);
-    expect(state.phase).toBe("wave-cleared");
+    expect(state.phase).toBe("choosing-upgrade");
   });
 });
 
@@ -1433,6 +1448,7 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
       new ControlledMovementInput(),
       presentation,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
     session.start();
     session.fixedUpdate(FIXED_TEST_STEP_SECONDS);
@@ -1614,6 +1630,7 @@ describe("GameRuntimeSession player contact damage", () => {
       new ControlledMovementInput(),
       presentation,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
     session.start();
     session.fixedUpdate(0.01);
@@ -1661,6 +1678,7 @@ describe("GameRuntimeSession player contact damage", () => {
       new ControlledMovementInput(),
       presentation,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
     session.start();
     session.render();
@@ -1828,6 +1846,7 @@ describe("GameRuntimeSession projectile movement and presentation", () => {
       new ControlledMovementInput(),
       presentation,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
 
     session.render();
@@ -1862,6 +1881,7 @@ describe("GameRuntimeSession projectile movement and presentation", () => {
       new ControlledMovementInput(),
       presentation,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+      new SeededRandomSource(2),
     );
     session.start();
     session.render();

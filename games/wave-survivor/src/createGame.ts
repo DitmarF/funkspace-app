@@ -17,6 +17,8 @@ import { SeededRandomSource } from "./infrastructure/random/SeededRandomSource.j
 import { CanvasGameRenderer } from "./renderer/CanvasGameRenderer.js";
 
 const DEFAULT_GAMEPLAY_RANDOM_SEED = 0x5eed_c0de;
+const SPAWN_RANDOM_SEED_SALT = 0x2c92_7a4d;
+const UPGRADE_RANDOM_SEED_SALT = 0x79b9_f123;
 
 /**
  * Create an isolated Wave Survivor game instance.
@@ -45,7 +47,12 @@ export function createGame(options?: GameMountOptions): GameController {
     createInitialRuntimeState(),
     input,
     presentation,
-    new SeededRandomSource(DEFAULT_GAMEPLAY_RANDOM_SEED),
+    new SeededRandomSource(
+      (DEFAULT_GAMEPLAY_RANDOM_SEED ^ SPAWN_RANDOM_SEED_SALT) >>> 0,
+    ),
+    new SeededRandomSource(
+      (DEFAULT_GAMEPLAY_RANDOM_SEED ^ UPGRADE_RANDOM_SEED_SALT) >>> 0,
+    ),
     joystickInput ? () => joystickInput.readPresentationSnapshot() : null,
     options?.onStatusChange ?? null,
   );

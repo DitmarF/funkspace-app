@@ -9,6 +9,7 @@ import type { ProjectileState } from "../projectiles/index.js";
 import {
   createInitialRunUpgradeState,
   type RunUpgradeState,
+  type UpgradeId,
 } from "../upgrades/index.js";
 import {
   createWaveScheduleProgress,
@@ -53,6 +54,7 @@ export interface RuntimeState {
   movementIntent: MovementIntent;
   player: PlayerState;
   upgrades: Readonly<RunUpgradeState>;
+  pendingUpgradeOptionIds: readonly UpgradeId[];
   enemies: EnemyState[];
   nextEnemyId: number;
   waveSchedule: WaveScheduleProgress;
@@ -80,6 +82,7 @@ export function createInitialRuntimeState(): RuntimeState {
       invulnerableUntilSeconds: 0,
     },
     upgrades: createInitialRunUpgradeState(),
+    pendingUpgradeOptionIds: Object.freeze([]),
     enemies: [],
     nextEnemyId: 1,
     waveSchedule: createWaveScheduleProgress(1, PROVISIONAL_EPIC_5_WAVES[0]!),

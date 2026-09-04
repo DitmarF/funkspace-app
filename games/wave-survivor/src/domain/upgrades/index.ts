@@ -24,3 +24,4 @@ export type {
   UpgradeLevels,
   VitalityHealthResult,
 } from "./RunUpgradeState.js";
+export { generateUpgradeOptionIds } from "./UpgradeOptions.js";

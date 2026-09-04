@@ -50,9 +50,12 @@ import {
   type RuntimeState,
 } from "../domain/state/RuntimeState.js";
 import {
+  generateUpgradeOptionIds,
   getEffectiveAttackCooldownSeconds,
   getEffectiveMaximumHealth,
   getEffectiveMovementSpeedUnitsPerSecond,
+  INITIAL_UPGRADE_DEFINITIONS,
+  type UpgradeId,
 } from "../domain/upgrades/index.js";
 import {
   advanceWaveSchedule,
@@ -73,6 +76,7 @@ const PROJECTILE_DESPAWN_BOUNDS = expandBoundsByOffset(
   VISIBLE_ARENA_BOUNDS,
   BASIC_ATTACK_DEFINITION.projectileDespawnMargin,
 );
+const UPGRADE_OPTION_COUNT = 3;
 
 /** Owns the current deterministic session and coordinates one fixed update. */
 export class GameRuntimeSession {
@@ -82,7 +86,8 @@ export class GameRuntimeSession {
     private state: RuntimeState,
     private input: MovementInputPort | null,
     private presentation: GamePresentationPort | null,
-    private readonly randomSource: RandomSource,
+    private readonly spawnRandomSource: RandomSource,
+    private readonly upgradeRandomSource: RandomSource,
     private readJoystickSnapshot:
       | (() => JoystickRenderSnapshot | null)
       | null = null,
@@ -95,6 +100,10 @@ export class GameRuntimeSession {
 
   get phase(): RuntimePhase {
     return this.state.phase;
+  }
+
+  get pendingUpgradeOptionIds(): readonly UpgradeId[] {
+    return this.state.pendingUpgradeOptionIds;
   }
 
   start(): boolean {
@@ -124,10 +133,14 @@ export class GameRuntimeSession {
 
   /** Enter upgrade choice after the application has prepared valid options. */
   beginUpgradeSelection(): boolean {
-    if (this.state.phase !== "wave-cleared") return false;
+    if (
+      this.state.phase !== "wave-cleared" ||
+      this.state.pendingUpgradeOptionIds.length === 0
+    ) {
+      return false;
+    }
 
     this.state.phase = "choosing-upgrade";
-    this.resetMovementInput();
     this.emitStatusIfChanged();
     return true;
   }
@@ -143,7 +156,8 @@ export class GameRuntimeSession {
 
   restart(): void {
     this.resetMovementInput();
-    this.randomSource.reset();
+    this.spawnRandomSource.reset();
+    this.upgradeRandomSource.reset();
     this.state = createInitialRuntimeState();
     this.state.phase = "playing";
     this.lastStatusSnapshot = null;
@@ -196,6 +210,7 @@ export class GameRuntimeSession {
     }
 
     if (this.transitionToWaveClearedIfComplete()) {
+      this.prepareUpgradeSelection();
       this.emitStatusIfChanged();
       return;
     }
@@ -285,7 +300,7 @@ export class GameRuntimeSession {
       this.state.player.collisionRadius,
       MINIMUM_CONTACT_TIME_SECONDS,
       MAX_SPAWN_ATTEMPTS,
-      this.randomSource,
+      this.spawnRandomSource,
     );
     if (!candidate) return;
 
@@ -455,6 +470,23 @@ export class GameRuntimeSession {
     this.state.phase = "wave-cleared";
     this.resetMovementInput();
     return true;
+  }
+
+  private prepareUpgradeSelection(): void {
+    if (
+      this.state.phase !== "wave-cleared" ||
+      this.state.pendingUpgradeOptionIds.length > 0
+    ) {
+      return;
+    }
+
+    this.state.pendingUpgradeOptionIds = generateUpgradeOptionIds(
+      INITIAL_UPGRADE_DEFINITIONS,
+      this.state.upgrades,
+      UPGRADE_OPTION_COUNT,
+      this.upgradeRandomSource,
+    );
+    this.beginUpgradeSelection();
   }
 
   private resetMovementInput(): void {

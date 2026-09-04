@@ -700,6 +700,7 @@ describe("CanvasGameRenderer", () => {
       new ZeroMovementInput(),
       renderer,
       new SeededRandomSource(1),
+      new SeededRandomSource(2),
     );
     const controller = new GameControllerImpl(session);
     const observer = resizeObservers[0];
@@ -755,6 +756,7 @@ describe("CanvasGameRenderer", () => {
       new ZeroMovementInput(),
       renderer,
       new SeededRandomSource(1),
+      new SeededRandomSource(2),
     );
     const controller = new GameControllerImpl(session);
     const observer = resizeObservers[0];

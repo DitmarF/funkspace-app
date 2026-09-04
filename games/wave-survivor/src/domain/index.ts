@@ -69,6 +69,7 @@ export {
   getEffectiveMaximumHealth,
   getEffectiveMovementSpeedUnitsPerSecond,
   getUpgradeDefinition,
+  generateUpgradeOptionIds,
   INITIAL_UPGRADE_DEFINITIONS,
   isUpgradeEligible,
 } from "./upgrades/index.js";
