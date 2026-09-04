@@ -711,8 +711,10 @@ Accepted centralized tuning values:
 
 # EPIC 5 — Finite waves, upgrade choice, and phase flow
 
-**Status:** Implementation complete; final manual gameplay and real-device
-validation pending. Gate 2 has not passed.
+**Status:** Implementation complete. Dimi reported PC/smartphone gameplay and
+standalone upgrade-flow checks PASS (recorded 2026-09-04). The follow-up review
+fixes below have automated coverage; renewed real-device review of those fixes
+and final sign-off remain pending. Gate 2 has not passed.
 
 ## Goal
 
@@ -781,6 +783,36 @@ but performs no fixed simulation work. Rendering and lifecycle no-ops do not
 advance time, schedules, cooldowns, entities, health, or either seeded random
 stream. A valid pending upgrade selection alone initializes the next wave and
 restarts the existing loop.
+
+### EPIC 5 review hardening — 2026-09-04
+
+- Exhausting all three five-level upgrades intentionally stops at
+  `wave-cleared` after Wave 16. The session publishes that status without an
+  empty upgrade request; the demo announces “All upgrades maxed” and offers
+  the existing Restart command. The application regression defeats the last
+  enemy with capped upgrades and verifies cleanup, frozen state, zero random
+  consumption, and fresh-run recovery. Controller coverage verifies loop
+  suspension and exactly one frame after restart.
+- Following mobile feedback, the demo choice panel overlays the game using
+  absolute positioning, with a fixed overlay on short screens. Its width is
+  independent of the portrait Canvas and content uses start alignment.
+  Browser regressions verify unchanged Canvas/status geometry and page scroll
+  across opening, scrolling, and selection in normal/short portrait, landscape,
+  and at 200% text size. The heading and every full option remain reachable;
+  keyboard selection and restart focus are covered.
+  These are actual demo DOM tests with public-contract fixtures, not a
+  sixteen-wave gameplay replay.
+- Hosted type compatibility is delivered. The current React `GameHost`
+  still lacks upgrade controls and cannot complete the flow by itself;
+  the playable standalone demo and the deferred EPIC 7 portfolio shell are
+  distinct deliverables.
+
+Validation: 52 focused application tests, all 682 package tests, all 1,017
+workspace tests, and five Chromium demo regressions passed. Package/frontend
+type checks, package/demo production builds, workspace lint, and the full
+portfolio production build passed. The earlier user-reported PC/smartphone
+PASS is retained as human evidence; automated layout checks do not constitute
+renewed real-device acceptance.
 
 ## Testing strategy
 

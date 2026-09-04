@@ -45,9 +45,11 @@ status, and clean restart.
 
 ## EPIC 5 implementation status
 
-Implementation is complete; the final manual gameplay and real-device review
-remains pending. The standalone demo supports the full provisional finite-wave
-flow through upgrade selection and subsequent waves. Gate 2 is not yet passed.
+Implementation is complete. Dimi reported PASS for PC and smartphone gameplay
+and the standalone upgrade flow (recorded September 4, 2026). The subsequent
+EPIC 5 review identified upgrade exhaustion and short-viewport layout issues;
+both now have fixes and automated regressions. Those follow-up fixes have not
+had a new real-device review. Gate 2 is not yet passed.
 
 ## Public API
 
@@ -90,6 +92,14 @@ The callback receives the initial idle state, then runs only when one of those
 discrete values changes. Per-frame positions and entity state remain private to
 the game and Canvas renderer.
 
+A published `wave-cleared` status with no subsequent upgrade request is the
+temporary exhausted-upgrade endpoint. Hosts should offer `restart()` here.
+The demo announces “All upgrades maxed” and focuses its Restart button. The
+session stays frozen, keeps the cleared wave number, and emits no empty
+upgrade-choice request. The three five-level upgrades allow 15 selections;
+clearing Wave 16 therefore reaches this endpoint. EPIC 6 owns the final run
+length and victory behavior.
+
 The optional `onEvent` callback receives frozen `wave-started`, `wave-cleared`,
 and `upgrade-choice-requested` events. Upgrade-choice events contain a frozen
 array of copied `{ id, title, description }` option DTOs; effect definitions,
@@ -121,6 +131,10 @@ that lifecycle contract.
 - `src/index.ts` is the only package entry point. Export public integration
   contracts deliberately; internal layers remain private.
 
+The frontend loader mirrors the event and selection contract, but the current
+React `GameHost` does not render upgrade controls. The standalone demo is the
+playable upgrade flow; the portfolio shell remains EPIC 7 work.
+
 The package uses project-owned TypeScript modules and browser primitives. It
 does not use React, Next.js, Phaser, or another game engine, and it must not
 import frontend source.
@@ -135,6 +149,7 @@ pnpm --filter @funkspace/wave-survivor test
 pnpm --filter @funkspace/wave-survivor build
 pnpm --filter @funkspace/wave-survivor demo
 pnpm --filter @funkspace/wave-survivor demo:build
+pnpm exec cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.demo.config.ts
 ```
 
 Build output is emitted to `dist/` and is not source-controlled.
@@ -147,5 +162,12 @@ public JavaScript entry point, creates a game controller, and renders the same
 responsive 360 × 640 logical arena as the portfolio host. It has no separate
 gameplay or renderer implementation. Semantic wave, health, and kill text
 accompany the Canvas. A keyboard- and pointer-operable DOM upgrade panel uses
-the public event and controller contracts, loss is announced politely, and a
-native restart button appears only after loss.
+the public event and controller contracts. Its scrollable panel overlays the
+game with absolute positioning and a width independent of the portrait Canvas.
+On short screens it uses a fixed overlay with screen-edge margins. Opening,
+scrolling, and closing the panel leave the game layout and page scroll unchanged.
+Loss and upgrade exhaustion are announced politely and expose a native Restart
+button. Browser regressions use public-contract fixtures with the actual demo
+markup and handlers, checking normal/short portrait, landscape, 200% text, full
+heading/option reachability, layout stability, selection focus, and
+exhausted-pool restart.

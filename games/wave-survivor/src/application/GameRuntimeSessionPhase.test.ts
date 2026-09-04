@@ -13,6 +13,10 @@ import {
   type RuntimeState,
 } from "../domain/state/index.js";
 import { createRunUpgradeState } from "../domain/upgrades/index.js";
+import {
+  createWaveScheduleProgress,
+  getProvisionalEpic5WaveDefinition,
+} from "../domain/waves/index.js";
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
 
@@ -340,6 +344,92 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(readOwnedRuntimeState(session)).toEqual(expected);
     expect(spawnRandomSource.resetCount).toBe(1);
     expect(upgradeRandomSource.resetCount).toBe(1);
+  });
+
+  it("publishes a recoverable wave-cleared stop when the final enemy falls with all upgrades capped", () => {
+    const state = createInitialRuntimeState();
+    state.upgrades = createRunUpgradeState({
+      "rapid-fire": 5,
+      "swift-movement": 5,
+      vitality: 5,
+    });
+    state.waveSchedule = createWaveScheduleProgress(
+      16,
+      getProvisionalEpic5WaveDefinition(16),
+    );
+    exhaustWaveSchedule(state);
+    const enemy = createBasicEnemyState(1, state.player.position);
+    enemy.phase = "active";
+    state.enemies.push(enemy);
+    state.projectiles.push(
+      createBasicProjectileState(
+        1,
+        state.player.position,
+        { x: 200, y: 320 },
+        0,
+      ),
+    );
+    state.nextAttackAtSeconds = 100;
+    const spawnRandom = new TrackingRandomSource(1);
+    const upgradeRandom = new TrackingRandomSource(2);
+    const statuses = vi.fn();
+    const events = vi.fn();
+    const session = new GameRuntimeSession(
+      state,
+      new TrackingMovementInput(ZERO_MOVEMENT_INTENT),
+      null,
+      spawnRandom,
+      upgradeRandom,
+      null,
+      statuses,
+      events,
+    );
+    session.start();
+
+    session.fixedUpdate(0.01);
+
+    expect(state.phase).toBe("wave-cleared");
+    expect(state.killCount).toBe(1);
+    expect(state.enemies).toEqual([]);
+    expect(state.projectiles).toEqual([]);
+    expect(state.pendingUpgradeOptionIds).toEqual([]);
+    expect(statuses).toHaveBeenLastCalledWith({
+      phase: "wave-cleared",
+      waveNumber: 16,
+      currentHealth: 3,
+      maximumHealth: 8,
+      killCount: 1,
+    });
+    expect(events.mock.calls.map(([event]) => event.type)).toEqual([
+      "wave-started",
+      "wave-cleared",
+    ]);
+    const stopped = structuredClone(state);
+    statuses.mockClear();
+    events.mockClear();
+    session.fixedUpdate(10);
+    session.fixedUpdate(10);
+    expect(session.pause()).toBe(false);
+    expect(session.resume()).toBe(false);
+    expect(session.chooseUpgrade("vitality")).toBe(false);
+    expect(state).toEqual(stopped);
+    expect(statuses).not.toHaveBeenCalled();
+    expect(events).not.toHaveBeenCalled();
+    expect(spawnRandom.nextFloatCount).toBe(0);
+    expect(upgradeRandom.nextFloatCount).toBe(0);
+
+    session.restart();
+
+    expect(readOwnedRuntimeState(session)).toEqual({
+      ...createInitialRuntimeState(),
+      phase: "playing",
+    });
+    expect(spawnRandom.resetCount).toBe(1);
+    expect(upgradeRandom.resetCount).toBe(1);
+    expect(events).toHaveBeenLastCalledWith({
+      type: "wave-started",
+      waveNumber: 1,
+    });
   });
 
   it("does not reroll options during repeated reads, rendering, or status work", () => {

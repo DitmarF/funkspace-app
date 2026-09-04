@@ -273,7 +273,6 @@ export class GameRuntimeSession {
         }),
       );
       this.prepareUpgradeSelection(clearedWaveNumber);
-      this.emitStatusIfChanged();
       return;
     }
     this.emitStatusIfChanged();
@@ -558,6 +557,12 @@ export class GameRuntimeSession {
       UPGRADE_OPTION_COUNT,
       this.upgradeRandomSource,
     );
+    if (this.state.pendingUpgradeOptionIds.length === 0) {
+      // Temporary EPIC 5 endpoint: publish wave-cleared so hosts can offer
+      // restart when every upgrade is capped. Do not request an empty choice.
+      this.emitStatusIfChanged();
+      return;
+    }
     if (!this.beginUpgradeSelection()) return;
 
     const options = this.createPendingUpgradeOptions();

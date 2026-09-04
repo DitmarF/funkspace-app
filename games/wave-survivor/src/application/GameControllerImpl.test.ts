@@ -18,6 +18,7 @@ import {
   type MovementIntent,
 } from "../domain/movement/MovementIntent.js";
 import { createInitialRuntimeState } from "../domain/state/RuntimeState.js";
+import { createRunUpgradeState } from "../domain/upgrades/index.js";
 import {
   FIXED_SIMULATION_STEP_SECONDS,
   FixedStepLoop,
@@ -173,6 +174,28 @@ describe("createGame", () => {
 });
 
 describe("GameController runtime lifecycle", () => {
+  it("suspends an exhausted upgrade pool and restarts with exactly one frame", () => {
+    const harness = createHarness();
+    harness.state.upgrades = createRunUpgradeState({
+      "rapid-fire": 5,
+      "swift-movement": 5,
+      vitality: 5,
+    });
+    reachUpgradeChoice(harness);
+
+    expect(harness.controller.lifecycleState).toBe("wave-cleared");
+    expect(harness.snapshots.at(-1)?.phase).toBe("wave-cleared");
+    expect(harness.frameScheduler.pendingFrameCount).toBe(0);
+    harness.controller.resume();
+    expect(harness.controller.chooseUpgrade("vitality")).toBe(false);
+    expect(harness.frameScheduler.pendingFrameCount).toBe(0);
+
+    harness.controller.restart();
+    expect(harness.controller.lifecycleState).toBe("running");
+    expect(harness.frameScheduler.pendingFrameCount).toBe(1);
+    expect(harness.frameScheduler.requestedFrameIds).toHaveLength(2);
+  });
+
   it("renders one lost frame, stops scheduling, and ignores pause or resume", () => {
     const {
       clock,

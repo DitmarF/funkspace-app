@@ -405,6 +405,11 @@ When the active-enemy cap is reached, queued spawns wait. This prevents uncontro
 
 As a temporary EPIC 5 fallback, wave numbers after the fourth provisional wave reuse Wave 4's definition while the displayed wave number continues increasing. EPIC 6 must replace this behavior with the final run length, pressure curve, and victory structure.
 
+If every upgrade has reached its cap, completing the wave leaves the game
+frozen in `wave-cleared`. The standalone demo displays “All upgrades maxed”
+and offers Restart. With three five-level upgrades this occurs after clearing
+Wave 16. This is a temporary recovery endpoint, not the final victory rule.
+
 ## 11. Upgrades and progression
 
 ### 11.1 Between-wave choice
@@ -775,5 +780,9 @@ discrete status UI, and deterministic restart. Gate 1 passed on August 30, 2026
 after successful PC and real-smartphone manual reviews and the complete
 automated validation suite. EPIC 5 finite waves, deterministic upgrade choices,
 public events, controller selection, standalone upgrade UI, and frozen
-between-wave transition cleanup are now implemented. Final gameplay and
-real-device validation remains pending; Gate 2 has not passed.
+between-wave transition cleanup are now implemented. Dimi reported PC and
+smartphone gameplay checks PASS (recorded September 4, 2026). The follow-up
+review's upgrade-exhaustion and short-viewport fixes have automated regression
+coverage; renewed real-device review of those fixes remains pending.
+Gate 2 has not passed. The portfolio host shares the API but its upgrade UI
+remains deferred to EPIC 7.

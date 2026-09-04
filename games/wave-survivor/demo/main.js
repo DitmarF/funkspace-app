@@ -70,6 +70,7 @@ const renderUpgradeOptions = (options) => {
   }
 
   upgradePanel.hidden = false;
+  upgradePanel.scrollTop = 0;
   upgradeOptions.querySelector("button")?.focus({ preventScroll: true });
 };
 
@@ -80,7 +81,8 @@ const game = createGame({
     wave.textContent = `Wave: ${status.waveNumber}`;
     health.textContent = `Health: ${status.currentHealth} / ${status.maximumHealth}`;
     kills.textContent = `Kills: ${status.killCount}`;
-    restartButton.hidden = status.phase !== "lost";
+    restartButton.hidden =
+      status.phase !== "lost" && status.phase !== "wave-cleared";
     canvas.dataset.gameState = status.phase;
 
     if (status.phase === "lost" && previousPhase !== "lost") {
@@ -88,6 +90,10 @@ const game = createGame({
     }
     if (status.phase !== "choosing-upgrade" && !selectionInProgress) {
       hideAndClearUpgradePanel();
+    }
+    if (status.phase === "wave-cleared" && previousPhase !== "wave-cleared") {
+      announcement.textContent = `Wave ${status.waveNumber} cleared. All upgrades maxed — restart to play again.`;
+      restartButton.focus();
     }
 
     previousPhase = status.phase;
