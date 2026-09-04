@@ -55,6 +55,13 @@ export class GameControllerImpl implements GameController {
     this.loop?.start();
   }
 
+  chooseUpgrade(id: string): boolean {
+    if (!this.session?.chooseUpgrade(id)) return false;
+
+    this.loop?.start();
+    return true;
+  }
+
   setTheme(theme: GameTheme): void {
     this.session?.setTheme(theme);
   }

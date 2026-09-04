@@ -61,14 +61,17 @@ game.start();
 game.pause();
 game.resume();
 game.restart();
+game.chooseUpgrade(selectedUpgradeId);
 game.setTheme(nextTheme);
 game.destroy();
 ```
 
 `createGame()` returns a fresh `GameController`. Lifecycle calls are
 idempotent. `restart()` starts a new session from any non-destroyed state, and
-`destroy()` is terminal and safe to repeat. When mount options are supplied,
-the factory composes the deterministic runtime, seeded random source, movement
+`destroy()` is terminal and safe to repeat. `chooseUpgrade(id)` returns `true`
+only when the ID is a valid pending option; a successful choice applies once
+and resumes the existing game loop. When mount options are supplied, the
+factory composes the deterministic runtime, seeded random source, movement
 input, and responsive Canvas renderer. A host supplies a canvas, an
 independently sized viewport boundary, and resolved `GameTheme` values through
 `GameMountOptions`; theme changes are forwarded with `setTheme()`.

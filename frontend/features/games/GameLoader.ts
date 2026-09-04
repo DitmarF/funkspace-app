@@ -11,6 +11,7 @@ export interface HostedGameController {
   pause(): void;
   resume(): void;
   restart(): void;
+  chooseUpgrade(id: string): boolean;
   setTheme(theme: GameTheme): void;
   destroy(): void;
 }

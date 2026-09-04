@@ -144,17 +144,29 @@ function createHarness(
 
 const FIXED_SIMULATION_STEP_MILLISECONDS = FIXED_SIMULATION_STEP_SECONDS * 1000;
 
+function reachUpgradeChoice(harness: ReturnType<typeof createHarness>): void {
+  harness.state.waveSchedule.nextScheduledSpawnIndex =
+    harness.state.waveSchedule.requests.length;
+  harness.controller.start();
+  harness.clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+  harness.frameScheduler.runNextFrame();
+}
+
 describe("createGame", () => {
   it("retains safe lifecycle-only behavior without browser mount options", () => {
     const controller = createGame();
 
+    expect(controller.chooseUpgrade("rapid-fire")).toBe(false);
     expect(() => {
       controller.start();
+      expect(controller.chooseUpgrade("rapid-fire")).toBe(false);
       controller.pause();
       controller.resume();
       controller.restart();
+      expect(controller.chooseUpgrade("unknown")).toBe(false);
       controller.setTheme(initialTheme);
       controller.destroy();
+      expect(controller.chooseUpgrade("rapid-fire")).toBe(false);
       controller.destroy();
     }).not.toThrow();
   });
@@ -261,6 +273,105 @@ describe("GameController runtime lifecycle", () => {
     expect(frameScheduler.requestedFrameIds).toHaveLength(2);
   });
 
+  it("applies one valid choice and starts exactly one existing loop", () => {
+    const harness = createHarness();
+    reachUpgradeChoice(harness);
+    const offeredId = harness.session.pendingUpgradeOptionIds[0]!;
+
+    expect(harness.controller.lifecycleState).toBe("choosing-upgrade");
+    expect(harness.frameScheduler.pendingFrameCount).toBe(0);
+    expect(harness.controller.chooseUpgrade(offeredId)).toBe(true);
+
+    expect(harness.controller.lifecycleState).toBe("running");
+    expect(harness.state.upgrades.levels[offeredId]).toBe(1);
+    expect(harness.frameScheduler.pendingFrameCount).toBe(1);
+    expect(harness.frameScheduler.requestedFrameIds).toHaveLength(2);
+
+    const selectedState = structuredClone(harness.state);
+    expect(harness.controller.chooseUpgrade(offeredId)).toBe(false);
+    expect(harness.state).toEqual(selectedState);
+    expect(harness.frameScheduler.pendingFrameCount).toBe(1);
+    expect(harness.frameScheduler.requestedFrameIds).toHaveLength(2);
+  });
+
+  it("does not touch state or scheduling for unknown and unoffered choices", () => {
+    const harness = createHarness();
+    reachUpgradeChoice(harness);
+    harness.state.pendingUpgradeOptionIds = Object.freeze(["vitality"]);
+    const choosingState = structuredClone(harness.state);
+
+    expect(harness.controller.chooseUpgrade("unknown")).toBe(false);
+    expect(harness.controller.chooseUpgrade("rapid-fire")).toBe(false);
+
+    expect(harness.state).toEqual(choosingState);
+    expect(harness.controller.lifecycleState).toBe("choosing-upgrade");
+    expect(harness.frameScheduler.pendingFrameCount).toBe(0);
+    expect(harness.frameScheduler.requestedFrameIds).toHaveLength(1);
+  });
+
+  it.each(["idle", "playing", "paused", "wave-cleared", "lost"] as const)(
+    "rejects upgrade selection during %s without touching the loop",
+    (phase) => {
+      const harness = createHarness();
+      if (phase === "playing" || phase === "paused") {
+        harness.controller.start();
+      }
+      if (phase === "paused") harness.controller.pause();
+      if (phase === "wave-cleared" || phase === "lost") {
+        harness.state.phase = phase;
+      }
+      const phaseState = structuredClone(harness.state);
+      const pendingFrameCount = harness.frameScheduler.pendingFrameCount;
+      const requestedFrameCount =
+        harness.frameScheduler.requestedFrameIds.length;
+
+      expect(harness.controller.chooseUpgrade("vitality")).toBe(false);
+
+      expect(harness.state).toEqual(phaseState);
+      expect(harness.frameScheduler.pendingFrameCount).toBe(pendingFrameCount);
+      expect(harness.frameScheduler.requestedFrameIds).toHaveLength(
+        requestedFrameCount,
+      );
+    },
+  );
+
+  it("ignores a stale stopped-run callback after a choice restarts the loop", () => {
+    const harness = createHarness();
+    harness.state.waveSchedule.nextScheduledSpawnIndex =
+      harness.state.waveSchedule.requests.length;
+    harness.controller.start();
+    const originalFrameId = harness.frameScheduler.requestedFrameIds[0];
+    if (originalFrameId === undefined)
+      throw new Error("No frame was requested.");
+    const staleCallback =
+      harness.frameScheduler.getRequestedCallback(originalFrameId);
+    if (!staleCallback) throw new Error("No frame callback was stored.");
+    harness.clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    harness.frameScheduler.runNextFrame();
+
+    const offeredId = harness.session.pendingUpgradeOptionIds[0]!;
+    expect(harness.controller.chooseUpgrade(offeredId)).toBe(true);
+    staleCallback();
+
+    expect(harness.controller.lifecycleState).toBe("running");
+    expect(harness.frameScheduler.pendingFrameCount).toBe(1);
+    expect(harness.frameScheduler.requestedFrameIds).toHaveLength(2);
+  });
+
+  it("restarts cleanly from a real pending upgrade choice", () => {
+    const harness = createHarness();
+    reachUpgradeChoice(harness);
+    const staleOfferedId = harness.session.pendingUpgradeOptionIds[0]!;
+
+    harness.controller.restart();
+
+    expect(harness.controller.lifecycleState).toBe("running");
+    expect(harness.session.pendingUpgradeOptionIds).toEqual([]);
+    expect(harness.controller.chooseUpgrade(staleOfferedId)).toBe(false);
+    expect(harness.frameScheduler.pendingFrameCount).toBe(1);
+    expect(harness.frameScheduler.requestedFrameIds).toHaveLength(2);
+  });
+
   it("keeps restart available after loss without creating a second loop", () => {
     const { clock, controller, frameScheduler, snapshots, state } =
       createHarness();
@@ -344,6 +455,7 @@ describe("GameController runtime lifecycle", () => {
     controller.destroy();
     controller.destroy();
     controller.resume();
+    expect(controller.chooseUpgrade("rapid-fire")).toBe(false);
 
     expect(controller.lifecycleState).toBe("destroyed");
     expect(frameScheduler.pendingFrameCount).toBe(0);

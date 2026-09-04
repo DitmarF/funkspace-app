@@ -49,6 +49,7 @@ function createController(): HostedGameController {
     pause: vi.fn(),
     resume: vi.fn(),
     restart: vi.fn(),
+    chooseUpgrade: vi.fn(() => false),
     setTheme: vi.fn(),
     destroy: vi.fn(),
   };

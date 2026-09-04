@@ -1,4 +1,5 @@
 import type {
+  GameController as PackageGameController,
   GameEvent as PackageGameEvent,
   GameMountOptions as PackageGameMountOptions,
   GameStatusSnapshot as PackageGameStatusSnapshot,
@@ -12,6 +13,7 @@ import {
   type GameMountOptions,
   type GameModule,
   type GameStatusSnapshot,
+  type HostedGameController,
   type UpgradeOption,
 } from "./GameLoader";
 
@@ -45,5 +47,6 @@ describe("GameLoader", () => {
     expectTypeOf<GameStatusSnapshot>().toEqualTypeOf<PackageGameStatusSnapshot>();
     expectTypeOf<GameEvent>().toEqualTypeOf<PackageGameEvent>();
     expectTypeOf<UpgradeOption>().toEqualTypeOf<PackageUpgradeOption>();
+    expectTypeOf<HostedGameController>().toEqualTypeOf<PackageGameController>();
   });
 });
