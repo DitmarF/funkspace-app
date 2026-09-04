@@ -129,6 +129,7 @@ Build output is emitted to `dist/` and is not source-controlled.
 without the portfolio or Next.js. The demo builds and imports the package's
 public JavaScript entry point, creates a game controller, and renders the same
 responsive 360 × 640 logical arena as the portfolio host. It has no separate
-gameplay or renderer implementation. Semantic health and kill text accompany
-the Canvas, loss is announced politely, and a native restart button appears
-only after loss.
+gameplay or renderer implementation. Semantic wave, health, and kill text
+accompany the Canvas. A keyboard- and pointer-operable DOM upgrade panel uses
+the public event and controller contracts, loss is announced politely, and a
+native restart button appears only after loss.

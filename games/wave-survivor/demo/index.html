@@ -36,6 +36,7 @@
         display: flex;
         width: min(calc(100% - 2rem), 33.75rem);
         align-items: center;
+        flex-wrap: wrap;
         justify-content: space-between;
         gap: 1rem;
       }
@@ -65,6 +66,11 @@
         outline-offset: 3px;
       }
 
+      button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
       #game-restart {
         position: absolute;
         inset-block-end: 0;
@@ -82,6 +88,47 @@
         width: min(calc(100% - 2rem), calc(56.25vh - 7.875rem), 33.75rem);
         width: min(calc(100% - 2rem), calc(56.25dvh - 7.875rem), 33.75rem);
         aspect-ratio: 9 / 16;
+      }
+
+      .upgrade-panel {
+        position: absolute;
+        z-index: 1;
+        inset: 0;
+        display: grid;
+        overflow-y: auto;
+        padding: clamp(1rem, 5vw, 2rem);
+        align-content: center;
+        background: Canvas;
+        color: CanvasText;
+      }
+
+      .upgrade-panel h2 {
+        margin: 0 0 1rem;
+        text-align: center;
+      }
+
+      .upgrade-options {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .upgrade-option {
+        display: grid;
+        width: 100%;
+        min-height: 4.5rem;
+        gap: 0.25rem;
+        justify-items: start;
+        text-align: start;
+      }
+
+      .upgrade-option-title {
+        font-size: 1rem;
+      }
+
+      .upgrade-option-description {
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.35;
       }
 
       canvas {
@@ -105,8 +152,18 @@
         >
           Your browser does not support the canvas element.
         </canvas>
+        <section
+          id="game-upgrades"
+          class="upgrade-panel"
+          aria-labelledby="game-upgrades-heading"
+          hidden
+        >
+          <h2 id="game-upgrades-heading">Choose an upgrade</h2>
+          <div id="game-upgrade-options" class="upgrade-options"></div>
+        </section>
       </div>
       <section class="game-status-panel" aria-label="Game status">
+        <p id="game-wave">Wave: —</p>
         <p id="game-health">Health: —</p>
         <p id="game-kills">Kills: —</p>
       </section>
