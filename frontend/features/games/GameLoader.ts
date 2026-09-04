@@ -1,3 +1,4 @@
+import type { RuntimePhase } from "@funkspace/wave-survivor";
 import type { GameTheme } from "./theme";
 
 export type GameId = "wave-survivor";
@@ -12,7 +13,7 @@ export interface HostedGameController {
 }
 
 export interface GameStatusSnapshot {
-  readonly phase: "idle" | "playing" | "paused" | "lost";
+  readonly phase: RuntimePhase;
   readonly currentHealth: number;
   readonly maximumHealth: number;
   readonly killCount: number;

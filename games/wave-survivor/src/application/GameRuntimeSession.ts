@@ -104,7 +104,7 @@ export class GameRuntimeSession {
     if (this.state.phase !== "playing") return false;
 
     this.state.phase = "paused";
-    this.input?.reset();
+    this.resetMovementInput();
     this.emitStatusIfChanged();
     return true;
   }
@@ -117,8 +117,27 @@ export class GameRuntimeSession {
     return true;
   }
 
+  /** Enter upgrade choice after the application has prepared valid options. */
+  beginUpgradeSelection(): boolean {
+    if (this.state.phase !== "wave-cleared") return false;
+
+    this.state.phase = "choosing-upgrade";
+    this.resetMovementInput();
+    this.emitStatusIfChanged();
+    return true;
+  }
+
+  /** Resume only after the application has applied a valid future selection. */
+  completeUpgradeSelection(): boolean {
+    if (this.state.phase !== "choosing-upgrade") return false;
+
+    this.state.phase = "playing";
+    this.emitStatusIfChanged();
+    return true;
+  }
+
   restart(): void {
-    this.input?.reset();
+    this.resetMovementInput();
     this.randomSource.reset();
     this.state = createInitialRuntimeState();
     this.state.phase = "playing";
@@ -167,10 +186,11 @@ export class GameRuntimeSession {
       return;
     }
 
-    const currentWaveComplete = this.isCurrentWaveComplete();
+    if (this.transitionToWaveClearedIfComplete()) {
+      this.emitStatusIfChanged();
+      return;
+    }
     this.emitStatusIfChanged();
-    // WS-5.5 will replace this terminal return with its phase transition.
-    if (currentWaveComplete) return;
   }
 
   render(): void {
@@ -398,14 +418,27 @@ export class GameRuntimeSession {
     }
 
     this.state.player.currentHealth = 0;
-    this.state.movementIntent = ZERO_MOVEMENT_INTENT;
     this.state.phase = "lost";
-    this.input?.reset();
+    this.resetMovementInput();
     return true;
   }
 
-  private isCurrentWaveComplete(): boolean {
-    return isWaveComplete(this.state.waveSchedule, this.state.enemies);
+  private transitionToWaveClearedIfComplete(): boolean {
+    if (
+      this.state.phase !== "playing" ||
+      !isWaveComplete(this.state.waveSchedule, this.state.enemies)
+    ) {
+      return false;
+    }
+
+    this.state.phase = "wave-cleared";
+    this.resetMovementInput();
+    return true;
+  }
+
+  private resetMovementInput(): void {
+    this.state.movementIntent = ZERO_MOVEMENT_INTENT;
+    this.input?.reset();
   }
 
   private emitStatusIfChanged(): void {

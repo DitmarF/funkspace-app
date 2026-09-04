@@ -21,7 +21,13 @@ export const PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND = 120;
 export const PROVISIONAL_PLAYER_MAXIMUM_HEALTH = 3;
 
 /** Session lifecycle phases that affect deterministic runtime updates. */
-export type RuntimePhase = "idle" | "playing" | "paused" | "lost";
+export type RuntimePhase =
+  | "idle"
+  | "playing"
+  | "wave-cleared"
+  | "choosing-upgrade"
+  | "paused"
+  | "lost";
 
 /** Complete mutable runtime state for the single player. */
 export interface PlayerState {

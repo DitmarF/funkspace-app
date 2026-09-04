@@ -8,3 +8,4 @@ export type { GameController } from "./GameController.js";
 export type { GameMountOptions } from "./GameMountOptions.js";
 export type { GameStatusSnapshot } from "./GameStatusSnapshot.js";
 export type { GameTheme } from "./GameTheme.js";
+export type { RuntimePhase } from "./domain/state/RuntimeState.js";

@@ -39,6 +39,7 @@ import {
   createSpawnGroup,
   createWaveDefinition,
   createWaveScheduleProgress,
+  isWaveComplete,
   PROVISIONAL_EPIC_5_WAVES,
 } from "../domain/waves/index.js";
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
@@ -130,9 +131,8 @@ function readOwnedRuntimeState(session: GameRuntimeSession): RuntimeState {
 }
 
 function readCurrentWaveCompletion(session: GameRuntimeSession): boolean {
-  return (
-    session as unknown as { isCurrentWaveComplete(): boolean }
-  ).isCurrentWaveComplete();
+  const state = readOwnedRuntimeState(session);
+  return isWaveComplete(state.waveSchedule, state.enemies);
 }
 
 function createExpectedPlayingState(): RuntimeState {
@@ -1000,7 +1000,7 @@ describe("GameRuntimeSession automatic attack", () => {
 
   it("fires as soon as a target appears without consuming no-target time", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
+    configureTestWave(state, 1, 100, 1, 0);
     const { session } = createSession(
       state,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
@@ -1219,6 +1219,7 @@ describe("GameRuntimeSession wave completion boundary", () => {
 
     expect(state.enemies[0]?.phase).toBe("dying");
     expect(readCurrentWaveCompletion(session)).toBe(true);
+    expect(state.phase).toBe("wave-cleared");
   });
 
   it("lets player loss win when the final enemy falls on the same update", () => {
@@ -1271,6 +1272,7 @@ describe("GameRuntimeSession wave completion boundary", () => {
 
     expect(state.enemies).toEqual([]);
     expect(readCurrentWaveCompletion(session)).toBe(true);
+    expect(state.phase).toBe("wave-cleared");
   });
 });
 
@@ -1303,7 +1305,6 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 
   it("removes a dying enemy at the exact simulation-time deadline", () => {
     const state = createInitialRuntimeState();
-    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     state.enemies[0]!.currentHealth = 0;

@@ -56,7 +56,7 @@ export function createGame(options?: GameMountOptions): GameController {
         {
           fixedUpdate: (deltaSeconds) => session.fixedUpdate(deltaSeconds),
           render: () => session.render(),
-          isTerminal: () => session.phase === "lost",
+          shouldSuspend: () => session.phase !== "playing",
         },
       )
     : null;

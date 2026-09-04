@@ -14,8 +14,8 @@ const ACCUMULATOR_EPSILON_MILLISECONDS = 1e-9;
 export interface FixedStepLoopCallbacks {
   fixedUpdate(deltaSeconds: number): void;
   render(): void;
-  /** Application-level terminal signal checked around the final render. */
-  isTerminal(): boolean;
+  /** Whether updates must suspend after one final rendered frame. */
+  shouldSuspend(): boolean;
 }
 
 /**
@@ -91,7 +91,7 @@ export class FixedStepLoop {
     while (
       this.running &&
       !this.destroyed &&
-      !this.callbacks.isTerminal() &&
+      !this.callbacks.shouldSuspend() &&
       fixedUpdateCount < MAX_FIXED_UPDATES_PER_FRAME &&
       this.accumulatorMilliseconds + ACCUMULATOR_EPSILON_MILLISECONDS >=
         FIXED_SIMULATION_STEP_MILLISECONDS
@@ -116,7 +116,7 @@ export class FixedStepLoop {
 
     this.callbacks.render();
 
-    if (this.callbacks.isTerminal()) {
+    if (this.callbacks.shouldSuspend()) {
       this.stop();
       return;
     }

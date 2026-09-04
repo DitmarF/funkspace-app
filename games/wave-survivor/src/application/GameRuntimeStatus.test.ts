@@ -23,8 +23,6 @@ function addActiveEnemyAtPlayer(state: RuntimeState): void {
 function createStatusHarness() {
   const state = createInitialRuntimeState();
   state.nextAttackAtSeconds = 100;
-  state.waveSchedule.nextScheduledSpawnIndex =
-    state.waveSchedule.requests.length;
   const statuses: GameStatusSnapshot[] = [];
   const onStatusChange = vi.fn((snapshot: GameStatusSnapshot) => {
     statuses.push(snapshot);
@@ -100,6 +98,26 @@ describe("GameRuntimeSession discrete status", () => {
       maximumHealth: 3,
       killCount: 1,
     });
+  });
+
+  it("represents finite-wave phases through the shared status type", () => {
+    const { onStatusChange, session, state, statuses } = createStatusHarness();
+    session.start();
+    onStatusChange.mockClear();
+    statuses.length = 0;
+    state.waveSchedule.nextScheduledSpawnIndex =
+      state.waveSchedule.requests.length;
+
+    session.fixedUpdate(0.01);
+    expect(session.beginUpgradeSelection()).toBe(true);
+    expect(session.completeUpgradeSelection()).toBe(true);
+
+    expect(statuses.map((status) => status.phase)).toEqual([
+      "wave-cleared",
+      "choosing-upgrade",
+      "playing",
+    ]);
+    expect(statuses.every(Object.isFrozen)).toBe(true);
   });
 
   it("emits lost once and a fresh initial status after restart", () => {

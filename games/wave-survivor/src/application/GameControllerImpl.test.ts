@@ -120,7 +120,7 @@ function createHarness(
   const loop = new FixedStepLoop(clock, frameScheduler, {
     fixedUpdate: (deltaSeconds) => session.fixedUpdate(deltaSeconds),
     render: () => session.render(),
-    isTerminal: () => session.phase === "lost",
+    shouldSuspend: () => session.phase !== "playing",
   });
   const controller = new GameControllerImpl(session, loop);
 
@@ -129,6 +129,7 @@ function createHarness(
     controller,
     frameScheduler,
     input,
+    loop,
     presentation,
     readMovementIntent,
     session,
@@ -201,6 +202,64 @@ describe("GameController runtime lifecycle", () => {
     expect(input.reset).toHaveBeenCalledOnce();
   });
 
+  it("renders one wave-cleared frame before suspending the loop", () => {
+    const {
+      clock,
+      controller,
+      frameScheduler,
+      input,
+      readMovementIntent,
+      snapshots,
+      state,
+    } = createHarness();
+    state.waveSchedule.nextScheduledSpawnIndex =
+      state.waveSchedule.requests.length;
+    controller.start();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS * 3);
+
+    frameScheduler.runNextFrame();
+
+    expect(controller.lifecycleState).toBe("wave-cleared");
+    expect(snapshots).toHaveLength(1);
+    expect(snapshots[0]).toMatchObject({
+      phase: "wave-cleared",
+      simulationTimeSeconds: FIXED_SIMULATION_STEP_SECONDS,
+    });
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+    expect(readMovementIntent).toHaveBeenCalledOnce();
+    expect(input.reset).toHaveBeenCalledOnce();
+  });
+
+  it("can render choosing-upgrade once without resuming updates", () => {
+    const {
+      clock,
+      controller,
+      frameScheduler,
+      loop,
+      readMovementIntent,
+      session,
+      snapshots,
+      state,
+    } = createHarness();
+    state.waveSchedule.nextScheduledSpawnIndex =
+      state.waveSchedule.requests.length;
+    controller.start();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    frameScheduler.runNextFrame();
+    expect(session.beginUpgradeSelection()).toBe(true);
+    readMovementIntent.mockClear();
+
+    loop.start();
+    frameScheduler.runNextFrame();
+
+    expect(controller.lifecycleState).toBe("choosing-upgrade");
+    expect(snapshots.at(-1)?.phase).toBe("choosing-upgrade");
+    expect(readMovementIntent).not.toHaveBeenCalled();
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(2);
+  });
+
   it("keeps restart available after loss without creating a second loop", () => {
     const { clock, controller, frameScheduler, snapshots, state } =
       createHarness();
@@ -224,13 +283,32 @@ describe("GameController runtime lifecycle", () => {
     });
   });
 
-  it.each(["playing", "paused", "lost"] as const)(
+  it.each([
+    "playing",
+    "paused",
+    "wave-cleared",
+    "choosing-upgrade",
+    "lost",
+  ] as const)(
     "keeps exactly one pending frame after repeated restart from %s",
     (startingPhase) => {
-      const { clock, controller, frameScheduler, snapshots, state } =
+      const { clock, controller, frameScheduler, session, snapshots, state } =
         createHarness();
       controller.start();
       if (startingPhase === "paused") controller.pause();
+      if (
+        startingPhase === "wave-cleared" ||
+        startingPhase === "choosing-upgrade"
+      ) {
+        state.waveSchedule.nextScheduledSpawnIndex =
+          state.waveSchedule.requests.length;
+        clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+        frameScheduler.runNextFrame();
+        expect(controller.lifecycleState).toBe("wave-cleared");
+        if (startingPhase === "choosing-upgrade") {
+          expect(session.beginUpgradeSelection()).toBe(true);
+        }
+      }
       if (startingPhase === "lost") {
         state.player.currentHealth = 0;
         clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
@@ -277,6 +355,34 @@ describe("GameController runtime lifecycle", () => {
     expect(frameScheduler.requestedFrameIds).toHaveLength(1);
     expect(input.destroy).toHaveBeenCalledOnce();
     expect(presentation.destroy).toHaveBeenCalledOnce();
+  });
+
+  it("ignores pause and resume throughout the upgrade phases", () => {
+    const { clock, controller, frameScheduler, input, session, state } =
+      createHarness();
+    state.waveSchedule.nextScheduledSpawnIndex =
+      state.waveSchedule.requests.length;
+    controller.start();
+    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+    frameScheduler.runNextFrame();
+    expect(controller.lifecycleState).toBe("wave-cleared");
+
+    controller.pause();
+    controller.resume();
+
+    expect(controller.lifecycleState).toBe("wave-cleared");
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+    expect(input.reset).toHaveBeenCalledOnce();
+
+    expect(session.beginUpgradeSelection()).toBe(true);
+    controller.pause();
+    controller.resume();
+
+    expect(controller.lifecycleState).toBe("choosing-upgrade");
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+    expect(input.reset).toHaveBeenCalledTimes(2);
   });
 
   it("starts exactly one loop and makes repeated start idempotent", () => {

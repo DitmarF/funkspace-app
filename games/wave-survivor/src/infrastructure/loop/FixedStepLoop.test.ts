@@ -64,14 +64,14 @@ function createLoop() {
   const frameScheduler = new FakeFrameScheduler();
   const fixedUpdate = vi.fn();
   const render = vi.fn();
-  const isTerminal = vi.fn(() => false);
+  const shouldSuspend = vi.fn(() => false);
   const loop = new FixedStepLoop(clock, frameScheduler, {
     fixedUpdate,
     render,
-    isTerminal,
+    shouldSuspend,
   });
 
-  return { clock, fixedUpdate, frameScheduler, isTerminal, loop, render };
+  return { clock, fixedUpdate, frameScheduler, loop, render, shouldSuspend };
 }
 
 const FIXED_SIMULATION_STEP_MILLISECONDS = FIXED_SIMULATION_STEP_SECONDS * 1000;
@@ -137,14 +137,14 @@ describe("FixedStepLoop scheduling", () => {
 });
 
 describe("FixedStepLoop advancement", () => {
-  it("renders a terminal update once before stopping scheduling", () => {
-    const { clock, fixedUpdate, frameScheduler, isTerminal, loop, render } =
+  it("renders a suspending update once before stopping scheduling", () => {
+    const { clock, fixedUpdate, frameScheduler, loop, render, shouldSuspend } =
       createLoop();
-    let terminal = false;
+    let suspended = false;
     fixedUpdate.mockImplementation(() => {
-      terminal = true;
+      suspended = true;
     });
-    isTerminal.mockImplementation(() => terminal);
+    shouldSuspend.mockImplementation(() => suspended);
     loop.start();
     clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS * 3);
 
@@ -155,6 +155,20 @@ describe("FixedStepLoop advancement", () => {
     expect(fixedUpdate.mock.invocationCallOrder[0]).toBeLessThan(
       render.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
     );
+    expect(frameScheduler.pendingFrameCount).toBe(0);
+    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+  });
+
+  it("renders an already-suspended state once without running an update", () => {
+    const { fixedUpdate, frameScheduler, loop, render, shouldSuspend } =
+      createLoop();
+    shouldSuspend.mockReturnValue(true);
+    loop.start();
+
+    frameScheduler.runNextFrame();
+
+    expect(fixedUpdate).not.toHaveBeenCalled();
+    expect(render).toHaveBeenCalledOnce();
     expect(frameScheduler.pendingFrameCount).toBe(0);
     expect(frameScheduler.requestedFrameIds).toHaveLength(1);
   });
