@@ -1,3 +1,4 @@
+import type { GameEvent, UpgradeOption } from "../GameEvent.js";
 import type { GameTheme } from "../GameTheme.js";
 import type { GameStatusSnapshot } from "../GameStatusSnapshot.js";
 import type {
@@ -55,6 +56,7 @@ import {
   getEffectiveAttackCooldownSeconds,
   getEffectiveMaximumHealth,
   getEffectiveMovementSpeedUnitsPerSecond,
+  getUpgradeDefinition,
   INITIAL_UPGRADE_DEFINITIONS,
   type UpgradeId,
 } from "../domain/upgrades/index.js";
@@ -100,6 +102,7 @@ export class GameRuntimeSession {
     private onStatusChange:
       | ((snapshot: GameStatusSnapshot) => void)
       | null = null,
+    private onEvent: ((event: GameEvent) => void) | null = null,
   ) {
     this.emitStatusIfChanged();
   }
@@ -117,6 +120,7 @@ export class GameRuntimeSession {
 
     this.state.phase = "playing";
     this.emitStatusIfChanged();
+    this.emitWaveStarted();
     return true;
   }
 
@@ -191,7 +195,9 @@ export class GameRuntimeSession {
     this.state.nextAttackAtSeconds = 0;
     this.resetMovementInput();
 
-    return this.completeUpgradeSelection();
+    const completed = this.completeUpgradeSelection();
+    if (completed) this.emitWaveStarted();
+    return completed;
   }
 
   private completeUpgradeSelection(): boolean {
@@ -210,6 +216,7 @@ export class GameRuntimeSession {
     this.state.phase = "playing";
     this.lastStatusSnapshot = null;
     this.emitStatusIfChanged();
+    this.emitWaveStarted();
   }
 
   fixedUpdate(deltaSeconds: number): void {
@@ -258,7 +265,14 @@ export class GameRuntimeSession {
     }
 
     if (this.transitionToWaveClearedIfComplete()) {
-      this.prepareUpgradeSelection();
+      const clearedWaveNumber = this.state.waveSchedule.currentWaveNumber;
+      this.emitEvent(
+        Object.freeze({
+          type: "wave-cleared",
+          waveNumber: clearedWaveNumber,
+        }),
+      );
+      this.prepareUpgradeSelection(clearedWaveNumber);
       this.emitStatusIfChanged();
       return;
     }
@@ -333,6 +347,7 @@ export class GameRuntimeSession {
     this.readJoystickSnapshot = null;
     this.lastStatusSnapshot = null;
     this.onStatusChange = null;
+    this.onEvent = null;
 
     this.presentation?.destroy();
     this.presentation = null;
@@ -522,7 +537,7 @@ export class GameRuntimeSession {
     return true;
   }
 
-  private prepareUpgradeSelection(): void {
+  private prepareUpgradeSelection(clearedWaveNumber: number): void {
     if (
       this.state.phase !== "wave-cleared" ||
       this.state.pendingUpgradeOptionIds.length > 0
@@ -536,7 +551,47 @@ export class GameRuntimeSession {
       UPGRADE_OPTION_COUNT,
       this.upgradeRandomSource,
     );
-    this.beginUpgradeSelection();
+    if (!this.beginUpgradeSelection()) return;
+
+    const options = this.createPendingUpgradeOptions();
+    this.emitEvent(
+      Object.freeze({
+        type: "upgrade-choice-requested",
+        clearedWaveNumber,
+        options,
+      }),
+    );
+  }
+
+  private createPendingUpgradeOptions(): readonly UpgradeOption[] {
+    const options: UpgradeOption[] = [];
+    for (const upgradeId of this.state.pendingUpgradeOptionIds) {
+      const definition = getUpgradeDefinition(upgradeId);
+      if (!definition) continue;
+
+      options.push(
+        Object.freeze({
+          id: definition.id,
+          title: definition.title,
+          description: definition.description,
+        }),
+      );
+    }
+
+    return Object.freeze(options);
+  }
+
+  private emitWaveStarted(): void {
+    this.emitEvent(
+      Object.freeze({
+        type: "wave-started",
+        waveNumber: this.state.waveSchedule.currentWaveNumber,
+      }),
+    );
+  }
+
+  private emitEvent(event: GameEvent): void {
+    this.onEvent?.(event);
   }
 
   private resetMovementInput(): void {
@@ -554,6 +609,7 @@ export class GameRuntimeSession {
     const previous = this.lastStatusSnapshot;
     if (
       previous?.phase === this.state.phase &&
+      previous.waveNumber === this.state.waveSchedule.currentWaveNumber &&
       previous.currentHealth === this.state.player.currentHealth &&
       previous.maximumHealth === maximumHealth &&
       previous.killCount === this.state.killCount
@@ -563,6 +619,7 @@ export class GameRuntimeSession {
 
     const snapshot: GameStatusSnapshot = Object.freeze({
       phase: this.state.phase,
+      waveNumber: this.state.waveSchedule.currentWaveNumber,
       currentHealth: this.state.player.currentHealth,
       maximumHealth,
       killCount: this.state.killCount,

@@ -55,6 +55,7 @@ export function createGame(options?: GameMountOptions): GameController {
     ),
     joystickInput ? () => joystickInput.readPresentationSnapshot() : null,
     options?.onStatusChange ?? null,
+    options?.onEvent ?? null,
   );
   const loop = options
     ? new FixedStepLoop(

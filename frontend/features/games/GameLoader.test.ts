@@ -1,8 +1,18 @@
-import { describe, expect, it, vi } from "vitest";
+import type {
+  GameEvent as PackageGameEvent,
+  GameMountOptions as PackageGameMountOptions,
+  GameStatusSnapshot as PackageGameStatusSnapshot,
+  UpgradeOption as PackageUpgradeOption,
+} from "@funkspace/wave-survivor";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 import {
   GameLoader,
+  type GameEvent,
   type GameImporterMap,
+  type GameMountOptions,
   type GameModule,
+  type GameStatusSnapshot,
+  type UpgradeOption,
 } from "./GameLoader";
 
 describe("GameLoader", () => {
@@ -28,5 +38,12 @@ describe("GameLoader", () => {
     const gameModule = await new GameLoader().load("wave-survivor");
 
     expect(gameModule.createGame).toBeTypeOf("function");
+  });
+
+  it("keeps the lazy host mirror compatible with the package contract", () => {
+    expectTypeOf<GameMountOptions>().toEqualTypeOf<PackageGameMountOptions>();
+    expectTypeOf<GameStatusSnapshot>().toEqualTypeOf<PackageGameStatusSnapshot>();
+    expectTypeOf<GameEvent>().toEqualTypeOf<PackageGameEvent>();
+    expectTypeOf<UpgradeOption>().toEqualTypeOf<PackageUpgradeOption>();
   });
 });

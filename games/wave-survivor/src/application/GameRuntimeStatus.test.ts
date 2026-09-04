@@ -47,6 +47,7 @@ describe("GameRuntimeSession discrete status", () => {
     expect(onStatusChange).toHaveBeenCalledOnce();
     expect(statuses[0]).toEqual({
       phase: "idle",
+      waveNumber: 1,
       currentHealth: 3,
       maximumHealth: 3,
       killCount: 0,
@@ -77,6 +78,7 @@ describe("GameRuntimeSession discrete status", () => {
     expect(onStatusChange).toHaveBeenCalledOnce();
     expect(onStatusChange).toHaveBeenLastCalledWith({
       phase: "playing",
+      waveNumber: 1,
       currentHealth: 2,
       maximumHealth: 3,
       killCount: 0,
@@ -95,6 +97,7 @@ describe("GameRuntimeSession discrete status", () => {
     expect(onStatusChange).toHaveBeenCalledOnce();
     expect(onStatusChange).toHaveBeenLastCalledWith({
       phase: "playing",
+      waveNumber: 1,
       currentHealth: 3,
       maximumHealth: 3,
       killCount: 1,
@@ -119,6 +122,7 @@ describe("GameRuntimeSession discrete status", () => {
       "choosing-upgrade",
       "playing",
     ]);
+    expect(statuses.map((status) => status.waveNumber)).toEqual([1, 2]);
     expect(statuses.every(Object.isFrozen)).toBe(true);
   });
 
@@ -136,6 +140,7 @@ describe("GameRuntimeSession discrete status", () => {
     expect(onStatusChange).toHaveBeenCalledOnce();
     expect(onStatusChange).toHaveBeenLastCalledWith({
       phase: "lost",
+      waveNumber: 1,
       currentHealth: 0,
       maximumHealth: 3,
       killCount: 0,
@@ -146,6 +151,7 @@ describe("GameRuntimeSession discrete status", () => {
     expect(onStatusChange).toHaveBeenCalledTimes(2);
     expect(onStatusChange).toHaveBeenLastCalledWith({
       phase: "playing",
+      waveNumber: 1,
       currentHealth: 3,
       maximumHealth: 3,
       killCount: 0,

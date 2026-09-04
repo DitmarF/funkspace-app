@@ -44,12 +44,19 @@ status, and clean restart. EPIC 5 is the next gameplay boundary.
 ## Public API
 
 ```ts
-import { createGame, type GameStatusSnapshot } from "@funkspace/wave-survivor";
+import {
+  createGame,
+  type GameEvent,
+  type GameStatusSnapshot,
+} from "@funkspace/wave-survivor";
 
 const onStatusChange = (status: GameStatusSnapshot) => {
-  // Update semantic DOM only when phase, health, or kill count changes.
+  // Update semantic DOM when phase, wave, health, or kill count changes.
 };
-const game = createGame({ canvas, viewport, theme, onStatusChange });
+const onEvent = (event: GameEvent) => {
+  // Announce wave milestones or render event.options for an upgrade choice.
+};
+const game = createGame({ canvas, viewport, theme, onStatusChange, onEvent });
 game.start();
 game.pause();
 game.resume();
@@ -67,10 +74,15 @@ independently sized viewport boundary, and resolved `GameTheme` values through
 `GameMountOptions`; theme changes are forwarded with `setTheme()`.
 
 Hosts may also supply `onStatusChange`. It receives immutable snapshots with
-only `phase`, `currentHealth`, `maximumHealth`, and `killCount`. The callback
-receives the initial idle state, then runs only when one of those discrete
-values changes. Per-frame positions and entity state remain private to the game
-and Canvas renderer.
+only `phase`, `waveNumber`, `currentHealth`, `maximumHealth`, and `killCount`.
+The callback receives the initial idle state, then runs only when one of those
+discrete values changes. Per-frame positions and entity state remain private to
+the game and Canvas renderer.
+
+The optional `onEvent` callback receives frozen `wave-started`, `wave-cleared`,
+and `upgrade-choice-requested` events. Upgrade-choice events contain a frozen
+array of copied `{ id, title, description }` option DTOs; effect definitions,
+runtime entities, scheduler state, and random sources remain private.
 
 The game clears all movement input on pause, restart, window blur, document
 visibility loss, pointer interruption, and destruction. Hosts pause and resume

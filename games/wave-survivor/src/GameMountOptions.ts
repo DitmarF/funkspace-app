@@ -1,3 +1,4 @@
+import type { GameEvent } from "./GameEvent.js";
 import type { GameTheme } from "./GameTheme.js";
 import type { GameStatusSnapshot } from "./GameStatusSnapshot.js";
 
@@ -7,4 +8,5 @@ export interface GameMountOptions {
   readonly viewport: HTMLElement;
   readonly theme: GameTheme;
   readonly onStatusChange?: (snapshot: GameStatusSnapshot) => void;
+  readonly onEvent?: (event: GameEvent) => void;
 }
