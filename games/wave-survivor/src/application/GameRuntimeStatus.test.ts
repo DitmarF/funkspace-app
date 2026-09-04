@@ -23,7 +23,8 @@ function addActiveEnemyAtPlayer(state: RuntimeState): void {
 function createStatusHarness() {
   const state = createInitialRuntimeState();
   state.nextAttackAtSeconds = 100;
-  state.nextEnemySpawnAtSeconds = 100;
+  state.waveSchedule.nextScheduledSpawnIndex =
+    state.waveSchedule.requests.length;
   const statuses: GameStatusSnapshot[] = [];
   const onStatusChange = vi.fn((snapshot: GameStatusSnapshot) => {
     statuses.push(snapshot);

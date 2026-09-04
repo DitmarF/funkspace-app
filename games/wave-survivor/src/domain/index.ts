@@ -47,13 +47,10 @@ export {
   DESPAWN_EXTRA_MARGIN,
   ENTRY_LEAD_SECONDS,
   expandBoundsByOffset,
-  FIRST_SPAWN_DELAY_SECONDS,
   mapPerimeterDistance,
-  MAX_LIVE_ENEMIES,
   MAX_SPAWN_ATTEMPTS,
   MINIMUM_CONTACT_TIME_SECONDS,
   samplePerimeterPoint,
-  SPAWN_INTERVAL_SECONDS,
   tryCreateFairEnemySpawnCandidate,
 } from "./spawning/index.js";
 export type { PerimeterEdge, PerimeterSample } from "./spawning/index.js";
@@ -65,12 +62,19 @@ export {
 } from "./state/index.js";
 export type { PlayerState, RuntimePhase, RuntimeState } from "./state/index.js";
 export {
+  advanceWaveSchedule,
+  compileWaveSchedule,
+  consumeNextScheduledSpawnRequest,
   createSpawnGroup,
   createWaveDefinition,
+  createWaveScheduleProgress,
+  getDueScheduledSpawnRequest,
   PROVISIONAL_EPIC_5_WAVES,
 } from "./waves/index.js";
 export type {
+  ScheduledSpawnRequest,
   SpawnGroup,
   SpawnPattern,
   WaveDefinition,
+  WaveScheduleProgress,
 } from "./waves/index.js";

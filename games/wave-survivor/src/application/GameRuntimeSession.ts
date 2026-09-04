@@ -38,10 +38,8 @@ import {
 import {
   ENTRY_LEAD_SECONDS,
   DESPAWN_EXTRA_MARGIN,
-  MAX_LIVE_ENEMIES,
   MAX_SPAWN_ATTEMPTS,
   MINIMUM_CONTACT_TIME_SECONDS,
-  SPAWN_INTERVAL_SECONDS,
   createEnemyDespawnBounds,
   expandBoundsByOffset,
   tryCreateFairEnemySpawnCandidate,
@@ -51,8 +49,13 @@ import {
   type RuntimePhase,
   type RuntimeState,
 } from "../domain/state/RuntimeState.js";
+import {
+  advanceWaveSchedule,
+  consumeNextScheduledSpawnRequest,
+  getDueScheduledSpawnRequest,
+  type ScheduledSpawnRequest,
+} from "../domain/waves/index.js";
 
-const SPAWN_TIME_EPSILON_SECONDS = 1e-9;
 const ENEMY_DESPAWN_BOUNDS = createEnemyDespawnBounds(
   VISIBLE_ARENA_BOUNDS,
   BASIC_ENEMY_DEFINITION,
@@ -141,7 +144,8 @@ export class GameRuntimeSession {
       deltaSeconds,
     );
     this.transitionDefeatedEnemies(nextSimulationTimeSeconds);
-    this.spawnEnemyIfDue(nextSimulationTimeSeconds);
+    advanceWaveSchedule(this.state.waveSchedule, deltaSeconds);
+    this.spawnScheduledEnemyIfDue();
     this.moveEnemiesTowardPlayer(deltaSeconds);
     this.activateEnemiesIntersectingVisibleArena();
     this.removeInvalidEscapedOrExpiredEnemies(nextSimulationTimeSeconds);
@@ -226,28 +230,9 @@ export class GameRuntimeSession {
     this.presentation = null;
   }
 
-  private spawnEnemyIfDue(simulationTimeSeconds: number): void {
-    if (
-      simulationTimeSeconds + SPAWN_TIME_EPSILON_SECONDS <
-      this.state.nextEnemySpawnAtSeconds
-    ) {
-      return;
-    }
-
-    const nextEnemySpawnAtSeconds =
-      simulationTimeSeconds + SPAWN_INTERVAL_SECONDS;
-    if (!Number.isFinite(nextEnemySpawnAtSeconds)) return;
-
-    // A due opportunity is always consumed, preventing cap or failed-sampling
-    // conditions from accumulating a backlog across fixed updates.
-    this.state.nextEnemySpawnAtSeconds = nextEnemySpawnAtSeconds;
-
-    const liveEnemyCount = this.state.enemies.filter(
-      (enemy) =>
-        isEnemyStateValid(enemy) &&
-        (enemy.phase === "entering" || enemy.phase === "active"),
-    ).length;
-    if (liveEnemyCount >= MAX_LIVE_ENEMIES) return;
+  private spawnScheduledEnemyIfDue(): void {
+    const request = getDueScheduledSpawnRequest(this.state.waveSchedule);
+    if (!request || !this.isSupportedSpawnRequest(request)) return;
 
     const candidate = tryCreateFairEnemySpawnCandidate(
       VISIBLE_ARENA_BOUNDS,
@@ -265,6 +250,14 @@ export class GameRuntimeSession {
       createBasicEnemyState(this.state.nextEnemyId, candidate.position),
     );
     this.state.nextEnemyId += 1;
+    consumeNextScheduledSpawnRequest(this.state.waveSchedule);
+  }
+
+  private isSupportedSpawnRequest(request: ScheduledSpawnRequest): boolean {
+    return (
+      request.enemyId === BASIC_ENEMY_DEFINITION.kind &&
+      request.pattern === "random-perimeter"
+    );
   }
 
   /** Newly spawned enemies participate in pursuit during their spawn update. */

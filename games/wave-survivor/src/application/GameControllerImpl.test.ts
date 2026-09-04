@@ -171,7 +171,8 @@ describe("GameController runtime lifecycle", () => {
     } = createHarness();
     state.player.currentHealth = 1;
     state.nextAttackAtSeconds = 100;
-    state.nextEnemySpawnAtSeconds = 100;
+    state.waveSchedule.nextScheduledSpawnIndex =
+      state.waveSchedule.requests.length;
     const enemy = createBasicEnemyState(1, state.player.position);
     enemy.phase = "active";
     state.enemies.push(enemy);

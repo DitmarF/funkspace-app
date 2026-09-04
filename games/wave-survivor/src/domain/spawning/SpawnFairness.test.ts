@@ -10,9 +10,7 @@ import {
 } from "./SpawnGeometry.js";
 import {
   calculateEnemyContactTimeSeconds,
-  MAX_LIVE_ENEMIES,
   MINIMUM_CONTACT_TIME_SECONDS,
-  SPAWN_INTERVAL_SECONDS,
   tryCreateFairEnemySpawnCandidate,
 } from "./SpawnFairness.js";
 
@@ -78,13 +76,6 @@ function tryCandidate(
 
   return { candidate, nextFloat: random.nextFloat };
 }
-
-describe("Gate 1 spawn tuning", () => {
-  it("uses a spawn interval faster than the basic attack cooldown", () => {
-    expect(SPAWN_INTERVAL_SECONDS).toBe(0.75);
-    expect(MAX_LIVE_ENEMIES).toBe(4);
-  });
-});
 
 describe("calculateEnemyContactTimeSeconds", () => {
   it("subtracts both collision radii from center distance", () => {

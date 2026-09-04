@@ -29,15 +29,18 @@ import {
   DESPAWN_EXTRA_MARGIN,
   ENTRY_LEAD_SECONDS,
   expandBoundsByOffset,
-  FIRST_SPAWN_DELAY_SECONDS,
-  MAX_LIVE_ENEMIES,
   MAX_SPAWN_ATTEMPTS,
-  SPAWN_INTERVAL_SECONDS,
 } from "../domain/spawning/index.js";
 import {
   createInitialRuntimeState,
   type RuntimeState,
 } from "../domain/state/index.js";
+import {
+  createSpawnGroup,
+  createWaveDefinition,
+  createWaveScheduleProgress,
+  PROVISIONAL_EPIC_5_WAVES,
+} from "../domain/waves/index.js";
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
 
@@ -62,6 +65,9 @@ const PROJECTILE_DESPAWN_BOUNDS = expandBoundsByOffset(
   VISIBLE_ARENA_BOUNDS,
   BASIC_ATTACK_DEFINITION.projectileDespawnMargin,
 );
+const FIRST_WAVE_GROUP = PROVISIONAL_EPIC_5_WAVES[0]!.groups[0]!;
+const FIRST_WAVE_FIRST_SPAWN_SECONDS = FIRST_WAVE_GROUP.startOffsetSeconds;
+const FIRST_WAVE_SPAWN_INTERVAL_SECONDS = FIRST_WAVE_GROUP.intervalSeconds;
 
 class ControlledMovementInput implements MovementInputPort {
   movementIntent: MovementIntent = ZERO_MOVEMENT_INTENT;
@@ -129,6 +135,11 @@ function createExpectedPlayingState(): RuntimeState {
   return state;
 }
 
+function exhaustWaveSchedule(state: RuntimeState): void {
+  state.waveSchedule.nextScheduledSpawnIndex =
+    state.waveSchedule.requests.length;
+}
+
 function addEnemy(
   state: RuntimeState,
   id: number,
@@ -163,7 +174,7 @@ describe("GameRuntimeSession loss transition", () => {
     const state = createInitialRuntimeState();
     state.player.currentHealth = 1;
     state.nextAttackAtSeconds = 100;
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     addEnemy(state, 1, state.player.position, "active");
     const input = new ControlledMovementInput();
     input.movementIntent = createMovementIntent(1, 0);
@@ -197,7 +208,6 @@ describe("GameRuntimeSession loss transition", () => {
   it("transitions a pre-defeated player before moving or spawning", () => {
     const state = createInitialRuntimeState();
     state.player.currentHealth = 0;
-    state.nextEnemySpawnAtSeconds = 0;
     const input = new ControlledMovementInput();
     input.movementIntent = createMovementIntent(1, 0);
     const { session } = createSession(
@@ -282,7 +292,8 @@ describe("GameRuntimeSession complete restart reset", () => {
       addEnemy(progressedState, 8, { x: 12, y: 12 }, "dying");
       progressedState.enemies[0]!.removeAtSimulationSeconds = 100;
       progressedState.nextEnemyId = 9;
-      progressedState.nextEnemySpawnAtSeconds = 99;
+      progressedState.waveSchedule.elapsedSeconds = 99;
+      progressedState.waveSchedule.nextScheduledSpawnIndex = 3;
       addProjectile(progressedState, 7, { x: 50, y: 50 });
       progressedState.nextProjectileId = 8;
       progressedState.nextAttackAtSeconds = 99;
@@ -312,9 +323,9 @@ describe("GameRuntimeSession complete restart reset", () => {
       new SeededRandomSource(42),
     );
     const steps = [
-      [createMovementIntent(-1, 0), FIRST_SPAWN_DELAY_SECONDS],
-      [createMovementIntent(0, 1), SPAWN_INTERVAL_SECONDS],
-      [createMovementIntent(1, 0), SPAWN_INTERVAL_SECONDS],
+      [createMovementIntent(-1, 0), FIRST_WAVE_FIRST_SPAWN_SECONDS],
+      [createMovementIntent(0, 1), FIRST_WAVE_SPAWN_INTERVAL_SECONDS],
+      [createMovementIntent(1, 0), FIRST_WAVE_SPAWN_INTERVAL_SECONDS],
     ] as const;
     const completedRuns: RuntimeState[] = [];
     session.start();
@@ -356,14 +367,14 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     const { input, session } = createSession(state, randomSource);
     input.movementIntent = createMovementIntent(0, -1);
 
-    session.fixedUpdate(FIRST_SPAWN_DELAY_SECONDS);
+    session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS);
 
     expect(state.player.position).toEqual({ x: 180, y: 40 });
     expect(state.enemies).toEqual([]);
     expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS);
   });
 
-  it("advances the schedule after failed bounded attempts", () => {
+  it("leaves a request pending after failed bounded attempts", () => {
     const state = createInitialRuntimeState();
     state.player.position = { x: 180, y: 12 };
     const randomSource = new SequenceRandomSource([
@@ -372,46 +383,55 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     ]);
     const { session } = createSession(state, randomSource);
 
-    session.fixedUpdate(FIRST_SPAWN_DELAY_SECONDS);
+    session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS);
 
     expect(state.enemies).toEqual([]);
-    expect(state.nextEnemySpawnAtSeconds).toBe(
-      FIRST_SPAWN_DELAY_SECONDS + SPAWN_INTERVAL_SECONDS,
-    );
-    expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS);
-
-    session.fixedUpdate(SPAWN_INTERVAL_SECONDS - 0.01);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
     expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS);
 
     session.fixedUpdate(0.01);
     expect(state.enemies).toHaveLength(1);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
     expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS + 1);
   });
 
-  it("counts entering and active enemies toward the live-enemy cap", () => {
+  it("releases at most one successful request per fixed update", () => {
     const state = createInitialRuntimeState();
-    state.enemies.push(
-      createBasicEnemyState(1, { x: -66, y: 100 }),
-      createBasicEnemyState(2, { x: -66, y: 200 }),
-      createBasicEnemyState(3, { x: -66, y: 300 }),
-      createBasicEnemyState(4, { x: -66, y: 400 }),
-    );
-    state.enemies[1]!.phase = "active";
-    state.nextEnemyId = 5;
+    const tiedWave = createWaveDefinition({
+      groups: [
+        createSpawnGroup({
+          startOffsetSeconds: 0.5,
+          enemyId: "basic",
+          count: 1,
+          intervalSeconds: 0,
+          pattern: "random-perimeter",
+        }),
+        createSpawnGroup({
+          startOffsetSeconds: 0.5,
+          enemyId: "basic",
+          count: 1,
+          intervalSeconds: 0,
+          pattern: "random-perimeter",
+        }),
+      ],
+      maxActiveEnemies: 2,
+    });
+    state.waveSchedule = createWaveScheduleProgress(1, tiedWave);
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
 
-    session.fixedUpdate(FIRST_SPAWN_DELAY_SECONDS);
+    session.fixedUpdate(0.5);
 
-    expect(state.enemies).toHaveLength(MAX_LIVE_ENEMIES);
-    expect(state.nextEnemyId).toBe(5);
-    expect(randomSource.calls).toHaveLength(0);
-    expect(state.nextEnemySpawnAtSeconds).toBe(
-      FIRST_SPAWN_DELAY_SECONDS + SPAWN_INTERVAL_SECONDS,
-    );
+    expect(state.enemies.map((enemy) => enemy.id)).toEqual([1]);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+
+    session.fixedUpdate(0.01);
+
+    expect(state.enemies.map((enemy) => enemy.id)).toEqual([1, 2]);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(2);
   });
 
-  it("adds at most one enemy for a due update without a spawn backlog", () => {
+  it("retains overdue finite requests instead of creating a same-update burst", () => {
     const state = createInitialRuntimeState();
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
@@ -421,7 +441,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     expect(state.enemies).toHaveLength(1);
     expect(state.nextEnemyId).toBe(2);
     expect(randomSource.calls).toHaveLength(1);
-    expect(state.nextEnemySpawnAtSeconds).toBe(10 + SPAWN_INTERVAL_SECONDS);
+    expect(state.waveSchedule.elapsedSeconds).toBe(10);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
   });
 
   it("moves a newly spawned enemy during the same fixed update", () => {
@@ -429,17 +450,45 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
 
-    session.fixedUpdate(FIRST_SPAWN_DELAY_SECONDS);
+    session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS);
 
     expect(state.enemies).toHaveLength(1);
     expect(state.enemies[0]?.position).toEqual({ x: 180, y: 670 });
     expect(state.enemies[0]?.phase).toBe("entering");
   });
 
+  it("stops spawning after the finite first-wave schedule is exhausted", () => {
+    const state = createInitialRuntimeState();
+    state.nextAttackAtSeconds = 100;
+    const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
+    const { session } = createSession(state, randomSource);
+
+    session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS);
+    for (
+      let spawnIndex = 1;
+      spawnIndex < FIRST_WAVE_GROUP.count;
+      spawnIndex += 1
+    ) {
+      session.fixedUpdate(FIRST_WAVE_SPAWN_INTERVAL_SECONDS);
+    }
+
+    expect(state.enemies).toHaveLength(FIRST_WAVE_GROUP.count);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(
+      state.waveSchedule.requests.length,
+    );
+
+    state.enemies = [];
+    session.fixedUpdate(10);
+    session.fixedUpdate(10);
+
+    expect(state.enemies).toEqual([]);
+    expect(randomSource.calls).toHaveLength(FIRST_WAVE_GROUP.count);
+  });
+
   it("pursues the player's newly updated position", () => {
     const state = createInitialRuntimeState();
     state.player.position = { x: 100, y: 100 };
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.enemies.push(createBasicEnemyState(1, { x: 0, y: 0 }));
     state.nextEnemyId = 2;
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
@@ -461,7 +510,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
   it("activates an entering enemy after pursuit reaches the visible arena", () => {
     const state = createInitialRuntimeState();
     state.player.position = { x: 100, y: 320 };
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.enemies.push(createBasicEnemyState(1, { x: -20, y: 320 }));
     state.nextEnemyId = 2;
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
@@ -475,7 +524,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
   it("retains an active enemy while its circle remains outside the visible arena", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     const enemy = createBasicEnemyState(1, { x: -20, y: 320 });
     enemy.phase = "active";
     state.enemies.push(enemy);
@@ -496,7 +545,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
   it("retains exact despawn-boundary tangency", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     const enemy = createBasicEnemyState(1, {
       x: DESPAWN_BOUNDS.x - BASIC_ENEMY_DEFINITION.collisionRadius,
       y: 320,
@@ -516,7 +565,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
   it("removes an enemy whose circle is fully outside the despawn bounds", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     const enemy = createBasicEnemyState(1, {
       x: DESPAWN_BOUNDS.x - BASIC_ENEMY_DEFINITION.collisionRadius - 10,
       y: 320,
@@ -535,7 +584,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
   it("removes invalid enemy coordinates without simulating or rendering them", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.enemies.push(createBasicEnemyState(1, { x: Number.NaN, y: 320 }));
     const snapshots: GameRenderSnapshot[] = [];
     const presentation: GamePresentationPort = {
@@ -578,7 +627,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     session.fixedUpdate(10);
 
     expect(state.simulationTimeSeconds).toBe(0);
-    expect(state.nextEnemySpawnAtSeconds).toBe(FIRST_SPAWN_DELAY_SECONDS);
+    expect(state.waveSchedule.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
     expect(state.enemies[0]?.position).toEqual(initialEnemyPosition);
     expect(state.enemies[0]?.phase).toBe("entering");
     expect(state.enemies).toContain(escapedEnemy);
@@ -591,21 +641,42 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     expect(state.simulationTimeSeconds).toBeCloseTo(1 / 60);
   });
 
-  it("restart resets the random sequence and initial spawn timing", () => {
+  it("does not advance wave-local time before gameplay starts", () => {
+    const state = createInitialRuntimeState();
+    const session = new GameRuntimeSession(
+      state,
+      new ControlledMovementInput(),
+      null,
+      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
+    );
+
+    session.fixedUpdate(10);
+
+    expect(state.phase).toBe("idle");
+    expect(state.waveSchedule.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+  });
+
+  it("restart resets the random sequence and the original wave-one schedule", () => {
     const state = createInitialRuntimeState();
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
-    session.fixedUpdate(FIRST_SPAWN_DELAY_SECONDS);
+    session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS);
     expect(state.enemies.map((enemy) => enemy.id)).toEqual([1]);
     expect(state.nextEnemyId).toBe(2);
 
     session.restart();
 
     expect(randomSource.resetCount).toBe(1);
-    session.fixedUpdate(FIRST_SPAWN_DELAY_SECONDS - 0.01);
+    const restartedState = readOwnedRuntimeState(session);
+    expect(restartedState.waveSchedule.currentWaveNumber).toBe(1);
+    expect(restartedState.waveSchedule.elapsedSeconds).toBe(0);
+    expect(restartedState.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS - 0.01);
     expect(randomSource.calls).toHaveLength(1);
     session.fixedUpdate(0.01);
     expect(randomSource.calls).toHaveLength(2);
+    expect(restartedState.waveSchedule.nextScheduledSpawnIndex).toBe(1);
   });
 
   it("reproduces enemy positions for the same seed and input sequence", () => {
@@ -614,9 +685,9 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     const first = createSession(firstState, new SeededRandomSource(42));
     const second = createSession(secondState, new SeededRandomSource(42));
     const steps = [
-      [createMovementIntent(-1, 0), FIRST_SPAWN_DELAY_SECONDS],
-      [createMovementIntent(0, 1), SPAWN_INTERVAL_SECONDS],
-      [createMovementIntent(1, 0), SPAWN_INTERVAL_SECONDS],
+      [createMovementIntent(-1, 0), FIRST_WAVE_FIRST_SPAWN_SECONDS],
+      [createMovementIntent(0, 1), FIRST_WAVE_SPAWN_INTERVAL_SECONDS],
+      [createMovementIntent(1, 0), FIRST_WAVE_SPAWN_INTERVAL_SECONDS],
     ] as const;
 
     for (const [intent, deltaSeconds] of steps) {
@@ -651,9 +722,9 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
       new SeededRandomSource(42),
     );
     const steps = [
-      [createMovementIntent(-1, 0), FIRST_SPAWN_DELAY_SECONDS],
-      [createMovementIntent(0, 1), SPAWN_INTERVAL_SECONDS],
-      [createMovementIntent(1, 0), SPAWN_INTERVAL_SECONDS],
+      [createMovementIntent(-1, 0), FIRST_WAVE_FIRST_SPAWN_SECONDS],
+      [createMovementIntent(0, 1), FIRST_WAVE_SPAWN_INTERVAL_SECONDS],
+      [createMovementIntent(1, 0), FIRST_WAVE_SPAWN_INTERVAL_SECONDS],
     ] as const;
     session.start();
 
@@ -684,7 +755,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 describe("GameRuntimeSession automatic attack", () => {
   it("keeps an immediately ready attack ready when no target exists", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     const { session } = createSession(
       state,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
@@ -702,7 +773,7 @@ describe("GameRuntimeSession automatic attack", () => {
     ["dying", { x: 180, y: 300 }],
   ] as const)("does not fire at an %s enemy", (phase, position) => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     addEnemy(state, 1, position, phase);
     const { session } = createSession(
       state,
@@ -718,7 +789,7 @@ describe("GameRuntimeSession automatic attack", () => {
 
   it("fires immediately at an active target and advances the cooldown", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     addEnemy(state, 1, { x: 300, y: 320 }, "active");
     const { session } = createSession(
       state,
@@ -742,7 +813,7 @@ describe("GameRuntimeSession automatic attack", () => {
 
   it("does not fire before the cooldown deadline", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 0.5;
     addEnemy(state, 1, { x: 180, y: 300 }, "active");
     const { session } = createSession(
@@ -759,7 +830,7 @@ describe("GameRuntimeSession automatic attack", () => {
 
   it("fires at the exact cooldown deadline", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.simulationTimeSeconds = 0.25;
     state.nextAttackAtSeconds = 0.5;
     addEnemy(state, 1, { x: 180, y: 300 }, "active");
@@ -779,7 +850,7 @@ describe("GameRuntimeSession automatic attack", () => {
 
   it("fires as soon as a target appears without consuming no-target time", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     const { session } = createSession(
       state,
       new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
@@ -798,7 +869,7 @@ describe("GameRuntimeSession automatic attack", () => {
 
   it("freezes the attack deadline relationship while paused", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 0.5;
     addEnemy(state, 1, { x: 180, y: 300 }, "active");
     const { session } = createSession(
@@ -826,7 +897,7 @@ describe("GameRuntimeSession automatic attack", () => {
 
   it("emits at most one projectile after a large delta", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
       state,
@@ -844,7 +915,7 @@ describe("GameRuntimeSession automatic attack", () => {
 
   it("aims at the nearest active enemy after enemy movement", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     addEnemy(state, 1, { x: 300, y: 320 }, "active");
     addEnemy(state, 2, { x: 180, y: 300 }, "active");
     const { session } = createSession(
@@ -873,7 +944,7 @@ describe("GameRuntimeSession automatic attack", () => {
       presentation,
       randomSource,
     );
-    const steps = [FIRST_SPAWN_DELAY_SECONDS, 0.25] as const;
+    const steps = [FIRST_WAVE_FIRST_SPAWN_SECONDS, 0.25] as const;
     session.start();
 
     for (const deltaSeconds of steps) session.fixedUpdate(deltaSeconds);
@@ -902,7 +973,7 @@ describe("GameRuntimeSession automatic attack", () => {
 describe("GameRuntimeSession projectile hit resolution", () => {
   it("retires a hitting projectile before the next renderer snapshot", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     addProjectile(state, 1, state.player.position);
@@ -939,7 +1010,7 @@ describe("GameRuntimeSession projectile hit resolution", () => {
 
   it("does not apply damage again on the next fixed update", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     state.enemies[0]!.currentHealth = 3;
@@ -960,7 +1031,7 @@ describe("GameRuntimeSession projectile hit resolution", () => {
 
   it("allows two projectiles to damage the same active enemy in one update", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     state.enemies[0]!.currentHealth = 3;
@@ -985,7 +1056,7 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 
   it("does not score or damage a dying enemy again", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     addProjectile(state, 1, state.player.position);
@@ -1009,7 +1080,7 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 
   it("removes a dying enemy at the exact simulation-time deadline", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     state.enemies[0]!.currentHealth = 0;
@@ -1035,7 +1106,7 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 
   it("freezes dying cleanup while paused", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     state.enemies[0]!.currentHealth = 0;
@@ -1057,7 +1128,7 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 
   it("restart clears the dying renderer state", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     state.enemies[0]!.currentHealth = 0;
@@ -1086,29 +1157,9 @@ describe("GameRuntimeSession enemy defeat lifecycle", () => {
 });
 
 describe("GameRuntimeSession player contact damage", () => {
-  it("allows default spawn pressure to reach a stationary player", () => {
-    const state = createInitialRuntimeState();
-    const { session } = createSession(
-      state,
-      new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]),
-    );
-
-    for (
-      let updateCount = 0;
-      updateCount < 720 &&
-      state.player.currentHealth === state.player.maximumHealth;
-      updateCount += 1
-    ) {
-      session.fixedUpdate(1 / 60);
-    }
-
-    expect(state.player.currentHealth).toBeLessThan(state.player.maximumHealth);
-    expect(state.simulationTimeSeconds).toBeLessThan(12);
-  });
-
   it("applies one active-enemy contact hit after enemy movement", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
@@ -1127,7 +1178,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("ignores continued overlap during invulnerability", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
@@ -1143,7 +1194,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("does not let another overlapping enemy bypass invulnerability", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
@@ -1160,7 +1211,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("ignores contact just before invulnerability expires", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
@@ -1178,7 +1229,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("allows contact at exact invulnerability expiration", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
@@ -1196,7 +1247,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("freezes the invulnerability relationship while paused", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
@@ -1216,7 +1267,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("resumes with the remaining simulation-time immunity intact", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
@@ -1238,7 +1289,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("does not advance immunity for invalid deltas", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
@@ -1259,7 +1310,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("restart reports a fresh vulnerable player", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const snapshots: GameRenderSnapshot[] = [];
@@ -1288,7 +1339,7 @@ describe("GameRuntimeSession player contact damage", () => {
   it("allows contact damage to reduce health to zero", () => {
     const state = createInitialRuntimeState();
     state.player.currentHealth = 1;
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const { session } = createSession(
@@ -1306,7 +1357,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("reports invulnerability only before its renderer-snapshot deadline", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     const snapshots: GameRenderSnapshot[] = [];
@@ -1339,7 +1390,7 @@ describe("GameRuntimeSession player contact damage", () => {
 
   it("does not take contact damage from an enemy defeated earlier in the update", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.nextAttackAtSeconds = 100;
     addEnemy(state, 1, state.player.position, "active");
     addProjectile(state, 1, state.player.position);
@@ -1358,7 +1409,7 @@ describe("GameRuntimeSession player contact damage", () => {
 describe("GameRuntimeSession projectile movement and presentation", () => {
   it("moves a seeded projectile without an eligible target", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.projectiles.push(
       createBasicProjectileState(
         state.nextProjectileId,
@@ -1382,7 +1433,7 @@ describe("GameRuntimeSession projectile movement and presentation", () => {
 
   it("removes a projectile at its exact expiration boundary", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     state.simulationTimeSeconds =
       BASIC_ATTACK_DEFINITION.projectileLifetimeSeconds - 0.01;
     state.projectiles.push(
@@ -1408,7 +1459,7 @@ describe("GameRuntimeSession projectile movement and presentation", () => {
 
   it("removes invalid and fully escaped projectiles safely", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     const invalid = createBasicProjectileState(
       1,
       { x: 180, y: 320 },
@@ -1442,7 +1493,7 @@ describe("GameRuntimeSession projectile movement and presentation", () => {
 
   it("freezes projectile movement while paused", () => {
     const state = createInitialRuntimeState();
-    state.nextEnemySpawnAtSeconds = 100;
+    exhaustWaveSchedule(state);
     const projectile = createBasicProjectileState(
       1,
       { x: 180, y: 320 },

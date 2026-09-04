@@ -8,3 +8,14 @@ export type {
   SpawnPattern,
   WaveDefinition,
 } from "./WaveDefinition.js";
+export {
+  advanceWaveSchedule,
+  compileWaveSchedule,
+  consumeNextScheduledSpawnRequest,
+  createWaveScheduleProgress,
+  getDueScheduledSpawnRequest,
+} from "./WaveSchedule.js";
+export type {
+  ScheduledSpawnRequest,
+  WaveScheduleProgress,
+} from "./WaveSchedule.js";

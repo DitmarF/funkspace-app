@@ -6,7 +6,11 @@ import {
   type MovementIntent,
 } from "../movement/index.js";
 import type { ProjectileState } from "../projectiles/index.js";
-import { FIRST_SPAWN_DELAY_SECONDS } from "../spawning/index.js";
+import {
+  createWaveScheduleProgress,
+  PROVISIONAL_EPIC_5_WAVES,
+  type WaveScheduleProgress,
+} from "../waves/index.js";
 
 export const PLAYER_COLLISION_RADIUS = 12;
 
@@ -38,7 +42,7 @@ export interface RuntimeState {
   player: PlayerState;
   enemies: EnemyState[];
   nextEnemyId: number;
-  nextEnemySpawnAtSeconds: number;
+  waveSchedule: WaveScheduleProgress;
   projectiles: ProjectileState[];
   nextProjectileId: number;
   nextAttackAtSeconds: number;
@@ -64,7 +68,7 @@ export function createInitialRuntimeState(): RuntimeState {
     },
     enemies: [],
     nextEnemyId: 1,
-    nextEnemySpawnAtSeconds: FIRST_SPAWN_DELAY_SECONDS,
+    waveSchedule: createWaveScheduleProgress(1, PROVISIONAL_EPIC_5_WAVES[0]!),
     projectiles: [],
     nextProjectileId: 1,
     nextAttackAtSeconds: 0,
