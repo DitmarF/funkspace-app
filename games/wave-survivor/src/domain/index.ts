@@ -64,3 +64,13 @@ export {
   PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
 } from "./state/index.js";
 export type { PlayerState, RuntimePhase, RuntimeState } from "./state/index.js";
+export {
+  createSpawnGroup,
+  createWaveDefinition,
+  PROVISIONAL_EPIC_5_WAVES,
+} from "./waves/index.js";
+export type {
+  SpawnGroup,
+  SpawnPattern,
+  WaveDefinition,
+} from "./waves/index.js";
