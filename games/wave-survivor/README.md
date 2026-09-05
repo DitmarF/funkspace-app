@@ -189,8 +189,8 @@ previous result references remain frozen. A loop generation guard prevents a
 callback-driven restart/destroy from continuing the old frame.
 
 WS-6.8 newcomer checks were reported PASS by Dimi (2026-09-05). WS-6.9 replay
-automation is implemented below; repeated real-device replay, final tuning and
-Gate 2 remain pending. See the [terminal rules and evidence](../../docs/features/wave-survivor.md#1010-ws-65-terminal-completion).
+automation and Dimi's manual PASS are recorded below; final tuning and Gate 2
+remain pending. See the [terminal rules and evidence](../../docs/features/wave-survivor.md#1010-ws-65-terminal-completion).
 
 ## WS-6.8 standalone Start → result → Replay
 
@@ -251,12 +251,31 @@ win/loss runs against three replays, exercising both streams, all four choices a
 boss actions. Controlled enemy defeats/invulnerability make these lifecycle tests,
 not pacing evidence. Browser mocked results separately verify UI cleanup.
 
-**Pending with Dimi:** on PC and smartphone, replay at least three times including
-both victory and loss; check fresh health/upgrades, no old boss/projectiles, usable
-focus/joystick, and one result each time. Hold a movement key or drag the joystick
-across an interruption, release/cancel, then replay; movement must start neutral.
-Switch tabs/apps around Replay and return: no hidden progress or time jump.
-This task's real-device confirmation and Gate 2 remain separate from automation.
+**Manual update — 2026-09-05:** Dimi reports the WS-6.9 repeated-replay and input
+interruption checks PASS. No device models or timing measurements were supplied.
+Gate 2 remains separate from that task acceptance.
+
+## WS-6.11 deterministic production full runs
+
+`src/application/GameRuntimeFullRun.test.ts` uses production configuration/combat,
+spawn seed **1**, upgrade seed **2**, and the production fixed step (currently
+1/60 second). Both scripts stand still during normal waves and select **Rapid
+Fire** from each actual offer. From boss entry, the winning script rotates
+movement intent `(cos(t), sin(t))` at one radian per simulation second; the losing
+script stays still and dies from real contact. No runtime state is injected.
+
+Each run is bounded by **9000 gameplay steps** (currently 150 simulated seconds),
+with progress/health/enemy diagnostics on failure. This is not a completion timer
+or pacing target. Tests assert ordered events, four legal upgrades then one boss,
+score/progress/time, frozen results, unchanged terminal state and fresh/replay
+equivalence. Compact samples replace stored tuning snapshots. Twelve companion
+cases naturally reach entry/wind-up/charge/recovery, pause, then resume, restart
+or destroy, checking clocks, warnings and cleanup.
+
+Older constructed-combat/queue tests remain boundary evidence; browser mocked
+result events prove UI behavior only. **Rerun after WS-6.10 tuning** without
+altering production balance merely to make scripts pass. Successful scripts prove
+correctness, not human playability, pacing or boss fairness. Dimi retains Gate 2.
 
 ## WS-6.6 score candidate
 

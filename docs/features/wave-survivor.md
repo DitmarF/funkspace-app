@@ -1143,12 +1143,43 @@ accumulator reset, paused/upgrade states, callback restart/pause/destroy, held k
 pointer cancellation, listener/observer reuse and final teardown. Browser tests
 separate actual-runtime hidden activation from mocked alternating result/UI checks.
 
-**Pending manual handoff:** Dimi repeats Replay at least three times on PC and
-smartphone, including wins and losses; verifies fresh health/upgrades, no stale
-boss/projectiles/results and usable focus/joystick; interrupts held keyboard or
-touch input, releases/cancels and confirms neutral movement; switches tabs/apps
-around Replay and checks for hidden progression or a return-time jump. This new
-task's real-device confirmation, final tuning and Gate 2 remain pending.
+**Manual update — 2026-09-05:** Dimi reports WS-6.9 repeated-replay and input
+interruption checks PASS. No device models or timing measurements were supplied.
+This is separate human confirmation; final tuning and Gate 2 remain pending.
+
+### 15.8 WS-6.11 production full-run regression evidence
+
+The test-only `GameRuntimeFullRun.test.ts` constructs the real initial session
+with spawn seed 1 and upgrade seed 2, then advances the production fixed step
+(currently 1/60 second). It never writes runtime state. Both scripts stand still
+for normal waves and choose Rapid Fire only after verifying it is actually offered.
+At boss entry the victory script rotates movement intent `(cos(t), sin(t))` at
+one radian per simulation second. The loss script remains still and dies from
+actual combat damage. All four normal schedules, upgrade handoffs and the boss
+are traversed; automatic targeting/projectiles/contact/defeat produce the outcomes.
+
+The 9000-gameplay-step bound (currently 150 simulated seconds) fails with seeds,
+phase, clock, wave/queue, health/kills and remaining enemy/action diagnostics.
+This bound is neither a run-duration target nor a completion timer. Tests compare
+fresh and replayed runs through ordered events/status phases and compact render
+samples without recording giant expected snapshots. Assertions cover encounter
+order, one choice per normal clear, no post-boss upgrade, boss defeat counted once,
+loss health reaching zero, score from authoritative final inputs, elapsed time
+equal to gameplay steps, frozen result/event identity, and unchanged terminal state.
+
+Twelve focused companion cases use the same real gameplay to reach boss entry,
+wind-up, charge and recovery. Pausing resets input and freezes simulation/warning
+data; subsequent resume finishes the run, restart clears the abandoned encounter
+and finishes a fresh run, or destroy removes entities and releases input/presentation
+once without publication. Fixed updates replace waiting; no wall-clock sleeps or
+requestAnimationFrame are used. Browser interruptions/scheduling remain covered
+by existing adapter/controller tests.
+
+Earlier constructed states and injected defeats/invulnerability remain separately
+labelled boundary coverage. Browser mocked public events prove UI behavior only.
+WS-6.10 must rerun these production fixtures after tuning and investigate changed
+outcomes without changing balance solely to satisfy a script. Successful scripts
+prove correctness, not human playability, pacing or boss fairness; Dimi owns Gate 2.
 
 ## 16. Accessibility and user control
 

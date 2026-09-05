@@ -868,8 +868,9 @@ combat fixtures; WS-6.3 production entry and WS-6.4 static action telegraphs are
 implemented. Dimi reports WS-6.4 manual checks PASS. WS-6.5 terminal completion
 is implemented. WS-6.8 delivers the completion event and standalone Start/result/Replay
 flow; Dimi reports WS-6.8 manual checks PASS. WS-6.9 replay hardening and
-deterministic equivalence checks are implemented. Repeated replay on real devices,
-full-run tuning and Gate 2 remain pending.
+deterministic equivalence checks are implemented; Dimi reports WS-6.9 manual checks
+PASS. WS-6.11 adds actual production full-run win/loss/replay fixtures. Full-run
+tuning and Gate 2 remain pending.
 
 ## Goal
 
@@ -921,9 +922,53 @@ EPIC 5.
 | **WS-6.6**  | Define score calculation.                 | Implemented pure 10/100/500/100 candidate; WS-6.5 integrates authoritative terminal inputs.                                 | Numeric safety and integrated win/loss scores tested; final reward approval pending.                                      |
 | **WS-6.7**  | Define `RunResult`.                       | Implemented validated/frozen public record, committed by WS-6.5 and published by WS-6.8.                                    | Value/immutability/public compatibility tests pass; Dimi's result-information review pending.                             |
 | **WS-6.8**  | Implement result event and UI.            | One guarded frozen completion event; deliberate Start, semantic result fields and Replay in the standalone demo.            | Automated checks pass; Dimi reports task manual checks PASS (2026-09-05).                                                 |
-| **WS-6.9**  | Implement immediate replay.               | Existing fresh-state replay extended for callback, held-key and hidden-page safety.                                         | Fresh/replay state and output equivalence tested; repeated PC/phone replay confirmation pending.                          |
+| **WS-6.9**  | Implement immediate replay.               | Existing fresh-state replay extended for callback, held-key and hidden-page safety.                                         | Automated tests pass; Dimi reports task manual checks PASS (2026-09-05).                                                  |
 | **WS-6.10** | Balance the full run.                     | Tune enemy speed, health, spawn timing, attack cooldown, upgrade strength, and upgrade frequency.                           | Player power grows, but movement remains important through the boss.                                                      |
-| **WS-6.11** | Add deterministic full-run test fixtures. | Use controlled seed and time to cover win and loss paths where practical.                                                   | Critical transitions do not depend on flaky real-time tests.                                                              |
+| **WS-6.11** | Add deterministic full-run test fixtures. | Implemented actual production combat win/loss/replay and naturally reached boss interruption companions.                    | Bounded scripts verify events/results/terminal freeze/replay; rerun after WS-6.10 tuning.                                 |
+
+### WS-6.11 implementation and dependent acceptance
+
+Added test-only production full-run fixtures: spawn seed **1**, upgrade seed **2**,
+production fixed step (currently **1/60 second**), and a **9000 gameplay-step**
+safety bound. Both scripts remain stationary in normal waves and select actually
+offered Rapid Fire at all four upgrade opportunities. For victory, movement intent
+rotates `(cos(t), sin(t))` at one radian per simulation second from boss entry;
+the loss script remains stationary. Automatic attacks, real contact damage and
+normal defeat accounting produce both outcomes. No runtime health/queue/position/
+phase writes, alternate balance, forced kills or terminal calls exist in this fixture.
+
+Two complete-run cases include fresh/replay comparisons. Twelve companion cases
+naturally reach boss entry, wind-up, charge and recovery before pause followed by
+resume/restart/destroy. They cover frozen warning clocks, neutral input, cleanup,
+no abandoned-run event and completion after resume/replay. Events, legal choices,
+finite ordering, score/progress/time, immutable payloads and terminal freeze are
+asserted. Compact samples compare runs without hardcoding every tuning number.
+Older constructed-combat replay tests are explicitly labelled boundary evidence;
+browser mocked events remain UI-only. See [full-run evidence](./wave-survivor.md#158-ws-611-production-full-run-regression-evidence).
+
+Executed WS-6.11 validation (2026-09-05):
+
+- `pnpm --filter @funkspace/wave-survivor test src/application/GameRuntimeFullRun.test.ts`:
+  **14 tests pass** (two full-run/replay cases and twelve interruption companions).
+- `pnpm --filter @funkspace/wave-survivor test`: **906 tests / 58 files pass**.
+- `pnpm --filter @funkspace/wave-survivor typecheck` and
+  `pnpm --filter @funkspace/wave-survivor exec tsc -p /private/tmp/ws63-tests.tsconfig.json`:
+  package and strict source/test compilation pass. The temporary config extends
+  the package config and includes test files.
+- Scoped ESLint using `frontend/eslint.config.mjs` with `--max-warnings=0`
+  passes on both changed test files. Repository `pnpm lint` (frontend lint and
+  formatting) and `git diff --check` pass after the final scope/lifecycle review.
+- Package/demo builds, browser tests and frontend host/type checks are not rerun:
+  only tests/docs changed; production runtime, renderer and public API are unchanged.
+
+No wall-clock waits, random policy changes, dependencies, generated files, commits
+or deployment. Existing root React/pages lint discovery notices are non-failing.
+
+**Handoff to Dimi:** covered scenarios are real victory, real contact defeat,
+replay after each, and interruptions/cleanup in every tested boss stage.
+These scripts establish correctness, not human playability or fairness. Rerun
+the fixtures after WS-6.10 tuning; tuning acceptance and Gate 2 remain pending.
+The WS-6.9 manual PASS is recorded separately below.
 
 ### WS-6.9 implementation and dependent acceptance
 
@@ -969,12 +1014,10 @@ new session guard's line wrapping; formatting was corrected before the final run
 Existing Next-lint deprecation, root React/pages discovery and Playwright color
 environment notices remain non-failing. No commits, deployment or settings changes.
 
-**Pending with Dimi:** repeat at least three replays on PC and smartphone,
-including win and loss; verify fresh gameplay state, one result and usable
-Replay/focus/joystick. Interrupt held keyboard/touch input, release/cancel, replay,
-and check neutral movement. Switch tabs/apps around Replay and check no hidden
-progress or time jump. No new real-device confirmation or Gate 2 approval is
-inferred from automated fixtures or the prior WS-6.8 PASS.
+**Manual update — 2026-09-05:** Dimi reports WS-6.9 repeated-replay and input
+interruption checks PASS. No device models or timing measurements were supplied.
+This records task acceptance separately from automated fixtures; Gate 2 is not
+approved by this report.
 
 ### WS-6.8 implementation and dependent acceptance
 
@@ -1037,7 +1080,7 @@ dependencies, commits, deployments, or repository settings were changed.
 can start, understand the outcome and find Replay without coaching. No device
 models or timing measurements were supplied. Runtime event tests and UI-only
 mocked event tests remain separate evidence. WS-6.9 adds replay automation above;
-new repeated-replay device confirmation, final tuning and Gate 2 remain pending.
+WS-6.9's later manual PASS is recorded above; final tuning and Gate 2 remain pending.
 
 ### WS-6.5 implementation and dependent acceptance (historical baseline before WS-6.8)
 

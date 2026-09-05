@@ -95,7 +95,7 @@ function play(harness: ReturnType<typeof fixture>, outcome: "won" | "lost") {
   return structuredClone({ output: harness.output, state });
 }
 
-describe("finite-run replay", () => {
+describe("constructed combat replay boundaries (not production full-run proof)", () => {
   it.each(["won", "lost"] as const)(
     "matches a fresh %s run through three replays, including both random streams",
     (outcome) => {
