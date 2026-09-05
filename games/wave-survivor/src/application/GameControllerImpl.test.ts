@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { createGame } from "../createGame.js";
 import type { GameTheme } from "../GameTheme.js";
+import type { GameEvent } from "../GameEvent.js";
 import type {
   GamePresentationPort,
   GameRenderSnapshot,
@@ -93,6 +94,7 @@ class FakeFrameScheduler implements FrameScheduler {
 function createHarness(
   readJoystickSnapshot: (() => JoystickRenderSnapshot | null) | null = null,
   onStatusChange: ((status: GameStatusSnapshot) => void) | null = null,
+  onEvent: ((event: GameEvent) => void) | null = null,
 ) {
   const clock = new FakeMonotonicClock();
   const frameScheduler = new FakeFrameScheduler();
@@ -122,6 +124,7 @@ function createHarness(
     new SeededRandomSource(2),
     readJoystickSnapshot,
     onStatusChange,
+    onEvent,
   );
   const loop = new FixedStepLoop(clock, frameScheduler, {
     fixedUpdate: (deltaSeconds) => session.fixedUpdate(deltaSeconds),
@@ -254,15 +257,28 @@ describe("GameController runtime lifecycle", () => {
     },
   );
 
-  it.each(["restart", "destroy"] as const)(
-    "abandons the old frame when a terminal status callback calls %s",
-    (action) => {
-      const harness = createHarness(null, (status) => {
-        if (status.phase === "won") {
-          expect(harness.session.result?.outcome).toBe("won");
-          harness.controller[action]();
-        }
-      });
+  it.each([
+    ["restart", "status"],
+    ["destroy", "status"],
+    ["restart", "event"],
+    ["destroy", "event"],
+  ] as const)(
+    "abandons the old frame on %s from the completion %s callback",
+    (action, notification) => {
+      const complete = () => {
+        expect(harness.session.result?.outcome).toBe("won");
+        harness.controller[action]();
+      };
+      const harness = createHarness(
+        null,
+        (status) => {
+          if (notification === "status" && status.phase === "won") complete();
+        },
+        (event) => {
+          if (notification === "event" && event.type === "run-finished")
+            complete();
+        },
+      );
       const boss = createChargerBossState(1, { x: 180, y: 160 });
       boss.phase = "active";
       boss.currentHealth = 0;

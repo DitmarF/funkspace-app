@@ -48,6 +48,9 @@ describe("GameLoader", () => {
     expectTypeOf<GameMountOptions>().toEqualTypeOf<PackageGameMountOptions>();
     expectTypeOf<GameStatusSnapshot>().toEqualTypeOf<PackageGameStatusSnapshot>();
     expectTypeOf<GameEvent>().toEqualTypeOf<PackageGameEvent>();
+    expectTypeOf<
+      Extract<GameEvent, { type: "run-finished" }>["result"]
+    >().toEqualTypeOf<PackageRunResult>();
     expectTypeOf<UpgradeOption>().toEqualTypeOf<PackageUpgradeOption>();
     expectTypeOf<HostedGameController>().toEqualTypeOf<PackageGameController>();
     expectTypeOf<RunResult>().toEqualTypeOf<PackageRunResult>();

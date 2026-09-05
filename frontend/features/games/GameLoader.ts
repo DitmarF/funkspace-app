@@ -1,4 +1,5 @@
 import type {
+  GameEvent as PackageGameEvent,
   RuntimePhase,
   UpgradeOption as PackageUpgradeOption,
 } from "@funkspace/wave-survivor";
@@ -32,21 +33,7 @@ export interface UpgradeOption {
   readonly description: string;
 }
 
-export type GameEvent =
-  | {
-      readonly type: "wave-started";
-      readonly waveNumber: number;
-      readonly encounterKind?: "normal-wave" | "boss";
-    }
-  | {
-      readonly type: "wave-cleared";
-      readonly waveNumber: number;
-    }
-  | {
-      readonly type: "upgrade-choice-requested";
-      readonly clearedWaveNumber: number;
-      readonly options: readonly UpgradeOption[];
-    };
+export type GameEvent = PackageGameEvent;
 
 export interface GameMountOptions {
   readonly canvas: HTMLCanvasElement;

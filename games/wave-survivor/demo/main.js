@@ -9,6 +9,14 @@ const announcement = document.querySelector("#game-announcement");
 const restartButton = document.querySelector("#game-restart");
 const upgradePanel = document.querySelector("#game-upgrades");
 const upgradeOptions = document.querySelector("#game-upgrade-options");
+const introPanel = document.querySelector("#game-intro");
+const startButton = document.querySelector("#game-start");
+const resultPanel = document.querySelector("#game-result");
+const resultOutcome = document.querySelector("#game-result-outcome");
+const resultScore = document.querySelector("#game-result-score");
+const resultWave = document.querySelector("#game-result-wave");
+const resultTime = document.querySelector("#game-result-time");
+const replayButton = document.querySelector("#game-replay");
 
 if (
   !(canvas instanceof HTMLCanvasElement) ||
@@ -19,7 +27,15 @@ if (
   !(announcement instanceof HTMLElement) ||
   !(restartButton instanceof HTMLButtonElement) ||
   !(upgradePanel instanceof HTMLElement) ||
-  !(upgradeOptions instanceof HTMLElement)
+  !(upgradeOptions instanceof HTMLElement) ||
+  !(introPanel instanceof HTMLElement) ||
+  !(startButton instanceof HTMLButtonElement) ||
+  !(resultPanel instanceof HTMLElement) ||
+  !(resultOutcome instanceof HTMLElement) ||
+  !(resultScore instanceof HTMLElement) ||
+  !(resultWave instanceof HTMLElement) ||
+  !(resultTime instanceof HTMLElement) ||
+  !(replayButton instanceof HTMLButtonElement)
 ) {
   throw new Error("The Wave Survivor demo markup is incomplete.");
 }
@@ -74,6 +90,34 @@ const renderUpgradeOptions = (options) => {
   upgradeOptions.querySelector("button")?.focus({ preventScroll: true });
 };
 
+const clearResult = () => {
+  resultPanel.hidden = true;
+  resultOutcome.textContent = "";
+  resultScore.textContent = "";
+  resultWave.textContent = "";
+  resultTime.textContent = "";
+};
+
+const showResult = (result) => {
+  hideAndClearUpgradePanel();
+  introPanel.hidden = true;
+  restartButton.hidden = true;
+  selectedUpgradeTitle = null;
+  selectionInProgress = false;
+  const outcome = result.outcome === "won" ? "You won!" : "You lost";
+  // Format only the supplied duration; the UI owns no clock or score calculation.
+  const elapsed = `${Math.floor(result.elapsedSeconds / 60)}:${String(Math.floor(result.elapsedSeconds % 60)).padStart(2, "0")}`;
+  resultOutcome.textContent = outcome;
+  resultScore.textContent = String(result.score);
+  resultWave.textContent = String(result.waveReached);
+  resultTime.textContent = elapsed;
+  resultPanel.hidden = false;
+  resultPanel.scrollTop = 0;
+  canvas.tabIndex = -1;
+  announcement.textContent = `${outcome} Score ${result.score}. Wave reached ${result.waveReached}. Elapsed time ${elapsed}. Replay is available.`;
+  resultOutcome.focus({ preventScroll: true });
+};
+
 const game = createGame({
   canvas,
   viewport,
@@ -81,18 +125,9 @@ const game = createGame({
     wave.textContent = `Wave: ${status.waveNumber}`;
     health.textContent = `Health: ${status.currentHealth} / ${status.maximumHealth}`;
     kills.textContent = `Kills: ${status.killCount}`;
-    restartButton.hidden =
-      status.phase !== "lost" &&
-      status.phase !== "won" &&
-      status.phase !== "wave-cleared";
+    restartButton.hidden = status.phase !== "wave-cleared";
     canvas.dataset.gameState = status.phase;
-
-    if (status.phase === "lost" && previousPhase !== "lost") {
-      announcement.textContent = "You lost. Restart is available.";
-    }
-    if (status.phase === "won" && previousPhase !== "won") {
-      announcement.textContent = "You won. Restart is available.";
-    }
+    canvas.tabIndex = status.phase === "playing" ? 0 : -1;
     if (status.phase !== "choosing-upgrade" && !selectionInProgress) {
       hideAndClearUpgradePanel();
     }
@@ -104,27 +139,30 @@ const game = createGame({
     previousPhase = status.phase;
   },
   onEvent: (event) => {
-    if (event.type === "wave-started") {
-      if (event.encounterKind === "boss") {
-        announcement.textContent =
-          "Boss entering from the top. Move clear of the entry point.";
-      } else if (selectedUpgradeTitle) {
-        announcement.textContent = `${selectedUpgradeTitle} selected. Wave ${event.waveNumber} started.`;
-      } else if (restartInProgress) {
-        announcement.textContent = `New run started. Wave ${event.waveNumber}.`;
-      } else {
-        announcement.textContent = `Wave ${event.waveNumber} started.`;
-      }
-      return;
+    switch (event.type) {
+      case "wave-started":
+        if (event.encounterKind === "boss") {
+          announcement.textContent =
+            "Boss entering from the top. Move clear of the entry point.";
+        } else if (selectedUpgradeTitle) {
+          announcement.textContent = `${selectedUpgradeTitle} selected. Wave ${event.waveNumber} started.`;
+        } else if (restartInProgress) {
+          announcement.textContent = `New run started. Wave ${event.waveNumber}.`;
+        } else {
+          announcement.textContent = `Wave ${event.waveNumber} started.`;
+        }
+        return;
+      case "wave-cleared":
+        announcement.textContent = `Wave ${event.waveNumber} cleared.`;
+        return;
+      case "upgrade-choice-requested":
+        renderUpgradeOptions(event.options);
+        announcement.textContent = `Wave ${event.clearedWaveNumber} cleared. Upgrade choice available.`;
+        return;
+      case "run-finished":
+        showResult(event.result);
+        return;
     }
-
-    if (event.type === "wave-cleared") {
-      announcement.textContent = `Wave ${event.waveNumber} cleared.`;
-      return;
-    }
-
-    renderUpgradeOptions(event.options);
-    announcement.textContent = `Wave ${event.clearedWaveNumber} cleared. Upgrade choice available.`;
   },
   theme: {
     colors: {
@@ -137,14 +175,20 @@ const game = createGame({
   },
 });
 
-game.start();
-if (document.hidden) {
-  game.pause();
-}
+const handleStart = () => {
+  introPanel.hidden = true;
+  startButton.disabled = true;
+  game.start();
+  canvas.focus({ preventScroll: true });
+};
 
 const handleRestart = () => {
   restartInProgress = true;
   hideAndClearUpgradePanel();
+  clearResult();
+  introPanel.hidden = true;
+  selectedUpgradeTitle = null;
+  selectionInProgress = false;
   game.restart();
   restartInProgress = false;
   canvas.focus({ preventScroll: true });
@@ -195,16 +239,21 @@ const handleVisibilityChange = () => {
 const destroyGame = () => {
   document.removeEventListener("visibilitychange", handleVisibilityChange);
   restartButton.removeEventListener("click", handleRestart);
+  startButton.removeEventListener("click", handleStart);
+  replayButton.removeEventListener("click", handleRestart);
   upgradeOptions.removeEventListener("click", handleUpgradeSelection);
   window.removeEventListener("pagehide", destroyGame);
   selectionInProgress = false;
   selectedUpgradeTitle = null;
   restartInProgress = false;
   hideAndClearUpgradePanel();
+  clearResult();
   game.destroy();
 };
 
 document.addEventListener("visibilitychange", handleVisibilityChange);
 restartButton.addEventListener("click", handleRestart);
+startButton.addEventListener("click", handleStart);
+replayButton.addEventListener("click", handleRestart);
 upgradeOptions.addEventListener("click", handleUpgradeSelection);
 window.addEventListener("pagehide", destroyGame, { once: true });

@@ -82,6 +82,19 @@ describe("GameHost", () => {
     );
     act(() => onEvent({ type: "wave-started", waveNumber: 1 }));
     expect(screen.getByRole("status")).toHaveTextContent("Wave 1 started.");
+    act(() =>
+      onEvent({
+        type: "run-finished",
+        result: {
+          outcome: "won",
+          score: 1290,
+          waveReached: 5,
+          elapsedSeconds: 60,
+        },
+      }),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Wave 1 started.");
+    expect(screen.queryByRole("button", { name: "Replay" })).toBeNull();
     unmount();
     act(() =>
       onEvent({ type: "wave-started", waveNumber: 5, encounterKind: "boss" }),

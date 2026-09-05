@@ -553,7 +553,7 @@ movement challenge for a person. No health padding was added to fill run time.
 
 **Dependent acceptance:** WS-6.3 has integrated entry and finite handoff; WS-6.4
 has added static action telegraphs; WS-6.5 now integrates terminal boss defeat
-without normal-wave upgrade handling. Result publication/UI remain WS-6.8.
+without normal-wave upgrade handling. WS-6.8 now delivers the result event/demo UI.
 WS-6.10 owns final tuning. After entry and telegraphs exist, Dimi must evaluate
 on PC/phone whether the charger tests positioning rather than merely adding a
 large health pool, and assess timing, damage fairness, edge behavior, and build
@@ -690,7 +690,8 @@ same object. Application owns one `finalizeRun()` path for both outcomes, reusin
 the pure WS-6.6 score calculation and WS-6.7 constructor. It validates/calculates
 the result, commits result/outcome/health and clears pending choices, then resets
 movement and calls the existing discrete status observer. No score calculation
-occurs in rendering or status. No result event or result schema is introduced.
+occurs in rendering or status. WS-6.8 now publishes the same committed record
+before terminal status, as specified below; no second result schema is introduced.
 
 Victory requires the existing valid active-to-dying transition for a charger in
 the final encounter (null normal schedule), retained within boss cleanup bounds.
@@ -739,8 +740,8 @@ retained result intact while releasing runtime resources.
 Automated coverage includes win/loss scores and time, final-upgrade entry and
 wind-up, lethal ordering, false-win cases, duplicate updates, frozen state/result,
 restart retention, status-callback restart/destroy, loop suspension, terminal
-render/theme/resize and demo restart compatibility. WS-6.8 still owns result
-publication and its exactly-once event acceptance; WS-6.9 owns comprehensive
+render/theme/resize and demo restart compatibility. WS-6.8 adds tested result
+publication and standalone UI below; WS-6.9 owns comprehensive
 fresh-run replay equivalence.
 
 **Pending manual acceptance — Dimi:** confirm boss defeat visibly ends gameplay.
@@ -843,7 +844,7 @@ does not validate whether the supplied outcome/progress is reachable; that
 belongs to session integration.
 
 **Integration:** WS-6.5 now supplies coherent application inputs and uses WS-6.7
-result construction. WS-6.8 still owns result publication and display.
+result construction. WS-6.8 publishes the committed result and displays it in the demo.
 Dimi must approve these rewards. Automated arithmetic tests do not provide
 human scoring approval or Gate 2 acceptance.
 
@@ -1047,10 +1048,66 @@ unchanged. The factory is internal; hosts receive the type only for now.
 
 **Integration:** WS-6.5 now commits terminal results using the gameplay clock and
 actual encounter progression, including boss entry/wind-up. It tests preservation
-of retained result references across restart. WS-6.8 owns delivery/UI and emitted
-result acceptance; WS-6.9 owns comprehensive replay equivalence. Dimi's confirmation
+of retained result references across restart. WS-6.8 now implements delivery/UI and
+automated event acceptance; WS-6.9 owns comprehensive replay equivalence. Dimi's confirmation
 that the fields are sufficient and understandable for a result screen remains
 pending; Gate 2 is not approved.
+
+### 15.6 WS-6.8 result publication and standalone flow
+
+The public `GameEvent` union adds
+`{ readonly type: "run-finished"; readonly result: RunResult }`. The package root
+already exports both types; the frontend loader now aliases the whole package
+event union, avoiding another schema. The portfolio host handles this variant
+explicitly without rendering a result screen (EPIC 7 owns that UI).
+
+**Completion notification order:** the shared terminal finalizer calculates and
+commits outcome, immutable result and progress/time first, resets movement, sets
+the session's per-run publication guard, then invokes `onEvent(run-finished)`.
+The frozen event contains the exact frozen `session.result` reference, not a
+recalculation or mutable runtime reference. Only after this event does terminal
+`onStatusChange` run, and only if the session is not destroyed and still owns the
+same completed state. Thus a completion-event callback can restart/destroy
+without stale terminal status overwriting a new run. A terminal-status callback
+can restart/destroy after the result is already delivered. Existing loop generation
+checks stop obsolete frame work. Duplicate/reentrant updates cannot republish;
+restart clears the guard for the next run. Abandoned restarts and destruction of
+unfinished runs emit no completion. No generic event bus or extra scheduler exists.
+
+**Standalone experience:** the game remains idle until the native Start button
+is activated. Brief instructions explain WASD/arrows, the phone's lower-left
+joystick, automatic firing, four waves/upgrades and the boss. Start focuses the
+Canvas. Visibility changes only pause/resume through existing phase guards;
+returning to the page cannot start an idle or terminal run.
+
+The demo uses explicit cases for all four event variants. `run-finished` clears
+stale upgrade options and shows a labelled semantic section with an outcome
+heading, a definition list for score/wave reached/elapsed time, and a native Replay
+button. All values come from the delivered `RunResult`; elapsed time is formatting
+only (`floor(seconds/60):floor(seconds%60)`, seconds padded to two digits). There
+is no DOM clock, score arithmetic, or per-frame update. Focus moves to the outcome
+heading and Tab reaches Replay; a polite live region announces the summary.
+Replay clears old panels/values, calls existing `restart()`, and focuses the Canvas.
+Only the defensive exhausted-upgrade fallback uses the older Restart control.
+
+The panels reuse the existing overlay/scroll layout, native controls and semantic
+system colors. Short portrait/landscape panels fill the viewport and scroll from
+the top; enlarged text can reach both headings and buttons. Essential content
+requires no motion. Start, upgrade, result, and replay listeners are released on
+page teardown. The portfolio remains unchanged in scope beyond event compatibility.
+
+**Evidence separation:** real session/controller tests cover both outcomes,
+exactly-once publication, frozen payloads, abandoned runs, multiple completed runs,
+and event/status callbacks that restart/destroy. Browser result tests use a mock
+public host and real DOM; they are UI evidence, not real boss defeat or score
+verification. A separate browser test uses the actual runtime for idle/keyboard
+Start and injected visibility changes. Keyboard/joystick adapters retain their
+existing automated coverage; Start/Replay also have native touch/keyboard tests.
+
+**Pending with Dimi:** verify a newcomer can start, understand win/loss and the
+result fields, and find Replay without coaching on PC and phone. Automated
+checks and screenshots do not establish that human judgment. WS-6.9 comprehensive
+replay, final tuning, and Gate 2 approval remain pending.
 
 ## 16. Accessibility and user control
 

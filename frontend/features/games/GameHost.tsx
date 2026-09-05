@@ -81,12 +81,20 @@ export function GameHost({
           viewport,
           theme: currentTheme,
           onEvent: (event) => {
-            if (!cancelled && event.type === "wave-started") {
-              setAnnouncement(
-                event.encounterKind === "boss"
-                  ? "Boss entering from the top. Move clear of the entry point."
-                  : `Wave ${event.waveNumber} started.`,
-              );
+            if (cancelled) return;
+            switch (event.type) {
+              case "wave-started":
+                setAnnouncement(
+                  event.encounterKind === "boss"
+                    ? "Boss entering from the top. Move clear of the entry point."
+                    : `Wave ${event.waveNumber} started.`,
+                );
+                return;
+              case "wave-cleared":
+              case "upgrade-choice-requested":
+              case "run-finished":
+                // Portfolio milestone/result UI belongs to EPIC 7.
+                return;
             }
           },
         });

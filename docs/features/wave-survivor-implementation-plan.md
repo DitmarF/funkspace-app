@@ -59,7 +59,8 @@ candidate. WS-6.7 adds the immutable public result type and internal factory.
 WS-6.2 adds active charger behavior and combat fixtures; WS-6.3 integrates
 production entry; WS-6.4 adds static action telegraphs and focused swept contact.
 WS-6.5 now integrates terminal victory/loss and committed scores/results. Result
-publication/UI, audio and persistence remain unimplemented; see evidence below.
+publication and standalone UI are now implemented by WS-6.8. Audio and persistence
+remain unimplemented; see evidence below.
 
 ### Safe assumptions
 
@@ -866,7 +867,8 @@ implemented and integrated by WS-6.5; Dimi's result-information review remains
 pending. WS-6.2 active charger behavior is implemented with deterministic
 combat fixtures; WS-6.3 production entry and WS-6.4 static action telegraphs are
 implemented. Dimi reports WS-6.4 manual checks PASS. WS-6.5 terminal completion
-is implemented; its visible-end manual check and Gate 2 remain pending.
+is implemented. WS-6.8 delivers the completion event and standalone Start/result/Replay
+flow; visible-end/newcomer manual checks and Gate 2 remain pending.
 
 ## Goal
 
@@ -916,13 +918,75 @@ EPIC 5.
 | **WS-6.4**  | Implement boss action telegraphing.       | Implemented static action cues, shared charge geometry and swept contact.                                                   | Automated checks pass; Dimi reports all task manual checks PASS (2026-09-05).                                             |
 | **WS-6.5**  | Implement victory.                        | Confirmed final-boss defeat commits won through shared win/loss finalization with frozen score/result.                      | Terminal suspension and callback safety tested; Dimi's visible-end check pending. Result publication is WS-6.8.           |
 | **WS-6.6**  | Define score calculation.                 | Implemented pure 10/100/500/100 candidate; WS-6.5 integrates authoritative terminal inputs.                                 | Numeric safety and integrated win/loss scores tested; final reward approval pending.                                      |
-| **WS-6.7**  | Define `RunResult`.                       | Implemented validated/frozen record and public type; WS-6.5 stores it once at completion.                                   | Terminal values and retained-result preservation tested; result-screen information review and WS-6.8 publication pending. |
-| **WS-6.8**  | Implement result event and UI.            | Standalone demo presents victory/defeat and replay.                                                                         | Event fires once per run and no post-result combat continues.                                                             |
+| **WS-6.7**  | Define `RunResult`.                       | Implemented validated/frozen public record, committed by WS-6.5 and published by WS-6.8.                                    | Value/immutability/public compatibility tests pass; Dimi's result-information review pending.                             |
+| **WS-6.8**  | Implement result event and UI.            | One guarded frozen completion event; deliberate Start, semantic result fields and Replay in the standalone demo.            | Runtime publication/reentrancy and separate browser UI checks pass; Dimi's newcomer review pending.                       |
 | **WS-6.9**  | Implement immediate replay.               | Restart from won or lost without page reload or controller recreation.                                                      | Replayed run is equivalent to a fresh run.                                                                                |
 | **WS-6.10** | Balance the full run.                     | Tune enemy speed, health, spawn timing, attack cooldown, upgrade strength, and upgrade frequency.                           | Player power grows, but movement remains important through the boss.                                                      |
 | **WS-6.11** | Add deterministic full-run test fixtures. | Use controlled seed and time to cover win and loss paths where practical.                                                   | Critical transitions do not depend on flaky real-time tests.                                                              |
 
-### WS-6.5 implementation and dependent acceptance
+### WS-6.8 implementation and dependent acceptance
+
+Implemented one frozen `run-finished` event per completed win/loss, carrying the
+already committed frozen result. A per-run guard is set before host callbacks.
+Order is commit → reset input → completion event → terminal status. If the event
+callback restarts/destroys, old terminal status is suppressed; existing loop
+generation checks prevent obsolete frames. Abandoned runs publish nothing and
+restart resets the guard. The frontend loader aliases the package event type;
+the portfolio consumer explicitly ignores completion pending EPIC 7 UI.
+
+The standalone demo starts idle with brief controls/auto-fire instructions and a
+native Start button. It explicitly handles all event variants, displays supplied
+outcome/score/wave/time in semantic DOM, and uses existing restart for Replay.
+Outcome focus, a polite summary, stale-panel cleanup, keyboard/touch activation,
+and scrolling full-viewport panels on short screens are implemented. No UI clock,
+score calculation, result schema, framework, dependency, or effects system is added.
+See [contract and evidence](./wave-survivor.md#156-ws-68-result-publication-and-standalone-flow).
+
+Executed WS-6.8 validation (2026-09-05), final checks all exit 0:
+
+- `pnpm --filter @funkspace/wave-survivor typecheck`.
+- `pnpm --filter @funkspace/wave-survivor test`: **879 tests / 56 files**,
+  including seven additional completion/publication/controller cases. These use
+  the actual runtime, score/result factory, and loop with deterministic fixtures.
+- `pnpm --filter @funkspace/wave-survivor exec tsc -p /private/tmp/ws63-tests.tsconfig.json`:
+  strict source/test checking via the existing temporary config that extends the
+  package tsconfig and clears test exclusions.
+- `pnpm --filter @funkspace/wave-survivor demo:build`: package TypeScript build
+  and standalone Vite production build pass.
+- `pnpm -F frontend exec tsc --noEmit` and
+  `pnpm exec vitest run frontend/features/games/GameHost.test.tsx frontend/features/games/GameLoader.test.ts`:
+  types pass; **6 tests / 2 files** pass, including exact event/result type
+  compatibility and explicit portfolio handling without result UI.
+- `pnpm lint`: frontend lint and repository-wide Prettier pass. Scoped ESLint
+  with `frontend/eslint.config.mjs` and `--max-warnings=0` also passes on the four
+  changed game TypeScript files, demo `main.js`, and the demo browser spec.
+- `pnpm exec cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.demo.config.ts`:
+  **16 browser tests** pass. Actual runtime idle/keyboard Start and visibility
+  gating are separate from mocked win/loss result delivery. UI cases cover
+  supplied fields/time formatting, keyboard/touch Start/Replay, focus, hidden
+  upgrades/results, short portrait/landscape, enlarged text, and existing themes.
+- `git diff --check` passes. Reviewed scope, type ownership, callback ordering,
+  stale notifications, listener teardown, and absence of duplicate clocks/scores.
+
+The first browser attempt had **8 passes / 8 failures**: the new UI fixture used
+a plain DOM Event instead of a CustomEvent carrying result data, and a reused
+local server stopped before the last checks. The fixture now dispatches typed
+CustomEvent data; reruns used a Playwright-owned server and passed all 16 tests.
+Screenshot review then prompted full-viewport short-screen panels to eliminate
+background text peeking around enlarged content; the final 16-test rerun passes.
+Inspected final Start/result screenshots in portrait, landscape and enlarged text.
+They are browser UI evidence, not newcomer or real-device acceptance.
+
+Existing Next-lint deprecation, root ESLint React/pages discovery notices, and
+Playwright color-environment notices remain non-failing. No generated tokens,
+dependencies, commits, deployments, or repository settings were changed.
+
+**Pending with Dimi:** newcomer can start, understand the outcome and find Replay
+without coaching. Runtime event tests and UI-only mocked event tests are separate;
+neither constitutes human acceptance. Comprehensive replay remains WS-6.9; final
+tuning and Gate 2 remain pending.
+
+### WS-6.5 implementation and dependent acceptance (historical baseline before WS-6.8)
 
 Implemented `won` and one shared win/loss finalizer. It commits one frozen result
 with final score, progress and overall simulation time before input reset and

@@ -63,7 +63,8 @@
         cursor: pointer;
       }
 
-      button:focus-visible {
+      button:focus-visible,
+      #game-result-outcome:focus-visible {
         outline: 3px solid Highlight;
         outline-offset: 3px;
       }
@@ -92,7 +93,7 @@
         aspect-ratio: 9 / 16;
       }
 
-      .upgrade-panel {
+      .game-panel {
         position: absolute;
         z-index: 1;
         inset-block: 0;
@@ -110,15 +111,37 @@
       }
 
       @media (max-height: 40rem) {
-        .upgrade-panel {
+        .game-panel {
           position: fixed;
-          inset-block: 1rem;
+          inset-block: 0;
+          left: 0;
+          width: 100%;
+          transform: none;
         }
       }
 
-      .upgrade-panel h2 {
+      .game-panel h2 {
         margin: 0 0 1rem;
         text-align: center;
+      }
+
+      .game-panel p {
+        margin-block-end: 1rem;
+        line-height: 1.5;
+      }
+
+      .game-panel dl {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 0 0 1.5rem;
+        overflow-wrap: anywhere;
+      }
+
+      .game-panel dd {
+        margin: 0;
+        text-align: end;
+        font-weight: 700;
       }
 
       .upgrade-options {
@@ -172,13 +195,46 @@
           </canvas>
         </div>
         <section
+          id="game-intro"
+          class="game-panel"
+          aria-labelledby="game-intro-heading"
+        >
+          <h2 id="game-intro-heading">Ready to survive?</h2>
+          <p>
+            Move with WASD or arrow keys. On a phone, drag the joystick at the
+            lower left.
+          </p>
+          <p>
+            You fire automatically. Keep moving, clear four waves, choose
+            upgrades, then defeat the boss.
+          </p>
+          <button id="game-start" type="button">Start game</button>
+        </section>
+        <section
           id="game-upgrades"
-          class="upgrade-panel"
+          class="game-panel"
           aria-labelledby="game-upgrades-heading"
           hidden
         >
           <h2 id="game-upgrades-heading">Choose an upgrade</h2>
           <div id="game-upgrade-options" class="upgrade-options"></div>
+        </section>
+        <section
+          id="game-result"
+          class="game-panel"
+          aria-labelledby="game-result-outcome"
+          hidden
+        >
+          <h2 id="game-result-outcome" tabindex="-1"></h2>
+          <dl>
+            <dt>Score</dt>
+            <dd id="game-result-score"></dd>
+            <dt>Wave reached</dt>
+            <dd id="game-result-wave"></dd>
+            <dt>Elapsed time</dt>
+            <dd id="game-result-time"></dd>
+          </dl>
+          <button id="game-replay" type="button">Replay</button>
         </section>
       </div>
       <section class="game-status-panel" aria-label="Game status">
@@ -188,7 +244,7 @@
       </section>
       <div class="game-feedback">
         <p id="game-announcement" role="status" aria-live="polite">
-          Starting arena…
+          Choose Start game when you are ready.
         </p>
         <button id="game-restart" type="button" hidden>Restart game</button>
       </div>

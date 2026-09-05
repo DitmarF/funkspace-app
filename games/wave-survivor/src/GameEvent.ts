@@ -1,4 +1,5 @@
 import type { UpgradeId } from "./domain/upgrades/index.js";
+import type { RunResult } from "./domain/result/RunResult.js";
 
 /** Immutable player-facing details for one offered run upgrade. */
 export interface UpgradeOption {
@@ -9,6 +10,10 @@ export interface UpgradeOption {
 
 /** Discrete immutable gameplay milestones emitted to standalone hosts. */
 export type GameEvent =
+  | {
+      readonly type: "run-finished";
+      readonly result: RunResult;
+    }
   | {
       readonly type: "wave-started";
       readonly waveNumber: number;

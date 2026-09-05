@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { INITIAL_UPGRADE_DEFINITIONS } from "../../games/wave-survivor/src/domain/upgrades/index.js";
 import { colors } from "../../common/generated/colors.js";
+import type { RunResult } from "../../games/wave-survivor/src/index.js";
 
 const options = INITIAL_UPGRADE_DEFINITIONS.map(
   ({ id, title, description }) => ({
@@ -16,6 +17,7 @@ async function openDemo(
   exhausted = false,
   clearImmediately = true,
   boss = false,
+  startImmediately = true,
 ): Promise<void> {
   await page.route(/\/dist\/index\.js(?:\?|$)/, (route) =>
     route.fulfill({
@@ -28,16 +30,19 @@ async function openDemo(
           const options = ${JSON.stringify(options)};
           const status = () => onStatusChange({ phase, waveNumber,
             currentHealth: 3, maximumHealth: 3, killCount: 4 });
+          status();
+          canvas.addEventListener("test-result", ({ detail }) => {
+            phase = detail.outcome;
+            waveNumber = detail.waveReached;
+            onEvent(Object.freeze({ type: "run-finished", result: Object.freeze({ ...detail }) }));
+            status();
+          });
           return {
             start() {
+              if (phase !== "idle") return;
               phase = "playing";
               status();
               onEvent({ type: "wave-started", waveNumber });
-              canvas.addEventListener("test-win", () => {
-                phase = "won";
-                waveNumber = 5;
-                status();
-              }, { once: true });
               canvas.addEventListener("test-clear-wave", () => {
                 phase = ${JSON.stringify(exhausted ? "wave-cleared" : "choosing-upgrade")};
                 onEvent({ type: "wave-cleared", waveNumber });
@@ -61,13 +66,17 @@ async function openDemo(
               status();
               onEvent({ type: "wave-started", waveNumber });
             },
-            pause() {}, resume() {}, setTheme() {}, destroy() {}
+            pause() { if (phase === "playing") { phase = "paused"; status(); } },
+            resume() { if (phase === "paused") { phase = "playing"; status(); } },
+            setTheme() {}, destroy() {}
           };
         }
       `,
     }),
   );
   await page.goto("/");
+  if (startImmediately)
+    await page.getByRole("button", { name: "Start game" }).click();
   if (clearImmediately) await clearWave(page);
 }
 
@@ -89,27 +98,130 @@ async function clearWave(page: Page): Promise<void> {
   await page.locator("#game-canvas").dispatchEvent("test-clear-wave");
 }
 
-test("announces terminal victory and keeps restart reachable", async ({
+/** UI-only delivery fixture, deliberately separate from runtime completion tests. */
+async function deliverMockResult(page: Page, result: RunResult): Promise<void> {
+  await page.locator("#game-canvas").evaluate((canvas, result) => {
+    canvas.dispatchEvent(new CustomEvent("test-result", { detail: result }));
+  }, result);
+}
+
+async function setVisibility(page: Page, hidden: boolean): Promise<void> {
+  await page.evaluate((hidden) => {
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      get: () => hidden,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  }, hidden);
+}
+
+test("real runtime stays idle until keyboard Start and only resumes paused gameplay", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await openDemo(page, false, false);
-  await page.locator("#game-canvas").dispatchEvent("test-win");
-  await expect(page.getByRole("status")).toContainText(
-    "You won. Restart is available.",
-  );
+  await page.goto("/");
   await expect(page.locator("#game-canvas")).toHaveAttribute(
     "data-game-state",
-    "won",
+    "idle",
   );
-  const restart = page.getByRole("button", { name: "Restart game" });
-  await expect(restart).toBeVisible();
-  await restart.click();
-  await expect(restart).toBeHidden();
+  await expect(page.getByText(/You fire automatically/)).toBeVisible();
+  await expect(page.getByText(/WASD or arrow keys/)).toBeVisible();
+  await setVisibility(page, true);
+  await setVisibility(page, false);
+  await expect(page.locator("#game-canvas")).toHaveAttribute(
+    "data-game-state",
+    "idle",
+  );
+  await page.getByRole("button", { name: "Start game" }).focus();
+  await page.keyboard.press("Space");
   await expect(page.locator("#game-canvas")).toBeFocused();
-  await expect(page.locator("#game-wave")).toHaveText("Wave: 1");
+  await expect(page.locator("#game-canvas")).toHaveAttribute(
+    "data-game-state",
+    "playing",
+  );
+  await page.keyboard.press("ArrowRight");
+  await setVisibility(page, true);
+  await expect(page.locator("#game-canvas")).toHaveAttribute(
+    "data-game-state",
+    "paused",
+  );
+  await setVisibility(page, false);
+  await expect(page.locator("#game-canvas")).toHaveAttribute(
+    "data-game-state",
+    "playing",
+  );
 });
+
+test.describe("native touch controls with mocked result delivery", () => {
+  test.use({ hasTouch: true });
+  test("Start and Replay respond to taps and terminal visibility never restarts", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openDemo(page, false, false, false, false);
+    await page.getByRole("button", { name: "Start game" }).tap();
+    await deliverMockResult(page, {
+      outcome: "lost",
+      score: 0,
+      waveReached: 1,
+      elapsedSeconds: 9.9,
+    });
+    await setVisibility(page, true);
+    await setVisibility(page, false);
+    await expect(page.locator("#game-canvas")).toHaveAttribute(
+      "data-game-state",
+      "lost",
+    );
+    await expect(page.locator("#game-result-time")).toHaveText("0:09");
+    await page.getByRole("button", { name: "Replay", exact: true }).tap();
+    await expect(page.locator("#game-canvas")).toHaveAttribute(
+      "data-game-state",
+      "playing",
+    );
+    await expect(page.locator("#game-result")).toBeHidden();
+  });
+});
+
+for (const outcome of ["won", "lost"] as const)
+  test(`mocked ${outcome} result displays supplied fields and keyboard Replay`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await openDemo(page, false, false);
+    await clearWave(page);
+    await expect(page.locator("#game-upgrades")).toBeVisible();
+    await deliverMockResult(page, {
+      outcome,
+      score: 1234,
+      waveReached: 5,
+      elapsedSeconds: 125.9,
+    });
+    await expect(page.getByRole("status")).toContainText(
+      "Replay is available.",
+    );
+    await expect(page.locator("#game-canvas")).toHaveAttribute(
+      "data-game-state",
+      outcome,
+    );
+    await expect(page.locator("#game-result-outcome")).toHaveText(
+      outcome === "won" ? "You won!" : "You lost",
+    );
+    await expect(page.locator("#game-result-score")).toHaveText("1234");
+    await expect(page.locator("#game-result-wave")).toHaveText("5");
+    await expect(page.locator("#game-result-time")).toHaveText("2:05");
+    await expect(page.locator("#game-result-outcome")).toBeFocused();
+    const restart = page.getByRole("button", { name: "Replay", exact: true });
+    await expect(restart).toBeVisible();
+    await page.keyboard.press("Tab");
+    await expect(restart).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(restart).toBeHidden();
+    await expect(page.locator("#game-canvas")).toBeFocused();
+    await expect(page.locator("#game-wave")).toHaveText("Wave: 1");
+    await expect(page.locator("#game-result")).toBeHidden();
+    await expect(page.locator("#game-upgrades")).toBeHidden();
+    await expect(page.locator("#game-intro")).toBeHidden();
+  });
 
 test("renders the actual boss entry warning in monochrome reduced motion", async ({
   page,
@@ -292,11 +404,14 @@ async function readPageLayout(page: Page) {
   }));
 }
 
-async function expectFullyReachable(item: Locator): Promise<void> {
+async function expectFullyReachable(
+  item: Locator,
+  panelSelector = "#game-upgrades",
+): Promise<void> {
   await item.scrollIntoViewIfNeeded();
-  const bounds = await item.evaluate((element) => {
+  const bounds = await item.evaluate((element, panelSelector) => {
     const rect = element.getBoundingClientRect();
-    const panel = document.querySelector("#game-upgrades")!;
+    const panel = document.querySelector(panelSelector)!;
     const clip = panel.getBoundingClientRect();
     return {
       top: rect.top,
@@ -308,7 +423,7 @@ async function expectFullyReachable(item: Locator): Promise<void> {
       clipLeft: Math.max(0, clip.left),
       clipRight: Math.min(window.innerWidth, clip.left + panel.clientWidth),
     };
-  });
+  }, panelSelector);
   expect(bounds.top).toBeGreaterThanOrEqual(bounds.clipTop - 1);
   expect(bounds.bottom).toBeLessThanOrEqual(bounds.clipBottom + 1);
   expect(bounds.left).toBeGreaterThanOrEqual(bounds.clipLeft - 1);
@@ -321,14 +436,22 @@ for (const { name, width, height, textScale } of [
   { name: "landscape", width: 640, height: 360, textScale: 1 },
   { name: "enlarged text", width: 390, height: 600, textScale: 2 },
 ]) {
-  test(`overlay stays reachable without shifting the page in ${name}`, async ({
+  test(`upgrade and result panels stay reachable in ${name}`, async ({
     page,
-  }) => {
+  }, testInfo) => {
     await page.setViewportSize({ width, height });
-    await openDemo(page, false, false);
+    await openDemo(page, false, false, false, false);
     await page.addStyleTag({
       content: `:root { font-size: ${textScale * 100}%; }`,
     });
+    const intro = page.getByRole("region", { name: "Ready to survive?" });
+    await expectFullyReachable(intro.getByRole("heading"), "#game-intro");
+    await page.screenshot({ path: testInfo.outputPath("start.png") });
+    await expectFullyReachable(
+      intro.getByRole("button", { name: "Start game" }),
+      "#game-intro",
+    );
+    await intro.getByRole("button", { name: "Start game" }).click();
     const playingLayout = await readPageLayout(page);
     await clearWave(page);
     const panel = page.getByRole("region", { name: "Choose an upgrade" });
@@ -358,6 +481,25 @@ for (const { name, width, height, textScale } of [
     await expect(page.locator("#game-canvas")).toBeFocused();
     await expect(page.locator("#game-wave")).toHaveText("Wave: 2");
     expect(await readPageLayout(page)).toEqual(playingLayout);
+    await deliverMockResult(page, {
+      outcome: "won",
+      score: 1290,
+      waveReached: 5,
+      elapsedSeconds: 65.75,
+    });
+    await expect(panel).toBeHidden();
+    await expect(buttons).toHaveCount(0);
+    const result = page.getByRole("region", { name: "You won!" });
+    await expect(result).toBeVisible();
+    await expectFullyReachable(result.getByRole("heading"), "#game-result");
+    await expectFullyReachable(
+      result.getByRole("button", { name: "Replay" }),
+      "#game-result",
+    );
+    await page.screenshot({ path: testInfo.outputPath("result.png") });
+    await result.getByRole("button", { name: "Replay" }).click();
+    await expect(result).toBeHidden();
+    await expect(page.locator("#game-canvas")).toBeFocused();
   });
 }
 

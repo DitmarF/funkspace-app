@@ -102,6 +102,7 @@ const NO_PENDING_UPGRADE_OPTIONS: readonly UpgradeId[] = Object.freeze([]);
 /** Owns the current deterministic session and coordinates one fixed update. */
 export class GameRuntimeSession {
   private destroyed = false;
+  private completionPublished = false;
   private lastStatusSnapshot: GameStatusSnapshot | null = null;
 
   constructor(
@@ -125,7 +126,7 @@ export class GameRuntimeSession {
     return this.state.phase;
   }
 
-  /** Internal committed boundary for future result publication (WS-6.8). */
+  /** The committed result shared by completion publication and internal callers. */
   get result(): RunResult | null {
     return this.state.result;
   }
@@ -249,6 +250,7 @@ export class GameRuntimeSession {
     this.spawnRandomSource.reset();
     this.upgradeRandomSource.reset();
     this.state = createInitialRuntimeState();
+    this.completionPublished = false;
     this.state.phase = "playing";
     this.lastStatusSnapshot = null;
     this.emitStatusIfChanged();
@@ -672,8 +674,16 @@ export class GameRuntimeSession {
     this.state.phase = outcome;
     this.state.player.currentHealth = currentHealth;
     this.state.pendingUpgradeOptionIds = NO_PENDING_UPGRADE_OPTIONS;
+    const completedState = this.state;
     this.resetMovementInput();
-    this.emitStatusIfChanged();
+    // Guard before callbacks: reentrant updates cannot publish twice. Publish
+    // before terminal status so a status-driven restart cannot suppress delivery.
+    if (!this.completionPublished) {
+      this.completionPublished = true;
+      this.emitEvent(Object.freeze({ type: "run-finished", result }));
+    }
+    if (!this.destroyed && this.state === completedState)
+      this.emitStatusIfChanged();
   }
 
   private transitionToWaveClearedIfComplete(): boolean {

@@ -166,7 +166,7 @@ victory behavior. WS-6.10 still owns final tuning.
 constructs a frozen `RunResult`, and commits it to `RuntimeState.result` before
 resetting input and notifying status observers. The internal `session.result`
 getter returns that same object; rendering and status never recalculate it.
-No result event or result-field UI is added; WS-6.8 owns publication and display.
+WS-6.8 now publishes that result and displays it in the standalone demo.
 
 Victory requires a valid active charger to transition to dying through existing
 defeat accounting in the final encounter. Missing, invalid, escaped, or already
@@ -188,9 +188,49 @@ and Restart button support both outcomes. Restart creates fresh state/result;
 previous result references remain frozen. A loop generation guard prevents a
 callback-driven restart/destroy from continuing the old frame.
 
-**Pending with Dimi:** confirm boss defeat visibly ends gameplay. Result event/UI
-acceptance (WS-6.8), comprehensive replay (WS-6.9), final tuning and Gate 2 remain
+**Pending with Dimi:** confirm boss defeat visibly ends gameplay. Newcomer review
+of the result flow, comprehensive replay (WS-6.9), final tuning and Gate 2 remain
 pending. See the [terminal rules and evidence](../../docs/features/wave-survivor.md#1010-ws-65-terminal-completion).
+
+## WS-6.8 standalone Start → result → Replay
+
+The demo initially stays idle behind movement/auto-fire instructions and a native
+**Start game** button. Starting hides the instructions and focuses the Canvas.
+Visibility return calls the existing guarded resume; it cannot start idle or
+terminal runs. Keyboard and joystick gameplay remain in the existing adapters.
+
+Each completed run publishes one frozen public event:
+
+```ts
+{ readonly type: "run-finished"; readonly result: RunResult }
+```
+
+The event holds the already-finalized frozen result. Notification order is commit
+result/outcome → reset movement → guarded `run-finished` → terminal status. The
+publication flag is set before calling the host. If that callback restarts or
+destroys, obsolete terminal status is suppressed using the completed run's state
+identity. A status callback may also restart/destroy safely after publication.
+Restart resets the per-run guard; abandoned or destroyed unfinished runs publish
+nothing. No new event bus, live score, clock, or result recalculation is added.
+
+The demo explicitly switches over every event variant. Its semantic result panel
+shows **You won! / You lost**, score, wave reached, and elapsed time formatted as
+minutes:seconds (fractional seconds omitted). A native **Replay** button calls
+the existing `restart()`. Focus moves to the outcome heading; Tab reaches Replay.
+A polite announcement summarizes the supplied record. Start/result/upgrade
+panels are mutually hidden as appropriate; replay clears stale results/options
+and returns focus to the Canvas. Panels scroll and fill short screens, including
+landscape and enlarged text. The defensive upgrade-exhaustion Restart remains.
+
+The frontend loader aliases the package `GameEvent`, including its `RunResult`.
+The current portfolio host explicitly ignores result/upgrade milestones until
+EPIC 7; no portfolio result UI is implemented here.
+
+Real runtime fixtures prove publication/immutability and callback safety. Mocked
+result events in browser tests prove DOM behavior only; a separate real-runtime
+browser check proves idle/Start and visibility gating. **Pending with Dimi:**
+verify a newcomer can start, understand the outcome, and find Replay without
+coaching. See the [event/UI contract](../../docs/features/wave-survivor.md#156-ws-68-result-publication-and-standalone-flow).
 
 ## WS-6.6 score candidate
 
@@ -247,11 +287,11 @@ boss entry/wind-up, excluding idle, pauses, upgrade selection, and terminal
 time. The per-wave schedule clock is unsuitable because it pauses at capacity.
 
 See [field ownership and integration requirements](../../docs/features/wave-survivor.md#155-ws-67-completion-record).
-The frontend loader aliases the package type. Result events/UI (WS-6.8)
-and comprehensive replay verification (WS-6.9) remain pending. WS-6.5 tests
+The frontend loader aliases the package type. WS-6.8 delivers results and the
+standalone result UI; comprehensive replay verification (WS-6.9) remains pending. WS-6.5 tests
 terminal sampling and preservation of retained result references across restart.
-No result is currently emitted or displayed. Boss entry does not itself complete
-the run. Dimi's review of the result information remains pending.
+Boss entry does not itself complete the run. Dimi's review of the result
+information and newcomer flow remains pending.
 
 ```ts
 import {
@@ -302,7 +342,7 @@ run. The old Wave 16 repeat endpoint was removed by WS-6.3. WS-6.5 implements
 runtime victory behavior.
 
 The optional `onEvent` callback receives frozen `wave-started`, `wave-cleared`,
-and `upgrade-choice-requested` events. Upgrade-choice events contain a frozen
+`upgrade-choice-requested`, and `run-finished` events. Upgrade-choice events contain a frozen
 array of copied `{ id, title, description }` option DTOs; effect definitions,
 runtime entities, scheduler state, and random sources remain private.
 
@@ -332,7 +372,7 @@ that lifecycle contract.
 - `src/index.ts` is the only package entry point. Export public integration
   contracts deliberately; internal layers remain private.
 
-The frontend loader mirrors the event and selection contract, but the current
+The frontend loader aliases the event contract and mirrors selection details, but the current
 React `GameHost` does not render upgrade controls. The standalone demo is the
 playable upgrade flow; the portfolio shell remains EPIC 7 work.
 

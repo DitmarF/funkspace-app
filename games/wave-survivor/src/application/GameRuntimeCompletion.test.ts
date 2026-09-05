@@ -14,7 +14,10 @@ import {
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
 
-function fixture(onStatus?: (status: GameStatusSnapshot) => void) {
+function fixture(
+  onStatus?: (status: GameStatusSnapshot) => void,
+  onEvent?: (event: GameEvent) => void,
+) {
   const state = createInitialRuntimeState();
   state.waveSchedule = null;
   state.killCount = 28;
@@ -47,7 +50,10 @@ function fixture(onStatus?: (status: GameStatusSnapshot) => void) {
     new SeededRandomSource(2),
     null,
     onStatus ?? null,
-    (event) => events.push(event),
+    (event) => {
+      events.push(event);
+      onEvent?.(event);
+    },
   );
   session.start();
   events.length = 0;
@@ -66,6 +72,95 @@ function lethalProjectile(state: ReturnType<typeof createInitialRuntimeState>) {
 }
 
 describe("committed run completion", () => {
+  it.each(["won", "lost"] as const)(
+    "publishes one immutable %s payload before terminal status",
+    (outcome) => {
+      const order: string[] = [];
+      const { state, boss, session, events } = fixture(
+        (status) => {
+          order.push(status.phase);
+        },
+        (event) => {
+          order.push(event.type);
+          if (event.type !== "run-finished") return;
+          expect(session.result).toBe(event.result);
+          expect(state.phase).toBe(outcome);
+          expect(Object.isFrozen(event)).toBe(true);
+          expect(Object.isFrozen(event.result)).toBe(true);
+          expect(Reflect.set(event.result, "score", -1)).toBe(false);
+          expect(Reflect.set(event, "type", "wave-cleared")).toBe(false);
+          session.fixedUpdate(20);
+          session.render();
+        },
+      );
+      order.length = 0;
+      if (outcome === "won") {
+        boss.currentHealth = 1;
+        lethalProjectile(state);
+      } else state.player.currentHealth = 1;
+      session.fixedUpdate(1 / 60);
+      session.fixedUpdate(20);
+      expect(order).toEqual(["run-finished", outcome]);
+      expect(events).toHaveLength(1);
+      session.destroy();
+    },
+  );
+
+  it.each(["restart", "destroy"] as const)(
+    "completion event %s suppresses obsolete terminal status",
+    (action) => {
+      const statuses: string[] = [];
+      const { state, boss, session, events } = fixture(
+        (status) => {
+          statuses.push(status.phase);
+        },
+        (event) => {
+          if (event.type === "run-finished") session[action]();
+        },
+      );
+      statuses.length = 0;
+      boss.currentHealth = 1;
+      lethalProjectile(state);
+      session.fixedUpdate(1 / 60);
+      expect(statuses).toEqual(action === "restart" ? ["playing"] : []);
+      expect(events.map((event) => event.type)).toEqual(
+        action === "restart"
+          ? ["run-finished", "wave-started"]
+          : ["run-finished"],
+      );
+      expect(session.result).toBe(action === "restart" ? null : state.result);
+      session.destroy();
+    },
+  );
+
+  it("resets publication for a new run and never publishes abandoned runs", () => {
+    const { state, boss, session, events } = fixture();
+    boss.currentHealth = 0;
+    session.fixedUpdate(1 / 60);
+    const first = session.result;
+    expect(
+      events.filter((event) => event.type === "run-finished"),
+    ).toHaveLength(1);
+    session.restart();
+    session.restart(); // Abandoned, unfinished run.
+    expect(session.result).toBeNull();
+    // Large injected deterministic steps force contact loss in the fresh run.
+    for (let i = 0; i < 10 && session.result === null; i += 1)
+      session.fixedUpdate(10);
+    expect(session.result?.outcome).toBe("lost");
+    expect(session.result).not.toBe(first);
+    expect(state.result).toBe(first);
+    expect(
+      events.filter((event) => event.type === "run-finished"),
+    ).toHaveLength(2);
+    session.restart();
+    session.destroy();
+    session.fixedUpdate(10);
+    expect(
+      events.filter((event) => event.type === "run-finished"),
+    ).toHaveLength(2);
+  });
+
   it("finalizes boss victory once with authoritative kills, four normal clears, upgraded health and time", () => {
     const { state, boss, session, input, events, presentation } = fixture();
     boss.currentHealth = 1;
@@ -84,7 +179,7 @@ describe("committed run completion", () => {
     expect(state.player.currentHealth).toBe(5);
     expect(input.reset).toHaveBeenCalled();
     expect(state.movementIntent).toEqual({ x: 0, y: 0 });
-    expect(events).toEqual([]); // WS-6.8 owns publication; no extra upgrade/event.
+    expect(events).toEqual([{ type: "run-finished", result }]);
     const completed = structuredClone(state);
     for (let i = 0; i < 10; i += 1) session.fixedUpdate(10);
     expect(session.start()).toBe(false);
@@ -284,9 +379,12 @@ describe("committed run completion", () => {
         expect(observed).not.toBeNull();
         if (action === "restart") {
           expect(session.result).toBeNull();
-          expect(events).toEqual([{ type: "wave-started", waveNumber: 1 }]);
+          expect(events).toEqual([
+            { type: "run-finished", result: observed },
+            { type: "wave-started", waveNumber: 1 },
+          ]);
         } else {
-          expect(events).toEqual([]);
+          expect(events).toEqual([{ type: "run-finished", result: observed }]);
           expect(session.start()).toBe(false);
           expect(session.resume()).toBe(false);
           session.restart();
