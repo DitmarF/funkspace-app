@@ -181,6 +181,41 @@ describe("createGame", () => {
 });
 
 describe("GameController runtime lifecycle", () => {
+  it.each(["restart", "pause", "destroy"] as const)(
+    "respects a %s callback during replay without duplicate wave notifications",
+    (action) => {
+      let armed = false;
+      const events: GameEvent[] = [];
+      const harness = createHarness(
+        null,
+        (status) => {
+          if (!armed || status.phase !== "playing") return;
+          armed = false;
+          harness.controller[action]();
+        },
+        (event) => events.push(event),
+      );
+      harness.controller.start();
+      events.length = 0;
+      armed = true;
+      harness.controller.restart();
+      expect(events.map((event) => event.type)).toEqual(
+        action === "destroy" ? [] : ["wave-started"],
+      );
+      expect(harness.frameScheduler.pendingFrameCount).toBe(
+        action === "restart" ? 1 : 0,
+      );
+      expect(harness.controller.lifecycleState).toBe(
+        action === "restart"
+          ? "running"
+          : action === "pause"
+            ? "paused"
+            : "destroyed",
+      );
+      harness.controller.destroy();
+    },
+  );
+
   it("suspends an exhausted upgrade pool and restarts with exactly one frame", () => {
     const harness = createHarness();
     harness.state.upgrades = createRunUpgradeState({
@@ -491,6 +526,7 @@ describe("GameController runtime lifecycle", () => {
     "wave-cleared",
     "choosing-upgrade",
     "lost",
+    "won",
   ] as const)(
     "keeps exactly one pending frame after repeated restart from %s",
     (startingPhase) => {
@@ -510,6 +546,16 @@ describe("GameController runtime lifecycle", () => {
         clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
         frameScheduler.runNextFrame();
         expect(controller.lifecycleState).toBe("lost");
+      }
+      if (startingPhase === "won") {
+        state.waveSchedule = null;
+        const boss = createChargerBossState(29, { x: 180, y: 100 });
+        boss.phase = "active";
+        boss.currentHealth = 0;
+        state.enemies = [boss];
+        clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+        frameScheduler.runNextFrame();
+        expect(controller.lifecycleState).toBe("won");
       }
 
       controller.restart();

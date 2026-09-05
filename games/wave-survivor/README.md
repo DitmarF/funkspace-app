@@ -188,9 +188,9 @@ and Restart button support both outcomes. Restart creates fresh state/result;
 previous result references remain frozen. A loop generation guard prevents a
 callback-driven restart/destroy from continuing the old frame.
 
-**Pending with Dimi:** confirm boss defeat visibly ends gameplay. Newcomer review
-of the result flow, comprehensive replay (WS-6.9), final tuning and Gate 2 remain
-pending. See the [terminal rules and evidence](../../docs/features/wave-survivor.md#1010-ws-65-terminal-completion).
+WS-6.8 newcomer checks were reported PASS by Dimi (2026-09-05). WS-6.9 replay
+automation is implemented below; repeated real-device replay, final tuning and
+Gate 2 remain pending. See the [terminal rules and evidence](../../docs/features/wave-survivor.md#1010-ws-65-terminal-completion).
 
 ## WS-6.8 standalone Start → result → Replay
 
@@ -228,9 +228,35 @@ EPIC 7; no portfolio result UI is implemented here.
 
 Real runtime fixtures prove publication/immutability and callback safety. Mocked
 result events in browser tests prove DOM behavior only; a separate real-runtime
-browser check proves idle/Start and visibility gating. **Pending with Dimi:**
-verify a newcomer can start, understand the outcome, and find Replay without
-coaching. See the [event/UI contract](../../docs/features/wave-survivor.md#156-ws-68-result-publication-and-standalone-flow).
+browser check proves idle/Start and visibility gating. **Manual update:** Dimi
+reports the WS-6.8 newcomer checks PASS (2026-09-05); no device models or duration
+measurements were supplied. See the [event/UI contract](../../docs/features/wave-survivor.md#156-ws-68-result-publication-and-standalone-flow).
+
+## WS-6.9 immediate replay
+
+Replay reuses the controller, Canvas, renderer, resolved theme and input adapters.
+The existing initial-state factory resets all gameplay fields, result and boss
+state; both seeded streams rewind under the unchanged production seed policy.
+The one loop stops and clears accumulated time before restarting. Retained frozen
+results stay unchanged, and each newly completed run can publish exactly once.
+Restart callbacks cannot append an obsolete wave notification or override pause.
+
+Held-key repeats cannot revive cleared movement; release and press again. Replay
+releases joystick capture, so an old pointer gesture cannot move the new player.
+The demo clears result/upgrade panels and restores Canvas focus. Hidden activation
+immediately pauses the new run and defers focus until visibility returns.
+
+Automated fixtures compare full state and event/status/render sequences for fresh
+win/loss runs against three replays, exercising both streams, all four choices and
+boss actions. Controlled enemy defeats/invulnerability make these lifecycle tests,
+not pacing evidence. Browser mocked results separately verify UI cleanup.
+
+**Pending with Dimi:** on PC and smartphone, replay at least three times including
+both victory and loss; check fresh health/upgrades, no old boss/projectiles, usable
+focus/joystick, and one result each time. Hold a movement key or drag the joystick
+across an interruption, release/cancel, then replay; movement must start neutral.
+Switch tabs/apps around Replay and return: no hidden progress or time jump.
+This task's real-device confirmation and Gate 2 remain separate from automation.
 
 ## WS-6.6 score candidate
 
@@ -288,10 +314,10 @@ time. The per-wave schedule clock is unsuitable because it pauses at capacity.
 
 See [field ownership and integration requirements](../../docs/features/wave-survivor.md#155-ws-67-completion-record).
 The frontend loader aliases the package type. WS-6.8 delivers results and the
-standalone result UI; comprehensive replay verification (WS-6.9) remains pending. WS-6.5 tests
+standalone result UI; WS-6.9 adds deterministic replay verification. WS-6.5 tests
 terminal sampling and preservation of retained result references across restart.
-Boss entry does not itself complete the run. Dimi's review of the result
-information and newcomer flow remains pending.
+Boss entry does not itself complete the run. Dimi reported the WS-6.8 newcomer
+flow PASS; final Gate 2 approval remains pending.
 
 ```ts
 import {

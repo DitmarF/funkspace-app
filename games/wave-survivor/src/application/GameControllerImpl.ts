@@ -52,7 +52,7 @@ export class GameControllerImpl implements GameController {
 
     this.loop?.stop();
     this.session.restart();
-    this.loop?.start();
+    if (this.session?.phase === "playing") this.loop?.start();
   }
 
   chooseUpgrade(id: string): boolean {

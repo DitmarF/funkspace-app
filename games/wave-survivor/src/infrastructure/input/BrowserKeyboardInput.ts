@@ -91,6 +91,8 @@ export class BrowserKeyboardInput implements MovementInputPort {
     if (this.destroyed || !isMovementKeyCode(event.code)) return;
 
     event.preventDefault();
+    // A held key must not re-enter the cleared set after replay or interruption.
+    if (event.repeat) return;
     this.heldKeys.add(event.code);
   };
 

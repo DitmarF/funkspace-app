@@ -46,6 +46,7 @@ let previousPhase = null;
 let selectionInProgress = false;
 let selectedUpgradeTitle = null;
 let restartInProgress = false;
+let focusOnVisibilityReturn = false;
 const optionTitlesById = new Map();
 
 const clearUpgradeOptions = () => {
@@ -179,7 +180,9 @@ const handleStart = () => {
   introPanel.hidden = true;
   startButton.disabled = true;
   game.start();
-  canvas.focus({ preventScroll: true });
+  focusOnVisibilityReturn = document.hidden;
+  if (document.hidden) game.pause();
+  else canvas.focus({ preventScroll: true });
 };
 
 const handleRestart = () => {
@@ -191,7 +194,9 @@ const handleRestart = () => {
   selectionInProgress = false;
   game.restart();
   restartInProgress = false;
-  canvas.focus({ preventScroll: true });
+  focusOnVisibilityReturn = document.hidden;
+  if (document.hidden) game.pause();
+  else canvas.focus({ preventScroll: true });
 };
 
 const handleUpgradeSelection = (event) => {
@@ -233,6 +238,10 @@ const handleVisibilityChange = () => {
     game.pause();
   } else {
     game.resume();
+    if (focusOnVisibilityReturn && previousPhase === "playing") {
+      canvas.focus({ preventScroll: true });
+    }
+    focusOnVisibilityReturn = false;
   }
 };
 
@@ -246,6 +255,7 @@ const destroyGame = () => {
   selectionInProgress = false;
   selectedUpgradeTitle = null;
   restartInProgress = false;
+  focusOnVisibilityReturn = false;
   hideAndClearUpgradePanel();
   clearResult();
   game.destroy();

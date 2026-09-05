@@ -186,6 +186,40 @@ function createHarness() {
 }
 
 describe("game input lifecycle integration", () => {
+  it("requires a fresh key press after replay despite held-key repeat events", () => {
+    const harness = createHarness();
+    harness.controller.start();
+    harness.activateKeyboard();
+    harness.controller.restart();
+    harness.surface.emit("keydown", {
+      ...createKeyboardEvent("KeyD"),
+      repeat: true,
+    });
+    harness.session.fixedUpdate(FIXED_SIMULATION_STEP_SECONDS);
+    expect(harness.renderPlayerX()).toBe(180);
+    harness.surface.emit("keyup", createKeyboardEvent("KeyD"));
+    harness.activateKeyboard();
+    harness.session.fixedUpdate(FIXED_SIMULATION_STEP_SECONDS);
+    expect(harness.renderPlayerX()).toBeGreaterThan(180);
+    harness.controller.destroy();
+  });
+
+  it("ignores old pointer movement/cancellation after replay and accepts a new gesture", () => {
+    const harness = createHarness();
+    harness.controller.start();
+    harness.activateJoystick();
+    harness.controller.restart();
+    harness.surface.emit("pointermove", createPointerEvent("move"));
+    harness.surface.emit("pointercancel", createPointerEvent("move"));
+    expect(harness.input.readMovementIntent()).toBe(ZERO_MOVEMENT_INTENT);
+    expect(harness.surface.capturedPointerIds.size).toBe(0);
+    harness.activateJoystick();
+    expect(harness.input.readMovementIntent()).toEqual({ x: 1, y: 0 });
+    harness.surface.emit("pointercancel", createPointerEvent("move"));
+    expect(harness.input.readMovementIntent()).toBe(ZERO_MOVEMENT_INTENT);
+    harness.controller.destroy();
+  });
+
   it.each([
     [
       "keyboard",

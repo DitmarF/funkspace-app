@@ -181,6 +181,68 @@ test.describe("native touch controls with mocked result delivery", () => {
   });
 });
 
+test("real runtime pauses hidden Start/replay activation and preserves the mounted canvas", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const canvas = page.locator("#game-canvas");
+  const originalCanvas = await canvas.elementHandle();
+  await setVisibility(page, true);
+  await page.getByRole("button", { name: "Start game" }).dispatchEvent("click");
+  await expect(canvas).toHaveAttribute("data-game-state", "paused");
+  for (let replay = 0; replay < 3; replay += 1) {
+    // Programmatic activation covers a queued click arriving after the page hides.
+    await page.locator("#game-replay").dispatchEvent("click");
+    await expect(canvas).toHaveAttribute("data-game-state", "paused");
+  }
+  await setVisibility(page, false);
+  await expect(canvas).toHaveAttribute("data-game-state", "playing");
+  await expect(canvas).toBeFocused();
+  expect(
+    await originalCanvas?.evaluate(
+      (node) => node === document.querySelector("#game-canvas"),
+    ),
+  ).toBe(true);
+  await page.evaluate(() => window.dispatchEvent(new Event("pagehide")));
+  const status = await canvas.getAttribute("data-game-state");
+  await page.locator("#game-replay").dispatchEvent("click");
+  await setVisibility(page, true);
+  await setVisibility(page, false);
+  await expect(canvas).toHaveAttribute("data-game-state", status!);
+});
+
+test("mocked alternating results clear every replay panel and recover from hidden activation", async ({
+  page,
+}) => {
+  await openDemo(page, false, false);
+  for (const outcome of ["won", "lost", "won", "lost"] as const) {
+    await deliverMockResult(page, {
+      outcome,
+      score: 123,
+      waveReached: 5,
+      elapsedSeconds: 62,
+    });
+    await expect(page.locator("#game-result-outcome")).toBeFocused();
+    await setVisibility(page, true);
+    await page
+      .getByRole("button", { name: "Replay", exact: true })
+      .dispatchEvent("click");
+    await expect(page.locator("#game-canvas")).toHaveAttribute(
+      "data-game-state",
+      "paused",
+    );
+    await expect(page.locator("#game-result")).toBeHidden();
+    await expect(page.locator("#game-upgrades")).toBeHidden();
+    await expect(page.locator("#game-result-score")).toBeEmpty();
+    await setVisibility(page, false);
+    await expect(page.locator("#game-canvas")).toHaveAttribute(
+      "data-game-state",
+      "playing",
+    );
+    await expect(page.locator("#game-canvas")).toBeFocused();
+  }
+});
+
 for (const outcome of ["won", "lost"] as const)
   test(`mocked ${outcome} result displays supplied fields and keyboard Replay`, async ({
     page,

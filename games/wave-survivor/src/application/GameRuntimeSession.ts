@@ -253,8 +253,10 @@ export class GameRuntimeSession {
     this.completionPublished = false;
     this.state.phase = "playing";
     this.lastStatusSnapshot = null;
+    const restartedState = this.state;
     this.emitStatusIfChanged();
-    this.emitWaveStarted();
+    if (!this.destroyed && this.state === restartedState)
+      this.emitWaveStarted();
   }
 
   fixedUpdate(deltaSeconds: number): void {

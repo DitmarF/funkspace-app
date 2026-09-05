@@ -1049,9 +1049,8 @@ unchanged. The factory is internal; hosts receive the type only for now.
 **Integration:** WS-6.5 now commits terminal results using the gameplay clock and
 actual encounter progression, including boss entry/wind-up. It tests preservation
 of retained result references across restart. WS-6.8 now implements delivery/UI and
-automated event acceptance; WS-6.9 owns comprehensive replay equivalence. Dimi's confirmation
-that the fields are sufficient and understandable for a result screen remains
-pending; Gate 2 is not approved.
+automated event acceptance; WS-6.9 adds replay equivalence tests. Dimi reports the
+WS-6.8 newcomer/result-flow checks PASS (2026-09-05); Gate 2 is not approved.
 
 ### 15.6 WS-6.8 result publication and standalone flow
 
@@ -1104,10 +1103,52 @@ verification. A separate browser test uses the actual runtime for idle/keyboard
 Start and injected visibility changes. Keyboard/joystick adapters retain their
 existing automated coverage; Start/Replay also have native touch/keyboard tests.
 
-**Pending with Dimi:** verify a newcomer can start, understand win/loss and the
-result fields, and find Replay without coaching on PC and phone. Automated
-checks and screenshots do not establish that human judgment. WS-6.9 comprehensive
-replay, final tuning, and Gate 2 approval remain pending.
+**Manual update — 2026-09-05:** Dimi reports WS-6.8 manual checks PASS: newcomer
+Start, understandable outcome and reachable Replay. No device models or timing
+measurements were supplied. This records human confirmation separately from
+automation; it does not approve full-run tuning or Gate 2.
+
+### 15.7 WS-6.9 immediate replay
+
+`restart()` stops the existing loop, resets input and both seeded random streams,
+replaces the session state using `createInitialRuntimeState()`, resets completion
+publication, then starts that same loop. The initial-state source owns health,
+upgrades/choices, score inputs, progression, clocks, IDs, attack/invulnerability
+deadlines and empty enemy/projectile collections. Removing the old enemy collection
+also removes boss entry/actions and all derived telegraphs. No reset service or
+second controller exists. Production seeds and deterministic replay policy stay
+unchanged. Frozen result references retained by observers remain valid.
+
+The loop clears its accumulator and timestamp at restart; its generation guard
+prevents old frames from continuing. Session restart now checks state identity
+after the status callback before sending wave-started, preventing duplicate
+notifications after a nested restart. The controller respects a callback that
+pauses/destroys the replacement run. Terminal publication remains once per run.
+
+The keyboard adapter ignores repeat keydown events: cleared input needs a new
+press. Existing pointer reset releases capture; stale move/cancel events cannot
+activate a new gesture. Adapters, listeners, Canvas, theme and resize observer are
+preserved. The demo clears stale panels, uses existing restart, and restores focus.
+A queued Start/Replay activation while hidden immediately pauses before any frame
+can run and defers focus until visible. Visibility return cannot revive a terminal
+or idle game; page teardown removes handlers and terminally destroys the controller.
+
+**Automated evidence:** session fixtures compare full state and event/status/render
+sequences across fresh wins/losses and three replays, including spawn randomness,
+upgrade order, four choices and all boss actions. They inject normal-enemy defeats
+and player invulnerability to isolate lifecycle behavior; they are not unassisted
+full-fight/pacing evidence. Separate boss-state reset fixtures cover entry,
+approach, wind-up, charge and recovery. Controller/input/renderer tests cover
+accumulator reset, paused/upgrade states, callback restart/pause/destroy, held keys,
+pointer cancellation, listener/observer reuse and final teardown. Browser tests
+separate actual-runtime hidden activation from mocked alternating result/UI checks.
+
+**Pending manual handoff:** Dimi repeats Replay at least three times on PC and
+smartphone, including wins and losses; verifies fresh health/upgrades, no stale
+boss/projectiles/results and usable focus/joystick; interrupts held keyboard or
+touch input, releases/cancels and confirms neutral movement; switches tabs/apps
+around Replay and checks for hidden progression or a return-time jump. This new
+task's real-device confirmation, final tuning and Gate 2 remain pending.
 
 ## 16. Accessibility and user control
 
