@@ -104,8 +104,8 @@ simulation diagnostics, not human gameplay, production-entry, or fairness
 acceptance. See the [definition and evidence](../../docs/features/wave-survivor.md#107-ws-62-charger-candidate)
 for exact configuration, fixture setup, and ideal all-hit duration estimates.
 
-Production entry is now implemented by WS-6.3. Visible action telegraphs belong
-to WS-6.4 and terminal integration to WS-6.5. After entry/telegraph validation,
+Production entry and static action telegraphs are implemented by WS-6.3/6.4.
+Terminal integration belongs to WS-6.5. During entry/telegraph validation,
 Dimi evaluates whether the boss offers a distinct positioning challenge on
 PC/phone. Final balance is WS-6.10; manual acceptance and Gate 2 are pending.
 
@@ -126,8 +126,38 @@ new event variant. Normal events retain their existing payloads. See the
 
 No normal schedule or upgrade follows the boss. Defeating it currently leaves
 gameplay running, pending WS-6.5 terminal handling; no victory is inferred from
-an empty arena. Action telegraphs are WS-6.4. Dimi's PC/phone warning and escape
+an empty arena. Action telegraphs are implemented below. Dimi's PC/phone warning and escape
 review, including thumb/joystick occlusion, remains pending.
+
+## WS-6.4 static boss action telegraphs
+
+Active boss snapshots carry a copied, frozen `bossAction`: phase, remaining
+simulation seconds, and the Domain-calculated charge corridor during wind-up
+and charge. The same bounded travel calculation drives movement and warning;
+the renderer never predicts a target or endpoint. Direction stays locked after
+wind-up begins. Wall contact shortens the charge and immediately starts recovery.
+
+Approach has its label and existing diamond; wind-up adds an inner ring,
+countdown, outlined corridor, and endpoint arrow; charge keeps the remaining
+corridor/arrow with a heavier outline; recovery shows two bars and a countdown.
+All cues are static shapes/text using existing semantic colors, with no flashing,
+pulsing, shake, or optional-effects dependency. Pause freezes the countdown/path;
+theme and size changes only redraw. Entry/death/restart remove action warnings.
+
+The outlined capsule is the boss's physical **48-unit-wide swept body**, including
+rounded ends. The player center needs **more than 12 units beyond its outline**
+to avoid contact (combined radii 36); touching counts as contact. Recovery is a
+stationary repositioning opportunity, not contact immunity. All active actions
+remain contact-dangerous. Focused relative swept-circle checks use actual boss
+movement segments and the player's bounded fixed-step displacement; this catches
+grazes missed by endpoint sampling while retaining projectile-before-contact
+defeat, shared immunity, and normal-enemy behavior.
+
+See the [telegraph contract and collision evidence](../../docs/features/wave-survivor.md#109-ws-64-static-action-telegraphs).
+**Pending with Dimi:** smartphone anticipation/avoidance, readable recovery across
+themes and simplified effects, thumb/joystick occlusion, and Gate 2. Automated
+geometry and rendering checks do not establish perceived fairness. WS-6.5 still
+owns terminal handling; WS-6.10 owns final tuning.
 
 ## WS-6.6 score candidate
 

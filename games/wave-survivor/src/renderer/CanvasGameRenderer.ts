@@ -136,6 +136,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
     if (!this.latestSnapshot) return;
 
     this.drawEntryWarnings(this.latestSnapshot);
+    this.drawBossActions(this.latestSnapshot.enemies);
     this.drawEnemies(this.latestSnapshot.enemies);
     this.drawBossEntryAnnouncement(this.latestSnapshot);
 
@@ -276,6 +277,100 @@ export class CanvasGameRenderer implements GamePresentationPort {
       this.context.lineTo(enemy.x - enemy.collisionRadius, enemy.y);
       this.context.closePath();
       this.context.stroke();
+    }
+  }
+
+  /** Essential static information, also the reduced-effects baseline. Geometry
+   * and deadlines arrive from Domain; resizing/themes only redraw this snapshot.
+   */
+  private drawBossActions(enemies: readonly EnemyRenderSnapshot[]): void {
+    const context = this.context;
+    if (!context || !this.theme) return;
+    for (const enemy of enemies) {
+      const action = enemy.bossAction;
+      if (enemy.phase !== "active" || !action) continue;
+      context.strokeStyle = this.theme.colors.effect;
+      context.fillStyle = this.theme.colors.effect;
+      context.lineWidth = action.phase === "charge" ? 4 : 2;
+      const path = action.chargePath;
+      if (path) {
+        const angle = Math.atan2(path.direction.y, path.direction.x);
+        const nx = -path.direction.y * path.radius;
+        const ny = path.direction.x * path.radius;
+        // Outlined capsule is the swept boss body, including both circular ends.
+        context.beginPath();
+        context.moveTo(path.from.x + nx, path.from.y + ny);
+        context.lineTo(path.to.x + nx, path.to.y + ny);
+        context.arc(
+          path.to.x,
+          path.to.y,
+          path.radius,
+          angle + Math.PI / 2,
+          angle - Math.PI / 2,
+          true,
+        );
+        context.lineTo(path.from.x - nx, path.from.y - ny);
+        context.arc(
+          path.from.x,
+          path.from.y,
+          path.radius,
+          angle - Math.PI / 2,
+          angle + Math.PI / 2,
+          true,
+        );
+        context.closePath();
+        context.stroke();
+        // Arrow sits inside the endpoint, so it remains visible at arena edges.
+        context.beginPath();
+        context.moveTo(
+          path.to.x - path.direction.x * 12 - path.direction.y * 8,
+          path.to.y - path.direction.y * 12 + path.direction.x * 8,
+        );
+        context.lineTo(path.to.x, path.to.y);
+        context.lineTo(
+          path.to.x - path.direction.x * 12 + path.direction.y * 8,
+          path.to.y - path.direction.y * 12 - path.direction.x * 8,
+        );
+        context.stroke();
+      }
+      if (action.phase === "wind-up") {
+        context.beginPath();
+        context.arc(
+          enemy.x,
+          enemy.y,
+          enemy.collisionRadius / 2,
+          0,
+          Math.PI * 2,
+        );
+        context.stroke();
+      } else if (action.phase === "recovery") {
+        context.beginPath();
+        for (const offset of [-5, 5]) {
+          context.moveTo(enemy.x - 10, enemy.y + offset);
+          context.lineTo(enemy.x + 10, enemy.y + offset);
+        }
+        context.stroke();
+      }
+      const label =
+        action.phase === "wind-up"
+          ? "WIND-UP"
+          : action.phase === "recovery"
+            ? "RECOVER"
+            : action.phase.toUpperCase();
+      const remaining = Math.ceil(action.secondsRemaining * 10) / 10;
+      const text =
+        action.phase === "wind-up" || action.phase === "recovery"
+          ? `${label} ${remaining.toFixed(1)}s`
+          : label;
+      const x = Math.max(74, Math.min(ARENA.width - 74, enemy.x));
+      const y = Math.max(72, enemy.y - enemy.collisionRadius - 20);
+      context.fillStyle = this.theme.colors.background;
+      context.fillRect(x - 72, y - 2, 144, 18);
+      context.fillStyle = this.theme.colors.effect;
+      context.font = "700 12px sans-serif";
+      context.textAlign = "center";
+      context.textBaseline = "top";
+      context.fillText(text, x, y);
     }
   }
 

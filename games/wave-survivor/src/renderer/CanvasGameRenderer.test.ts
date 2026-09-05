@@ -4,6 +4,10 @@ import { GameControllerImpl } from "../application/GameControllerImpl.js";
 import { GameRuntimeSession } from "../application/GameRuntimeSession.js";
 import type { GameRenderSnapshot } from "../domain/GamePresentationPort.js";
 import { createInitialRuntimeState } from "../domain/state/RuntimeState.js";
+import {
+  createChargerBossState,
+  getBossActionTelegraph,
+} from "../domain/enemies/ChargerBoss.js";
 import { ZeroMovementInput } from "../infrastructure/input/ZeroMovementInput.js";
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { CanvasGameRenderer } from "./CanvasGameRenderer.js";
@@ -166,6 +170,122 @@ function createCanvas(displayWidth: number, displayHeight: number) {
 }
 
 describe("CanvasGameRenderer", () => {
+  it.each(["approach", "wind-up", "charge", "recovery"] as const)(
+    "distinguishes %s without animation or color differences, including redraws",
+    (phase) => {
+      const {
+        canvas,
+        container,
+        context,
+        globalAlphas,
+        lineWidths,
+        strokeStyles,
+      } = createCanvas(360, 640);
+      const monochrome: GameTheme = {
+        colors: {
+          background: "#111",
+          player: "#fff",
+          enemy: "#fff",
+          projectile: "#fff",
+          effect: "#fff",
+        },
+      };
+      const renderer = new CanvasGameRenderer(
+        { canvas, viewport: container, theme: monochrome },
+        1,
+      );
+      const boss = createChargerBossState(1, { x: 330, y: 200 });
+      boss.phase = "active";
+      boss.action =
+        phase === "wind-up" || phase === "charge"
+          ? { phase, endsAtSeconds: 0.8, direction: { x: 1, y: 0 } }
+          : { phase, endsAtSeconds: 0.8 };
+      const snapshot = createRenderSnapshot({
+        joystick: null,
+        enemies: [
+          {
+            id: 1,
+            phase: "active",
+            x: 330,
+            y: 200,
+            collisionRadius: 24,
+            bossAction: getBossActionTelegraph(boss, 0)!,
+          },
+        ],
+      });
+      const before = structuredClone(snapshot);
+      renderer.render(snapshot);
+      const labels = {
+        approach: "APPROACH",
+        "wind-up": "WIND-UP 0.8s",
+        charge: "CHARGE",
+        recovery: "RECOVER 0.8s",
+      };
+      expect(context.fillText).toHaveBeenCalledWith(labels[phase], 286, 156);
+      if (phase === "wind-up" || phase === "charge") {
+        // Supplied wall-clipped endpoint, not a renderer prediction beyond x=336.
+        expect(context.lineTo).toHaveBeenCalledWith(336, 224);
+        expect(context.lineTo).toHaveBeenCalledWith(336, 200);
+        expect(context.arc).toHaveBeenCalledWith(
+          336,
+          200,
+          24,
+          Math.PI / 2,
+          -Math.PI / 2,
+          true,
+        );
+      }
+      if (phase === "wind-up")
+        expect(context.arc).toHaveBeenCalledWith(330, 200, 12, 0, Math.PI * 2);
+      if (phase === "charge") expect(lineWidths).toContain(4);
+      if (phase === "recovery")
+        expect(context.moveTo).toHaveBeenCalledWith(320, 195);
+      expect(globalAlphas).toEqual([]);
+      const calls = vi.mocked(context.fillText).mock.calls.length;
+      renderer.resize(240, 320, 2);
+      renderer.setTheme(initialTheme);
+      expect(context.fillText).toHaveBeenCalledTimes(calls * 3);
+      expect(strokeStyles).toContain("effect");
+      expect(snapshot).toEqual(before);
+      renderer.destroy();
+    },
+  );
+
+  it("removes action warnings when the boss dies or disappears", () => {
+    const { canvas, container, context } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer(
+      { canvas, viewport: container, theme: initialTheme },
+      1,
+    );
+    const staleAction = { phase: "wind-up" as const, secondsRemaining: 0.8 };
+    renderer.render(
+      createRenderSnapshot({
+        enemies: [
+          {
+            id: 1,
+            phase: "dying",
+            x: 180,
+            y: 160,
+            collisionRadius: 24,
+            bossAction: staleAction,
+          },
+        ],
+      }),
+    );
+    expect(context.fillText).not.toHaveBeenCalledWith(
+      "WIND-UP 0.8s",
+      expect.anything(),
+      expect.anything(),
+    );
+    renderer.render(createRenderSnapshot());
+    expect(context.fillText).not.toHaveBeenCalledWith(
+      "WIND-UP 0.8s",
+      expect.anything(),
+      expect.anything(),
+    );
+    renderer.destroy();
+  });
+
   it("renders a static boss label and double chevron while entry is partially visible", () => {
     const { canvas, container, context } = createCanvas(360, 640);
     const renderer = new CanvasGameRenderer(

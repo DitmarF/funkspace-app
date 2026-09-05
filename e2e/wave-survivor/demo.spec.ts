@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { INITIAL_UPGRADE_DEFINITIONS } from "../../games/wave-survivor/src/domain/upgrades/index.js";
+import { colors } from "../../common/generated/colors.js";
 
 const options = INITIAL_UPGRADE_DEFINITIONS.map(
   ({ id, title, description }) => ({
@@ -147,6 +148,107 @@ test("renders the actual boss entry warning in monochrome reduced motion", async
     .locator("#game-canvas")
     .screenshot({ path: testInfo.outputPath("boss-entry.png") });
 });
+
+for (const themeName of [
+  "default",
+  "dark",
+  "muted",
+  "dark-high-contrast",
+  "monochrome",
+] as const) {
+  test(`renders four static boss actions in ${themeName} with reduced motion`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await openDemo(page, false, false);
+    const gameColors =
+      themeName === "monochrome"
+        ? {
+            background: "#111111",
+            player: "#ffffff",
+            enemy: "#ffffff",
+            projectile: "#ffffff",
+            effect: "#ffffff",
+          }
+        : colors[themeName].game;
+    const frames: string[] = [];
+    for (const phase of [
+      "approach",
+      "wind-up",
+      "charge",
+      "recovery",
+    ] as const) {
+      frames.push(
+        await page.evaluate(
+          async ({ base, phase, gameColors }) => {
+            const { CanvasGameRenderer } = await import(
+              `${base}/renderer/CanvasGameRenderer.js`
+            );
+            const { createChargerBossState, getBossActionTelegraph } =
+              await import(`${base}/domain/enemies/ChargerBoss.js`);
+            const canvas =
+              document.querySelector<HTMLCanvasElement>("#game-canvas")!;
+            const viewport = document.querySelector("#game-viewport");
+            const renderer = new CanvasGameRenderer(
+              { canvas, viewport, theme: { colors: gameColors } },
+              1,
+            );
+            const boss = createChargerBossState(29, { x: 180, y: 160 });
+            boss.phase = "active";
+            boss.action =
+              phase === "wind-up" || phase === "charge"
+                ? { phase, endsAtSeconds: 40.8, direction: { x: 0.6, y: 0.8 } }
+                : { phase, endsAtSeconds: 40.8 };
+            renderer.render({
+              phase: "playing",
+              simulationTimeSeconds: 40,
+              playerX: 245,
+              playerY: 380,
+              playerCollisionRadius: 12,
+              playerCurrentHealth: 3,
+              playerMaximumHealth: 3,
+              isPlayerInvulnerable: false,
+              killCount: 28,
+              projectiles: [],
+              joystick: {
+                active: false,
+                centerX: 72,
+                centerY: 568,
+                baseRadius: 52,
+                knobX: 72,
+                knobY: 568,
+                knobRadius: 22,
+              },
+              enemies: [
+                {
+                  id: boss.id,
+                  phase: boss.phase,
+                  x: boss.position.x,
+                  y: boss.position.y,
+                  collisionRadius: boss.collisionRadius,
+                  bossAction: getBossActionTelegraph(boss, 40),
+                },
+              ],
+            });
+            const frame = canvas.toDataURL();
+            renderer.destroy();
+            return frame;
+          },
+          {
+            base: `/@fs${process.cwd()}/games/wave-survivor/dist`,
+            phase,
+            gameColors,
+          },
+        ),
+      );
+      await page
+        .locator("#game-canvas")
+        .screenshot({ path: testInfo.outputPath(`boss-${phase}.png`) });
+    }
+    expect(new Set(frames).size).toBe(4);
+  });
+}
 
 async function readPageLayout(page: Page) {
   return page.evaluate(() => ({

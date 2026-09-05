@@ -1,11 +1,14 @@
 import type { GameTheme } from "../GameTheme.js";
 import type { EnemyPhase } from "./enemies/EnemyState.js";
+import type { BossActionTelegraph } from "./enemies/ChargerBoss.js";
 import type { RuntimePhase } from "./state/RuntimeState.js";
 
 /** Immutable enemy data required by the Canvas renderer. */
 export interface EnemyRenderSnapshot {
   /** Static top-edge warning during the deliberate boss entry only. */
   readonly entryWarning?: "boss";
+  /** Domain-owned action timing and bounded physical charge corridor. */
+  readonly bossAction?: BossActionTelegraph;
   readonly id: number;
   readonly phase: EnemyPhase;
   readonly x: number;

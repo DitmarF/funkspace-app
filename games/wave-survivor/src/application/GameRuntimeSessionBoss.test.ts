@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import type { GamePresentationPort } from "../domain/GamePresentationPort.js";
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
 import { createChargerBossState } from "../domain/enemies/ChargerBoss.js";
 import {
@@ -25,7 +26,10 @@ import {
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
 
-function fixture(upgrade?: UpgradeId) {
+function fixture(
+  upgrade?: UpgradeId,
+  presentation: GamePresentationPort | null = null,
+) {
   const state = createInitialRuntimeState();
   state.player.position = { x: 180, y: 480 };
   state.upgrades = createRunUpgradeState(upgrade ? { [upgrade]: 4 } : {});
@@ -62,7 +66,7 @@ function fixture(upgrade?: UpgradeId) {
   const session = new GameRuntimeSession(
     state,
     input,
-    null,
+    presentation,
     new SeededRandomSource(1),
     new SeededRandomSource(2),
   );
@@ -71,6 +75,105 @@ function fixture(upgrade?: UpgradeId) {
 }
 
 describe("active charger session fixtures", () => {
+  it.each([false, true])(
+    "resolves a swept graze after projectile damage (defeated=%s)",
+    (defeated) => {
+      const { state, boss, session } = fixture();
+      state.nextAttackAtSeconds = 100;
+      boss.position = { x: 100, y: 200 };
+      boss.action = {
+        phase: "charge",
+        endsAtSeconds: 0.8,
+        direction: { x: 1, y: 0 },
+      };
+      state.player.position = { x: 100 + 280 / 120, y: 235.99 };
+      if (defeated) {
+        boss.currentHealth = 1;
+        state.projectiles = [
+          createBasicProjectileState(
+            1,
+            { x: 100 + 280 / 60, y: 200 + 320 / 60 },
+            { x: 100 + 280 / 60, y: 100 },
+            0,
+          ),
+        ];
+      }
+      session.fixedUpdate(1 / 60);
+      expect(
+        Math.hypot(
+          boss.position.x - state.player.position.x,
+          boss.position.y - state.player.position.y,
+        ),
+      ).toBeGreaterThan(36);
+      expect(state.player.currentHealth).toBe(defeated ? 3 : 2);
+      expect(state.killCount).toBe(defeated ? 1 : 0);
+      session.fixedUpdate(1 / 60);
+      expect(state.killCount).toBe(defeated ? 1 : 0);
+      session.destroy();
+    },
+  );
+
+  it("freezes warning time on pause and removes stale warnings on death, restart, and destroy", () => {
+    const presentation: GamePresentationPort = {
+      render: vi.fn(),
+      setTheme: vi.fn(),
+      destroy: vi.fn(),
+    };
+    const { boss, session } = fixture(undefined, presentation);
+    boss.action = {
+      phase: "wind-up",
+      endsAtSeconds: 0.8,
+      direction: { x: 0, y: 1 },
+    };
+    session.render();
+    const before = vi.mocked(presentation.render).mock.calls.at(-1)![0];
+    expect(before.enemies[0]?.bossAction?.chargePath?.to).toEqual({
+      x: 180,
+      y: 384,
+    });
+    session.pause();
+    session.fixedUpdate(30);
+    session.render();
+    expect(
+      vi.mocked(presentation.render).mock.calls.at(-1)![0].enemies,
+    ).toEqual(before.enemies);
+    session.resume();
+    session.fixedUpdate(0.4);
+    session.render();
+    expect(
+      vi.mocked(presentation.render).mock.calls.at(-1)![0].enemies[0]
+        ?.bossAction?.secondsRemaining,
+    ).toBeCloseTo(0.4);
+    boss.currentHealth = 0;
+    session.fixedUpdate(1 / 60);
+    session.render();
+    expect(
+      vi.mocked(presentation.render).mock.calls.at(-1)![0].enemies[0]
+        ?.bossAction,
+    ).toBeUndefined();
+    // Restart must also clear a live, still visible warning.
+    boss.currentHealth = 24;
+    boss.phase = "active";
+    boss.removeAtSimulationSeconds = null;
+    session.render();
+    expect(
+      vi.mocked(presentation.render).mock.calls.at(-1)![0].enemies[0]
+        ?.bossAction,
+    ).toBeDefined();
+    session.restart();
+    session.render();
+    expect(
+      vi.mocked(presentation.render).mock.calls.at(-1)![0].enemies,
+    ).toEqual([]);
+    const calls = vi.mocked(presentation.render).mock.calls.length;
+    session.destroy();
+    session.render();
+    session.fixedUpdate(1);
+    expect(presentation.render).toHaveBeenCalledTimes(calls);
+    expect(presentation.destroy).toHaveBeenCalledOnce();
+    expect(before.enemies[0]?.bossAction?.secondsRemaining).toBe(0.8);
+  });
+
   it("uses automatic targeting and existing projectiles to damage the boss", () => {
     const { state, boss, session } = fixture();
     session.fixedUpdate(1 / 60);

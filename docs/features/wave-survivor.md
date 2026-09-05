@@ -510,7 +510,7 @@ the separate lifecycle; no boss action is a global game phase.
 The existing overall gameplay simulation time sets deadlines. Updates split
 at action boundaries, so a charge cannot consume wind-up/recovery time.
 Pausing the session freezes both the clock and action state. The first active
-update starts approach; entering uses existing pursuit without an action clock.
+update starts approach; WS-6.3 entry uses its deliberate top-edge path without an action clock.
 Active boss centers stay within the arena inset by their collision radius.
 
 Wind-up locks aim toward the player's position clamped to that reachable inset;
@@ -552,7 +552,7 @@ no damage across all three builds, which does not establish a fair or distinct
 movement challenge for a person. No health padding was added to fill run time.
 
 **Dependent acceptance:** WS-6.3 has integrated entry and finite handoff; WS-6.4
-adds visible action telegraphs; WS-6.5 integrates terminal boss defeat without
+has added static action telegraphs; WS-6.5 integrates terminal boss defeat without
 normal-wave upgrade handling. No complete victory flow is delivered here.
 WS-6.10 owns final tuning. After entry and telegraphs exist, Dimi must evaluate
 on PC/phone whether the charger tests positioning rather than merely adding a
@@ -593,7 +593,7 @@ frozen enemy snapshot. It draws a static double chevron at the top and
 **BOSS INCOMING / Move clear of the top entry** in existing semantic colors.
 It also draws the partially visible body; actors stay above the warning so it
 does not hide the player. The message and shape require neither animation nor
-color discrimination. Action telegraphs for wind-up/charge remain WS-6.4.
+color discrimination. WS-6.4 now adds the active action telegraphs below.
 
 For the concrete screen-reader/DOM announcement need, the existing
 `wave-started` event adds optional `encounterKind: "normal-wave" | "boss"`.
@@ -612,8 +612,75 @@ delay. This is deterministic evidence of an escape route, not human acceptance.
 **Pending manual acceptance — Dimi:** check warning visibility and escape
 fairness on PC and a real phone, especially near the top entry and with
 thumb/joystick occlusion. Check dark/high-contrast readability and reduced
-motion. Human warning timing approval and Gate 2 remain pending. WS-6.4 owns
-visible action telegraphs; WS-6.5 owns victory and stopping terminal gameplay.
+motion. Human warning timing approval and Gate 2 remain pending. WS-6.4 provides
+static action telegraphs; WS-6.5 owns victory and stopping terminal gameplay.
+
+### 10.9 WS-6.4 static action telegraphs
+
+**Implemented, provisional tuning:** `getBossActionTelegraph()` copies and freezes
+only the active action phase, remaining simulation seconds, and optional charge
+path into the existing enemy render snapshot. Its nested positions/direction are
+frozen copies, not references to mutable runtime state. No new public event,
+package export, theme role, timer, loop, or effects setting is introduced.
+
+Wind-up and charge use the same Domain `chargeTravel()` calculation as actual
+movement: locked direction, speed × remaining charge duration, and first contact
+with the radius-inset arena bounds. Wind-up shows the entire forthcoming charge;
+charge shows only its remaining travel. Aim never follows the player after the
+wind-up starts. A wall-clipped charge begins recovery immediately at that wall.
+No warning remains on entry, defeat/dying, restart, or destroyed-session redraw.
+
+| Action   | Essential presentation                                                      |
+| -------- | --------------------------------------------------------------------------- |
+| Approach | Existing diamond body and `APPROACH` label                                  |
+| Wind-up  | Inner ring, `WIND-UP` countdown, outlined capsule, endpoint direction arrow |
+| Charge   | Remaining capsule/arrow with heavier outline and `CHARGE` label             |
+| Recovery | Two stationary bars inside the body and `RECOVER` countdown                 |
+
+Countdowns round remaining simulation time upward to tenths of a second. They
+freeze on pause, as do movement and path geometry. Labels stay inside the arena;
+endpoint arrows point along the supplied direction and sit inside the endpoint
+so walls do not hide them. Warnings draw before actors. Existing background,
+enemy, and effect semantic colors are sufficient. Static shapes and text carry
+all meaning in monochrome and reduced motion, without flashing, opacity pulses,
+screen shake, or optional effects. Resize/theme changes redraw the same snapshot.
+
+**Width and clearance:** the capsule outlines the actual radius-24 boss body
+swept along its center segment: 48 units wide, with circular ends. A radius-12
+player needs its center **more than 12 units beyond that outline**, or more than
+36 units from the center segment, to avoid collision. Tangency counts as contact.
+The warning is not a damage beam or an enlarged hitbox. All active boss actions,
+including wind-up and recovery, remain contact-dangerous; recovery means a
+stationary positioning/shooting window, not permission to overlap the body.
+
+**Collision evidence:** at the production `1/60s` step, a 280-unit/s charge moves
+4.667 units. With four movement upgrades, opposite player movement can make
+relative travel 7.467 units (7.667 at the canonical five-level cap). Small steps
+alone do not exclude grazing misses. A deterministic fixture moves the boss from
+`(100,200)` to `(104.667,200)` past a stationary player at `(102.333,235.99)`:
+both endpoint distances exceed the combined radius 36, but the swept minimum is
+35.99. Focused relative swept-circle checks now catch this case and exact tangent
+contact; 36.01 clearance stays safe.
+
+Boss advancement returns transient linear segments split at action deadlines and
+first wall contact, including stationary wind-up/recovery portions. Contact math
+interpolates the player's bounded fixed-step displacement over each segment's
+time fraction and checks the closest relative point. This avoids a false single
+chord through a stopped or waiting boss. Traces/contact IDs live only for that
+update; they do not become another position/health authority. The shared contact
+resolver still checks active eligibility, immunity, and lowest ID **after** all
+projectile hits/defeats. Normal enemies retain their existing contact behavior.
+
+The three recorded scripted fight fixtures still produce 30.82s / 43.13s /
+46.00s and unchanged health with the focused sweep. They remain simulation
+diagnostics, not human observations or tuning approval.
+
+**Pending manual acceptance — Dimi:** on a real smartphone, verify attacks can
+be anticipated and avoided, recovery is readable across all supported themes
+and simplified effects, and thumb/joystick occlusion does not hide crucial cues.
+Also review boundary/corner escape and PC readability. Automated geometry,
+rendering, and browser screenshots do not establish perceived fairness. WS-6.5
+terminal handling, WS-6.10 final tuning, and Gate 2 approval remain pending.
 
 ## 11. Upgrades and progression
 

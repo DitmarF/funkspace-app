@@ -10,7 +10,12 @@ import type {
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
 import type { RandomSource } from "../domain/RandomSource.js";
 import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
-import { advanceChargerBoss } from "../domain/enemies/ChargerBoss.js";
+import {
+  advanceChargerBoss,
+  getBossActionTelegraph,
+} from "../domain/enemies/ChargerBoss.js";
+import { doesBossSweepContactPlayer } from "../domain/combat/BossContactSweep.js";
+import type { LogicalPosition } from "../domain/geometry/index.js";
 import {
   advanceBossEntry,
   BOSS_DESPAWN_BOUNDS,
@@ -255,6 +260,7 @@ export class GameRuntimeSession {
     if (!Number.isFinite(nextSimulationTimeSeconds)) return;
 
     const movementIntent = this.input.readMovementIntent();
+    const playerFrom = this.state.player.position;
     this.state.movementIntent = movementIntent;
     this.state.player.position = calculateNextPlayerPosition(
       this.state.player,
@@ -274,14 +280,20 @@ export class GameRuntimeSession {
       advanceWaveSchedule(this.state.waveSchedule, deltaSeconds);
       this.spawnScheduledEnemyIfDue();
     }
-    this.moveEnemiesTowardPlayer(deltaSeconds);
+    const sweptBossContactIds = this.moveEnemiesTowardPlayer(
+      deltaSeconds,
+      playerFrom,
+    );
     this.activateEnemiesIntersectingVisibleArena();
     this.removeInvalidEscapedOrExpiredEnemies(nextSimulationTimeSeconds);
     this.emitBasicProjectileIfReady(nextSimulationTimeSeconds);
     this.updateProjectiles(deltaSeconds, nextSimulationTimeSeconds);
     // Projectile hits transition defeated enemies before contact eligibility is
     // evaluated, so a same-update defeat cannot damage the player.
-    this.resolvePlayerEnemyContact(nextSimulationTimeSeconds);
+    this.resolvePlayerEnemyContact(
+      nextSimulationTimeSeconds,
+      sweptBossContactIds,
+    );
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
     if (this.transitionToLostIfPlayerDefeated()) {
       this.emitStatusIfChanged();
@@ -306,20 +318,25 @@ export class GameRuntimeSession {
     if (!this.presentation) return;
 
     const enemies = Object.freeze(
-      this.state.enemies.filter(isEnemyStateValid).map((enemy) =>
-        Object.freeze({
+      this.state.enemies.filter(isEnemyStateValid).map((enemy) => {
+        const bossAction =
+          enemy.kind === "charger"
+            ? getBossActionTelegraph(enemy, this.state.simulationTimeSeconds)
+            : undefined;
+        return Object.freeze({
           id: enemy.id,
           phase: enemy.phase,
           x: enemy.position.x,
           y: enemy.position.y,
           collisionRadius: enemy.collisionRadius,
+          ...(bossAction ? { bossAction } : {}),
           ...(enemy.kind === "charger" &&
           enemy.phase === "entering" &&
           enemy.entryStartedAtSeconds !== null
             ? { entryWarning: "boss" as const }
             : {}),
-        }),
-      ),
+        });
+      }),
     );
     const projectileSnapshots: ProjectileRenderSnapshot[] = [];
     for (const projectile of this.state.projectiles) {
@@ -413,7 +430,11 @@ export class GameRuntimeSession {
   }
 
   /** Newly spawned enemies participate in pursuit during their spawn update. */
-  private moveEnemiesTowardPlayer(deltaSeconds: number): void {
+  private moveEnemiesTowardPlayer(
+    deltaSeconds: number,
+    playerFrom: Readonly<LogicalPosition>,
+  ): ReadonlySet<number> | undefined {
+    let sweptBossContactIds: Set<number> | undefined;
     for (const enemy of this.state.enemies) {
       if (!isEnemyStateValid(enemy)) continue;
 
@@ -429,12 +450,23 @@ export class GameRuntimeSession {
         continue;
       }
       if (enemy.kind === "charger" && enemy.phase === "active") {
-        advanceChargerBoss(
+        const segments = advanceChargerBoss(
           enemy,
           this.state.player.position,
           this.state.simulationTimeSeconds,
           deltaSeconds,
         );
+        if (
+          doesBossSweepContactPlayer(
+            segments,
+            playerFrom,
+            this.state.player.position,
+            enemy.collisionRadius + this.state.player.collisionRadius,
+          )
+        ) {
+          sweptBossContactIds ??= new Set<number>();
+          sweptBossContactIds.add(enemy.id);
+        }
         continue;
       }
       enemy.position = calculateNextEnemyPosition(
@@ -443,6 +475,7 @@ export class GameRuntimeSession {
         deltaSeconds,
       );
     }
+    return sweptBossContactIds;
   }
 
   private activateEnemiesIntersectingVisibleArena(): void {
@@ -550,7 +583,10 @@ export class GameRuntimeSession {
     this.state.projectiles.length = retainedProjectileCount;
   }
 
-  private resolvePlayerEnemyContact(simulationTimeSeconds: number): void {
+  private resolvePlayerEnemyContact(
+    simulationTimeSeconds: number,
+    sweptBossContactIds: ReadonlySet<number> | undefined,
+  ): void {
     resolvePlayerContactDamage(
       this.state.player,
       this.state.enemies,
@@ -559,6 +595,7 @@ export class GameRuntimeSession {
         this.state.player.maximumHealth,
         this.state.upgrades,
       ),
+      sweptBossContactIds,
     );
   }
 

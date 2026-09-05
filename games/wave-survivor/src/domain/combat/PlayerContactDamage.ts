@@ -31,6 +31,7 @@ export function resolvePlayerContactDamage(
   enemies: readonly Readonly<EnemyState>[],
   simulationTimeSeconds: number,
   maximumHealth = player.maximumHealth,
+  sweptBossContactIds?: ReadonlySet<number>,
 ): boolean {
   if (
     !Number.isFinite(maximumHealth) ||
@@ -54,6 +55,7 @@ export function resolvePlayerContactDamage(
     }
     if (contactEnemy !== null && enemy.id >= contactEnemy.id) continue;
     if (
+      !(enemy.kind === "charger" && sweptBossContactIds?.has(enemy.id)) &&
       !doCirclesIntersect(
         player.position,
         player.collisionRadius,
