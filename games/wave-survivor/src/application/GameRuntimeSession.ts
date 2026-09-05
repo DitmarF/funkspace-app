@@ -1,6 +1,8 @@
 import type { GameEvent, UpgradeOption } from "../GameEvent.js";
 import type { GameTheme } from "../GameTheme.js";
 import type { GameStatusSnapshot } from "../GameStatusSnapshot.js";
+import { calculateScore } from "../domain/score/CalculateScore.js";
+import { createRunResult, type RunResult } from "../domain/result/RunResult.js";
 import type {
   GamePresentationPort,
   GameRenderSnapshot,
@@ -123,12 +125,17 @@ export class GameRuntimeSession {
     return this.state.phase;
   }
 
+  /** Internal committed boundary for future result publication (WS-6.8). */
+  get result(): RunResult | null {
+    return this.state.result;
+  }
+
   get pendingUpgradeOptionIds(): readonly UpgradeId[] {
     return this.state.pendingUpgradeOptionIds;
   }
 
   start(): boolean {
-    if (this.state.phase !== "idle") return false;
+    if (this.destroyed || this.state.phase !== "idle") return false;
 
     this.state.phase = "playing";
     this.emitStatusIfChanged();
@@ -137,7 +144,7 @@ export class GameRuntimeSession {
   }
 
   pause(): boolean {
-    if (this.state.phase !== "playing") return false;
+    if (this.destroyed || this.state.phase !== "playing") return false;
 
     this.state.phase = "paused";
     this.resetMovementInput();
@@ -146,7 +153,7 @@ export class GameRuntimeSession {
   }
 
   resume(): boolean {
-    if (this.state.phase !== "paused") return false;
+    if (this.destroyed || this.state.phase !== "paused") return false;
 
     this.state.phase = "playing";
     this.emitStatusIfChanged();
@@ -237,6 +244,7 @@ export class GameRuntimeSession {
   }
 
   restart(): void {
+    if (this.destroyed) return;
     this.resetMovementInput();
     this.spawnRandomSource.reset();
     this.upgradeRandomSource.reset();
@@ -248,9 +256,8 @@ export class GameRuntimeSession {
   }
 
   fixedUpdate(deltaSeconds: number): void {
-    if (this.state.phase !== "playing" || !this.input) return;
+    if (this.destroyed || this.state.phase !== "playing" || !this.input) return;
     if (this.transitionToLostIfPlayerDefeated()) {
-      this.emitStatusIfChanged();
       return;
     }
     if (!Number.isFinite(deltaSeconds) || deltaSeconds <= 0) return;
@@ -271,7 +278,9 @@ export class GameRuntimeSession {
         this.state.upgrades,
       ),
     );
-    this.transitionDefeatedEnemies(nextSimulationTimeSeconds);
+    let finalBossDefeated = this.transitionDefeatedEnemies(
+      nextSimulationTimeSeconds,
+    );
     if (
       this.state.waveSchedule !== null &&
       countEnemiesOccupyingWaveCapacity(this.state.enemies) <
@@ -287,7 +296,9 @@ export class GameRuntimeSession {
     this.activateEnemiesIntersectingVisibleArena();
     this.removeInvalidEscapedOrExpiredEnemies(nextSimulationTimeSeconds);
     this.emitBasicProjectileIfReady(nextSimulationTimeSeconds);
-    this.updateProjectiles(deltaSeconds, nextSimulationTimeSeconds);
+    finalBossDefeated =
+      this.updateProjectiles(deltaSeconds, nextSimulationTimeSeconds) ||
+      finalBossDefeated;
     // Projectile hits transition defeated enemies before contact eligibility is
     // evaluated, so a same-update defeat cannot damage the player.
     this.resolvePlayerEnemyContact(
@@ -296,7 +307,10 @@ export class GameRuntimeSession {
     );
     this.state.simulationTimeSeconds = nextSimulationTimeSeconds;
     if (this.transitionToLostIfPlayerDefeated()) {
-      this.emitStatusIfChanged();
+      return;
+    }
+    if (finalBossDefeated) {
+      this.finalizeRun("won");
       return;
     }
 
@@ -491,12 +505,21 @@ export class GameRuntimeSession {
     }
   }
 
-  private transitionDefeatedEnemies(simulationTimeSeconds: number): void {
+  private transitionDefeatedEnemies(simulationTimeSeconds: number): boolean {
+    let finalBossDefeated = false;
     for (const enemy of this.state.enemies) {
       if (transitionEnemyToDying(enemy, simulationTimeSeconds)) {
         this.state.killCount += 1;
+        if (
+          this.state.waveSchedule === null &&
+          enemy.kind === "charger" &&
+          shouldRetainEnemyWithinBounds(enemy, BOSS_DESPAWN_BOUNDS)
+        ) {
+          finalBossDefeated = true;
+        }
       }
     }
+    return finalBossDefeated;
   }
 
   private removeInvalidEscapedOrExpiredEnemies(
@@ -554,8 +577,9 @@ export class GameRuntimeSession {
   private updateProjectiles(
     deltaSeconds: number,
     simulationTimeSeconds: number,
-  ): void {
+  ): boolean {
     let retainedProjectileCount = 0;
+    let finalBossDefeated = false;
 
     for (const projectile of this.state.projectiles) {
       moveProjectile(projectile, deltaSeconds);
@@ -572,7 +596,9 @@ export class GameRuntimeSession {
       }
 
       if (resolveProjectileHit(projectile, this.state.enemies)) {
-        this.transitionDefeatedEnemies(simulationTimeSeconds);
+        finalBossDefeated =
+          this.transitionDefeatedEnemies(simulationTimeSeconds) ||
+          finalBossDefeated;
         continue;
       }
 
@@ -581,6 +607,7 @@ export class GameRuntimeSession {
     }
 
     this.state.projectiles.length = retainedProjectileCount;
+    return finalBossDefeated;
   }
 
   private resolvePlayerEnemyContact(
@@ -608,10 +635,45 @@ export class GameRuntimeSession {
       return false;
     }
 
-    this.state.player.currentHealth = 0;
-    this.state.phase = "lost";
-    this.resetMovementInput();
+    this.finalizeRun("lost");
     return true;
+  }
+
+  /** Commit all completion data before invoking input/status adapters. The caller
+   * returns immediately, even if a callback restarts or destroys this session.
+   */
+  private finalizeRun(outcome: RunResult["outcome"]): void {
+    if (this.destroyed || this.state.phase !== "playing" || this.state.result)
+      return;
+    const currentHealth =
+      outcome === "lost" ? 0 : this.state.player.currentHealth;
+    // Completion occurs only from playing. Every earlier normal encounter was
+    // cleared before its upgrade allowed entry here; the boss is not a clear.
+    const normalWavesCleared =
+      this.state.waveSchedule === null
+        ? PROVISIONAL_RUN_DEFINITION.normalWaves.length
+        : this.state.waveSchedule.currentWaveNumber - 1;
+    const result = createRunResult({
+      outcome,
+      score: calculateScore({
+        enemiesDefeated: this.state.killCount,
+        normalWavesCleared,
+        won: outcome === "won",
+        currentHealth,
+        effectiveMaximumHealth: getEffectiveMaximumHealth(
+          this.state.player.maximumHealth,
+          this.state.upgrades,
+        ),
+      }),
+      waveReached: this.currentEncounterNumber,
+      elapsedSeconds: this.state.simulationTimeSeconds,
+    });
+    this.state.result = result;
+    this.state.phase = outcome;
+    this.state.player.currentHealth = currentHealth;
+    this.state.pendingUpgradeOptionIds = NO_PENDING_UPGRADE_OPTIONS;
+    this.resetMovementInput();
+    this.emitStatusIfChanged();
   }
 
   private transitionToWaveClearedIfComplete(): boolean {

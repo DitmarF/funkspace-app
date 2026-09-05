@@ -26,6 +26,8 @@ import {
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameControllerImpl } from "./GameControllerImpl.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
+import type { GameStatusSnapshot } from "../GameStatusSnapshot.js";
+import { createChargerBossState } from "../domain/enemies/ChargerBoss.js";
 
 const initialTheme: GameTheme = {
   colors: {
@@ -90,6 +92,7 @@ class FakeFrameScheduler implements FrameScheduler {
 
 function createHarness(
   readJoystickSnapshot: (() => JoystickRenderSnapshot | null) | null = null,
+  onStatusChange: ((status: GameStatusSnapshot) => void) | null = null,
 ) {
   const clock = new FakeMonotonicClock();
   const frameScheduler = new FakeFrameScheduler();
@@ -118,6 +121,7 @@ function createHarness(
     new SeededRandomSource(1),
     new SeededRandomSource(2),
     readJoystickSnapshot,
+    onStatusChange,
   );
   const loop = new FixedStepLoop(clock, frameScheduler, {
     fixedUpdate: (deltaSeconds) => session.fixedUpdate(deltaSeconds),
@@ -196,47 +200,94 @@ describe("GameController runtime lifecycle", () => {
     expect(harness.frameScheduler.requestedFrameIds).toHaveLength(2);
   });
 
-  it("renders one lost frame, stops scheduling, and ignores pause or resume", () => {
-    const {
-      clock,
-      controller,
-      frameScheduler,
-      input,
-      readMovementIntent,
-      snapshots,
-      state,
-    } = createHarness();
-    state.player.currentHealth = 1;
-    state.nextAttackAtSeconds = 100;
-    state.waveSchedule!.nextScheduledSpawnIndex =
-      state.waveSchedule!.requests.length;
-    const enemy = createBasicEnemyState(1, state.player.position);
-    enemy.phase = "active";
-    state.enemies.push(enemy);
-    controller.start();
-    clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS * 3);
+  it.each(["won", "lost"] as const)(
+    "renders one %s frame, stops scheduling, and ignores start/pause/resume/choice",
+    (outcome) => {
+      const {
+        clock,
+        controller,
+        frameScheduler,
+        input,
+        readMovementIntent,
+        snapshots,
+        state,
+      } = createHarness();
+      state.player.currentHealth = 1;
+      state.nextAttackAtSeconds = 100;
+      state.waveSchedule!.nextScheduledSpawnIndex =
+        state.waveSchedule!.requests.length;
+      const enemy = createBasicEnemyState(1, state.player.position);
+      enemy.phase = "active";
+      state.enemies.push(enemy);
+      if (outcome === "won") {
+        const boss = createChargerBossState(1, { x: 180, y: 160 });
+        boss.phase = "active";
+        boss.currentHealth = 0;
+        state.waveSchedule = null;
+        state.enemies = [boss];
+      }
+      controller.start();
+      clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS * 3);
 
-    frameScheduler.runNextFrame();
+      frameScheduler.runNextFrame();
 
-    expect(controller.lifecycleState).toBe("lost");
-    expect(snapshots).toHaveLength(1);
-    expect(snapshots[0]).toMatchObject({
-      phase: "lost",
-      simulationTimeSeconds: FIXED_SIMULATION_STEP_SECONDS,
-    });
-    expect(frameScheduler.pendingFrameCount).toBe(0);
-    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
-    expect(readMovementIntent).toHaveBeenCalledOnce();
-    expect(input.reset).toHaveBeenCalledOnce();
+      expect(controller.lifecycleState).toBe(outcome);
+      expect(snapshots).toHaveLength(1);
+      expect(snapshots[0]).toMatchObject({
+        phase: outcome,
+        simulationTimeSeconds: FIXED_SIMULATION_STEP_SECONDS,
+      });
+      expect(frameScheduler.pendingFrameCount).toBe(0);
+      expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+      expect(readMovementIntent).toHaveBeenCalledOnce();
+      expect(input.reset).toHaveBeenCalledOnce();
 
-    controller.pause();
-    controller.resume();
+      controller.pause();
+      controller.resume();
+      controller.start();
+      expect(controller.chooseUpgrade("vitality")).toBe(false);
 
-    expect(controller.lifecycleState).toBe("lost");
-    expect(frameScheduler.pendingFrameCount).toBe(0);
-    expect(frameScheduler.requestedFrameIds).toHaveLength(1);
-    expect(input.reset).toHaveBeenCalledOnce();
-  });
+      expect(controller.lifecycleState).toBe(outcome);
+      expect(frameScheduler.pendingFrameCount).toBe(0);
+      expect(frameScheduler.requestedFrameIds).toHaveLength(1);
+      expect(input.reset).toHaveBeenCalledOnce();
+    },
+  );
+
+  it.each(["restart", "destroy"] as const)(
+    "abandons the old frame when a terminal status callback calls %s",
+    (action) => {
+      const harness = createHarness(null, (status) => {
+        if (status.phase === "won") {
+          expect(harness.session.result?.outcome).toBe("won");
+          harness.controller[action]();
+        }
+      });
+      const boss = createChargerBossState(1, { x: 180, y: 160 });
+      boss.phase = "active";
+      boss.currentHealth = 0;
+      harness.state.waveSchedule = null;
+      harness.state.enemies = [boss];
+      harness.controller.start();
+      harness.clock.advanceByMilliseconds(200);
+      harness.frameScheduler.runNextFrame();
+      expect(harness.snapshots).toEqual([]);
+      expect(harness.frameScheduler.pendingFrameCount).toBe(
+        action === "restart" ? 1 : 0,
+      );
+      if (action === "restart") {
+        expect(harness.session.result).toBeNull();
+        harness.clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
+        harness.frameScheduler.runNextFrame();
+        expect(harness.snapshots.at(-1)).toMatchObject({
+          phase: "playing",
+          simulationTimeSeconds: FIXED_SIMULATION_STEP_SECONDS,
+        });
+        expect(harness.frameScheduler.pendingFrameCount).toBe(1);
+      }
+      harness.controller.destroy();
+    },
+  );
 
   it("renders one choosing-upgrade frame before suspending the loop", () => {
     const {

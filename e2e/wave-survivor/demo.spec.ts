@@ -33,6 +33,11 @@ async function openDemo(
               phase = "playing";
               status();
               onEvent({ type: "wave-started", waveNumber });
+              canvas.addEventListener("test-win", () => {
+                phase = "won";
+                waveNumber = 5;
+                status();
+              }, { once: true });
               canvas.addEventListener("test-clear-wave", () => {
                 phase = ${JSON.stringify(exhausted ? "wave-cleared" : "choosing-upgrade")};
                 onEvent({ type: "wave-cleared", waveNumber });
@@ -83,6 +88,28 @@ test("announces the boss after the final upgrade and restores movement focus", a
 async function clearWave(page: Page): Promise<void> {
   await page.locator("#game-canvas").dispatchEvent("test-clear-wave");
 }
+
+test("announces terminal victory and keeps restart reachable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await openDemo(page, false, false);
+  await page.locator("#game-canvas").dispatchEvent("test-win");
+  await expect(page.getByRole("status")).toContainText(
+    "You won. Restart is available.",
+  );
+  await expect(page.locator("#game-canvas")).toHaveAttribute(
+    "data-game-state",
+    "won",
+  );
+  const restart = page.getByRole("button", { name: "Restart game" });
+  await expect(restart).toBeVisible();
+  await restart.click();
+  await expect(restart).toBeHidden();
+  await expect(page.locator("#game-canvas")).toBeFocused();
+  await expect(page.locator("#game-wave")).toHaveText("Wave: 1");
+});
 
 test("renders the actual boss entry warning in monochrome reduced motion", async ({
   page,

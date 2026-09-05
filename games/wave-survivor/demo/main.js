@@ -82,11 +82,16 @@ const game = createGame({
     health.textContent = `Health: ${status.currentHealth} / ${status.maximumHealth}`;
     kills.textContent = `Kills: ${status.killCount}`;
     restartButton.hidden =
-      status.phase !== "lost" && status.phase !== "wave-cleared";
+      status.phase !== "lost" &&
+      status.phase !== "won" &&
+      status.phase !== "wave-cleared";
     canvas.dataset.gameState = status.phase;
 
     if (status.phase === "lost" && previousPhase !== "lost") {
       announcement.textContent = "You lost. Restart is available.";
+    }
+    if (status.phase === "won" && previousPhase !== "won") {
+      announcement.textContent = "You won. Restart is available.";
     }
     if (status.phase !== "choosing-upgrade" && !selectionInProgress) {
       hideAndClearUpgradePanel();

@@ -58,8 +58,8 @@ WS-6.1 adds the finite candidate configuration; WS-6.6 adds the pure score
 candidate. WS-6.7 adds the immutable public result type and internal factory.
 WS-6.2 adds active charger behavior and combat fixtures; WS-6.3 integrates
 production entry; WS-6.4 adds static action telegraphs and focused swept contact.
-Score/result integration, victory, audio, and
-persistence remain unimplemented; see the per-epic evidence below.
+WS-6.5 now integrates terminal victory/loss and committed scores/results. Result
+publication/UI, audio and persistence remain unimplemented; see evidence below.
 
 ### Safe assumptions
 
@@ -862,10 +862,11 @@ renewed real-device acceptance.
 **Status:** WS-6.1 finite candidate and WS-6.6 pure score candidate implemented
 with automated regressions (2026-09-05). Dimi's structure/pacing and scoring
 reward approvals remain pending. WS-6.7 record construction and public type are
-implemented; result integration and Dimi's result-information review remain
+implemented and integrated by WS-6.5; Dimi's result-information review remains
 pending. WS-6.2 active charger behavior is implemented with deterministic
 combat fixtures; WS-6.3 production entry and WS-6.4 static action telegraphs are
-implemented. Human boss review and Gate 2 remain pending.
+implemented. Dimi reports WS-6.4 manual checks PASS. WS-6.5 terminal completion
+is implemented; its visible-end manual check and Gate 2 remain pending.
 
 ## Goal
 
@@ -912,16 +913,72 @@ EPIC 5.
 | **WS-6.1**  | Resolve the minimal run structure.        | Implemented provisional four normal waves + boss, finite lookup/successors, wave validation, and upgrade-capacity safety.   | Configuration and pacing evidence recorded; Dimi's PC/phone pacing and candidate approval pending.                        |
 | **WS-6.2**  | Define one boss.                          | Implemented provisional charger cycle with locked aim, bounded charge, recovery, and existing combat.                       | Active Domain/session fixtures pass; entry/telegraphs integrated by WS-6.3/6.4; Dimi's movement-challenge review pending. |
 | **WS-6.3**  | Implement boss entry.                     | Implemented single top-center boss after fourth upgrade; repeat bridge removed, static warning and host announcement added. | Automated handoff, escape, eligibility, cleanup, and lifecycle checks; Dimi's PC/phone fairness review pending.           |
-| **WS-6.4**  | Implement boss action telegraphing.       | Implemented static action labels/shapes, countdowns, shared bounded charge corridor, and focused swept contact.             | Automated geometry, timing, collision, lifecycle, and rendering checks; Dimi's smartphone fairness review pending.        |
-| **WS-6.5**  | Implement victory.                        | Defeating the boss or completing the final condition transitions to `won`.                                                  | Simulation stops cleanly and result is emitted once.                                                                      |
-| **WS-6.6**  | Define score calculation.                 | Implemented pure candidate: 10 per enemy, 100 per normal clear; on win, 500 plus floored health percentage. No time factor. | Numeric validity and safe totals tested; Dimi's reward approval and WS-6.5/7 integration pending.                         |
-| **WS-6.7**  | Define `RunResult`.                       | Implemented four-field public type, pure validated/frozen construction, and frontend type alias.                            | Copy/freeze and public types tested; terminal/restart integration and Dimi's information review pending.                  |
+| **WS-6.4**  | Implement boss action telegraphing.       | Implemented static action cues, shared charge geometry and swept contact.                                                   | Automated checks pass; Dimi reports all task manual checks PASS (2026-09-05).                                             |
+| **WS-6.5**  | Implement victory.                        | Confirmed final-boss defeat commits won through shared win/loss finalization with frozen score/result.                      | Terminal suspension and callback safety tested; Dimi's visible-end check pending. Result publication is WS-6.8.           |
+| **WS-6.6**  | Define score calculation.                 | Implemented pure 10/100/500/100 candidate; WS-6.5 integrates authoritative terminal inputs.                                 | Numeric safety and integrated win/loss scores tested; final reward approval pending.                                      |
+| **WS-6.7**  | Define `RunResult`.                       | Implemented validated/frozen record and public type; WS-6.5 stores it once at completion.                                   | Terminal values and retained-result preservation tested; result-screen information review and WS-6.8 publication pending. |
 | **WS-6.8**  | Implement result event and UI.            | Standalone demo presents victory/defeat and replay.                                                                         | Event fires once per run and no post-result combat continues.                                                             |
 | **WS-6.9**  | Implement immediate replay.               | Restart from won or lost without page reload or controller recreation.                                                      | Replayed run is equivalent to a fresh run.                                                                                |
 | **WS-6.10** | Balance the full run.                     | Tune enemy speed, health, spawn timing, attack cooldown, upgrade strength, and upgrade frequency.                           | Player power grows, but movement remains important through the boss.                                                      |
 | **WS-6.11** | Add deterministic full-run test fixtures. | Use controlled seed and time to cover win and loss paths where practical.                                                   | Critical transitions do not depend on flaky real-time tests.                                                              |
 
-### WS-6.4 implementation and dependent acceptance
+### WS-6.5 implementation and dependent acceptance
+
+Implemented `won` and one shared win/loss finalizer. It commits one frozen result
+with final score, progress and overall simulation time before input reset and
+status callbacks. Normal clears come from finite progression, not a new counter.
+Only a confirmed valid final-charger defeat can win; empty/invalid/escaped or
+already-dying boss states do not. Projectile-before-contact ordering remains;
+a surviving enemy's lethal contact takes loss precedence over a boss kill.
+
+Terminal runs reject updates, choices and start/resume. The existing loop renders
+once then suspends. Its generation guard now prevents callback-driven restart or
+destroy from continuing the old frame. Restart clears new per-run result state;
+retained results remain immutable. Existing Canvas/DOM terminal feedback and the
+demo restart control now support won. No result event or result-field UI is added.
+See [terminal rules](./wave-survivor.md#1010-ws-65-terminal-completion).
+
+Executed WS-6.5 validation (2026-09-05), all exit 0:
+
+- `pnpm --filter @funkspace/wave-survivor typecheck`.
+- `pnpm --filter @funkspace/wave-survivor test`: **872 tests / 56 files**,
+  including 19 added completion/controller/loop/renderer cases.
+- `pnpm --filter @funkspace/wave-survivor exec tsc -p /private/tmp/ws63-tests.tsconfig.json`:
+  strict checking also includes all test files via the existing temporary config
+  that extends the game tsconfig and clears its test exclusions.
+- `pnpm --filter @funkspace/wave-survivor demo:build`: package TypeScript and
+  standalone Vite production builds pass.
+- `pnpm lint`: frontend lint and repository-wide formatting pass. Scoped ESLint
+  with `frontend/eslint.config.mjs` on all 8 changed game TypeScript files,
+  `games/wave-survivor/demo/main.js` and `e2e/wave-survivor/demo.spec.ts`, with
+  `--max-warnings=0`, also passes.
+- `pnpm -F frontend exec tsc --noEmit` passes. The frontend's imported
+  `RuntimePhase` already includes won without a duplicate phase declaration.
+- `pnpm exec vitest run frontend/features/games/GameHost.test.tsx frontend/features/games/GameLoader.test.ts`:
+  **6 tests / 2 files** pass.
+- `pnpm exec cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.demo.config.ts`:
+  **13 browser tests** pass, including won announcement/restart under reduced
+  motion and existing action-theme, entry and mobile upgrade checks. The terminal
+  DOM fixture exercises host compatibility; real boss combat/loop termination
+  is covered by application fixtures, not claimed as a browser playtest.
+- `git diff --check` passes. Diff review found no duplicate scoring authority,
+  new resource lifetime, dependency, generated-token change, or result event.
+
+Existing Next-lint deprecation, root ESLint React/pages discovery, and Playwright
+color-environment notices remain non-failing. No human victory judgment or
+run-finished publication acceptance is inferred from automated checks.
+
+**Pending with Dimi:** confirm boss defeat visibly ends gameplay. WS-6.8 owns
+result publication/UI and exactly-once event acceptance; WS-6.9 owns comprehensive
+replay verification. Final tuning and Gate 2 remain pending.
+
+### WS-6.4 implementation and dependent acceptance (completed before WS-6.5)
+
+**Manual update — 2026-09-05:** Dimi reports all WS-6.4 manual tests PASS, including
+smartphone anticipation/avoidance, recovery readability across themes/simplified
+effects and thumb/joystick occlusion. The pending list below is the historical
+handoff now satisfied for this task. No measured durations or device details were
+provided. This does not constitute WS-6.5 acceptance or Gate 2 approval.
 
 The active boss snapshot now contains copied/frozen Domain action timing and,
 during wind-up/charge, a bounded physical charge path. Movement and warning use

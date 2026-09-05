@@ -408,12 +408,12 @@ final `{ kind: "boss" }` encounter. Its zero-based encounter lookup rejects
 invalid or out-of-range indexes. Successor resolution requires one upgrade
 after every normal wave, including Wave 4 before the boss at encounter index 4
 (position 5). Completing the boss resolves run completion without an upgrade;
-this is a progression rule, not an implemented boss-defeat or victory state.
+WS-6.5 now connects that progression rule to confirmed boss defeat and victory.
 
 WS-6.3 removes the production repeat bridge. The fourth valid upgrade enters
 one boss at encounter 5, with no normal-wave schedule or subsequent upgrade.
 Normal-wave completion still requires an empty queue and no entering/active
-enemies. Boss terminal handling remains WS-6.5; an empty boss arena is not
+enemies. WS-6.5 implements boss terminal handling; an empty boss arena is not
 treated as victory or another normal-wave clear.
 
 If every upgrade has reached its cap, completing the wave leaves the game
@@ -552,8 +552,8 @@ no damage across all three builds, which does not establish a fair or distinct
 movement challenge for a person. No health padding was added to fill run time.
 
 **Dependent acceptance:** WS-6.3 has integrated entry and finite handoff; WS-6.4
-has added static action telegraphs; WS-6.5 integrates terminal boss defeat without
-normal-wave upgrade handling. No complete victory flow is delivered here.
+has added static action telegraphs; WS-6.5 now integrates terminal boss defeat
+without normal-wave upgrade handling. Result publication/UI remain WS-6.8.
 WS-6.10 owns final tuning. After entry and telegraphs exist, Dimi must evaluate
 on PC/phone whether the charger tests positioning rather than merely adding a
 large health pool, and assess timing, damage fairness, edge behavior, and build
@@ -568,8 +568,7 @@ final boss encounter. The displayed encounter is derived from the normal
 schedule or `normalWaves.length + 1`, never stored in a second counter. The
 production repeat-last-wave function is removed. No normal schedule, upgrade
 selection, or normal-wave completion can follow the boss, even if the arena is
-empty. Until WS-6.5, defeating the boss leaves gameplay running without a win
-result; no empty-arena victory is inferred.
+empty. WS-6.5 now finalizes confirmed boss defeat; no empty-arena victory is inferred.
 
 Entry is provisional **top-center, straight downward**, without tracking the
 player. The radius-24 boss starts at `(180,-96)` and moves at 48 units/s.
@@ -675,12 +674,78 @@ The three recorded scripted fight fixtures still produce 30.82s / 43.13s /
 46.00s and unchanged health with the focused sweep. They remain simulation
 diagnostics, not human observations or tuning approval.
 
-**Pending manual acceptance — Dimi:** on a real smartphone, verify attacks can
-be anticipated and avoided, recovery is readable across all supported themes
-and simplified effects, and thumb/joystick occlusion does not hide crucial cues.
-Also review boundary/corner escape and PC readability. Automated geometry,
-rendering, and browser screenshots do not establish perceived fairness. WS-6.5
-terminal handling, WS-6.10 final tuning, and Gate 2 approval remain pending.
+**Manual acceptance — 2026-09-05:** Dimi reports “all manual tests a PASS” for
+the WS-6.4 handoff: smartphone anticipation/avoidance, recovery readability across
+supported themes and simplified effects, thumb/joystick occlusion, and the
+requested boundary/corner and PC readability checks. No device models, measured
+durations, or additional observations were supplied. This is Dimi's acceptance
+of those checks, separate from automated evidence. It does not approve the new
+WS-6.5 terminal behavior, final tuning, or Gate 2.
+
+### 10.10 WS-6.5 terminal completion
+
+`RuntimePhase` includes `won`. `RuntimeState.result` starts null and holds one
+frozen `RunResult` after completion; the internal session getter returns that
+same object. Application owns one `finalizeRun()` path for both outcomes, reusing
+the pure WS-6.6 score calculation and WS-6.7 constructor. It validates/calculates
+the result, commits result/outcome/health and clears pending choices, then resets
+movement and calls the existing discrete status observer. No score calculation
+occurs in rendering or status. No result event or result schema is introduced.
+
+Victory requires the existing valid active-to-dying transition for a charger in
+the final encounter (null normal schedule), retained within boss cleanup bounds.
+That transition increments the existing kill count once and reports a transient
+confirmed-defeat flag for the current update. Missing/invalid/escaped bodies,
+entering or already-dying bodies, normal encounters, and empty arenas cannot
+substitute for this confirmation. There is no persistent duplicate defeat flag.
+
+**Outcome precedence preserves combat ordering:** a player already defeated at
+update start loses at the current clock without processing enemies. Otherwise
+movement, projectile hits and enemy defeats precede contact, as before. A boss
+killed by projectiles cannot deliver even an otherwise lethal contact that step.
+If a different surviving enemy delivers lethal contact, loss wins precedence;
+the confirmed boss kill still contributes to the loss score. After contact, the
+overall clock is committed, then player defeat selects loss, otherwise confirmed
+final boss defeat selects victory. The outcomes are mutually exclusive.
+
+**Score/progress/time ownership:** kills come from `killCount`; normal clears are
+derived from the current normal encounter number minus one, or the finite run's
+normal count during the boss. Finalization only occurs from playing, so earlier
+normal encounters necessarily passed completion and upgrade before this entry.
+The current encounter is not credited as a normal clear merely for being reached.
+The boss contributes one kill and zero normal clears. Effective maximum health
+comes from upgrades. Result time samples the overall gameplay clock including
+the completing step, capacity waiting, boss entry and wind-up; idle, pauses,
+upgrade choice and terminal time are excluded. No wall clock or wave-local clock
+is used. A win at 29 kills, four clears, and 5/7 health scores
+`290 + 400 + 500 + floor(500/7) = 1261`; a wave-3 loss with 12 kills scores
+`120 + 200 = 320`, with no victory/health bonus.
+
+Terminal phases reject start/resume/choices and fixed updates, preserving clocks,
+actors, health, attacks, progression and the result. The existing loop suspension
+draws one terminal frame, then schedules no successor. The static Canvas terminal
+marker supports WON as well as LOST; the existing demo announcement/restart
+control supports both. These are minimal lifecycle feedback, not the WS-6.8
+result screen. Theme/resize redraws remain usable without combat updates.
+
+The committed result is visible internally before terminal status callbacks.
+Callbacks may synchronously restart or destroy: finalization returns immediately
+after notification, and the loop checks its existing generation after update and
+render callbacks so an old frame cannot consume new-run time or suspend it.
+Restart initializes all state, including a null result; previously retained result
+references stay frozen and unchanged. Destroy remains terminal and leaves any
+retained result intact while releasing runtime resources.
+
+Automated coverage includes win/loss scores and time, final-upgrade entry and
+wind-up, lethal ordering, false-win cases, duplicate updates, frozen state/result,
+restart retention, status-callback restart/destroy, loop suspension, terminal
+render/theme/resize and demo restart compatibility. WS-6.8 still owns result
+publication and its exactly-once event acceptance; WS-6.9 owns comprehensive
+fresh-run replay equivalence.
+
+**Pending manual acceptance — Dimi:** confirm boss defeat visibly ends gameplay.
+This new check is not covered by the preceding WS-6.4 manual PASS. Final tuning
+and Gate 2 approval remain pending.
 
 ## 11. Upgrades and progression
 
@@ -743,13 +808,13 @@ not a score input; WS-6.7 may include it in results for later display, with no
 time bonus or penalty. No live-score counter, persistence, currency, spending,
 or leaderboard is introduced.
 
-| Score input              | Authoritative owner / integration obligation                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `enemiesDefeated`        | Existing `RuntimeState.killCount`, incremented once when `transitionEnemyToDying()` succeeds. WS-6.5 integration must include a defeated boss exactly once through the authoritative defeat path; no parallel kill counter.                                                                                                                                                                                                     |
-| `normalWavesCleared`     | Application derives completed **normal** encounters from the finite run's progression and existing `isWaveComplete()` boundary (queue empty and no entering/active enemies). A wave merely reached is not cleared; the boss is never a normal-wave clear. There is no authoritative completed-normal count in today's runtime yet; WS-6.5 must resolve it from progression, without adding a duplicate mutable scoring counter. |
-| `won`                    | Authoritative terminal outcome from WS-6.5, not inferred from health, kills, an empty arena, or upgrade exhaustion. Victory is not implemented by this task.                                                                                                                                                                                                                                                                    |
-| `currentHealth`          | Existing `RuntimeState.player.currentHealth` at the outcome boundary.                                                                                                                                                                                                                                                                                                                                                           |
-| `effectiveMaximumHealth` | Existing `getEffectiveMaximumHealth(player.maximumHealth, state.upgrades)` at the same boundary, including Vitality; never use the unchanged base maximum alone.                                                                                                                                                                                                                                                                |
+| Score input              | Authoritative owner / integration obligation                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enemiesDefeated`        | Existing `RuntimeState.killCount`, incremented once when `transitionEnemyToDying()` succeeds. WS-6.5 includes the defeated boss once through that same path; no parallel kill counter.                                                                                                                                                                                                                                        |
+| `normalWavesCleared`     | Application derives completed **normal** encounters from the finite run's progression and existing `isWaveComplete()` boundary (queue empty and no entering/active enemies). A wave merely reached is not cleared; the boss is never a normal-wave clear. WS-6.5 derives this at terminal completion as current normal encounter minus one, or the finite normal count during the boss; no duplicate mutable scoring counter. |
+| `won`                    | Authoritative terminal outcome from WS-6.5, not inferred from health, kills, an empty arena, or upgrade exhaustion. WS-6.5 now implements confirmed boss-defeat victory.                                                                                                                                                                                                                                                      |
+| `currentHealth`          | Existing `RuntimeState.player.currentHealth` at the outcome boundary.                                                                                                                                                                                                                                                                                                                                                         |
+| `effectiveMaximumHealth` | Existing `getEffectiveMaximumHealth(player.maximumHealth, state.upgrades)` at the same boundary, including Vitality; never use the unchanged base maximum alone.                                                                                                                                                                                                                                                              |
 
 The WS-6.1 candidate still has four normal waves and one boss. Current normal
 content totals 28 enemies, so a completed boss contributes enemy 29 while the
@@ -777,8 +842,8 @@ silent repair. The result must be a non-negative safe integer. The arithmetic
 does not validate whether the supplied outcome/progress is reachable; that
 belongs to session integration.
 
-**Dependent acceptance:** WS-6.5 owns application integration and coherent
-terminal inputs; WS-6.7 owns result construction; later UI work displays results.
+**Integration:** WS-6.5 now supplies coherent application inputs and uses WS-6.7
+result construction. WS-6.8 still owns result publication and display.
 Dimi must approve these rewards. Automated arithmetic tests do not provide
 human scoring approval or Gate 2 acceptance.
 
@@ -980,13 +1045,12 @@ no hard-coded five-encounter cap in this reusable record boundary.
 export, and frontend type alias. `GameEvent` and `GameStatusSnapshot` are
 unchanged. The factory is internal; hosts receive the type only for now.
 
-**Dependent acceptance:** WS-6.5 owns terminal integration, including clock
-sampling. WS-6.3 now records actual boss entry at encounter 5. WS-6.8 owns result delivery and
-UI. Preservation of an emitted result across restart is deferred to WS-6.5/9;
-the isolated copy/freeze tests do not exercise that runtime path. Boss
-entry and wind-up use the gameplay clock, but terminal sampling is still
-pending integration. Dimi's confirmation that these fields are sufficient and
-understandable for a result screen remains pending; Gate 2 is not approved.
+**Integration:** WS-6.5 now commits terminal results using the gameplay clock and
+actual encounter progression, including boss entry/wind-up. It tests preservation
+of retained result references across restart. WS-6.8 owns delivery/UI and emitted
+result acceptance; WS-6.9 owns comprehensive replay equivalence. Dimi's confirmation
+that the fields are sufficient and understandable for a result screen remains
+pending; Gate 2 is not approved.
 
 ## 16. Accessibility and user control
 

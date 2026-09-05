@@ -64,7 +64,7 @@ Tests cover all 81 legal four-choice paths without pool exhaustion.
 WS-6.3 removes the production repeat bridge: the fourth upgrade now enters one
 boss. The normal schedule is absent during that final encounter, preventing
 additional normal waves or upgrades. Normal completion remains queue empty
-plus no entering/active enemies. Victory and terminal stop remain WS-6.5;
+plus no entering/active enemies. WS-6.5 implements victory and terminal stop;
 an empty boss arena is not treated as victory.
 
 See the [candidate pacing record](../../docs/features/wave-survivor.md#106-ws-61-candidate-pacing-record--2026-09-05)
@@ -105,7 +105,7 @@ acceptance. See the [definition and evidence](../../docs/features/wave-survivor.
 for exact configuration, fixture setup, and ideal all-hit duration estimates.
 
 Production entry and static action telegraphs are implemented by WS-6.3/6.4.
-Terminal integration belongs to WS-6.5. During entry/telegraph validation,
+Terminal integration is implemented by WS-6.5. During entry/telegraph validation,
 Dimi evaluates whether the boss offers a distinct positioning challenge on
 PC/phone. Final balance is WS-6.10; manual acceptance and Gate 2 are pending.
 
@@ -124,8 +124,8 @@ sets it to `"boss"`. Both demo and portfolio host announce the boss without a
 new event variant. Normal events retain their existing payloads. See the
 [entry contract and acceptance record](../../docs/features/wave-survivor.md#108-ws-63-deliberate-boss-entry).
 
-No normal schedule or upgrade follows the boss. Defeating it currently leaves
-gameplay running, pending WS-6.5 terminal handling; no victory is inferred from
+No normal schedule or upgrade follows the boss. WS-6.5 now ends gameplay on
+confirmed boss defeat; no victory is inferred from
 an empty arena. Action telegraphs are implemented below. Dimi's PC/phone warning and escape
 review, including thumb/joystick occlusion, remains pending.
 
@@ -154,10 +154,43 @@ grazes missed by endpoint sampling while retaining projectile-before-contact
 defeat, shared immunity, and normal-enemy behavior.
 
 See the [telegraph contract and collision evidence](../../docs/features/wave-survivor.md#109-ws-64-static-action-telegraphs).
-**Pending with Dimi:** smartphone anticipation/avoidance, readable recovery across
-themes and simplified effects, thumb/joystick occlusion, and Gate 2. Automated
-geometry and rendering checks do not establish perceived fairness. WS-6.5 still
-owns terminal handling; WS-6.10 owns final tuning.
+**Manual acceptance — 2026-09-05:** Dimi reports all WS-6.4 manual tests PASS:
+smartphone anticipation/avoidance, recovery readability across themes and
+simplified effects, and thumb/joystick occlusion. No device models or measured
+durations were supplied. This accepts that task's checks, not Gate 2 or the new
+victory behavior. WS-6.10 still owns final tuning.
+
+## WS-6.5 terminal victory and loss
+
+`won` joins the existing lifecycle. One shared session finalizer computes score,
+constructs a frozen `RunResult`, and commits it to `RuntimeState.result` before
+resetting input and notifying status observers. The internal `session.result`
+getter returns that same object; rendering and status never recalculate it.
+No result event or result-field UI is added; WS-6.8 owns publication and display.
+
+Victory requires a valid active charger to transition to dying through existing
+defeat accounting in the final encounter. Missing, invalid, escaped, or already
+dying bosses and empty arenas do not award a win. Projectiles/defeats still precede
+contact: a boss killed that update cannot deal contact damage. If another active
+enemy nevertheless defeats the player, loss takes precedence. A player already
+dead at update start loses without advancing time or processing enemies.
+
+Kills include the boss once. Completed normal waves are derived from progression:
+current normal number minus one, or all four when the boss is entered. Encounter
+reached includes the boss at 5. Time is the committed overall simulation clock,
+including the final combat step, entry and wind-up, excluding choices/pauses and
+terminal time. At 29 kills, four normal clears and 5/7 health, victory scores 1261.
+
+Both outcomes block updates, choices, start/resume, and progression. The existing
+loop draws the terminal frame and suspends scheduling; static WON/LOST markers,
+theme redraws and resizing remain available. The demo's existing announcement
+and Restart button support both outcomes. Restart creates fresh state/result;
+previous result references remain frozen. A loop generation guard prevents a
+callback-driven restart/destroy from continuing the old frame.
+
+**Pending with Dimi:** confirm boss defeat visibly ends gameplay. Result event/UI
+acceptance (WS-6.8), comprehensive replay (WS-6.9), final tuning and Gate 2 remain
+pending. See the [terminal rules and evidence](../../docs/features/wave-survivor.md#1010-ws-65-terminal-completion).
 
 ## WS-6.6 score candidate
 
@@ -178,13 +211,12 @@ or unsafe totals throw `RangeError`; a non-boolean win flag throws `TypeError`.
 Repeated evaluation is stateless and never accumulates points. Time is not an
 input, and losses earn neither victory nor remaining-health bonuses.
 
-For example, a loss with 7 kills and one normal clear scores **170**. A future
+For example, a loss with 7 kills and one normal clear scores **170**. A
 win with 29 kills, four normal clears, and full health scores **1290**; at
-3/6 upgraded health it scores **1240**. These are arithmetic examples, not
-implemented boss/victory results. See [input ownership and examples](../../docs/features/wave-survivor.md#113-ws-66-score-candidate).
+3/6 upgraded health it scores **1240**. These arithmetic examples now use the same
+formula as terminal integration. See [input ownership and examples](../../docs/features/wave-survivor.md#113-ws-66-score-candidate).
 
-WS-6.5 owns session integration (including normal-clear progress, which is not
-yet tracked as a terminal score input); WS-6.7 owns result construction. The
+WS-6.5 integrates authoritative session inputs with WS-6.7 result construction. The
 scoring rule adds no live-score system, economy, time bonus, or persistence.
 The formula remains a candidate pending Dimi's reward approval, not a
 playtest-approved decision or Gate 2 completion.
@@ -215,11 +247,11 @@ boss entry/wind-up, excluding idle, pauses, upgrade selection, and terminal
 time. The per-wave schedule clock is unsuitable because it pauses at capacity.
 
 See [field ownership and integration requirements](../../docs/features/wave-survivor.md#155-ws-67-completion-record).
-The frontend loader aliases the package type. Result events/UI (WS-6.8),
-terminal integration (WS-6.5), and emitted-result preservation across restart
-(WS-6.5/9) remain pending. No result is currently emitted or displayed; the
-boss entry does not itself complete the run. Dimi's review of
-the result information remains pending.
+The frontend loader aliases the package type. Result events/UI (WS-6.8)
+and comprehensive replay verification (WS-6.9) remain pending. WS-6.5 tests
+terminal sampling and preservation of retained result references across restart.
+No result is currently emitted or displayed. Boss entry does not itself complete
+the run. Dimi's review of the result information remains pending.
 
 ```ts
 import {
@@ -266,8 +298,8 @@ The demo announces “All upgrades maxed” and focuses its Restart button. The
 session stays frozen, keeps the cleared wave number, and emits no empty
 upgrade-choice request. The three five-level upgrades allow 15 selections;
 this defensive exhaustion endpoint is unreachable in the finite four-choice
-run. The old Wave 16 repeat endpoint was removed by WS-6.3. WS-6.5 owns runtime
-victory behavior.
+run. The old Wave 16 repeat endpoint was removed by WS-6.3. WS-6.5 implements
+runtime victory behavior.
 
 The optional `onEvent` callback receives frozen `wave-started`, `wave-cleared`,
 and `upgrade-choice-requested` events. Upgrade-choice events contain a frozen

@@ -34,7 +34,7 @@ const HEALTH_BAR_INSET = 1;
 const KILL_COUNT_RIGHT_INSET = 10;
 const KILL_COUNT_TOP_INSET = 10;
 const KILL_COUNT_FONT = "600 12px sans-serif";
-const LOST_LABEL_FONT = "700 32px sans-serif";
+const TERMINAL_LABEL_FONT = "700 32px sans-serif";
 
 function getBrowserDevicePixelRatio(): number {
   return typeof window === "undefined" ? 1 : window.devicePixelRatio;
@@ -164,8 +164,11 @@ export class CanvasGameRenderer implements GamePresentationPort {
     this.drawHealth(this.latestSnapshot);
     this.drawKillCount(this.latestSnapshot.killCount);
 
-    if (this.latestSnapshot.phase === "lost") {
-      this.drawLostState();
+    if (
+      this.latestSnapshot.phase === "lost" ||
+      this.latestSnapshot.phase === "won"
+    ) {
+      this.drawTerminalState(this.latestSnapshot.phase);
     }
   }
 
@@ -485,14 +488,18 @@ export class CanvasGameRenderer implements GamePresentationPort {
     );
   }
 
-  private drawLostState(): void {
+  private drawTerminalState(outcome: "won" | "lost"): void {
     if (!this.context || !this.theme) return;
 
     this.context.fillStyle = this.theme.colors.effect;
-    this.context.font = LOST_LABEL_FONT;
+    this.context.font = TERMINAL_LABEL_FONT;
     this.context.textAlign = "center";
     this.context.textBaseline = "middle";
-    this.context.fillText("LOST", ARENA.width / 2, ARENA.height / 2);
+    this.context.fillText(
+      outcome.toUpperCase(),
+      ARENA.width / 2,
+      ARENA.height / 2,
+    );
   }
 
   private drawJoystick(snapshot: JoystickRenderSnapshot): void {

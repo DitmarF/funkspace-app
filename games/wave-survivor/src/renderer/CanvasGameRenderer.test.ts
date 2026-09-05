@@ -489,27 +489,42 @@ describe("CanvasGameRenderer", () => {
     expect(fillStyles).toContain(initialTheme.colors.player);
   });
 
-  it("draws a static centered lost state from the terminal snapshot", () => {
-    const { canvas, container, context } = createCanvas(360, 640);
-    const renderer = new CanvasGameRenderer({
-      canvas,
-      viewport: container,
-      theme: initialTheme,
-    });
+  it.each(["won", "lost"] as const)(
+    "draws and redraws a static centered %s terminal marker",
+    (outcome) => {
+      const { canvas, container, context } = createCanvas(360, 640);
+      const renderer = new CanvasGameRenderer({
+        canvas,
+        viewport: container,
+        theme: initialTheme,
+      });
 
-    renderer.render(
-      createRenderSnapshot({
-        phase: "lost",
-        joystick: null,
-      }),
-    );
+      renderer.render(
+        createRenderSnapshot({
+          phase: outcome,
+          joystick: null,
+        }),
+      );
 
-    expect(context.fillStyle).toBe(initialTheme.colors.effect);
-    expect(context.font).toBe("700 32px sans-serif");
-    expect(context.textAlign).toBe("center");
-    expect(context.textBaseline).toBe("middle");
-    expect(context.fillText).toHaveBeenLastCalledWith("LOST", 180, 320);
-  });
+      expect(context.fillStyle).toBe(initialTheme.colors.effect);
+      expect(context.font).toBe("700 32px sans-serif");
+      expect(context.textAlign).toBe("center");
+      expect(context.textBaseline).toBe("middle");
+      expect(context.fillText).toHaveBeenLastCalledWith(
+        outcome.toUpperCase(),
+        180,
+        320,
+      );
+      renderer.resize(240, 320, 2);
+      renderer.setTheme(initialTheme);
+      expect(context.fillText).toHaveBeenLastCalledWith(
+        outcome.toUpperCase(),
+        180,
+        320,
+      );
+      renderer.destroy();
+    },
+  );
 
   it("draws projectile snapshot circles after the player", () => {
     const { canvas, container, context, fillStyles } = createCanvas(360, 640);

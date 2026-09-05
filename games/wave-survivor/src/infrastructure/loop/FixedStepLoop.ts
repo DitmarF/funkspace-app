@@ -97,6 +97,14 @@ export class FixedStepLoop {
         FIXED_SIMULATION_STEP_MILLISECONDS
     ) {
       this.callbacks.fixedUpdate(FIXED_SIMULATION_STEP_SECONDS);
+      // A completion callback may synchronously restart/destroy the controller.
+      // Never consume the new run's accumulator or render from this old frame.
+      if (
+        runGeneration !== this.runGeneration ||
+        !this.running ||
+        this.destroyed
+      )
+        return;
       this.accumulatorMilliseconds = Math.max(
         0,
         this.accumulatorMilliseconds - FIXED_SIMULATION_STEP_MILLISECONDS,
@@ -115,6 +123,8 @@ export class FixedStepLoop {
     if (!this.running || this.destroyed) return;
 
     this.callbacks.render();
+    if (runGeneration !== this.runGeneration || !this.running || this.destroyed)
+      return;
 
     if (this.callbacks.shouldSuspend()) {
       this.stop();

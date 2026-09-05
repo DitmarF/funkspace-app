@@ -77,6 +77,19 @@ function createLoop() {
 const FIXED_SIMULATION_STEP_MILLISECONDS = FIXED_SIMULATION_STEP_SECONDS * 1000;
 
 describe("FixedStepLoop scheduling", () => {
+  it("does not suspend a restarted generation from an old render callback", () => {
+    const { frameScheduler, loop, render, shouldSuspend } = createLoop();
+    render.mockImplementationOnce(() => {
+      loop.stop();
+      loop.start();
+    });
+    shouldSuspend.mockReturnValue(true);
+    loop.start();
+    frameScheduler.runNextFrame();
+    expect(render).toHaveBeenCalledOnce();
+    expect(frameScheduler.pendingFrameCount).toBe(1);
+    loop.destroy();
+  });
   it("requests exactly one frame when started", () => {
     const { frameScheduler, loop } = createLoop();
 

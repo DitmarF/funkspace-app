@@ -6,6 +6,7 @@ import {
   type MovementIntent,
 } from "../movement/index.js";
 import type { ProjectileState } from "../projectiles/index.js";
+import type { RunResult } from "../result/RunResult.js";
 import {
   createInitialRunUpgradeState,
   type RunUpgradeState,
@@ -32,7 +33,8 @@ export type RuntimePhase =
   | "wave-cleared"
   | "choosing-upgrade"
   | "paused"
-  | "lost";
+  | "lost"
+  | "won";
 
 /** Complete mutable runtime state for the single player. */
 export interface PlayerState {
@@ -50,6 +52,8 @@ export interface PlayerState {
 export interface RuntimeState {
   /** Single lifecycle authority for the current game session. */
   phase: RuntimePhase;
+  /** Committed once at completion; frozen and detached from mutable run state. */
+  result: RunResult | null;
   simulationTimeSeconds: number;
   movementIntent: MovementIntent;
   player: PlayerState;
@@ -69,6 +73,7 @@ export interface RuntimeState {
 export function createInitialRuntimeState(): RuntimeState {
   return {
     phase: "idle",
+    result: null,
     simulationTimeSeconds: 0,
     movementIntent: ZERO_MOVEMENT_INTENT,
     player: {
