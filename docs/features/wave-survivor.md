@@ -5,7 +5,7 @@
 ## Document metadata
 
 - **Status:** Approved starting concept
-- **Product stage:** Gate 1 approved / Gate 2 in progress; WS-6.1/6.6 candidates and WS-6.7 record boundary implemented
+- **Product stage:** Gate 1 approved / Gate 2 in progress; WS-6.1/6.2/6.6 candidates and WS-6.7 record boundary implemented
 - **Owner:** Dimi
 - **Working title:** Wave Survivor
 - **Target platform:** Modern web browsers
@@ -435,13 +435,13 @@ adjustments. Existing groups are retained: Wave 3 uses `4 + 4`, and Wave 4
 uses `6 + 4` enemies. Wave 4 retains its concurrent cap of 6.
 Group start offsets, spawn intervals, combat stats, and upgrades are unchanged.
 
-| Encounter        |      Enemy count | Group start offsets / spawn intervals |       Entering + active cap | Last scheduled spawn offset | Upgrade afterward             | Provisional clear-time review target |
-| ---------------- | ---------------: | ------------------------------------- | --------------------------: | --------------------------: | ----------------------------- | ------------------------------------ |
-| Normal Wave 1    |                4 | `0.5s / 1s`                           |                           2 |                      `3.5s` | One                           | About `7s`, diagnostic only          |
-| Normal Wave 2    |                6 | `0.5s / 0.85s`                        |                           3 |                     `4.75s` | One                           | About `9s`, diagnostic only          |
-| Normal Wave 3    |            4 + 4 | `0.5s / 0.8s`; `4.5s / 0.7s`          |                           4 |                      `6.6s` | One                           | About `10s`, diagnostic only         |
-| Normal Wave 4    |            6 + 4 | `0.5s / 0.7s`; `5s / 0.6s`            |                           6 |                      `6.8s` | One, before boss              | About `12s`, diagnostic only         |
-| Boss, position 5 | One boss planned | WS-6.2/3 pending                      | Pending boss implementation |             Not yet defined | None after completion/victory | Pending real boss measurement        |
+| Encounter        |       Enemy count | Group start offsets / spawn intervals |              Entering + active cap | Last scheduled spawn offset | Upgrade afterward             | Provisional clear-time review target       |
+| ---------------- | ----------------: | ------------------------------------- | ---------------------------------: | --------------------------: | ----------------------------- | ------------------------------------------ |
+| Normal Wave 1    |                 4 | `0.5s / 1s`                           |                                  2 |                      `3.5s` | One                           | About `7s`, diagnostic only                |
+| Normal Wave 2    |                 6 | `0.5s / 0.85s`                        |                                  3 |                     `4.75s` | One                           | About `9s`, diagnostic only                |
+| Normal Wave 3    |             4 + 4 | `0.5s / 0.8s`; `4.5s / 0.7s`          |                                  4 |                      `6.6s` | One                           | About `10s`, diagnostic only               |
+| Normal Wave 4    |             6 + 4 | `0.5s / 0.7s`; `5s / 0.6s`            |                                  6 |                      `6.8s` | One, before boss              | About `12s`, diagnostic only               |
+| Boss, position 5 | One charger model | WS-6.3 entry pending                  | One boss; production entry pending |             Not yet defined | None after completion/victory | Active fixtures below; human fight pending |
 
 The clear-time review targets are provisional, not approved human pacing or
 gameplay timers. Earlier diagnostic targets are superseded by this explicit
@@ -482,6 +482,84 @@ start-to-result and boss duration after WS-6.3/5 integration. EPIC 5's recorded
 PC/phone PASS contains no pacing measurements and does not approve this
 candidate. The 5–7-minute target and Gate 2 approval remain pending. Do not add
 waves or enemies solely to fill that duration.
+
+### 10.7 WS-6.2 charger candidate
+
+One charger is implemented in `domain/enemies/ChargerBoss.ts` and dispatched by
+the existing session when an injected charger is active. Production waves still
+spawn only basic enemies; WS-6.3 owns real boss entry and removal of the repeat
+bridge. No boss is currently reachable through the playable run.
+
+The action cycle is **approach → wind-up → charge → recovery → approach**.
+`EnemyState` distinguishes basic and charger bodies by kind. The charger adds
+only its action/deadline and, during wind-up/charge, a locked unit direction.
+Position, health, contact damage, dying deadline, and defeat count stay in the
+same enemy/session fields used by normal combat. Entering/active/dying remains
+the separate lifecycle; no boss action is a global game phase.
+
+| Provisional value                  |                                 Setting |
+| ---------------------------------- | --------------------------------------: |
+| Maximum health                     |                                      24 |
+| Collision radius / diameter        |                   24 / 48 logical units |
+| Contact damage                     | 1, using existing 0.65s player immunity |
+| Approach speed / duration          |                      48 units/s / 1.25s |
+| Wind-up duration                   |                        0.8s, stationary |
+| Charge speed / maximum duration    |                      280 units/s / 0.8s |
+| Maximum unobstructed charge travel |                               224 units |
+| Recovery duration                  |                          1s, stationary |
+| Uninterrupted action cycle         |     3.85s; wall contact shortens charge |
+
+The existing overall gameplay simulation time sets deadlines. Updates split
+at action boundaries, so a charge cannot consume wind-up/recovery time.
+Pausing the session freezes both the clock and action state. The first active
+update starts approach; entering uses existing pursuit without an action clock.
+Active boss centers stay within the arena inset by their collision radius.
+
+Wind-up locks aim toward the player's position clamped to that reachable inset;
+moving afterward does not redirect the charge. Coincident aim falls back toward
+arena center, then downward if both centers coincide. This avoids normalizing
+zero and repeated outward charges at a wall. The charge stops at first wall
+contact and begins recovery immediately, without sliding, reflecting, leaving
+the arena, or waiting forever for an unreachable target. Boundary/fallback
+handling is tested; the production entry layout remains WS-6.3 work.
+
+All active actions remain targetable and contact-dangerous, including stationary
+wind-up/recovery. Entering/dying bosses are ineligible. Existing nearest-target
+selection, projectile damage, contact immunity, and active-to-dying handling
+are reused; a projectile defeat increments the existing kill count once before
+same-update contact resolution. There is no boss projectile, summon, damage
+multiplier, separate health pool, or parallel combat path.
+
+**Deterministic active-fight evidence — 2026-09-05:** application fixtures use
+the real session, attack, collisions, damage, and boss motion at `1/60s`, spawn
+seed 1 / upgrade seed 2. Boss starts active at `(180,160)`; player starts at
+`(180,480)`, with four levels of one upgrade and full effective health. Scripted
+movement follows `(60,480) → (60,160) → (300,160) → (300,480)`, switching within
+4 units. A far-future normal spawn request isolates the fight and prevents the
+normal-wave completion path; it is not production boss progression or victory.
+
+| Four-choice build | Effective cooldown / speed / max health | Simulated boss defeat | Player health at defeat | Ideal all-hit firing span (estimate) |
+| ----------------- | --------------------------------------- | --------------------: | ----------------------: | -----------------------------------: |
+| Rapid Fire ×4     | `1.5/1.4 ≈ 1.0714s` / 120 units/s / 3   |                30.82s |                       3 |                               24.64s |
+| Swift Movement ×4 | 1.5s / 168 units/s / 3                  |                43.13s |                       3 |                               34.50s |
+| Vitality ×4       | 1.5s / 120 units/s / 7                  |                46.00s |                       7 |                               34.50s |
+
+The ideal estimate is `(24 − 1) × effectiveCooldown` from first shot to last,
+assuming all 24 one-damage projectiles hit. It excludes first-shot delay, flight,
+misses, fixed-step cooldown quantization, and entry. Fixture defeat times include
+the actual attack pipeline and all active actions; they exclude production
+entry, normal waves, choice time, and human reaction. They are not PC/phone
+measurements or evidence of the 5–7-minute run target. The scripted route took
+no damage across all three builds, which does not establish a fair or distinct
+movement challenge for a person. No health padding was added to fill run time.
+
+**Dependent acceptance:** WS-6.3 integrates entry and finite handoff; WS-6.4
+adds visible action telegraphs; WS-6.5 integrates terminal boss defeat without
+normal-wave upgrade handling. No complete victory flow is delivered here.
+WS-6.10 owns final tuning. After entry and telegraphs exist, Dimi must evaluate
+on PC/phone whether the charger tests positioning rather than merely adding a
+large health pool, and assess timing, damage fairness, edge behavior, and build
+durations. That human review and Gate 2 remain pending.
 
 ## 11. Upgrades and progression
 

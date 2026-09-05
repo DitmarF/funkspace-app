@@ -85,6 +85,34 @@ absent boss; scheduled offsets alone exclude capacity waiting.
 PC/phone pacing observations, structure approval, the original 5–7-minute
 target, and Gate 2 approval remain pending with Dimi.
 
+## WS-6.2 charger candidate
+
+`src/domain/enemies/ChargerBoss.ts` defines one provisional charger and its
+deterministic **approach → wind-up → charge → recovery** cycle. The existing
+session dispatches active charger movement, reusing normal targeting, projectile
+hits, contact damage/immunity, and exactly-once defeat counting. Boss actions
+are separate from entering/active/dying and add no second body or health owner.
+
+Candidate tuning: 24 health, radius 24, contact damage 1; approach at 48 units/s
+for 1.25s; stationary wind-up 0.8s; charge at 280 units/s for at most 0.8s/224
+units; stationary recovery 1s. Direction locks at wind-up. First wall contact
+ends charge immediately; the body stays inside the arena, and zero-length aim
+has a deterministic inward fallback. All active actions remain damage-eligible.
+Action deadlines use the existing gameplay simulation clock and freeze on pause.
+
+Real-session fixtures with an already-active boss and a scripted rectangular
+route defeated it in **30.82s / 43.13s / 46.00s** for four Rapid Fire / Swift
+Movement / Vitality upgrades respectively, without taking damage. These are
+simulation diagnostics, not human gameplay, production-entry, or fairness
+acceptance. See the [definition and evidence](../../docs/features/wave-survivor.md#107-ws-62-charger-candidate)
+for exact configuration, fixture setup, and ideal all-hit duration estimates.
+
+Production still uses the repeat-wave bridge. Boss entry belongs to WS-6.3,
+visible action telegraphs to WS-6.4, and terminal integration to WS-6.5; no boss
+can yet be reached through normal play. After those entry/telegraph tasks,
+Dimi evaluates whether the boss offers a distinct positioning challenge on
+PC/phone. Final balance is WS-6.10; manual acceptance and Gate 2 are pending.
+
 ## WS-6.6 score candidate
 
 The internal `src/domain/score/CalculateScore.ts` provides a readonly

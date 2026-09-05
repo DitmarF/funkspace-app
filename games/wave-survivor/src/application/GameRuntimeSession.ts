@@ -10,6 +10,7 @@ import type {
 import type { MovementInputPort } from "../domain/MovementInputPort.js";
 import type { RandomSource } from "../domain/RandomSource.js";
 import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
+import { advanceChargerBoss } from "../domain/enemies/ChargerBoss.js";
 import {
   BASIC_ATTACK_DEFINITION,
   findNearestTargetableEnemy,
@@ -417,6 +418,15 @@ export class GameRuntimeSession {
     for (const enemy of this.state.enemies) {
       if (!isEnemyStateValid(enemy)) continue;
 
+      if (enemy.kind === "charger" && enemy.phase === "active") {
+        advanceChargerBoss(
+          enemy,
+          this.state.player.position,
+          this.state.simulationTimeSeconds,
+          deltaSeconds,
+        );
+        continue;
+      }
       enemy.position = calculateNextEnemyPosition(
         enemy,
         this.state.player.position,

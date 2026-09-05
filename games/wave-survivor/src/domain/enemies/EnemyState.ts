@@ -3,15 +3,14 @@ import {
   doesCircleIntersectBounds,
   type LogicalPosition,
 } from "../geometry/index.js";
-import { BASIC_ENEMY_DEFINITION, type EnemyKind } from "./EnemyDefinition.js";
+import { BASIC_ENEMY_DEFINITION } from "./EnemyDefinition.js";
 
 /** Complete lifecycle phases for an enemy runtime instance. */
 export type EnemyPhase = "entering" | "active" | "dying";
 
 /** Mutable runtime data for one deterministic enemy instance. */
-export interface EnemyState {
+interface EnemyBodyState {
   readonly id: number;
-  readonly kind: EnemyKind;
   phase: EnemyPhase;
   position: LogicalPosition;
   readonly collisionRadius: number;
@@ -21,11 +20,45 @@ export interface EnemyState {
   removeAtSimulationSeconds: number | null;
 }
 
+/** Action state is separate from entering/active/dying and has no second body. */
+export type BossActionState =
+  | { readonly phase: "approach" | "recovery"; readonly endsAtSeconds: number }
+  | {
+      readonly phase: "wind-up" | "charge";
+      readonly endsAtSeconds: number;
+      readonly direction: Readonly<LogicalPosition>;
+    };
+
+export interface BasicEnemyState extends EnemyBodyState {
+  readonly kind: "basic";
+}
+
+export interface ChargerBossState extends EnemyBodyState {
+  readonly kind: "charger";
+  /** Initialized on the first active update, never while entering. */
+  action: BossActionState | null;
+}
+
+export type EnemyState = BasicEnemyState | ChargerBossState;
+
+function isBossActionValid(action: BossActionState | null): boolean {
+  if (action === null) return true;
+  if (!Number.isFinite(action.endsAtSeconds) || action.endsAtSeconds < 0)
+    return false;
+  if (action.phase === "approach" || action.phase === "recovery") return true;
+  return (
+    (action.phase === "wind-up" || action.phase === "charge") &&
+    Number.isFinite(action.direction.x) &&
+    Number.isFinite(action.direction.y) &&
+    Math.abs(Math.hypot(action.direction.x, action.direction.y) - 1) <= 1e-12
+  );
+}
+
 /** Create one basic enemy entering at the supplied logical position. */
 export function createBasicEnemyState(
   id: number,
   position: Readonly<LogicalPosition>,
-): EnemyState {
+): BasicEnemyState {
   return {
     id,
     kind: BASIC_ENEMY_DEFINITION.kind,
@@ -64,6 +97,8 @@ export function canEnemyDealContactDamage(
  */
 export function isEnemyStateValid(enemy: Readonly<EnemyState>): boolean {
   return (
+    (enemy.kind === "basic" ||
+      (enemy.kind === "charger" && isBossActionValid(enemy.action))) &&
     Number.isSafeInteger(enemy.id) &&
     enemy.id > 0 &&
     Number.isFinite(enemy.position.x) &&

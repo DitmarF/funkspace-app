@@ -4,7 +4,7 @@
 
 ## Document metadata
 
-- **Status:** In progress — EPICs 0–5 implemented; WS-6.1/6.6 candidates and WS-6.7 record boundary implemented; Gate 1 approved, Gate 2 pending
+- **Status:** In progress — EPICs 0–5 implemented; WS-6.1/6.2/6.6 candidates and WS-6.7 record boundary implemented; Gate 1 approved, Gate 2 pending
 - **Owner:** Dimi
 - **Product:** FunkSpace Wave Survivor
 - **Planning level:** Epic and implementation-task roadmap
@@ -56,7 +56,8 @@ That list is the historical roadmap baseline. EPICs 1–5 have since delivered
 simulation, controls, enemy behavior, combat drawing, waves, and upgrades.
 WS-6.1 adds the finite candidate configuration; WS-6.6 adds the pure score
 candidate. WS-6.7 adds the immutable public result type and internal factory.
-Score/result integration, boss behavior, victory, audio, and
+WS-6.2 adds active charger behavior and combat fixtures. Score/result
+integration, production boss entry/telegraphs, victory, audio, and
 persistence remain unimplemented; see the per-epic evidence below.
 
 ### Safe assumptions
@@ -861,7 +862,9 @@ renewed real-device acceptance.
 with automated regressions (2026-09-05). Dimi's structure/pacing and scoring
 reward approvals remain pending. WS-6.7 record construction and public type are
 implemented; result integration and Dimi's result-information review remain
-pending. Other EPIC 6 work and Gate 2 remain pending.
+pending. WS-6.2 active charger behavior is implemented with deterministic
+combat fixtures; production entry, visible telegraphs, human boss review, and
+Gate 2 remain pending.
 
 ## Goal
 
@@ -903,19 +906,58 @@ EPIC 5.
 
 ## Work items
 
-| ID          | Task                                      | Planned behavior                                                                                                                                            | Acceptance criteria                                                                                      |
-| ----------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| **WS-6.1**  | Resolve the minimal run structure.        | Implemented provisional four normal waves + boss, finite lookup/successors, wave validation, and upgrade-capacity safety.                                   | Configuration and pacing evidence recorded; Dimi's PC/phone pacing and candidate approval pending.       |
-| **WS-6.2**  | Define one boss.                          | Build the smallest behavior that creates a distinct final test using existing movement, collision, and damage concepts.                                     | Boss does not require a generic behavior-tree or scene framework.                                        |
-| **WS-6.3**  | Implement boss entry.                     | Integrate the real boss successor after the fourth upgrade; remove the WS-6.1 application repeat bridge. Use a deliberate spawn pattern and longer warning. | Player understands the final encounter; no production normal-wave repeat fallback remains.               |
-| **WS-6.4**  | Implement boss action telegraphing.       | Communicate dangerous timing through shape, position, and optional color.                                                                                   | Reduced-effects adaptation remains possible without removing information.                                |
-| **WS-6.5**  | Implement victory.                        | Defeating the boss or completing the final condition transitions to `won`.                                                                                  | Simulation stops cleanly and result is emitted once.                                                     |
-| **WS-6.6**  | Define score calculation.                 | Implemented pure candidate: 10 per enemy, 100 per normal clear; on win, 500 plus floored health percentage. No time factor.                                 | Numeric validity and safe totals tested; Dimi's reward approval and WS-6.5/7 integration pending.        |
-| **WS-6.7**  | Define `RunResult`.                       | Implemented four-field public type, pure validated/frozen construction, and frontend type alias.                                                            | Copy/freeze and public types tested; terminal/restart integration and Dimi's information review pending. |
-| **WS-6.8**  | Implement result event and UI.            | Standalone demo presents victory/defeat and replay.                                                                                                         | Event fires once per run and no post-result combat continues.                                            |
-| **WS-6.9**  | Implement immediate replay.               | Restart from won or lost without page reload or controller recreation.                                                                                      | Replayed run is equivalent to a fresh run.                                                               |
-| **WS-6.10** | Balance the full run.                     | Tune enemy speed, health, spawn timing, attack cooldown, upgrade strength, and upgrade frequency.                                                           | Player power grows, but movement remains important through the boss.                                     |
-| **WS-6.11** | Add deterministic full-run test fixtures. | Use controlled seed and time to cover win and loss paths where practical.                                                                                   | Critical transitions do not depend on flaky real-time tests.                                             |
+| ID          | Task                                      | Planned behavior                                                                                                                                            | Acceptance criteria                                                                                                         |
+| ----------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **WS-6.1**  | Resolve the minimal run structure.        | Implemented provisional four normal waves + boss, finite lookup/successors, wave validation, and upgrade-capacity safety.                                   | Configuration and pacing evidence recorded; Dimi's PC/phone pacing and candidate approval pending.                          |
+| **WS-6.2**  | Define one boss.                          | Implemented provisional charger cycle with locked aim, bounded charge, recovery, and existing combat.                                                       | Active Domain/session fixtures and build diagnostics pass; entry, telegraphs, and Dimi's movement-challenge review pending. |
+| **WS-6.3**  | Implement boss entry.                     | Integrate the real boss successor after the fourth upgrade; remove the WS-6.1 application repeat bridge. Use a deliberate spawn pattern and longer warning. | Player understands the final encounter; no production normal-wave repeat fallback remains.                                  |
+| **WS-6.4**  | Implement boss action telegraphing.       | Communicate dangerous timing through shape, position, and optional color.                                                                                   | Reduced-effects adaptation remains possible without removing information.                                                   |
+| **WS-6.5**  | Implement victory.                        | Defeating the boss or completing the final condition transitions to `won`.                                                                                  | Simulation stops cleanly and result is emitted once.                                                                        |
+| **WS-6.6**  | Define score calculation.                 | Implemented pure candidate: 10 per enemy, 100 per normal clear; on win, 500 plus floored health percentage. No time factor.                                 | Numeric validity and safe totals tested; Dimi's reward approval and WS-6.5/7 integration pending.                           |
+| **WS-6.7**  | Define `RunResult`.                       | Implemented four-field public type, pure validated/frozen construction, and frontend type alias.                                                            | Copy/freeze and public types tested; terminal/restart integration and Dimi's information review pending.                    |
+| **WS-6.8**  | Implement result event and UI.            | Standalone demo presents victory/defeat and replay.                                                                                                         | Event fires once per run and no post-result combat continues.                                                               |
+| **WS-6.9**  | Implement immediate replay.               | Restart from won or lost without page reload or controller recreation.                                                                                      | Replayed run is equivalent to a fresh run.                                                                                  |
+| **WS-6.10** | Balance the full run.                     | Tune enemy speed, health, spawn timing, attack cooldown, upgrade strength, and upgrade frequency.                                                           | Player power grows, but movement remains important through the boss.                                                        |
+| **WS-6.11** | Add deterministic full-run test fixtures. | Use controlled seed and time to cover win and loss paths where practical.                                                                                   | Critical transitions do not depend on flaky real-time tests.                                                                |
+
+### WS-6.2 implementation and dependent acceptance
+
+One `charger` kind adds action state to the existing enemy body, preserving its
+lifecycle, position, health, contact damage, and defeat authority. The session
+dispatches its active movement through the existing fixed update and gameplay
+clock. Normal pursuit/spawn behavior, combat pipeline, public API, and renderer
+contracts are unchanged. There is no generic behavior registry or second engine.
+
+The [charger candidate](./wave-survivor.md#107-ws-62-charger-candidate) records
+health, geometry, speeds, exact action timing, direction fallback, boundary
+recovery, and three upgrade-build diagnostics. Active scripted fights take
+30.82s / 43.13s / 46.00s for Rapid Fire / Swift Movement / Vitality ×4. Ideal
+all-hit spans are estimates, separately labeled. No human fight duration or
+fairness approval is inferred from fixtures; the route takes no damage.
+
+WS-6.3 owns production entry, replacing the repeat bridge and establishing the
+real finite boss handoff. WS-6.4 owns visible action telegraphs; WS-6.5 owns
+terminal boss defeat rather than treating it as a normal-wave upgrade boundary.
+Fixtures inject an active boss and a far-future normal queue to isolate combat;
+they do not implement boss entry or claim a complete win flow. After entry and
+telegraphs exist, Dimi evaluates whether positioning matters rather than merely
+shooting a large health pool. Final balance belongs to WS-6.10; human PC/phone
+acceptance and Gate 2 remain pending.
+
+Executed WS-6.2 validation (2026-09-05):
+
+- `pnpm --filter @funkspace/wave-survivor typecheck` — passed.
+- `pnpm --filter @funkspace/wave-survivor exec tsc -p /private/tmp/ws62-tests.tsconfig.json` — passed; temporary configuration extends strict package settings and includes enemy and session test files normally excluded from production compilation.
+- `pnpm --filter @funkspace/wave-survivor test src/domain/enemies/ChargerBoss.test.ts src/application/GameRuntimeSessionBoss.test.ts` — 34 tests passed, covering action boundaries, aim lock, zero aim, wall recovery, pause in every action, shared damage/immunity, automatic projectile hits, and exactly-once defeat.
+- `pnpm --filter @funkspace/wave-survivor test` — 52 files, 816 tests passed, including normal-enemy and earlier finite-run/scoring/result regressions plus the three scripted fight diagnostics.
+- `pnpm --filter @funkspace/wave-survivor demo:build` — package TypeScript build and standalone Vite production build passed.
+- `pnpm lint` — passed, including repository formatting; existing Next lint deprecation notice remains.
+- `pnpm exec eslint --config frontend/eslint.config.mjs games/wave-survivor/src/domain/enemies/EnemyDefinition.ts games/wave-survivor/src/domain/enemies/EnemyState.ts games/wave-survivor/src/domain/enemies/ChargerBoss.ts games/wave-survivor/src/domain/enemies/ChargerBoss.test.ts games/wave-survivor/src/application/GameRuntimeSession.ts games/wave-survivor/src/application/GameRuntimeSessionBoss.test.ts --max-warnings=0` — exit 0; existing React/pages discovery notices remain.
+- `git diff --check` and scope review — passed. No new lifecycle resources, dependencies, duplicated combat pipeline, public-contract changes, generated source edits, or unrelated tuning.
+
+Frontend type/host checks were not rerun because public contracts did not
+change. Manual boss gameplay is pending production entry and visible telegraphs;
+no PC/phone measurement or approval is claimed by this task.
 
 ### WS-6.7 implementation and dependent acceptance
 
