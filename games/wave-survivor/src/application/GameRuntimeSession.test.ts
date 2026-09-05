@@ -140,7 +140,7 @@ function readOwnedRuntimeState(session: GameRuntimeSession): RuntimeState {
 
 function readCurrentWaveCompletion(session: GameRuntimeSession): boolean {
   const state = readOwnedRuntimeState(session);
-  return isWaveComplete(state.waveSchedule, state.enemies);
+  return isWaveComplete(state.waveSchedule!, state.enemies);
 }
 
 function createExpectedPlayingState(): RuntimeState {
@@ -150,8 +150,8 @@ function createExpectedPlayingState(): RuntimeState {
 }
 
 function exhaustWaveSchedule(state: RuntimeState): void {
-  state.waveSchedule.nextScheduledSpawnIndex =
-    state.waveSchedule.requests.length;
+  state.waveSchedule!.nextScheduledSpawnIndex =
+    state.waveSchedule!.requests.length;
 }
 
 function configureTestWave(
@@ -334,8 +334,8 @@ describe("GameRuntimeSession complete restart reset", () => {
       addEnemy(progressedState, 8, { x: 12, y: 12 }, "dying");
       progressedState.enemies[0]!.removeAtSimulationSeconds = 100;
       progressedState.nextEnemyId = 9;
-      progressedState.waveSchedule.elapsedSeconds = 99;
-      progressedState.waveSchedule.nextScheduledSpawnIndex = 3;
+      progressedState.waveSchedule!.elapsedSeconds = 99;
+      progressedState.waveSchedule!.nextScheduledSpawnIndex = 3;
       addProjectile(progressedState, 7, { x: 50, y: 50 });
       progressedState.nextProjectileId = 8;
       progressedState.nextAttackAtSeconds = 99;
@@ -427,12 +427,12 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS);
 
     expect(state.enemies).toEqual([]);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(0);
     expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS);
 
     session.fixedUpdate(0.01);
     expect(state.enemies).toHaveLength(1);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(1);
     expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS + 1);
   });
 
@@ -446,8 +446,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     session.fixedUpdate(0.1);
 
     expect(state.simulationTimeSeconds).toBe(0.1);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(0);
     expect(state.enemies[0]?.position).toEqual({ x: 180, y: 207.2 });
     expect(state.projectiles).toHaveLength(1);
     expect(randomSource.calls).toHaveLength(0);
@@ -466,8 +466,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     session.fixedUpdate(0.25);
 
     expect(state.simulationTimeSeconds).toBe(0.75);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(0);
     expect(randomSource.calls).toHaveLength(0);
   });
 
@@ -486,8 +486,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
       "dying",
       "entering",
     ]);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0.1);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0.1);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(1);
     expect(randomSource.calls).toHaveLength(1);
   });
 
@@ -500,24 +500,24 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     const { session } = createSession(state, randomSource);
 
     session.fixedUpdate(0.5);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0);
 
     state.enemies = [];
     session.fixedUpdate(0.5);
 
     expect(state.enemies).toHaveLength(1);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0.5);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0.5);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(1);
 
     session.fixedUpdate(0.5);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0.5);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0.5);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(1);
 
     state.enemies = [];
     session.fixedUpdate(0.01);
 
     expect(state.enemies).toHaveLength(1);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(2);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(2);
     expect(randomSource.calls).toHaveLength(2);
   });
 
@@ -534,23 +534,23 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     const { session } = createSession(state, randomSource);
 
     session.fixedUpdate(0.5);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0);
     expect(randomSource.calls).toHaveLength(0);
 
     state.enemies = [];
     session.fixedUpdate(0.5);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0.5);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0.5);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(0);
     expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS);
 
     addEnemy(state, 1, { x: -66, y: 100 }, "entering");
     session.fixedUpdate(0.1);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0.5);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0.5);
     expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS);
 
     state.enemies = [];
     session.fixedUpdate(0.1);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(1);
     expect(randomSource.calls).toHaveLength(MAX_SPAWN_ATTEMPTS + 1);
   });
 
@@ -582,12 +582,12 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     session.fixedUpdate(0.5);
 
     expect(state.enemies.map((enemy) => enemy.id)).toEqual([1]);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(1);
 
     session.fixedUpdate(0.01);
 
     expect(state.enemies.map((enemy) => enemy.id)).toEqual([1, 2]);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(2);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(2);
   });
 
   it("retains overdue finite requests instead of creating a same-update burst", () => {
@@ -600,8 +600,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     expect(state.enemies).toHaveLength(1);
     expect(state.nextEnemyId).toBe(2);
     expect(randomSource.calls).toHaveLength(1);
-    expect(state.waveSchedule.elapsedSeconds).toBe(10);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(10);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(1);
   });
 
   it("moves a newly spawned enemy during the same fixed update", () => {
@@ -619,7 +619,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
   it("stops spawning after a finite test schedule is exhausted", () => {
     const state = createInitialRuntimeState();
     configureTestWave(state, 4);
-    const spawnCount = state.waveSchedule.requests.length;
+    const spawnCount = state.waveSchedule!.requests.length;
     state.nextAttackAtSeconds = 100;
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
@@ -630,8 +630,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     }
 
     expect(state.enemies).toHaveLength(spawnCount);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(
-      state.waveSchedule.requests.length,
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(
+      state.waveSchedule!.requests.length,
     );
 
     state.enemies = [];
@@ -786,8 +786,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     session.fixedUpdate(10);
 
     expect(state.simulationTimeSeconds).toBe(0);
-    expect(state.waveSchedule.elapsedSeconds).toBe(0);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(0);
     expect(state.enemies[0]?.position).toEqual(initialEnemyPosition);
     expect(state.enemies[0]?.phase).toBe("entering");
     expect(state.enemies).toContain(escapedEnemy);
@@ -813,8 +813,8 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     session.fixedUpdate(10);
 
     expect(state.phase).toBe("idle");
-    expect(state.waveSchedule.elapsedSeconds).toBe(0);
-    expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(state.waveSchedule!.elapsedSeconds).toBe(0);
+    expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(0);
   });
 
   it("restart resets the random sequence and the original wave-one schedule", () => {
@@ -829,17 +829,17 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
 
     expect(randomSource.resetCount).toBe(1);
     const restartedState = readOwnedRuntimeState(session);
-    expect(restartedState.waveSchedule.currentWaveNumber).toBe(1);
-    expect(restartedState.waveSchedule.maxActiveEnemies).toBe(
+    expect(restartedState.waveSchedule!.currentWaveNumber).toBe(1);
+    expect(restartedState.waveSchedule!.maxActiveEnemies).toBe(
       PROVISIONAL_EPIC_5_WAVES[0]!.maxActiveEnemies,
     );
-    expect(restartedState.waveSchedule.elapsedSeconds).toBe(0);
-    expect(restartedState.waveSchedule.nextScheduledSpawnIndex).toBe(0);
+    expect(restartedState.waveSchedule!.elapsedSeconds).toBe(0);
+    expect(restartedState.waveSchedule!.nextScheduledSpawnIndex).toBe(0);
     session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS - 0.01);
     expect(randomSource.calls).toHaveLength(1);
     session.fixedUpdate(0.01);
     expect(randomSource.calls).toHaveLength(2);
-    expect(restartedState.waveSchedule.nextScheduledSpawnIndex).toBe(1);
+    expect(restartedState.waveSchedule!.nextScheduledSpawnIndex).toBe(1);
   });
 
   it("reproduces enemy positions for the same seed and input sequence", () => {

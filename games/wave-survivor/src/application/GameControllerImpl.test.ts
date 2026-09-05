@@ -146,8 +146,8 @@ function createHarness(
 const FIXED_SIMULATION_STEP_MILLISECONDS = FIXED_SIMULATION_STEP_SECONDS * 1000;
 
 function reachUpgradeChoice(harness: ReturnType<typeof createHarness>): void {
-  harness.state.waveSchedule.nextScheduledSpawnIndex =
-    harness.state.waveSchedule.requests.length;
+  harness.state.waveSchedule!.nextScheduledSpawnIndex =
+    harness.state.waveSchedule!.requests.length;
   harness.controller.start();
   harness.clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
   harness.frameScheduler.runNextFrame();
@@ -208,8 +208,8 @@ describe("GameController runtime lifecycle", () => {
     } = createHarness();
     state.player.currentHealth = 1;
     state.nextAttackAtSeconds = 100;
-    state.waveSchedule.nextScheduledSpawnIndex =
-      state.waveSchedule.requests.length;
+    state.waveSchedule!.nextScheduledSpawnIndex =
+      state.waveSchedule!.requests.length;
     const enemy = createBasicEnemyState(1, state.player.position);
     enemy.phase = "active";
     state.enemies.push(enemy);
@@ -248,8 +248,8 @@ describe("GameController runtime lifecycle", () => {
       snapshots,
       state,
     } = createHarness();
-    state.waveSchedule.nextScheduledSpawnIndex =
-      state.waveSchedule.requests.length;
+    state.waveSchedule!.nextScheduledSpawnIndex =
+      state.waveSchedule!.requests.length;
     controller.start();
     clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS * 3);
 
@@ -278,8 +278,8 @@ describe("GameController runtime lifecycle", () => {
       snapshots,
       state,
     } = createHarness();
-    state.waveSchedule.nextScheduledSpawnIndex =
-      state.waveSchedule.requests.length;
+    state.waveSchedule!.nextScheduledSpawnIndex =
+      state.waveSchedule!.requests.length;
     controller.start();
     clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
     frameScheduler.runNextFrame();
@@ -360,8 +360,8 @@ describe("GameController runtime lifecycle", () => {
 
   it("ignores a stale stopped-run callback after a choice restarts the loop", () => {
     const harness = createHarness();
-    harness.state.waveSchedule.nextScheduledSpawnIndex =
-      harness.state.waveSchedule.requests.length;
+    harness.state.waveSchedule!.nextScheduledSpawnIndex =
+      harness.state.waveSchedule!.requests.length;
     harness.controller.start();
     const originalFrameId = harness.frameScheduler.requestedFrameIds[0];
     if (originalFrameId === undefined)
@@ -509,8 +509,8 @@ describe("GameController runtime lifecycle", () => {
 
   it("ignores pause and resume while choosing an upgrade", () => {
     const { clock, controller, frameScheduler, input, state } = createHarness();
-    state.waveSchedule.nextScheduledSpawnIndex =
-      state.waveSchedule.requests.length;
+    state.waveSchedule!.nextScheduledSpawnIndex =
+      state.waveSchedule!.requests.length;
     controller.start();
     clock.advanceByMilliseconds(FIXED_SIMULATION_STEP_MILLISECONDS);
     frameScheduler.runNextFrame();

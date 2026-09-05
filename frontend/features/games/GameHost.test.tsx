@@ -62,6 +62,32 @@ function createLoader(gameModule: GameModule): GameModuleLoader {
 }
 
 describe("GameHost", () => {
+  it("announces boss entry through the public wave event and clears it for a new run", async () => {
+    useServicesMock.mockReturnValue({
+      themeService: createThemeSource().themeService,
+    });
+    const createGame = vi.fn<GameModule["createGame"]>(() =>
+      createController(),
+    );
+    const { unmount } = render(
+      <GameHost loader={createLoader({ createGame })} />,
+    );
+    await waitFor(() => expect(createGame).toHaveBeenCalledOnce());
+    const onEvent = createGame.mock.calls[0]![0].onEvent!;
+    act(() =>
+      onEvent({ type: "wave-started", waveNumber: 5, encounterKind: "boss" }),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Boss entering from the top. Move clear of the entry point.",
+    );
+    act(() => onEvent({ type: "wave-started", waveNumber: 1 }));
+    expect(screen.getByRole("status")).toHaveTextContent("Wave 1 started.");
+    unmount();
+    act(() =>
+      onEvent({ type: "wave-started", waveNumber: 5, encounterKind: "boss" }),
+    );
+  });
+
   it("mounts a lazy game, forwards themes, and owns its lifecycle", async () => {
     const hidden = vi.spyOn(document, "hidden", "get").mockReturnValue(false);
     const theme = createThemeSource();
@@ -91,6 +117,7 @@ describe("GameHost", () => {
     expect(createGame).toHaveBeenCalledWith({
       canvas,
       viewport: canvas.parentElement,
+      onEvent: expect.any(Function),
       theme: {
         colors: {
           background: "#e6e6e6",

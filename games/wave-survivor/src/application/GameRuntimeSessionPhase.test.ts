@@ -81,8 +81,8 @@ function createHarness(
 }
 
 function exhaustWaveSchedule(state: RuntimeState): void {
-  state.waveSchedule.nextScheduledSpawnIndex =
-    state.waveSchedule.requests.length;
+  state.waveSchedule!.nextScheduledSpawnIndex =
+    state.waveSchedule!.requests.length;
 }
 
 function readOwnedRuntimeState(session: GameRuntimeSession): RuntimeState {
@@ -210,7 +210,7 @@ describe("GameRuntimeSession phase transitions", () => {
     state.nextEnemyId = 12;
     state.nextProjectileId = 9;
     state.nextAttackAtSeconds = 42;
-    state.waveSchedule.elapsedSeconds = 3;
+    state.waveSchedule!.elapsedSeconds = 3;
     exhaustWaveSchedule(state);
     const dyingEnemy = createBasicEnemyState(11, { x: 80, y: 120 });
     dyingEnemy.phase = "dying";
@@ -253,7 +253,7 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(state.waveSchedule).toMatchObject({
       currentWaveNumber: 1,
       elapsedSeconds: 3.25,
-      nextScheduledSpawnIndex: state.waveSchedule.requests.length,
+      nextScheduledSpawnIndex: state.waveSchedule!.requests.length,
     });
     expect(state.enemies).toEqual([]);
     expect(state.projectiles).toEqual([]);
@@ -346,7 +346,7 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(upgradeRandomSource.resetCount).toBe(1);
   });
 
-  it("publishes a recoverable wave-cleared stop when the final enemy falls with all upgrades capped", () => {
+  it("defensively stops a normal wave with an artificially exhausted upgrade pool", () => {
     const state = createInitialRuntimeState();
     state.upgrades = createRunUpgradeState({
       "rapid-fire": 5,
@@ -354,7 +354,7 @@ describe("GameRuntimeSession phase transitions", () => {
       vitality: 5,
     });
     state.waveSchedule = createWaveScheduleProgress(
-      16,
+      4,
       PROVISIONAL_RUN_DEFINITION.normalWaves.at(-1)!,
     );
     exhaustWaveSchedule(state);
@@ -395,7 +395,7 @@ describe("GameRuntimeSession phase transitions", () => {
     expect(state.pendingUpgradeOptionIds).toEqual([]);
     expect(statuses).toHaveBeenLastCalledWith({
       phase: "wave-cleared",
-      waveNumber: 16,
+      waveNumber: 4,
       currentHealth: 3,
       maximumHealth: 8,
       killCount: 1,

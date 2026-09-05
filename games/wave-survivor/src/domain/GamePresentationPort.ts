@@ -4,6 +4,8 @@ import type { RuntimePhase } from "./state/RuntimeState.js";
 
 /** Immutable enemy data required by the Canvas renderer. */
 export interface EnemyRenderSnapshot {
+  /** Static top-edge warning during the deliberate boss entry only. */
+  readonly entryWarning?: "boss";
   readonly id: number;
   readonly phase: EnemyPhase;
   readonly x: number;

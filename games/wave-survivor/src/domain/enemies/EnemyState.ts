@@ -37,6 +37,7 @@ export interface ChargerBossState extends EnemyBodyState {
   readonly kind: "charger";
   /** Initialized on the first active update, never while entering. */
   action: BossActionState | null;
+  entryStartedAtSeconds: number | null;
 }
 
 export type EnemyState = BasicEnemyState | ChargerBossState;
@@ -98,7 +99,11 @@ export function canEnemyDealContactDamage(
 export function isEnemyStateValid(enemy: Readonly<EnemyState>): boolean {
   return (
     (enemy.kind === "basic" ||
-      (enemy.kind === "charger" && isBossActionValid(enemy.action))) &&
+      (enemy.kind === "charger" &&
+        isBossActionValid(enemy.action) &&
+        (enemy.entryStartedAtSeconds === null ||
+          (Number.isFinite(enemy.entryStartedAtSeconds) &&
+            enemy.entryStartedAtSeconds >= 0)))) &&
     Number.isSafeInteger(enemy.id) &&
     enemy.id > 0 &&
     Number.isFinite(enemy.position.x) &&

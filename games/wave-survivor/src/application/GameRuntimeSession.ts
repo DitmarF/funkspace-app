@@ -12,6 +12,11 @@ import type { RandomSource } from "../domain/RandomSource.js";
 import { VISIBLE_ARENA_BOUNDS } from "../domain/arena/index.js";
 import { advanceChargerBoss } from "../domain/enemies/ChargerBoss.js";
 import {
+  advanceBossEntry,
+  BOSS_DESPAWN_BOUNDS,
+  createEnteringBoss,
+} from "../domain/enemies/BossEntry.js";
+import {
   BASIC_ATTACK_DEFINITION,
   findNearestTargetableEnemy,
   isPlayerInvulnerable,
@@ -87,39 +92,6 @@ const PROJECTILE_DESPAWN_BOUNDS = expandBoundsByOffset(
 const UPGRADE_OPTION_COUNT = 3;
 const NO_PENDING_UPGRADE_OPTIONS: readonly UpgradeId[] = Object.freeze([]);
 
-/**
- * WS-6.1 staging bridge: use finite successors for normal waves, then retain
- * EPIC 5's playable repeat until WS-6.3 integrates real boss entry and removes
- * this bridge. Displayed wave numbers past the normal run are NOT encounters.
- */
-function createNextWaveScheduleUntilBossIntegration(
-  currentWaveNumber: number,
-): WaveScheduleProgress {
-  if (!Number.isSafeInteger(currentWaveNumber) || currentWaveNumber <= 0) {
-    throw new RangeError(
-      "Current wave number must be a positive safe integer.",
-    );
-  }
-
-  const run = PROVISIONAL_RUN_DEFINITION;
-  if (currentWaveNumber <= run.normalWaves.length) {
-    const next = resolveNextEncounter(run, currentWaveNumber - 1);
-    if (next.kind === "upgrade" && next.nextEncounter.kind === "normal-wave") {
-      return createWaveScheduleProgress(
-        currentWaveNumber + 1,
-        next.nextEncounter.wave,
-      );
-    }
-  }
-
-  // The finite model resolves a boss here. Do not instantiate a fake boss or
-  // report victory: only this explicitly temporary application path repeats.
-  return createWaveScheduleProgress(
-    currentWaveNumber + 1,
-    run.normalWaves[run.normalWaves.length - 1]!,
-  );
-}
-
 /** Owns the current deterministic session and coordinates one fixed update. */
 export class GameRuntimeSession {
   private destroyed = false;
@@ -179,6 +151,7 @@ export class GameRuntimeSession {
   /** Enter upgrade choice after the application has prepared valid options. */
   beginUpgradeSelection(): boolean {
     if (
+      this.state.waveSchedule === null ||
       this.state.phase !== "wave-cleared" ||
       this.state.pendingUpgradeOptionIds.length === 0
     ) {
@@ -194,6 +167,7 @@ export class GameRuntimeSession {
   chooseUpgrade(upgradeId: string): boolean {
     if (
       this.destroyed ||
+      this.state.waveSchedule === null ||
       this.state.phase !== "choosing-upgrade" ||
       !this.state.pendingUpgradeOptionIds.some(
         (pendingUpgradeId) => pendingUpgradeId === upgradeId,
@@ -210,11 +184,26 @@ export class GameRuntimeSession {
     );
     if (!applied) return false;
 
-    let nextWaveSchedule: WaveScheduleProgress;
+    let nextWaveSchedule: WaveScheduleProgress | null;
+    let boss: ReturnType<typeof createEnteringBoss> | null = null;
     try {
-      nextWaveSchedule = createNextWaveScheduleUntilBossIntegration(
-        this.state.waveSchedule.currentWaveNumber,
+      const next = resolveNextEncounter(
+        PROVISIONAL_RUN_DEFINITION,
+        this.state.waveSchedule.currentWaveNumber - 1,
       );
+      if (next.kind !== "upgrade") return false;
+      nextWaveSchedule =
+        next.nextEncounter.kind === "normal-wave"
+          ? createWaveScheduleProgress(
+              this.state.waveSchedule.currentWaveNumber + 1,
+              next.nextEncounter.wave,
+            )
+          : null;
+      if (nextWaveSchedule === null)
+        boss = createEnteringBoss(
+          this.state.nextEnemyId,
+          this.state.simulationTimeSeconds,
+        );
     } catch {
       return false;
     }
@@ -223,6 +212,9 @@ export class GameRuntimeSession {
     this.state.player.currentHealth = applied.currentHealth;
     this.state.pendingUpgradeOptionIds = NO_PENDING_UPGRADE_OPTIONS;
     this.state.waveSchedule = nextWaveSchedule;
+    this.state.enemies = boss ? [boss] : [];
+    this.state.projectiles = [];
+    if (boss) this.state.nextEnemyId += 1;
     this.state.nextAttackAtSeconds = 0;
     this.resetMovementInput();
 
@@ -275,8 +267,9 @@ export class GameRuntimeSession {
     );
     this.transitionDefeatedEnemies(nextSimulationTimeSeconds);
     if (
+      this.state.waveSchedule !== null &&
       countEnemiesOccupyingWaveCapacity(this.state.enemies) <
-      this.state.waveSchedule.maxActiveEnemies
+        this.state.waveSchedule.maxActiveEnemies
     ) {
       advanceWaveSchedule(this.state.waveSchedule, deltaSeconds);
       this.spawnScheduledEnemyIfDue();
@@ -296,7 +289,7 @@ export class GameRuntimeSession {
     }
 
     if (this.transitionToWaveClearedIfComplete()) {
-      const clearedWaveNumber = this.state.waveSchedule.currentWaveNumber;
+      const clearedWaveNumber = this.currentEncounterNumber;
       this.emitEvent(
         Object.freeze({
           type: "wave-cleared",
@@ -320,6 +313,11 @@ export class GameRuntimeSession {
           x: enemy.position.x,
           y: enemy.position.y,
           collisionRadius: enemy.collisionRadius,
+          ...(enemy.kind === "charger" &&
+          enemy.phase === "entering" &&
+          enemy.entryStartedAtSeconds !== null
+            ? { entryWarning: "boss" as const }
+            : {}),
         }),
       ),
     );
@@ -384,6 +382,7 @@ export class GameRuntimeSession {
   }
 
   private spawnScheduledEnemyIfDue(): void {
+    if (this.state.waveSchedule === null) return;
     const request = getDueScheduledSpawnRequest(this.state.waveSchedule);
     if (!request || !this.isSupportedSpawnRequest(request)) return;
 
@@ -418,6 +417,17 @@ export class GameRuntimeSession {
     for (const enemy of this.state.enemies) {
       if (!isEnemyStateValid(enemy)) continue;
 
+      if (
+        enemy.kind === "charger" &&
+        enemy.phase === "entering" &&
+        enemy.entryStartedAtSeconds !== null
+      ) {
+        advanceBossEntry(
+          enemy,
+          this.state.simulationTimeSeconds + deltaSeconds,
+        );
+        continue;
+      }
       if (enemy.kind === "charger" && enemy.phase === "active") {
         advanceChargerBoss(
           enemy,
@@ -438,6 +448,8 @@ export class GameRuntimeSession {
   private activateEnemiesIntersectingVisibleArena(): void {
     for (const enemy of this.state.enemies) {
       if (!isEnemyStateValid(enemy)) continue;
+      if (enemy.kind === "charger" && enemy.entryStartedAtSeconds !== null)
+        continue;
 
       enemy.phase = getEnemyPhaseAfterBoundsIntersection(
         enemy,
@@ -459,8 +471,10 @@ export class GameRuntimeSession {
   ): void {
     this.state.enemies = this.state.enemies.filter(
       (enemy) =>
-        shouldRetainEnemyWithinBounds(enemy, ENEMY_DESPAWN_BOUNDS) &&
-        !hasEnemyDyingExpired(enemy, simulationTimeSeconds),
+        shouldRetainEnemyWithinBounds(
+          enemy,
+          enemy.kind === "charger" ? BOSS_DESPAWN_BOUNDS : ENEMY_DESPAWN_BOUNDS,
+        ) && !hasEnemyDyingExpired(enemy, simulationTimeSeconds),
     );
   }
 
@@ -566,6 +580,7 @@ export class GameRuntimeSession {
   private transitionToWaveClearedIfComplete(): boolean {
     if (
       this.state.phase !== "playing" ||
+      this.state.waveSchedule === null ||
       !isWaveComplete(this.state.waveSchedule, this.state.enemies)
     ) {
       return false;
@@ -637,7 +652,10 @@ export class GameRuntimeSession {
     this.emitEvent(
       Object.freeze({
         type: "wave-started",
-        waveNumber: this.state.waveSchedule.currentWaveNumber,
+        waveNumber: this.currentEncounterNumber,
+        ...(this.state.waveSchedule === null
+          ? { encounterKind: "boss" as const }
+          : {}),
       }),
     );
   }
@@ -661,7 +679,7 @@ export class GameRuntimeSession {
     const previous = this.lastStatusSnapshot;
     if (
       previous?.phase === this.state.phase &&
-      previous.waveNumber === this.state.waveSchedule.currentWaveNumber &&
+      previous.waveNumber === this.currentEncounterNumber &&
       previous.currentHealth === this.state.player.currentHealth &&
       previous.maximumHealth === maximumHealth &&
       previous.killCount === this.state.killCount
@@ -671,12 +689,19 @@ export class GameRuntimeSession {
 
     const snapshot: GameStatusSnapshot = Object.freeze({
       phase: this.state.phase,
-      waveNumber: this.state.waveSchedule.currentWaveNumber,
+      waveNumber: this.currentEncounterNumber,
       currentHealth: this.state.player.currentHealth,
       maximumHealth,
       killCount: this.state.killCount,
     });
     this.lastStatusSnapshot = snapshot;
     this.onStatusChange(snapshot);
+  }
+
+  private get currentEncounterNumber(): number {
+    return (
+      this.state.waveSchedule?.currentWaveNumber ??
+      PROVISIONAL_RUN_DEFINITION.normalWaves.length + 1
+    );
   }
 }

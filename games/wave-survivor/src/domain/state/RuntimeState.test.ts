@@ -150,8 +150,8 @@ describe("createInitialRuntimeState", () => {
       createBasicEnemyState(progressedState.nextEnemyId, { x: -12, y: 320 }),
     );
     progressedState.nextEnemyId += 1;
-    progressedState.waveSchedule.elapsedSeconds = 99;
-    progressedState.waveSchedule.nextScheduledSpawnIndex = 3;
+    progressedState.waveSchedule!.elapsedSeconds = 99;
+    progressedState.waveSchedule!.nextScheduledSpawnIndex = 3;
     progressedState.enemies[0]!.phase = "dying";
     progressedState.enemies[0]!.removeAtSimulationSeconds = 99;
     progressedState.killCount = 1;
@@ -160,13 +160,13 @@ describe("createInitialRuntimeState", () => {
 
     expect(restartedState.enemies).toEqual([]);
     expect(restartedState.nextEnemyId).toBe(1);
-    expect(restartedState.waveSchedule.currentWaveNumber).toBe(1);
-    expect(restartedState.waveSchedule.maxActiveEnemies).toBe(
+    expect(restartedState.waveSchedule!.currentWaveNumber).toBe(1);
+    expect(restartedState.waveSchedule!.maxActiveEnemies).toBe(
       PROVISIONAL_EPIC_5_WAVES[0]!.maxActiveEnemies,
     );
-    expect(restartedState.waveSchedule.elapsedSeconds).toBe(0);
-    expect(restartedState.waveSchedule.nextScheduledSpawnIndex).toBe(0);
-    expect(restartedState.waveSchedule.requests).toEqual(
+    expect(restartedState.waveSchedule!.elapsedSeconds).toBe(0);
+    expect(restartedState.waveSchedule!.nextScheduledSpawnIndex).toBe(0);
+    expect(restartedState.waveSchedule!.requests).toEqual(
       compileWaveSchedule(PROVISIONAL_EPIC_5_WAVES[0]!),
     );
     expect(restartedState.killCount).toBe(0);

@@ -40,6 +40,7 @@ export function GameHost({
   const viewportRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<GameHostStatus>("loading");
+  const [announcement, setAnnouncement] = useState("");
   const { themeService } = useServices();
 
   useEffect(() => {
@@ -53,6 +54,7 @@ export function GameHost({
     let currentTheme = themeAdapter.getCurrentTheme();
 
     setStatus("loading");
+    setAnnouncement("");
 
     const unsubscribeTheme = themeAdapter.subscribe((theme) => {
       currentTheme = theme;
@@ -78,6 +80,15 @@ export function GameHost({
           canvas,
           viewport,
           theme: currentTheme,
+          onEvent: (event) => {
+            if (!cancelled && event.type === "wave-started") {
+              setAnnouncement(
+                event.encounterKind === "boss"
+                  ? "Boss entering from the top. Move clear of the entry point."
+                  : `Wave ${event.waveNumber} started.`,
+              );
+            }
+          },
         });
         controller.start();
         if (document.hidden) {
@@ -113,7 +124,9 @@ export function GameHost({
         Your browser does not support the canvas element.
       </canvas>
       <p className="sr-only" role="status" aria-live="polite">
-        {statusMessages[status]}
+        {status === "ready" && announcement
+          ? announcement
+          : statusMessages[status]}
       </p>
     </div>
   );

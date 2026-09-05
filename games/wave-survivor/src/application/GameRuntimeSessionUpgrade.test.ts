@@ -71,8 +71,8 @@ describe("GameRuntimeSession chooseUpgrade", () => {
       "vitality",
     ]);
     const originalSchedule = state.waveSchedule;
-    state.waveSchedule.elapsedSeconds = 4;
-    state.waveSchedule.nextScheduledSpawnIndex = 2;
+    state.waveSchedule!.elapsedSeconds = 4;
+    state.waveSchedule!.nextScheduledSpawnIndex = 2;
     state.player.position = { x: 75, y: 125 };
     state.player.currentHealth = 2;
     state.upgrades = createRunUpgradeState({ "swift-movement": 2 });
@@ -188,22 +188,20 @@ describe("GameRuntimeSession chooseUpgrade", () => {
     });
   });
 
-  it("keeps the explicit WS-6.3 bridge playable after the last normal wave", () => {
+  it("enters the boss after the last normal upgrade and rejects any following upgrade", () => {
     const { session, state } = createChoosingHarness(["swift-movement"], 4);
 
     expect(session.chooseUpgrade("swift-movement")).toBe(true);
-    expect(state.waveSchedule.currentWaveNumber).toBe(5);
-    expect(state.waveSchedule.requests).toEqual(
-      compileWaveSchedule(PROVISIONAL_EPIC_5_WAVES[3]!),
-    );
+    expect(state.waveSchedule).toBeNull();
+    expect(state.enemies).toMatchObject([
+      { kind: "charger", phase: "entering" },
+    ]);
 
     state.phase = "choosing-upgrade";
     state.pendingUpgradeOptionIds = Object.freeze(["rapid-fire"]);
-    expect(session.chooseUpgrade("rapid-fire")).toBe(true);
-    expect(state.waveSchedule.currentWaveNumber).toBe(6);
-    expect(state.waveSchedule.requests).toEqual(
-      compileWaveSchedule(PROVISIONAL_EPIC_5_WAVES[3]!),
-    );
+    expect(session.chooseUpgrade("rapid-fire")).toBe(false);
+    expect(state.waveSchedule).toBeNull();
+    expect(state.enemies).toHaveLength(1);
   });
 
   it("produces equal next-wave state from equal deterministic state", () => {
@@ -226,7 +224,7 @@ describe("GameRuntimeSession chooseUpgrade", () => {
     expect(restartedState.phase).toBe("playing");
     expect(restartedState.upgrades).toEqual(createInitialRunUpgradeState());
     expect(restartedState.pendingUpgradeOptionIds).toEqual([]);
-    expect(restartedState.waveSchedule.currentWaveNumber).toBe(1);
+    expect(restartedState.waveSchedule!.currentWaveNumber).toBe(1);
     expect(session.chooseUpgrade("rapid-fire")).toBe(false);
   });
 

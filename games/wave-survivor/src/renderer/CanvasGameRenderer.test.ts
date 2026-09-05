@@ -166,6 +166,48 @@ function createCanvas(displayWidth: number, displayHeight: number) {
 }
 
 describe("CanvasGameRenderer", () => {
+  it("renders a static boss label and double chevron while entry is partially visible", () => {
+    const { canvas, container, context } = createCanvas(360, 640);
+    const renderer = new CanvasGameRenderer(
+      { canvas, viewport: container, theme: initialTheme },
+      1,
+    );
+    renderer.render(
+      createRenderSnapshot({
+        enemies: [
+          {
+            id: 1,
+            phase: "entering",
+            x: 180,
+            y: 0,
+            collisionRadius: 24,
+            entryWarning: "boss",
+          },
+        ],
+      }),
+    );
+    expect(context.fillText).toHaveBeenCalledWith("BOSS INCOMING", 180, 30);
+    expect(context.fillText).toHaveBeenCalledWith(
+      "Move clear of the top entry",
+      180,
+      49,
+    );
+    expect(context.moveTo).toHaveBeenCalledWith(168, 6);
+    expect(context.moveTo).toHaveBeenCalledWith(168, 16);
+    expect(context.lineTo).toHaveBeenCalledWith(180, 14);
+    expect(context.lineTo).toHaveBeenCalledWith(180, 24);
+    vi.mocked(context.fillText).mockClear();
+    renderer.render(
+      createRenderSnapshot({
+        enemies: [
+          { id: 1, phase: "active", x: 180, y: 24, collisionRadius: 24 },
+        ],
+      }),
+    );
+    expect(context.fillText).not.toHaveBeenCalledWith("BOSS INCOMING", 180, 30);
+    renderer.destroy();
+  });
+
   it("initializes a centered DPR-aware canvas in logical coordinates", () => {
     const { canvas, container, context, fillStyles } = createCanvas(390, 844);
     Object.defineProperties(canvas, {

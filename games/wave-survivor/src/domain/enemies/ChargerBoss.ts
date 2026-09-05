@@ -45,6 +45,7 @@ export function createChargerBossState(
     contactDamage: definition.contactDamage,
     removeAtSimulationSeconds: null,
     action: null,
+    entryStartedAtSeconds: null,
   };
   if (!isEnemyStateValid(boss))
     throw new RangeError("Boss body must be finite and valid.");

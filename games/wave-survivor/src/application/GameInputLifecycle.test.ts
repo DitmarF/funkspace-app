@@ -315,8 +315,8 @@ describe("game input lifecycle integration", () => {
     harness.activateJoystick();
     expect(harness.joystick.readPresentationSnapshot()?.active).toBe(true);
     expect(harness.surface.capturedPointerIds.size).toBe(1);
-    harness.state.waveSchedule.nextScheduledSpawnIndex =
-      harness.state.waveSchedule.requests.length;
+    harness.state.waveSchedule!.nextScheduledSpawnIndex =
+      harness.state.waveSchedule!.requests.length;
 
     harness.session.fixedUpdate(FIXED_SIMULATION_STEP_SECONDS);
 

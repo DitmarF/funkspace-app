@@ -137,6 +137,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
 
     this.drawEntryWarnings(this.latestSnapshot);
     this.drawEnemies(this.latestSnapshot.enemies);
+    this.drawBossEntryAnnouncement(this.latestSnapshot);
 
     this.context.fillStyle = this.theme.colors.player;
     this.context.beginPath();
@@ -171,6 +172,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
     if (!this.context || !this.theme) return;
 
     for (const enemy of snapshot.enemies) {
+      if (enemy.entryWarning === "boss") continue;
       if (
         enemy.phase !== "entering" ||
         doesCircleIntersectBounds(
@@ -239,7 +241,7 @@ export class CanvasGameRenderer implements GamePresentationPort {
     if (!this.context || !this.theme) return;
 
     for (const enemy of enemies) {
-      if (enemy.phase === "entering") continue;
+      if (enemy.phase === "entering" && enemy.entryWarning !== "boss") continue;
 
       if (enemy.phase === "dying") {
         this.context.strokeStyle = this.theme.colors.effect;
@@ -275,6 +277,33 @@ export class CanvasGameRenderer implements GamePresentationPort {
       this.context.closePath();
       this.context.stroke();
     }
+  }
+
+  /** Static double chevron plus text; actors remain visible above the warning. */
+  private drawBossEntryAnnouncement(snapshot: GameRenderSnapshot): void {
+    if (!this.context || !this.theme) return;
+    const boss = snapshot.enemies.find(
+      (enemy) => enemy.entryWarning === "boss",
+    );
+    if (!boss) return;
+    this.context.fillStyle = this.theme.colors.background;
+    this.context.fillRect(ARENA.width / 2 - 120, 28, 240, 38);
+    this.context.strokeStyle = this.theme.colors.effect;
+    this.context.lineWidth = 3;
+    this.context.beginPath();
+    for (const y of [6, 16]) {
+      this.context.moveTo(boss.x - 12, y);
+      this.context.lineTo(boss.x, y + 8);
+      this.context.lineTo(boss.x + 12, y);
+    }
+    this.context.stroke();
+    this.context.fillStyle = this.theme.colors.effect;
+    this.context.font = "700 16px sans-serif";
+    this.context.textAlign = "center";
+    this.context.textBaseline = "top";
+    this.context.fillText("BOSS INCOMING", ARENA.width / 2, 30);
+    this.context.font = "600 12px sans-serif";
+    this.context.fillText("Move clear of the top entry", ARENA.width / 2, 49);
   }
 
   private drawProjectiles(

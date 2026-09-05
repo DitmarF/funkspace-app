@@ -33,8 +33,8 @@ function createEventHarness() {
 }
 
 function exhaustWaveSchedule(state: RuntimeState): void {
-  state.waveSchedule.nextScheduledSpawnIndex =
-    state.waveSchedule.requests.length;
+  state.waveSchedule!.nextScheduledSpawnIndex =
+    state.waveSchedule!.requests.length;
 }
 
 function clearCurrentWave(

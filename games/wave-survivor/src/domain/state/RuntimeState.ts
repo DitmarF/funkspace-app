@@ -57,7 +57,8 @@ export interface RuntimeState {
   pendingUpgradeOptionIds: readonly UpgradeId[];
   enemies: EnemyState[];
   nextEnemyId: number;
-  waveSchedule: WaveScheduleProgress;
+  /** Normal schedule is the progression authority; null means the final boss. */
+  waveSchedule: WaveScheduleProgress | null;
   projectiles: ProjectileState[];
   nextProjectileId: number;
   nextAttackAtSeconds: number;

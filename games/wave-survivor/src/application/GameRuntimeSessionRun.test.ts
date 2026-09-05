@@ -46,11 +46,11 @@ describe("provisional normal-run integration", () => {
       ) {
         session.fixedUpdate(1 / 60);
         const live = countEnemiesOccupyingWaveCapacity(state.enemies);
-        expect(live).toBeLessThanOrEqual(state.waveSchedule.maxActiveEnemies);
+        expect(live).toBeLessThanOrEqual(state.waveSchedule!.maxActiveEnemies);
       }
       expect(session.phase).toBe("choosing-upgrade");
-      expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(
-        state.waveSchedule.requests.length,
+      expect(state.waveSchedule!.nextScheduledSpawnIndex).toBe(
+        state.waveSchedule!.requests.length,
       );
       expect(state.enemies).toEqual([]);
       expect(state.projectiles).toEqual([]);
@@ -67,7 +67,7 @@ describe("provisional normal-run integration", () => {
       6.95, 8.58, 10.48, 11.88,
     ]);
     expect(session.phase).toBe("choosing-upgrade");
-    expect(state.waveSchedule.currentWaveNumber).toBe(4);
+    expect(state.waveSchedule!.currentWaveNumber).toBe(4);
     expect(state.simulationTimeSeconds).toBeCloseTo(37.9, 5);
     expect(state.killCount).toBe(28);
     expect(state.player.currentHealth).toBe(2);
@@ -80,19 +80,19 @@ describe("provisional normal-run integration", () => {
     session.destroy();
   });
 
-  it("retains four upgrade opportunities and the WS-6.3 bridge after tuning", () => {
+  it("retains four upgrade opportunities and enters the single boss", () => {
     const { state, events, session } = createHarness();
     for (const [
       index,
       wave,
     ] of PROVISIONAL_RUN_DEFINITION.normalWaves.entries()) {
-      expect(state.waveSchedule.currentWaveNumber).toBe(index + 1);
-      expect(state.waveSchedule.requests).toHaveLength(
+      expect(state.waveSchedule!.currentWaveNumber).toBe(index + 1);
+      expect(state.waveSchedule!.requests).toHaveLength(
         wave.groups.reduce((count, group) => count + group.count, 0),
       );
       // A completed-queue transition fixture, not gameplay or pacing evidence.
-      state.waveSchedule.nextScheduledSpawnIndex =
-        state.waveSchedule.requests.length;
+      state.waveSchedule!.nextScheduledSpawnIndex =
+        state.waveSchedule!.requests.length;
       session.fixedUpdate(1 / 60);
       expect(session.phase).toBe("choosing-upgrade");
       expect(state.pendingUpgradeOptionIds).toHaveLength(3);
@@ -105,9 +105,15 @@ describe("provisional normal-run integration", () => {
     ).toEqual([1, 2, 3, 4]);
     expect(state.upgrades.levels["rapid-fire"]).toBe(4);
     expect(session.phase).toBe("playing");
-    expect(state.waveSchedule.requests).toHaveLength(10);
-    expect(state.waveSchedule.maxActiveEnemies).toBe(6);
-    expect(events.at(-1)).toEqual({ type: "wave-started", waveNumber: 5 });
+    expect(state.waveSchedule).toBeNull();
+    expect(state.enemies).toMatchObject([
+      { kind: "charger", phase: "entering" },
+    ]);
+    expect(events.at(-1)).toEqual({
+      type: "wave-started",
+      waveNumber: 5,
+      encounterKind: "boss",
+    });
     session.destroy();
   });
 });

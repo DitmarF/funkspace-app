@@ -5,7 +5,7 @@
 ## Document metadata
 
 - **Status:** Approved starting concept
-- **Product stage:** Gate 1 approved / Gate 2 in progress; WS-6.1/6.2/6.6 candidates and WS-6.7 record boundary implemented
+- **Product stage:** Gate 1 approved / Gate 2 in progress; WS-6.1/6.2/6.3/6.6 candidates and WS-6.7 record boundary implemented
 - **Owner:** Dimi
 - **Working title:** Wave Survivor
 - **Target platform:** Modern web browsers
@@ -410,13 +410,11 @@ after every normal wave, including Wave 4 before the boss at encounter index 4
 (position 5). Completing the boss resolves run completion without an upgrade;
 this is a progression rule, not an implemented boss-defeat or victory state.
 
-The production application temporarily retains EPIC 5 playability through
-`createNextWaveScheduleUntilBossIntegration`: normal successors use the finite
-model, while the boss boundary and later displayed waves explicitly repeat
-the last normal definition. These later displayed wave numbers are not finite
-encounter indexes. WS-6.3 owns real boss handoff and removal of this bridge.
-The final-normal-wave-to-boss runtime acceptance criterion is **pending**;
-there is no fake boss or empty-arena victory.
+WS-6.3 removes the production repeat bridge. The fourth valid upgrade enters
+one boss at encounter 5, with no normal-wave schedule or subsequent upgrade.
+Normal-wave completion still requires an empty queue and no entering/active
+enemies. Boss terminal handling remains WS-6.5; an empty boss arena is not
+treated as victory or another normal-wave clear.
 
 If every upgrade has reached its cap, completing the wave leaves the game
 frozen in `wave-cleared`. The standalone demo displays “All upgrades maxed”
@@ -435,13 +433,13 @@ adjustments. Existing groups are retained: Wave 3 uses `4 + 4`, and Wave 4
 uses `6 + 4` enemies. Wave 4 retains its concurrent cap of 6.
 Group start offsets, spawn intervals, combat stats, and upgrades are unchanged.
 
-| Encounter        |       Enemy count | Group start offsets / spawn intervals |              Entering + active cap | Last scheduled spawn offset | Upgrade afterward             | Provisional clear-time review target       |
-| ---------------- | ----------------: | ------------------------------------- | ---------------------------------: | --------------------------: | ----------------------------- | ------------------------------------------ |
-| Normal Wave 1    |                 4 | `0.5s / 1s`                           |                                  2 |                      `3.5s` | One                           | About `7s`, diagnostic only                |
-| Normal Wave 2    |                 6 | `0.5s / 0.85s`                        |                                  3 |                     `4.75s` | One                           | About `9s`, diagnostic only                |
-| Normal Wave 3    |             4 + 4 | `0.5s / 0.8s`; `4.5s / 0.7s`          |                                  4 |                      `6.6s` | One                           | About `10s`, diagnostic only               |
-| Normal Wave 4    |             6 + 4 | `0.5s / 0.7s`; `5s / 0.6s`            |                                  6 |                      `6.8s` | One, before boss              | About `12s`, diagnostic only               |
-| Boss, position 5 | One charger model | WS-6.3 entry pending                  | One boss; production entry pending |             Not yet defined | None after completion/victory | Active fixtures below; human fight pending |
+| Encounter        | Enemy count | Group start offsets / spawn intervals   |     Entering + active cap | Last scheduled spawn offset | Upgrade afterward | Provisional clear-time review target           |
+| ---------------- | ----------: | --------------------------------------- | ------------------------: | --------------------------: | ----------------- | ---------------------------------------------- |
+| Normal Wave 1    |           4 | `0.5s / 1s`                             |                         2 |                      `3.5s` | One               | About `7s`, diagnostic only                    |
+| Normal Wave 2    |           6 | `0.5s / 0.85s`                          |                         3 |                     `4.75s` | One               | About `9s`, diagnostic only                    |
+| Normal Wave 3    |       4 + 4 | `0.5s / 0.8s`; `4.5s / 0.7s`            |                         4 |                      `6.6s` | One               | About `10s`, diagnostic only                   |
+| Normal Wave 4    |       6 + 4 | `0.5s / 0.7s`; `5s / 0.6s`              |                         6 |                      `6.8s` | One, before boss  | About `12s`, diagnostic only                   |
+| Boss, position 5 | One charger | Top-center, 1.5s lead / 2.5s full entry | One boss, no normal queue |         Not a wave schedule | None after boss   | Active fixtures recorded; human review pending |
 
 The clear-time review targets are provisional, not approved human pacing or
 gameplay timers. Earlier diagnostic targets are superseded by this explicit
@@ -457,7 +455,7 @@ The stationary player clears all four normal waves in **6.95 / 8.58 / 10.48 /
 remaining. The test verifies the configured concurrent caps throughout.
 No injected kills or skipped spawn requests are used in this diagnostic. A separate
 completed-queue transition fixture verifies all four upgrade opportunities and
-the temporary bridge; it is not pacing or full-run gameplay evidence.
+the real boss handoff; it is not pacing or full-run gameplay evidence.
 
 Historical comparison: the doubled-count/cap version cleared Wave 1 in 12.37s
 with 2 health, then lost in Wave 2 at 23.68 total simulation seconds under the
@@ -486,9 +484,9 @@ waves or enemies solely to fill that duration.
 ### 10.7 WS-6.2 charger candidate
 
 One charger is implemented in `domain/enemies/ChargerBoss.ts` and dispatched by
-the existing session when an injected charger is active. Production waves still
-spawn only basic enemies; WS-6.3 owns real boss entry and removal of the repeat
-bridge. No boss is currently reachable through the playable run.
+the existing session when a charger is active. Normal waves still spawn only
+basic enemies. WS-6.3 now makes the boss reachable after the fourth upgrade;
+the original WS-6.2 isolated fight diagnostics below remain historical fixtures.
 
 The action cycle is **approach → wind-up → charge → recovery → approach**.
 `EnemyState` distinguishes basic and charger bodies by kind. The charger adds
@@ -521,7 +519,7 @@ arena center, then downward if both centers coincide. This avoids normalizing
 zero and repeated outward charges at a wall. The charge stops at first wall
 contact and begins recovery immediately, without sliding, reflecting, leaving
 the arena, or waiting forever for an unreachable target. Boundary/fallback
-handling is tested; the production entry layout remains WS-6.3 work.
+handling is tested; WS-6.3 now supplies the production entry layout below.
 
 All active actions remain targetable and contact-dangerous, including stationary
 wind-up/recovery. Entering/dying bosses are ineligible. Existing nearest-target
@@ -553,13 +551,69 @@ measurements or evidence of the 5–7-minute run target. The scripted route took
 no damage across all three builds, which does not establish a fair or distinct
 movement challenge for a person. No health padding was added to fill run time.
 
-**Dependent acceptance:** WS-6.3 integrates entry and finite handoff; WS-6.4
+**Dependent acceptance:** WS-6.3 has integrated entry and finite handoff; WS-6.4
 adds visible action telegraphs; WS-6.5 integrates terminal boss defeat without
 normal-wave upgrade handling. No complete victory flow is delivered here.
 WS-6.10 owns final tuning. After entry and telegraphs exist, Dimi must evaluate
 on PC/phone whether the charger tests positioning rather than merely adding a
 large health pool, and assess timing, damage fairness, edge behavior, and build
 durations. That human review and Gate 2 remain pending.
+
+### 10.8 WS-6.3 deliberate boss entry
+
+The last valid normal-wave upgrade resolves the existing finite successor and
+creates exactly one charger. `RuntimeState.waveSchedule` is now nullable: its
+normal schedule remains the progression authority; `null` explicitly marks the
+final boss encounter. The displayed encounter is derived from the normal
+schedule or `normalWaves.length + 1`, never stored in a second counter. The
+production repeat-last-wave function is removed. No normal schedule, upgrade
+selection, or normal-wave completion can follow the boss, even if the arena is
+empty. Until WS-6.5, defeating the boss leaves gameplay running without a win
+result; no empty-arena victory is inferred.
+
+Entry is provisional **top-center, straight downward**, without tracking the
+player. The radius-24 boss starts at `(180,-96)` and moves at 48 units/s.
+The warning precedes first visibility by **1.5 simulation seconds**, versus the
+normal 0.75s lead. Entry ends after **2.5s**, at `(180,24)`, with the whole body
+inside. All entering bosses are untargetable and cannot deal contact damage,
+including while partially visible. On activation they use the existing attack
+and contact rules; remaining at the entry point then becomes dangerous.
+
+Entry start time belongs to the boss's existing enemy state; position and
+lifecycle have no duplicate owner. It uses the overall gameplay clock and
+freezes on pause. Player movement remains available. Completed-wave enemies
+and projectiles are cleared; health (including the selected upgrade's normal
+effect), upgrades, immunity deadline, kills, and overall run time carry forward.
+Boss cleanup bounds are derived from its radius, speed, and entry lead: the
+outer offset is 160 logical units. Generic validity and cleanup still apply;
+the larger entry cannot be deleted merely for using normal-enemy bounds.
+
+The renderer receives only an optional `entryWarning: "boss"` on the copied,
+frozen enemy snapshot. It draws a static double chevron at the top and
+**BOSS INCOMING / Move clear of the top entry** in existing semantic colors.
+It also draws the partially visible body; actors stay above the warning so it
+does not hide the player. The message and shape require neither animation nor
+color discrimination. Action telegraphs for wind-up/charge remain WS-6.4.
+
+For the concrete screen-reader/DOM announcement need, the existing
+`wave-started` event adds optional `encounterKind: "normal-wave" | "boss"`.
+Boss entry emits `{ type: "wave-started", waveNumber: 5, encounterKind: "boss" }`;
+legacy normal events omit the field. No new event variant was added. The demo
+and portfolio host announce “Boss entering from the top. Move clear of the
+entry point.” The demo restores Canvas movement focus after upgrade choice;
+the frontend loader mirrors the public type without exposing internals.
+
+Automated fixtures check one spawn, preserved progress, no successor, partial
+visibility, cleanup retention, pause/resume, restart/destroy during entry, and
+nine starting points: four corners, four edge midpoints, and center. At base
+movement speed they escape without damage even after a 1.5s scripted reaction
+delay. This is deterministic evidence of an escape route, not human acceptance.
+
+**Pending manual acceptance — Dimi:** check warning visibility and escape
+fairness on PC and a real phone, especially near the top entry and with
+thumb/joystick occlusion. Check dark/high-contrast readability and reduced
+motion. Human warning timing approval and Gate 2 remain pending. WS-6.4 owns
+visible action telegraphs; WS-6.5 owns victory and stopping terminal gameplay.
 
 ## 11. Upgrades and progression
 
@@ -579,9 +633,8 @@ Run construction rejects more normal-wave upgrade opportunities than the
 canonical pool's 15 available levels. Each legal selection consumes one level;
 four choices cannot exhaust this pool. Exhaustive coverage of all 81 four-choice
 paths confirms all three options remain available at each candidate choice,
-including repeated selection of the same upgrade. The temporary Wave 16
-exhaustion endpoint is reachable only through the staging bridge, outside the
-finite candidate.
+including repeated selection of the same upgrade. WS-6.3 removed the temporary
+Wave 16 exhaustion endpoint with the repeat bridge.
 
 ### 11.2 No permanent power progression
 
@@ -634,9 +687,8 @@ or leaderboard is introduced.
 The WS-6.1 candidate still has four normal waves and one boss. Current normal
 content totals 28 enemies, so a completed boss contributes enemy 29 while the
 normal-wave count remains four. Boss counting is tested with numeric inputs;
-it is not evidence of a working boss or victory integration. The temporary
-repeat-wave bridge's displayed wave number must not be used as finite-run
-completion progress. Scoring is not wired into that bridge or the renderer.
+it is not evidence of victory integration. WS-6.3 now enters the real boss at
+encounter 5. Scoring is still not wired into runtime outcomes or the renderer.
 
 | Example                                          | Calculation                        | Score |
 | ------------------------------------------------ | ---------------------------------- | ----: |
@@ -862,12 +914,11 @@ export, and frontend type alias. `GameEvent` and `GameStatusSnapshot` are
 unchanged. The factory is internal; hosts receive the type only for now.
 
 **Dependent acceptance:** WS-6.5 owns terminal integration, including clock
-sampling and actual encounter entry. The temporary repeated normal wave 5 is
-not boss entry and must not be reported as such. WS-6.8 owns result delivery and
+sampling. WS-6.3 now records actual boss entry at encounter 5. WS-6.8 owns result delivery and
 UI. Preservation of an emitted result across restart is deferred to WS-6.5/9;
 the isolated copy/freeze tests do not exercise that runtime path. Boss
-entry/wind-up timing is also pending real integration, not proven by numeric
-fixtures. Dimi's confirmation that these fields are sufficient and
+entry and wind-up use the gameplay clock, but terminal sampling is still
+pending integration. Dimi's confirmation that these fields are sufficient and
 understandable for a result screen remains pending; Gate 2 is not approved.
 
 ## 16. Accessibility and user control

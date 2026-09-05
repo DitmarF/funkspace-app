@@ -14,6 +14,7 @@ async function openDemo(
   page: Page,
   exhausted = false,
   clearImmediately = true,
+  boss = false,
 ): Promise<void> {
   await page.route(/\/dist\/index\.js(?:\?|$)/, (route) =>
     route.fulfill({
@@ -22,7 +23,7 @@ async function openDemo(
         export function createGame({ canvas, onStatusChange, onEvent }) {
           canvas.tabIndex = 0;
           let phase = "idle";
-          let waveNumber = ${exhausted ? 16 : 1};
+          let waveNumber = ${exhausted || boss ? 4 : 1};
           const options = ${JSON.stringify(options)};
           const status = () => onStatusChange({ phase, waveNumber,
             currentHealth: 3, maximumHealth: 3, killCount: 4 });
@@ -45,7 +46,7 @@ async function openDemo(
               phase = "playing";
               waveNumber += 1;
               status();
-              onEvent({ type: "wave-started", waveNumber });
+              onEvent({ type: "wave-started", waveNumber, ${boss ? 'encounterKind: "boss"' : ""} });
               return true;
             },
             restart() {
@@ -64,9 +65,88 @@ async function openDemo(
   if (clearImmediately) await clearWave(page);
 }
 
+test("announces the boss after the final upgrade and restores movement focus", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "dark" });
+  await openDemo(page, false, true, true);
+  await page.getByRole("button", { name: /Rapid Fire/ }).click();
+  await expect(page.locator("#game-announcement")).toHaveText(
+    "Boss entering from the top. Move clear of the entry point.",
+  );
+  await expect(page.locator("#game-canvas")).toBeFocused();
+  await expect(page.locator("#game-upgrades")).toBeHidden();
+});
+
 async function clearWave(page: Page): Promise<void> {
   await page.locator("#game-canvas").dispatchEvent("test-clear-wave");
 }
+
+test("renders the actual boss entry warning in monochrome reduced motion", async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "dark" });
+  await openDemo(page, false, false);
+  // The host fixture owns no loop. Render one real Canvas frame for visual QA.
+  await page.evaluate(async (moduleUrl) => {
+    const { CanvasGameRenderer } = await import(moduleUrl);
+    const canvas = document.querySelector("#game-canvas");
+    const viewport = document.querySelector("#game-viewport");
+    const renderer = new CanvasGameRenderer(
+      {
+        canvas,
+        viewport,
+        theme: {
+          colors: {
+            background: "#111111",
+            player: "#ffffff",
+            enemy: "#ffffff",
+            projectile: "#ffffff",
+            effect: "#ffffff",
+          },
+        },
+      },
+      1,
+    );
+    renderer.render({
+      phase: "playing",
+      simulationTimeSeconds: 40,
+      playerX: 180,
+      playerY: 12,
+      playerCollisionRadius: 12,
+      playerCurrentHealth: 3,
+      playerMaximumHealth: 3,
+      isPlayerInvulnerable: false,
+      killCount: 28,
+      projectiles: [],
+      joystick: {
+        active: false,
+        centerX: 72,
+        centerY: 568,
+        baseRadius: 52,
+        knobX: 72,
+        knobY: 568,
+        knobRadius: 22,
+      },
+      enemies: [
+        {
+          id: 29,
+          phase: "entering",
+          x: 180,
+          y: -96,
+          collisionRadius: 24,
+          entryWarning: "boss",
+        },
+      ],
+    });
+    renderer.destroy();
+  }, `/@fs${process.cwd()}/games/wave-survivor/dist/renderer/CanvasGameRenderer.js`);
+  await page
+    .locator("#game-canvas")
+    .screenshot({ path: testInfo.outputPath("boss-entry.png") });
+});
 
 async function readPageLayout(page: Page) {
   return page.evaluate(() => ({

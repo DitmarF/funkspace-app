@@ -109,8 +109,8 @@ describe("GameRuntimeSession discrete status", () => {
     session.start();
     onStatusChange.mockClear();
     statuses.length = 0;
-    state.waveSchedule.nextScheduledSpawnIndex =
-      state.waveSchedule.requests.length;
+    state.waveSchedule!.nextScheduledSpawnIndex =
+      state.waveSchedule!.requests.length;
 
     session.fixedUpdate(0.01);
     expect(session.phase).toBe("choosing-upgrade");

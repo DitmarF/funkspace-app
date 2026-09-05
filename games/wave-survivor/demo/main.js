@@ -100,7 +100,10 @@ const game = createGame({
   },
   onEvent: (event) => {
     if (event.type === "wave-started") {
-      if (selectedUpgradeTitle) {
+      if (event.encounterKind === "boss") {
+        announcement.textContent =
+          "Boss entering from the top. Move clear of the entry point.";
+      } else if (selectedUpgradeTitle) {
         announcement.textContent = `${selectedUpgradeTitle} selected. Wave ${event.waveNumber} started.`;
       } else if (restartInProgress) {
         announcement.textContent = `New run started. Wave ${event.waveNumber}.`;

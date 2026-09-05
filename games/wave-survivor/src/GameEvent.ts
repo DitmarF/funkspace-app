@@ -12,6 +12,8 @@ export type GameEvent =
   | {
       readonly type: "wave-started";
       readonly waveNumber: number;
+      /** Omitted by legacy normal-wave events; lets hosts announce boss entry. */
+      readonly encounterKind?: "normal-wave" | "boss";
     }
   | {
       readonly type: "wave-cleared";

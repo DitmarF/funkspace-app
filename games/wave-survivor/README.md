@@ -61,21 +61,18 @@ after final encounter completion. Construction validates nested wave content
 and rejects runs whose upgrade opportunities exceed the canonical 15 levels.
 Tests cover all 81 legal four-choice paths without pool exhaustion.
 
-Production remains playable through the explicitly named application bridge
-`createNextWaveScheduleUntilBossIntegration`. It uses finite normal successors,
-then repeats the last normal wave at the boss boundary and beyond, retaining
-the existing exhausted-pool recovery endpoint. WS-6.3 must remove this bridge
-when real boss entry exists. Boss handoff and victory are **not implemented**
-by WS-6.1; the finite model does not create a fake boss or empty-arena victory.
-The public API, themes, renderer, and completion condition are unchanged:
-queue empty plus no entering/active enemies, with dying artifacts cleaned up.
+WS-6.3 removes the production repeat bridge: the fourth upgrade now enters one
+boss. The normal schedule is absent during that final encounter, preventing
+additional normal waves or upgrades. Normal completion remains queue empty
+plus no entering/active enemies. Victory and terminal stop remain WS-6.5;
+an empty boss arena is not treated as victory.
 
 See the [candidate pacing record](../../docs/features/wave-survivor.md#106-ws-61-candidate-pacing-record--2026-09-05)
 for counts, intervals, caps, and provisional review targets. Dimi's latest
 explicit table sets enemy totals to `4 / 6 / 8 / 10` and entering/active caps to
 `2 / 3 / 4 / 6`, superseding earlier tuning. Wave 3 uses groups of `4 + 4`;
 Wave 4 uses `6 + 4` and retains its cap of 6. Group start offsets and intervals
-are unchanged. The temporary bridge also uses the retuned last wave.
+are unchanged. The old repeat bridge has been removed by WS-6.3.
 A reproducible session test (spawn seed 1, upgrade seed 2, stationary player,
 `1/60s` updates, Rapid Fire after each completed wave) clears all four normal
 waves in `6.95 / 8.58 / 10.48 / 11.88s`, totaling `37.90` simulation seconds
@@ -107,11 +104,30 @@ simulation diagnostics, not human gameplay, production-entry, or fairness
 acceptance. See the [definition and evidence](../../docs/features/wave-survivor.md#107-ws-62-charger-candidate)
 for exact configuration, fixture setup, and ideal all-hit duration estimates.
 
-Production still uses the repeat-wave bridge. Boss entry belongs to WS-6.3,
-visible action telegraphs to WS-6.4, and terminal integration to WS-6.5; no boss
-can yet be reached through normal play. After those entry/telegraph tasks,
+Production entry is now implemented by WS-6.3. Visible action telegraphs belong
+to WS-6.4 and terminal integration to WS-6.5. After entry/telegraph validation,
 Dimi evaluates whether the boss offers a distinct positioning challenge on
 PC/phone. Final balance is WS-6.10; manual acceptance and Gate 2 are pending.
+
+## WS-6.3 boss entry
+
+After the fourth upgrade, one boss enters straight down from `(180,-96)` at
+48 units/s. The warning lasts 1.5s before first visibility and 2.5s until the
+full body is inside at `(180,24)`. Player movement remains available; entry
+is untargetable and contact-harmless even while partly visible. Pause freezes
+entry on the overall simulation clock. Boss-specific cleanup bounds retain
+the larger entry safely. Health/upgrades and overall time are preserved.
+
+A static double chevron and text announce the top entry using semantic colors.
+The existing `wave-started` event adds optional `encounterKind`; boss entry
+sets it to `"boss"`. Both demo and portfolio host announce the boss without a
+new event variant. Normal events retain their existing payloads. See the
+[entry contract and acceptance record](../../docs/features/wave-survivor.md#108-ws-63-deliberate-boss-entry).
+
+No normal schedule or upgrade follows the boss. Defeating it currently leaves
+gameplay running, pending WS-6.5 terminal handling; no victory is inferred from
+an empty arena. Action telegraphs are WS-6.4. Dimi's PC/phone warning and escape
+review, including thumb/joystick occlusion, remains pending.
 
 ## WS-6.6 score candidate
 
@@ -139,8 +155,7 @@ implemented boss/victory results. See [input ownership and examples](../../docs/
 
 WS-6.5 owns session integration (including normal-clear progress, which is not
 yet tracked as a terminal score input); WS-6.7 owns result construction. The
-package root API, renderer, playable repeat bridge, and runtime counters are
-unchanged. No live-score system, economy, time bonus, or persistence is added.
+scoring rule adds no live-score system, economy, time bonus, or persistence.
 The formula remains a candidate pending Dimi's reward approval, not a
 playtest-approved decision or Gate 2 completion.
 
@@ -173,7 +188,7 @@ See [field ownership and integration requirements](../../docs/features/wave-surv
 The frontend loader aliases the package type. Result events/UI (WS-6.8),
 terminal integration (WS-6.5), and emitted-result preservation across restart
 (WS-6.5/9) remain pending. No result is currently emitted or displayed; the
-temporary repeat-wave bridge is not a completed boss run. Dimi's review of
+boss entry does not itself complete the run. Dimi's review of
 the result information remains pending.
 
 ```ts
@@ -220,8 +235,9 @@ temporary exhausted-upgrade endpoint. Hosts should offer `restart()` here.
 The demo announces “All upgrades maxed” and focuses its Restart button. The
 session stays frozen, keeps the cleared wave number, and emits no empty
 upgrade-choice request. The three five-level upgrades allow 15 selections;
-clearing Wave 16 therefore reaches this endpoint through the temporary bridge.
-WS-6.3 removes that bridge; WS-6.5 owns runtime victory behavior.
+this defensive exhaustion endpoint is unreachable in the finite four-choice
+run. The old Wave 16 repeat endpoint was removed by WS-6.3. WS-6.5 owns runtime
+victory behavior.
 
 The optional `onEvent` callback receives frozen `wave-started`, `wave-cleared`,
 and `upgrade-choice-requested` events. Upgrade-choice events contain a frozen
