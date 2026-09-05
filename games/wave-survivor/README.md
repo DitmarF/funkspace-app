@@ -118,6 +118,36 @@ playtest-approved decision or Gate 2 completion.
 
 ## Public API
 
+`RunResult` is also exported as a type from the package root:
+
+```ts
+import type { RunResult } from "@funkspace/wave-survivor";
+// { readonly outcome: "won" | "lost"; readonly score: number;
+//   readonly waveReached: number; readonly elapsedSeconds: number; }
+```
+
+WS-6.7 defines this minimal completion record and the internal pure
+`createRunResult()` factory. The factory validates, copies just the four
+primitive fields, and freezes the new object at runtime. It rejects invalid
+outcomes with `TypeError`, and invalid numeric values with `RangeError`: score
+must be a non-negative safe integer, wave reached a positive safe integer,
+and elapsed seconds finite and non-negative. Readonly types alone do not
+freeze arbitrary objects created by a host.
+
+Wave reached means the highest encounter entered (one-based), including the
+boss at `normalWaves.length + 1`, currently 5; it is distinct from normal waves
+cleared for scoring. Score comes from `calculateScore()`. Elapsed seconds come
+from the overall gameplay simulation clock, including capacity waiting and
+boss entry/wind-up, excluding idle, pauses, upgrade selection, and terminal
+time. The per-wave schedule clock is unsuitable because it pauses at capacity.
+
+See [field ownership and integration requirements](../../docs/features/wave-survivor.md#155-ws-67-completion-record).
+The frontend loader aliases the package type. Result events/UI (WS-6.8),
+terminal integration (WS-6.5), and emitted-result preservation across restart
+(WS-6.5/9) remain pending. No result is currently emitted or displayed; the
+temporary repeat-wave bridge is not a completed boss run. Dimi's review of
+the result information remains pending.
+
 ```ts
 import {
   createGame,

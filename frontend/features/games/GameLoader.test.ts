@@ -3,6 +3,7 @@ import type {
   GameEvent as PackageGameEvent,
   GameMountOptions as PackageGameMountOptions,
   GameStatusSnapshot as PackageGameStatusSnapshot,
+  RunResult as PackageRunResult,
   UpgradeOption as PackageUpgradeOption,
 } from "@funkspace/wave-survivor";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
@@ -14,6 +15,7 @@ import {
   type GameModule,
   type GameStatusSnapshot,
   type HostedGameController,
+  type RunResult,
   type UpgradeOption,
 } from "./GameLoader";
 
@@ -48,5 +50,6 @@ describe("GameLoader", () => {
     expectTypeOf<GameEvent>().toEqualTypeOf<PackageGameEvent>();
     expectTypeOf<UpgradeOption>().toEqualTypeOf<PackageUpgradeOption>();
     expectTypeOf<HostedGameController>().toEqualTypeOf<PackageGameController>();
+    expectTypeOf<RunResult>().toEqualTypeOf<PackageRunResult>();
   });
 });

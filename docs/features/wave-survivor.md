@@ -5,7 +5,7 @@
 ## Document metadata
 
 - **Status:** Approved starting concept
-- **Product stage:** Gate 1 approved / Gate 2 in progress; WS-6.1 and WS-6.6 candidates implemented
+- **Product stage:** Gate 1 approved / Gate 2 in progress; WS-6.1/6.6 candidates and WS-6.7 record boundary implemented
 - **Owner:** Dimi
 - **Working title:** Wave Survivor
 - **Target platform:** Modern web browsers
@@ -743,6 +743,54 @@ The portfolio host may:
 - receive occasional game events.
 
 React must not store or render per-frame enemy, projectile, joystick, or position state.
+
+### 15.5 WS-6.7 completion record
+
+`RunResult` is a public package type owned by `domain/result/RunResult.ts`.
+Hosts import it from `@funkspace/wave-survivor`; the frontend `GameLoader`
+re-exports that same type instead of maintaining a second result schema.
+
+```ts
+interface RunResult {
+  readonly outcome: "won" | "lost";
+  readonly score: number;
+  readonly waveReached: number;
+  readonly elapsedSeconds: number;
+}
+```
+
+- `outcome`: the authoritative terminal win/loss decision from application integration.
+- `score`: the output of WS-6.6 `calculateScore()`, using authoritative kills, completed normal encounters, terminal outcome, and effective health after upgrades. Result construction does not recalculate or accumulate points.
+- `waveReached`: the highest encounter actually entered, numbered from one. The boss follows all normal waves (`normalWaves.length + 1`, currently 5). Losing during wave 2 means wave reached 2, even with only one normal wave cleared; entering the boss means 5 reached and four normal waves cleared. An offered successor is not entered until gameplay resumes into it.
+- `elapsedSeconds`: the existing overall `RuntimeState.simulationTimeSeconds` sampled at completion. Include gameplay waiting at enemy capacity and boss entry/wind-up. Exclude idle, pauses, upgrade selection, and time after the terminal boundary. Do not use wall-clock time or `waveSchedule.elapsedSeconds`, which resets per wave and pauses at capacity. Keep fractional seconds; formatting belongs to the future UI. Time does not affect score.
+
+The internal pure `createRunResult()` validates and copies only those four
+primitive values, then calls `Object.freeze()`. Neither later mutation of the
+input nor future session state replacement can change that record; extra
+properties are not copied. TypeScript `readonly` describes the public contract,
+while construction supplies the runtime freeze. A host-created object that
+merely satisfies the interface has no automatic freeze guarantee.
+
+Invalid outcomes throw `TypeError`. Score must be a non-negative safe integer,
+wave reached a positive safe integer, and elapsed seconds finite and
+non-negative; invalid numeric values throw `RangeError`. Zero elapsed time is
+valid, but encounter zero is not. The factory validates the record's numeric
+shape, not whether a run could produce those values. Application integration
+must validate actual finite progression and coherent terminal inputs; there is
+no hard-coded five-encounter cap in this reusable record boundary.
+
+**Implemented:** record construction/validation, runtime freeze, package type
+export, and frontend type alias. `GameEvent` and `GameStatusSnapshot` are
+unchanged. The factory is internal; hosts receive the type only for now.
+
+**Dependent acceptance:** WS-6.5 owns terminal integration, including clock
+sampling and actual encounter entry. The temporary repeated normal wave 5 is
+not boss entry and must not be reported as such. WS-6.8 owns result delivery and
+UI. Preservation of an emitted result across restart is deferred to WS-6.5/9;
+the isolated copy/freeze tests do not exercise that runtime path. Boss
+entry/wind-up timing is also pending real integration, not proven by numeric
+fixtures. Dimi's confirmation that these fields are sufficient and
+understandable for a result screen remains pending; Gate 2 is not approved.
 
 ## 16. Accessibility and user control
 

@@ -4,6 +4,8 @@ import type {
 } from "@funkspace/wave-survivor";
 import type { GameTheme } from "./theme";
 
+export type { RunResult } from "@funkspace/wave-survivor";
+
 export type GameId = "wave-survivor";
 
 export interface HostedGameController {
