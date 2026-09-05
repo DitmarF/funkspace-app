@@ -15,7 +15,7 @@ import {
 import { createRunUpgradeState } from "../domain/upgrades/index.js";
 import {
   createWaveScheduleProgress,
-  getProvisionalEpic5WaveDefinition,
+  PROVISIONAL_RUN_DEFINITION,
 } from "../domain/waves/index.js";
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
@@ -355,7 +355,7 @@ describe("GameRuntimeSession phase transitions", () => {
     });
     state.waveSchedule = createWaveScheduleProgress(
       16,
-      getProvisionalEpic5WaveDefinition(16),
+      PROVISIONAL_RUN_DEFINITION.normalWaves.at(-1)!,
     );
     exhaustWaveSchedule(state);
     const enemy = createBasicEnemyState(1, state.player.position);

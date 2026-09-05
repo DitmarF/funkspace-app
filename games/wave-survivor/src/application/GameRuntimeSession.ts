@@ -66,8 +66,9 @@ import {
   countEnemiesOccupyingWaveCapacity,
   createWaveScheduleProgress,
   getDueScheduledSpawnRequest,
-  getProvisionalEpic5WaveDefinition,
   isWaveComplete,
+  PROVISIONAL_RUN_DEFINITION,
+  resolveNextEncounter,
   type ScheduledSpawnRequest,
   type WaveScheduleProgress,
 } from "../domain/waves/index.js";
@@ -84,6 +85,39 @@ const PROJECTILE_DESPAWN_BOUNDS = expandBoundsByOffset(
 );
 const UPGRADE_OPTION_COUNT = 3;
 const NO_PENDING_UPGRADE_OPTIONS: readonly UpgradeId[] = Object.freeze([]);
+
+/**
+ * WS-6.1 staging bridge: use finite successors for normal waves, then retain
+ * EPIC 5's playable repeat until WS-6.3 integrates real boss entry and removes
+ * this bridge. Displayed wave numbers past the normal run are NOT encounters.
+ */
+function createNextWaveScheduleUntilBossIntegration(
+  currentWaveNumber: number,
+): WaveScheduleProgress {
+  if (!Number.isSafeInteger(currentWaveNumber) || currentWaveNumber <= 0) {
+    throw new RangeError(
+      "Current wave number must be a positive safe integer.",
+    );
+  }
+
+  const run = PROVISIONAL_RUN_DEFINITION;
+  if (currentWaveNumber <= run.normalWaves.length) {
+    const next = resolveNextEncounter(run, currentWaveNumber - 1);
+    if (next.kind === "upgrade" && next.nextEncounter.kind === "normal-wave") {
+      return createWaveScheduleProgress(
+        currentWaveNumber + 1,
+        next.nextEncounter.wave,
+      );
+    }
+  }
+
+  // The finite model resolves a boss here. Do not instantiate a fake boss or
+  // report victory: only this explicitly temporary application path repeats.
+  return createWaveScheduleProgress(
+    currentWaveNumber + 1,
+    run.normalWaves[run.normalWaves.length - 1]!,
+  );
+}
 
 /** Owns the current deterministic session and coordinates one fixed update. */
 export class GameRuntimeSession {
@@ -175,14 +209,10 @@ export class GameRuntimeSession {
     );
     if (!applied) return false;
 
-    const nextWaveNumber = this.state.waveSchedule.currentWaveNumber + 1;
-    if (!Number.isSafeInteger(nextWaveNumber)) return false;
-
     let nextWaveSchedule: WaveScheduleProgress;
     try {
-      nextWaveSchedule = createWaveScheduleProgress(
-        nextWaveNumber,
-        getProvisionalEpic5WaveDefinition(nextWaveNumber),
+      nextWaveSchedule = createNextWaveScheduleUntilBossIntegration(
+        this.state.waveSchedule.currentWaveNumber,
       );
     } catch {
       return false;

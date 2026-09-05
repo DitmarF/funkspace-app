@@ -616,23 +616,20 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     expect(state.enemies[0]?.phase).toBe("entering");
   });
 
-  it("stops spawning after the finite first-wave schedule is exhausted", () => {
+  it("stops spawning after a finite test schedule is exhausted", () => {
     const state = createInitialRuntimeState();
     configureTestWave(state, 4);
+    const spawnCount = state.waveSchedule.requests.length;
     state.nextAttackAtSeconds = 100;
     const randomSource = new SequenceRandomSource([BOTTOM_CENTER_DISTANCE]);
     const { session } = createSession(state, randomSource);
 
     session.fixedUpdate(FIRST_WAVE_FIRST_SPAWN_SECONDS);
-    for (
-      let spawnIndex = 1;
-      spawnIndex < FIRST_WAVE_GROUP.count;
-      spawnIndex += 1
-    ) {
+    for (let spawnIndex = 1; spawnIndex < spawnCount; spawnIndex += 1) {
       session.fixedUpdate(FIRST_WAVE_SPAWN_INTERVAL_SECONDS);
     }
 
-    expect(state.enemies).toHaveLength(FIRST_WAVE_GROUP.count);
+    expect(state.enemies).toHaveLength(spawnCount);
     expect(state.waveSchedule.nextScheduledSpawnIndex).toBe(
       state.waveSchedule.requests.length,
     );
@@ -642,7 +639,7 @@ describe("GameRuntimeSession enemy spawning and pursuit", () => {
     session.fixedUpdate(10);
 
     expect(state.enemies).toEqual([]);
-    expect(randomSource.calls).toHaveLength(FIRST_WAVE_GROUP.count);
+    expect(randomSource.calls).toHaveLength(spawnCount);
   });
 
   it("pursues the player's newly updated position", () => {

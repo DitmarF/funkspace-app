@@ -4,11 +4,11 @@
 
 ## Document metadata
 
-- **Status:** In progress — EPICs 0–4 complete; Gate 1 approved
+- **Status:** In progress — EPICs 0–5 implemented; WS-6.1 and WS-6.6 candidates implemented; Gate 1 approved, Gate 2 pending
 - **Owner:** Dimi
 - **Product:** FunkSpace Wave Survivor
 - **Planning level:** Epic and implementation-task roadmap
-- **Last updated:** 2026-08-30
+- **Last updated:** 2026-09-05
 - **Concept source:** [`docs/features/wave-survivor.md`](./wave-survivor.md)
 - **Game package:** `games/wave-survivor/`
 - **Portfolio integration:** `frontend/features/games/`
@@ -52,7 +52,11 @@ At the beginning of this roadmap, the repository already provides:
 - pure shared motion utilities;
 - package, frontend, Vitest, and Playwright foundations.
 
-Gameplay, simulation, controls, enemy behavior, combat drawing, waves, upgrades, scoring, boss behavior, audio, and persistence are not yet implemented.
+That list is the historical roadmap baseline. EPICs 1–5 have since delivered
+simulation, controls, enemy behavior, combat drawing, waves, and upgrades.
+WS-6.1 adds the finite candidate configuration; WS-6.6 adds the pure score
+candidate. Score integration/results, boss behavior, victory, audio, and
+persistence remain unimplemented; see the per-epic evidence below.
 
 ### Safe assumptions
 
@@ -852,6 +856,10 @@ renewed real-device acceptance.
 
 # EPIC 6 — Boss, scoring, complete run, and Gate 2
 
+**Status:** WS-6.1 finite candidate and WS-6.6 pure score candidate implemented
+with automated regressions (2026-09-05). Dimi's structure/pacing and scoring
+reward approvals remain pending. Other EPIC 6 work and Gate 2 remain pending.
+
 ## Goal
 
 Create a complete finite game with a beginning, escalating middle, final boss or final wave, explicit victory, explicit defeat, score, and immediate replay.
@@ -892,24 +900,169 @@ EPIC 5.
 
 ## Work items
 
-| ID          | Task                                      | Planned behavior                                                                                                        | Acceptance criteria                                                             |
-| ----------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| **WS-6.1**  | Resolve the minimal run structure.        | Choose normal-wave count, durations, pressure progression, and boss position from playtest evidence.                    | Target remains compact; values are recorded in configuration and documentation. |
-| **WS-6.2**  | Define one boss.                          | Build the smallest behavior that creates a distinct final test using existing movement, collision, and damage concepts. | Boss does not require a generic behavior-tree or scene framework.               |
-| **WS-6.3**  | Implement boss entry.                     | Use a deliberate spawn pattern and longer warning.                                                                      | Player understands that the final encounter is beginning.                       |
-| **WS-6.4**  | Implement boss action telegraphing.       | Communicate dangerous timing through shape, position, and optional color.                                               | Reduced-effects adaptation remains possible without removing information.       |
-| **WS-6.5**  | Implement victory.                        | Defeating the boss or completing the final condition transitions to `won`.                                              | Simulation stops cleanly and result is emitted once.                            |
-| **WS-6.6**  | Define score calculation.                 | Use a small transparent combination of kills, wave completion, remaining health, and/or completion time.                | Formula contains no economy or reward currency.                                 |
-| **WS-6.7**  | Define `RunResult`.                       | Expose outcome, score, wave reached, and elapsed time.                                                                  | Payload is immutable and host-relevant.                                         |
-| **WS-6.8**  | Implement result event and UI.            | Standalone demo presents victory/defeat and replay.                                                                     | Event fires once per run and no post-result combat continues.                   |
-| **WS-6.9**  | Implement immediate replay.               | Restart from won or lost without page reload or controller recreation.                                                  | Replayed run is equivalent to a fresh run.                                      |
-| **WS-6.10** | Balance the full run.                     | Tune enemy speed, health, spawn timing, attack cooldown, upgrade strength, and upgrade frequency.                       | Player power grows, but movement remains important through the boss.            |
-| **WS-6.11** | Add deterministic full-run test fixtures. | Use controlled seed and time to cover win and loss paths where practical.                                               | Critical transitions do not depend on flaky real-time tests.                    |
+| ID          | Task                                      | Planned behavior                                                                                                                                            | Acceptance criteria                                                                                |
+| ----------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **WS-6.1**  | Resolve the minimal run structure.        | Implemented provisional four normal waves + boss, finite lookup/successors, wave validation, and upgrade-capacity safety.                                   | Configuration and pacing evidence recorded; Dimi's PC/phone pacing and candidate approval pending. |
+| **WS-6.2**  | Define one boss.                          | Build the smallest behavior that creates a distinct final test using existing movement, collision, and damage concepts.                                     | Boss does not require a generic behavior-tree or scene framework.                                  |
+| **WS-6.3**  | Implement boss entry.                     | Integrate the real boss successor after the fourth upgrade; remove the WS-6.1 application repeat bridge. Use a deliberate spawn pattern and longer warning. | Player understands the final encounter; no production normal-wave repeat fallback remains.         |
+| **WS-6.4**  | Implement boss action telegraphing.       | Communicate dangerous timing through shape, position, and optional color.                                                                                   | Reduced-effects adaptation remains possible without removing information.                          |
+| **WS-6.5**  | Implement victory.                        | Defeating the boss or completing the final condition transitions to `won`.                                                                                  | Simulation stops cleanly and result is emitted once.                                               |
+| **WS-6.6**  | Define score calculation.                 | Implemented pure candidate: 10 per enemy, 100 per normal clear; on win, 500 plus floored health percentage. No time factor.                                 | Numeric validity and safe totals tested; Dimi's reward approval and WS-6.5/7 integration pending.  |
+| **WS-6.7**  | Define `RunResult`.                       | Expose outcome, score, wave reached, and elapsed time.                                                                                                      | Payload is immutable and host-relevant.                                                            |
+| **WS-6.8**  | Implement result event and UI.            | Standalone demo presents victory/defeat and replay.                                                                                                         | Event fires once per run and no post-result combat continues.                                      |
+| **WS-6.9**  | Implement immediate replay.               | Restart from won or lost without page reload or controller recreation.                                                                                      | Replayed run is equivalent to a fresh run.                                                         |
+| **WS-6.10** | Balance the full run.                     | Tune enemy speed, health, spawn timing, attack cooldown, upgrade strength, and upgrade frequency.                                                           | Player power grows, but movement remains important through the boss.                               |
+| **WS-6.11** | Add deterministic full-run test fixtures. | Use controlled seed and time to cover win and loss paths where practical.                                                                                   | Critical transitions do not depend on flaky real-time tests.                                       |
+
+### WS-6.6 implementation and dependent acceptance
+
+The internal `domain/score/CalculateScore.ts` contains the smallest readonly
+score-input contract, centralized immutable weights, and pure calculation.
+No runtime or public API integration is included. The [score candidate](./wave-survivor.md#113-ws-66-score-candidate)
+records the exact formula, examples, numeric validity, and ownership of every
+input. Dimi's approval of what the formula rewards remains pending; it is not
+playtest-approved.
+Dimi requested retaining the current candidate values for now on 2026-09-05.
+
+The existing session kill count is authoritative, including the future boss
+once defeated; effective maximum health comes from the existing upgrade helper.
+Normal-wave completion must come from finite encounter progression, excluding
+the boss and waves merely reached. This is a pending WS-6.5 integration duty:
+the current runtime lacks a terminal completed-normal-wave input. No duplicate
+mutable counters are added here. WS-6.7 constructs results after coherent
+terminal inputs are available; elapsed time may be displayed but never affects
+the score. The temporary repeat-wave endpoint is not a victory result.
+
+Tests cover zero progress, losses, completed normal waves, one boss kill,
+victory/health bonuses, rounding, equal health ratios, upgraded maximum health,
+invalid fields, safe-integer overflow, finite health extremes, and repeated
+calculation without mutation or accumulation. Boss/victory examples are pure
+numeric fixtures, not evidence of runtime boss integration or Gate 2 approval.
+
+Executed WS-6.6 validation (2026-09-05):
+
+- `pnpm --filter @funkspace/wave-survivor typecheck` — passed.
+- `pnpm --filter @funkspace/wave-survivor test src/domain/score/CalculateScore.test.ts` — 51 scoring tests passed.
+- `pnpm --filter @funkspace/wave-survivor test` — 49 files, 751 tests passed.
+- `pnpm --filter @funkspace/wave-survivor exec tsc -p /private/tmp/ws66-tests.tsconfig.json` — passed; temporary configuration extends the package's strict settings and includes the new test file, which the production typecheck excludes.
+- `pnpm lint` — passed, including repository formatting. Existing Next lint deprecation notice remains.
+- `pnpm exec eslint --config frontend/eslint.config.mjs games/wave-survivor/src/domain/score/CalculateScore.ts games/wave-survivor/src/domain/score/CalculateScore.test.ts --max-warnings=0` — exit 0; existing React/pages discovery notices remain.
+- `git diff --check` and scope review — passed. Prior WS-6.1 changes preserved; no new mutable counters, dependencies, lifecycle resources, or cross-layer imports.
+
+Package/demo builds and frontend host/type checks were not rerun for this
+isolated arithmetic module: runtime, renderer, and public contracts are unchanged
+by WS-6.6. Manual reward approval and Gate 2 remain pending with Dimi; retaining
+the candidate values for now is not recorded as playtest acceptance.
+
+### WS-6.1 implementation and dependent acceptance
+
+`RunDefinition` is internal Domain configuration: existing normal-wave content
+followed by one explicit boss. `getRunEncounter` uses zero-based finite indexes
+and throws for invalid lookup; `resolveNextEncounter` requires an upgrade after
+every normal wave, including before the boss, and resolves completion without
+an upgrade after the boss. Initial state and normal-wave progression consume
+this configuration. Nested data is validated and frozen; runs cannot require
+more choices than the existing canonical upgrade pool supplies.
+
+Only `createNextWaveScheduleUntilBossIntegration` in the application retains
+the production repeat-last-normal-wave behavior. Later displayed wave numbers
+are temporary bridge labels, not finite encounter indexes. Existing loop,
+clocks, random streams, combat, upgrade application, completion, and exhausted-
+pool restart behavior are preserved. No public-contract or renderer change,
+boss implementation, victory, or scoring is delivered here.
+
+The [candidate pacing record](./wave-survivor.md#106-ws-61-candidate-pacing-record--2026-09-05)
+contains counts, group timing, caps, four upgrade opportunities, boss position,
+and provisional clear-time review targets. Dimi's explicit table supersedes
+the earlier doubled/restored percentage adjustments: current totals are
+`4 / 6 / 8 / 10`, with caps `2 / 3 / 4 / 6`. Wave 3 uses `4 + 4` enemies;
+Wave 4 uses `6 + 4`, retaining the existing groups, offsets, intervals, and
+Wave 4 cap of 6. The stationary seeded diagnostic clears all four normal waves
+in 37.90 simulation seconds, with 28 kills and 2 health remaining. Earlier tuning results
+are historical, not human run-duration measurements. PC/phone difficulty
+acceptance and the 5–7-minute goal remain pending.
+
+Automated scope includes finite ordering, last-normal successor, invalid
+indexes/configuration, immutable configuration, upgrade-budget boundary,
+all 81 legal four-choice paths, real seeded wave clears with configured concurrent
+caps, and a separate completed-queue transition fixture with four upgrade
+requests. The transition fixture verifies the temporary bridge after the
+fourth choice, not gameplay pacing, a boss, or victory. Real boss
+handoff is pending WS-6.3, victory WS-6.5, full-run balance WS-6.10, and Gate 2
+approval remains Dimi's decision.
+
+Current 4/6/8/10 totals and 2/3/4/6 caps validation (2026-09-05):
+
+- `pnpm --filter @funkspace/wave-survivor typecheck` — passed.
+- `pnpm --filter @funkspace/wave-survivor test` — 48 files, 700 tests passed, including exact totals/caps and the 37.90s four-wave diagnostic.
+- `pnpm --filter @funkspace/wave-survivor build` and `pnpm --filter @funkspace/wave-survivor demo:build` — passed.
+- `pnpm lint` and direct ESLint on the six affected game TypeScript files using the existing frontend config with `--max-warnings=0` — passed; existing config-discovery notices remain.
+- `git diff --check` and scope review — passed. Existing WS-6.1 work preserved; no public API, renderer, timing, or upgrade changes.
+
+Manual PC/phone acceptance remains pending. No commit, push, merge, deployment,
+or repository-setting change was made.
+
+Historical 6/9/12/16-table validation (2026-09-05):
+
+- `pnpm --filter @funkspace/wave-survivor typecheck` — passed.
+- `pnpm --filter @funkspace/wave-survivor test` — 48 files, 700 tests passed; exact totals/caps and the seeded Wave 3 loss are covered.
+- `pnpm --filter @funkspace/wave-survivor build` and `pnpm --filter @funkspace/wave-survivor demo:build` — passed.
+- `pnpm lint` — passed. Direct ESLint on the six affected game TypeScript files using the existing frontend config and `--max-warnings=0` — exit 0, with the same configuration-discovery notices described below.
+- `git diff --check` and scope review — passed. Existing WS-6.1 changes preserved; no public API or renderer changes.
+
+These settings were superseded by the latest 4/6/8/10 table above. No commit,
+push, merge, deployment, or repository-setting change was made.
+
+Historical 50%-reduction validation, superseded by Dimi's explicit table (2026-09-05):
+
+- `pnpm --filter @funkspace/wave-survivor typecheck` — passed.
+- `pnpm --filter @funkspace/wave-survivor test` — 48 files, 700 tests passed, including the restored 37.93s stationary four-wave diagnostic and concurrent-cap checks.
+- `pnpm --filter @funkspace/wave-survivor demo:build` — package and standalone demo production builds passed.
+- `pnpm lint` — passed, including workspace formatting. Direct ESLint on the six affected game TypeScript files using the existing frontend config and `--max-warnings=0` also passed (same configuration-discovery notices noted below).
+- `git diff --check` and scope review — passed; existing WS-6.1 work preserved. No public-contract, renderer, spawn-timing, upgrade, or lifecycle change.
+
+That restored-original tuning was superseded by Dimi's explicit table above.
+No commit, push, merge, deployment, or repository-setting change was made.
+
+Historical difficulty-increase validation (2026-09-05):
+
+- `pnpm --filter @funkspace/wave-survivor typecheck` — passed.
+- `pnpm --filter @funkspace/wave-survivor test` — 48 files, 700 tests passed.
+- `pnpm --filter @funkspace/wave-survivor build` and `pnpm --filter @funkspace/wave-survivor demo:build` — passed.
+- `pnpm lint` — passed, including workspace formatting.
+- Direct ESLint on the six affected game TypeScript files with the existing frontend config and `--max-warnings=0` — exit 0; same configuration-discovery notices noted below.
+- `git diff --check` and scope review — passed. Earlier WS-6.1 work preserved; no public API or renderer changes.
+
+The first tuning test run exposed old enemy-count expectations, a test fixture
+coupled to the production count, and floating-point schedule comparison. These
+were corrected; at that stage the stationary diagnostic asserted the measured
+loss and retained all four transition checks in a separate fixture. Dimi's
+subsequent too-difficult feedback superseded that tuning with the reduction above.
+
+Initial WS-6.1 validation before the difficulty increase (2026-09-05):
+
+- `pnpm --filter @funkspace/wave-survivor typecheck` — passed.
+- Strict TypeScript check of all five changed/new test files using the package options and a temporary include-only configuration — passed.
+- `pnpm --filter @funkspace/wave-survivor test` — 48 files, 699 tests passed.
+- `pnpm --filter @funkspace/wave-survivor build` — passed.
+- `pnpm --filter @funkspace/wave-survivor demo:build` — package and demo builds passed.
+- `pnpm lint` — passed, including workspace formatting. The existing `next lint` deprecation notice remains.
+- Direct ESLint on the changed game TypeScript files using `frontend/eslint.config.mjs` and `--max-warnings=0` — exit 0, no rule violations; that shared Next/React config prints root-directory React/pages discovery notices.
+- `git diff --check` and scope/architecture review — passed.
+
+The first sandboxed test launch could not write Vite's temporary config cache;
+rerunning with authorized repository write access passed. No dependency or
+configuration workaround was needed. Public contracts and host files are
+unchanged, so frontend type/host-loader checks were not required for this task.
+No browser/device gameplay review, full portfolio build, Storybook, or
+Lighthouse run was performed; package/demo builds cover the changed runtime
+bundle. No commit, push, merge, deployment, or repository-setting change.
 
 ## Testing strategy
 
 ### Domain/unit
 
+- Finite run ordering, successor rules, validation, and upgrade-capacity safety.
 - Boss state and action timing.
 - Boss damage and defeat.
 - Score formula.
@@ -1329,18 +1482,18 @@ Gate 3 approval.
 
 ## 10. Open decisions and resolution timing
 
-| Decision                                    | Resolve in                             | Decision rule                                                                  |
-| ------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------ |
-| Final title, fiction, and visual identity   | After Gate 1, before final assets      | Choose a theme that fits proven mechanics without changing hitboxes or scope.  |
-| Exact wave count and durations              | EPIC 6                                 | Use measured run flow; preserve compact target.                                |
-| Boss behavior                               | EPIC 6                                 | Reuse existing systems and test learned movement skills.                       |
-| Final upgrade roster                        | EPIC 5, finalized EPIC 10              | Prefer modifiers to current rules; reject filler.                              |
-| Score formula                               | EPIC 6                                 | Keep transparent and independent from currencies.                              |
-| Sound/music direction                       | EPIC 8                                 | Match available feedback needs and asset budget.                               |
-| Portfolio route and case-study presentation | Route in EPIC 7; case study in EPIC 10 | Keep playable route dedicated and game lazily loaded.                          |
-| Entity and frame budgets                    | EPIC 9                                 | Derive from representative measurements.                                       |
-| Additional attack family                    | EPIC 10                                | Add only if the single attack plus upgrades cannot provide sufficient variety. |
-| Object pooling                              | EPIC 9                                 | Add only after profiling demonstrates allocation pressure.                     |
+| Decision                                    | Resolve in                                          | Decision rule                                                                                 |
+| ------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Final title, fiction, and visual identity   | After Gate 1, before final assets                   | Choose a theme that fits proven mechanics without changing hitboxes or scope.                 |
+| Exact wave count and durations              | WS-6.1 candidate; manual review and WS-6.10 pending | Four normal waves + boss provisionally; validate human pacing without padding to 5–7 minutes. |
+| Boss behavior                               | EPIC 6                                              | Reuse existing systems and test learned movement skills.                                      |
+| Final upgrade roster                        | EPIC 5, finalized EPIC 10                           | Prefer modifiers to current rules; reject filler.                                             |
+| Score formula                               | WS-6.6 candidate implemented; Dimi approval pending | Reward defeats, normal clears, victory, and victory health percentage; no time or currency.   |
+| Sound/music direction                       | EPIC 8                                              | Match available feedback needs and asset budget.                                              |
+| Portfolio route and case-study presentation | Route in EPIC 7; case study in EPIC 10              | Keep playable route dedicated and game lazily loaded.                                         |
+| Entity and frame budgets                    | EPIC 9                                              | Derive from representative measurements.                                                      |
+| Additional attack family                    | EPIC 10                                             | Add only if the single attack plus upgrades cannot provide sufficient variety.                |
+| Object pooling                              | EPIC 9                                              | Add only after profiling demonstrates allocation pressure.                                    |
 
 ## 11. Rollout and rollback
 

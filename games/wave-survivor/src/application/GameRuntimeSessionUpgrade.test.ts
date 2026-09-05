@@ -17,8 +17,8 @@ import {
 import {
   compileWaveSchedule,
   createWaveScheduleProgress,
-  getProvisionalEpic5WaveDefinition,
   PROVISIONAL_EPIC_5_WAVES,
+  PROVISIONAL_RUN_DEFINITION,
 } from "../domain/waves/index.js";
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
@@ -46,7 +46,7 @@ function createChoosingHarness(
   state.pendingUpgradeOptionIds = Object.freeze([...pendingUpgradeOptionIds]);
   state.waveSchedule = createWaveScheduleProgress(
     currentWaveNumber,
-    getProvisionalEpic5WaveDefinition(currentWaveNumber),
+    PROVISIONAL_RUN_DEFINITION.normalWaves[currentWaveNumber - 1]!,
   );
   const input = new TrackingMovementInput();
   const session = new GameRuntimeSession(
@@ -188,7 +188,7 @@ describe("GameRuntimeSession chooseUpgrade", () => {
     });
   });
 
-  it("reuses Wave 4 while later displayed wave numbers keep increasing", () => {
+  it("keeps the explicit WS-6.3 bridge playable after the last normal wave", () => {
     const { session, state } = createChoosingHarness(["swift-movement"], 4);
 
     expect(session.chooseUpgrade("swift-movement")).toBe(true);

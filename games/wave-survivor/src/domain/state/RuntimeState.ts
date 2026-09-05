@@ -13,7 +13,7 @@ import {
 } from "../upgrades/index.js";
 import {
   createWaveScheduleProgress,
-  PROVISIONAL_EPIC_5_WAVES,
+  PROVISIONAL_RUN_DEFINITION,
   type WaveScheduleProgress,
 } from "../waves/index.js";
 
@@ -85,7 +85,10 @@ export function createInitialRuntimeState(): RuntimeState {
     pendingUpgradeOptionIds: Object.freeze([]),
     enemies: [],
     nextEnemyId: 1,
-    waveSchedule: createWaveScheduleProgress(1, PROVISIONAL_EPIC_5_WAVES[0]!),
+    waveSchedule: createWaveScheduleProgress(
+      1,
+      PROVISIONAL_RUN_DEFINITION.normalWaves[0],
+    ),
     projectiles: [],
     nextProjectileId: 1,
     nextAttackAtSeconds: 0,

@@ -67,6 +67,12 @@ export function createSpawnGroup(definition: {
     );
   }
 
+  assertFiniteNonNegative(
+    definition.startOffsetSeconds +
+      (definition.count - 1) * definition.intervalSeconds,
+    "Last scheduled spawn time",
+  );
+
   assertSupportedEnemyId(definition.enemyId);
   assertSupportedPattern(definition.pattern);
 
@@ -103,7 +109,7 @@ export function createWaveDefinition(definition: {
   });
 }
 
-/** Temporary EPIC 5 tuning; EPIC 6 may replace these provisional waves. */
+/** WS-6.1 tuning: Dimi's explicit totals 4/6/8/10 and caps 2/3/4/6. */
 export const PROVISIONAL_EPIC_5_WAVES: readonly Readonly<WaveDefinition>[] =
   Object.freeze([
     createWaveDefinition({
@@ -166,30 +172,6 @@ export const PROVISIONAL_EPIC_5_WAVES: readonly Readonly<WaveDefinition>[] =
           pattern: "random-perimeter",
         }),
       ],
-      maxActiveEnemies: 4,
+      maxActiveEnemies: 6,
     }),
   ]);
-
-/**
- * Resolve temporary EPIC 5 wave content.
- *
- * Wave numbers beyond the provisional list reuse its final definition until
- * EPIC 6 replaces this fallback with the finished run structure.
- */
-export function getProvisionalEpic5WaveDefinition(
-  waveNumber: number,
-): Readonly<WaveDefinition> {
-  if (!Number.isSafeInteger(waveNumber) || waveNumber <= 0) {
-    throw new RangeError("Wave number must be a positive safe integer.");
-  }
-
-  const definition =
-    PROVISIONAL_EPIC_5_WAVES[
-      Math.min(waveNumber, PROVISIONAL_EPIC_5_WAVES.length) - 1
-    ];
-  if (!definition) {
-    throw new RangeError("At least one provisional wave must be defined.");
-  }
-
-  return definition;
-}

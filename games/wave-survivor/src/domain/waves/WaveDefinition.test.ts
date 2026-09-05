@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   createSpawnGroup,
   createWaveDefinition,
-  getProvisionalEpic5WaveDefinition,
   PROVISIONAL_EPIC_5_WAVES,
   type SpawnGroup,
 } from "./index.js";
@@ -59,6 +58,12 @@ describe("createSpawnGroup", () => {
   it("rejects a zero interval when count is greater than one", () => {
     expect(() =>
       createSpawnGroup({ ...VALID_GROUP, intervalSeconds: 0 }),
+    ).toThrow(RangeError);
+  });
+
+  it("rejects a finite interval whose final scheduled offset overflows", () => {
+    expect(() =>
+      createSpawnGroup({ ...VALID_GROUP, intervalSeconds: Number.MAX_VALUE }),
     ).toThrow(RangeError);
   });
 
@@ -179,7 +184,7 @@ describe("PROVISIONAL_EPIC_5_WAVES", () => {
             intervalSeconds: 0.6,
           },
         ],
-        maxActiveEnemies: 4,
+        maxActiveEnemies: 6,
       },
     ]);
   });
@@ -193,28 +198,4 @@ describe("PROVISIONAL_EPIC_5_WAVES", () => {
       expect(wave.groups.every(Object.isFrozen)).toBe(true);
     }
   });
-
-  it("resolves declared waves and reuses the final definition afterward", () => {
-    for (let waveNumber = 1; waveNumber <= 4; waveNumber += 1) {
-      expect(getProvisionalEpic5WaveDefinition(waveNumber)).toBe(
-        PROVISIONAL_EPIC_5_WAVES[waveNumber - 1],
-      );
-    }
-
-    expect(getProvisionalEpic5WaveDefinition(5)).toBe(
-      PROVISIONAL_EPIC_5_WAVES[3],
-    );
-    expect(getProvisionalEpic5WaveDefinition(99)).toBe(
-      PROVISIONAL_EPIC_5_WAVES[3],
-    );
-  });
-
-  it.each([0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1])(
-    "rejects invalid provisional wave number %s",
-    (waveNumber) => {
-      expect(() => getProvisionalEpic5WaveDefinition(waveNumber)).toThrow(
-        RangeError,
-      );
-    },
-  );
 });

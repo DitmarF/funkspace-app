@@ -5,13 +5,13 @@
 ## Document metadata
 
 - **Status:** Approved starting concept
-- **Product stage:** Gate 1 approved / Gate 2 ready
+- **Product stage:** Gate 1 approved / Gate 2 in progress; WS-6.1 and WS-6.6 candidates implemented
 - **Owner:** Dimi
 - **Working title:** Wave Survivor
 - **Target platform:** Modern web browsers
 - **Primary form factor:** Mobile, portrait orientation
 - **Secondary form factors:** Tablet and desktop
-- **Last updated:** 2026-09-04
+- **Last updated:** 2026-09-05
 - **Game package:** `games/wave-survivor/`
 - **Related decisions:**
   - [`ADR-002: Design tokens as the source of truth`](../decisions/ADR-002-design-token-source-of-truth.md)
@@ -56,7 +56,7 @@ The player makes one continuous decision: where to move. There is no manual aimi
 
 ### 4.2 Short, finite runs
 
-The game is wave-based rather than endless. The initial target is approximately **5–7 minutes**, with several normal waves followed by one boss or final survival wave. Exact duration and wave count remain tuning values.
+The game is wave-based rather than endless. WS-6.1 establishes **four normal waves followed by one boss** as the provisional candidate, pending Dimi's approval and measured pacing review. The original **5–7 minute** target remains pending validation; the current normal-wave diagnostic is much shorter and content must not be padded to hit that target.
 
 ### 4.3 Simple rules, meaningful pressure
 
@@ -403,18 +403,91 @@ no entering or active enemies remain
 
 When the active-enemy cap is reached, queued spawns wait. This prevents uncontrolled accumulation while preserving a finite wave.
 
-As a temporary EPIC 5 fallback, wave numbers after the fourth provisional wave reuse Wave 4's definition while the displayed wave number continues increasing. EPIC 6 must replace this behavior with the final run length, pressure curve, and victory structure.
+The internal `RunDefinition` now explicitly configures the normal waves and a
+final `{ kind: "boss" }` encounter. Its zero-based encounter lookup rejects
+invalid or out-of-range indexes. Successor resolution requires one upgrade
+after every normal wave, including Wave 4 before the boss at encounter index 4
+(position 5). Completing the boss resolves run completion without an upgrade;
+this is a progression rule, not an implemented boss-defeat or victory state.
+
+The production application temporarily retains EPIC 5 playability through
+`createNextWaveScheduleUntilBossIntegration`: normal successors use the finite
+model, while the boss boundary and later displayed waves explicitly repeat
+the last normal definition. These later displayed wave numbers are not finite
+encounter indexes. WS-6.3 owns real boss handoff and removal of this bridge.
+The final-normal-wave-to-boss runtime acceptance criterion is **pending**;
+there is no fake boss or empty-arena victory.
 
 If every upgrade has reached its cap, completing the wave leaves the game
 frozen in `wave-cleared`. The standalone demo displays “All upgrades maxed”
 and offers Restart. With three five-level upgrades this occurs after clearing
 Wave 16. This is a temporary recovery endpoint, not the final victory rule.
 
+### 10.6 WS-6.1 candidate pacing record — 2026-09-05
+
+Content remains in the existing `PROVISIONAL_EPIC_5_WAVES` definitions and is
+validated when constructing `PROVISIONAL_RUN_DEFINITION`. All normal enemies
+remain the existing basic type using random-perimeter spawning.
+
+Dimi's latest explicit table sets totals `4 / 6 / 8 / 10` and entering/active
+caps `2 / 3 / 4 / 6`, superseding the earlier tuning tables and percentage
+adjustments. Existing groups are retained: Wave 3 uses `4 + 4`, and Wave 4
+uses `6 + 4` enemies. Wave 4 retains its concurrent cap of 6.
+Group start offsets, spawn intervals, combat stats, and upgrades are unchanged.
+
+| Encounter        |      Enemy count | Group start offsets / spawn intervals |       Entering + active cap | Last scheduled spawn offset | Upgrade afterward             | Provisional clear-time review target |
+| ---------------- | ---------------: | ------------------------------------- | --------------------------: | --------------------------: | ----------------------------- | ------------------------------------ |
+| Normal Wave 1    |                4 | `0.5s / 1s`                           |                           2 |                      `3.5s` | One                           | About `7s`, diagnostic only          |
+| Normal Wave 2    |                6 | `0.5s / 0.85s`                        |                           3 |                     `4.75s` | One                           | About `9s`, diagnostic only          |
+| Normal Wave 3    |            4 + 4 | `0.5s / 0.8s`; `4.5s / 0.7s`          |                           4 |                      `6.6s` | One                           | About `10s`, diagnostic only         |
+| Normal Wave 4    |            6 + 4 | `0.5s / 0.7s`; `5s / 0.6s`            |                           6 |                      `6.8s` | One, before boss              | About `12s`, diagnostic only         |
+| Boss, position 5 | One boss planned | WS-6.2/3 pending                      | Pending boss implementation |             Not yet defined | None after completion/victory | Pending real boss measurement        |
+
+The clear-time review targets are provisional, not approved human pacing or
+gameplay timers. Earlier diagnostic targets are superseded by this explicit
+tuning and still need human pacing validation. Pressure rises through counts
+`4 → 6 → 8 → 10` and caps `2 → 3 → 4 → 6`; overlapping spawn groups still
+respect the existing queue and capacity rules. Human acceptance is pending.
+
+**Executed deterministic evidence:** `GameRuntimeSessionRun.test.ts` drives the
+existing session at `1/60s`, with spawn seed `1`, upgrade seed `2`, zero movement,
+unmodified health/combat, and Rapid Fire after each completed wave.
+The stationary player clears all four normal waves in **6.95 / 8.58 / 10.48 /
+11.88 simulation seconds**, totaling **37.90s**, with 28 kills and 2 health
+remaining. The test verifies the configured concurrent caps throughout.
+No injected kills or skipped spawn requests are used in this diagnostic. A separate
+completed-queue transition fixture verifies all four upgrade opportunities and
+the temporary bridge; it is not pacing or full-run gameplay evidence.
+
+Historical comparison: the doubled-count/cap version cleared Wave 1 in 12.37s
+with 2 health, then lost in Wave 2 at 23.68 total simulation seconds under the
+same stationary seed/step/Rapid Fire policy. That loss describes the previous
+tuning. The original-value sample cleared four waves in 37.93s without health
+loss. The previous `6 / 9 / 12 / 16` table produced a Wave 3 loss at 32.42s.
+These historical results do not describe the latest table. Human difficulty
+acceptance remains pending.
+
+**Measurement boundaries:** scheduled offsets are due times on the capacity-
+gated wave schedule. At a full cap, that schedule waits while simulation time
+and combat continue. Fairness retries and final enemy cleanup can add further
+time. Last spawn offsets (or their `21.65s` sum) therefore do not measure run
+duration. Simulated clear time includes that gameplay waiting, but excludes
+paused/choice time and the absent boss. Human-observed start-to-result duration
+must be recorded separately, with pause and upgrade-choice time identified.
+
+**Pending manual acceptance — Dimi:** record PC and real-phone device/browser,
+per-wave clear times, upgrade-choice time, pressure/readability observations,
+and approve or revise the four-normal-plus-boss candidate. Measure full
+start-to-result and boss duration after WS-6.3/5 integration. EPIC 5's recorded
+PC/phone PASS contains no pacing measurements and does not approve this
+candidate. The 5–7-minute target and Gate 2 approval remain pending. Do not add
+waves or enemies solely to fill that duration.
+
 ## 11. Upgrades and progression
 
 ### 11.1 Between-wave choice
 
-After each normal wave, the player chooses one upgrade from a small set. The simulation remains paused until the choice is made.
+After each normal wave, including the last one before the boss, the player chooses one upgrade from a small set. The candidate has four upgrade opportunities; victory never offers another upgrade. The simulation remains paused until the choice is made.
 
 The initial upgrade set modifies existing rules through three focused choices:
 
@@ -423,6 +496,14 @@ The initial upgrade set modifies existing rules through three focused choices:
 - **Vitality:** increase maximum health by `1` and immediately heal `1` health.
 
 Each initial upgrade has five levels. Rapid Fire retains a safe minimum cooldown of `0.6s`. Damage, recovery-only, projectile-size, and additional-projectile upgrades are deferred until playtesting demonstrates that the three-choice set needs expansion.
+
+Run construction rejects more normal-wave upgrade opportunities than the
+canonical pool's 15 available levels. Each legal selection consumes one level;
+four choices cannot exhaust this pool. Exhaustive coverage of all 81 four-choice
+paths confirms all three options remain available at each candidate choice,
+including repeated selection of the same upgrade. The temporary Wave 16
+exhaustion endpoint is reachable only through the staging bridge, outside the
+finite candidate.
 
 ### 11.2 No permanent power progression
 
@@ -440,6 +521,69 @@ type PersistentState = {
 ```
 
 A cosmetic unlock may be considered after the complete game works, but it is not part of the starting scope.
+
+### 11.3 WS-6.6 score candidate
+
+Earn **10 points per defeated enemy**, **100 per cleared normal wave**, and,
+only on victory, **500 plus the rounded-down percentage of health remaining**.
+These candidate rewards are implemented as pure arithmetic; Dimi's approval
+of what the score rewards is pending, and the formula is not playtest-approved.
+Dimi requested keeping the current values for now on 2026-09-05; this retains
+the provisional candidate without recording final reward or playtest approval.
+
+```text
+score = 10 * enemiesDefeated
+      + 100 * normalWavesCleared
+      + (won ? 500 : 0)
+      + (won ? floor(100 * currentHealth / effectiveMaximumHealth) : 0)
+```
+
+The internal `domain/score/CalculateScore.ts` module contains `ScoreInput`,
+frozen `SCORE_WEIGHTS`, and `calculateScore()`. The function returns a number
+without modifying its inputs or storing/accumulating points. Elapsed time is
+not a score input; WS-6.7 may include it in results for later display, with no
+time bonus or penalty. No live-score counter, persistence, currency, spending,
+or leaderboard is introduced.
+
+| Score input              | Authoritative owner / integration obligation                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enemiesDefeated`        | Existing `RuntimeState.killCount`, incremented once when `transitionEnemyToDying()` succeeds. WS-6.5 integration must include a defeated boss exactly once through the authoritative defeat path; no parallel kill counter.                                                                                                                                                                                                     |
+| `normalWavesCleared`     | Application derives completed **normal** encounters from the finite run's progression and existing `isWaveComplete()` boundary (queue empty and no entering/active enemies). A wave merely reached is not cleared; the boss is never a normal-wave clear. There is no authoritative completed-normal count in today's runtime yet; WS-6.5 must resolve it from progression, without adding a duplicate mutable scoring counter. |
+| `won`                    | Authoritative terminal outcome from WS-6.5, not inferred from health, kills, an empty arena, or upgrade exhaustion. Victory is not implemented by this task.                                                                                                                                                                                                                                                                    |
+| `currentHealth`          | Existing `RuntimeState.player.currentHealth` at the outcome boundary.                                                                                                                                                                                                                                                                                                                                                           |
+| `effectiveMaximumHealth` | Existing `getEffectiveMaximumHealth(player.maximumHealth, state.upgrades)` at the same boundary, including Vitality; never use the unchanged base maximum alone.                                                                                                                                                                                                                                                                |
+
+The WS-6.1 candidate still has four normal waves and one boss. Current normal
+content totals 28 enemies, so a completed boss contributes enemy 29 while the
+normal-wave count remains four. Boss counting is tested with numeric inputs;
+it is not evidence of a working boss or victory integration. The temporary
+repeat-wave bridge's displayed wave number must not be used as finite-run
+completion progress. Scoring is not wired into that bridge or the renderer.
+
+| Example                                          | Calculation                        | Score |
+| ------------------------------------------------ | ---------------------------------- | ----: |
+| No progress, not won, full health                | `0 + 0`                            |     0 |
+| Loss: 7 enemies, 1 normal wave                   | `70 + 100`                         |   170 |
+| Loss to boss after 28 enemies and 4 normal waves | `280 + 400`                        |   680 |
+| Win: 29 enemies, 4 normal waves, full health     | `290 + 400 + 500 + 100`            |  1290 |
+| Same win at 2 / 3 health                         | `290 + 400 + 500 + floor(200 / 3)` |  1256 |
+| Same win at 3 / 6 upgraded health                | `290 + 400 + 500 + 50`             |  1240 |
+
+Equal health percentages earn the same bonus: `1/2`, `2/4`, and `3/6` all award
+50 health points on victory. Loss awards neither victory nor health points,
+even if supplied a valid nonzero health value. All numeric inputs are validated
+on loss too: counts must be non-negative safe integers; maximum health must be
+finite and positive; current health must be finite and within `[0, maximum]`.
+Health need not be integral. Invalid numbers or an unsafe total throw
+`RangeError`; a non-boolean `won` throws `TypeError`. There is no clamping or
+silent repair. The result must be a non-negative safe integer. The arithmetic
+does not validate whether the supplied outcome/progress is reachable; that
+belongs to session integration.
+
+**Dependent acceptance:** WS-6.5 owns application integration and coherent
+terminal inputs; WS-6.7 owns result construction; later UI work displays results.
+Dimi must approve these rewards. Automated arithmetic tests do not provide
+human scoring approval or Gate 2 acceptance.
 
 ## 12. Initial content budget
 
@@ -747,10 +891,10 @@ The concept succeeds when:
 These decisions are intentionally deferred and do not block Gate 1:
 
 1. Final game title, fiction, setting, and player/enemy visual identity.
-2. Exact number and duration of normal waves.
+2. Approval and measured pacing of the WS-6.1 four-normal-wave candidate; boss duration and the original 5–7-minute target remain pending.
 3. Final enemy archetype roster and boss behavior.
 4. Final upgrade list and choice-generation rules.
-5. Score formula and best-score presentation.
+5. Approval of the WS-6.6 score candidate; result integration and best-score presentation remain pending.
 6. Sound and music direction.
 7. Exact portfolio play route and case-study presentation.
 8. Measured performance budget and active-entity cap.

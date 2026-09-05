@@ -1,9 +1,21 @@
 export {
   createSpawnGroup,
   createWaveDefinition,
-  getProvisionalEpic5WaveDefinition,
   PROVISIONAL_EPIC_5_WAVES,
 } from "./WaveDefinition.js";
+export {
+  createRunDefinition,
+  getRunEncounter,
+  PROVISIONAL_RUN_DEFINITION,
+  resolveNextEncounter,
+} from "./RunDefinition.js";
+export type {
+  BossEncounter,
+  NextEncounterResolution,
+  NormalWaveEncounter,
+  RunDefinition,
+  RunEncounter,
+} from "./RunDefinition.js";
 export type {
   SpawnGroup,
   SpawnPattern,
