@@ -5,13 +5,13 @@
 ## Document metadata
 
 - **Status:** Approved starting concept
-- **Product stage:** Gate 1 approved / Gate 2 in progress; WS-6.1/6.2/6.3/6.6 candidates and WS-6.7 record boundary implemented
+- **Product stage:** Complete standalone finite run implemented; Gate 2 verification records open technical/manual findings, without approval
 - **Owner:** Dimi
 - **Working title:** Wave Survivor
 - **Target platform:** Modern web browsers
 - **Primary form factor:** Mobile, portrait orientation
 - **Secondary form factors:** Tablet and desktop
-- **Last updated:** 2026-09-05
+- **Last updated:** 2026-09-06
 - **Game package:** `games/wave-survivor/`
 - **Related decisions:**
   - [`ADR-002: Design tokens as the source of truth`](../decisions/ADR-002-design-token-source-of-truth.md)
@@ -1180,6 +1180,24 @@ labelled boundary coverage. Browser mocked public events prove UI behavior only.
 WS-6.10 must rerun these production fixtures after tuning and investigate changed
 outcomes without changing balance solely to satisfy a script. Successful scripts
 prove correctness, not human playability, pacing or boss fairness; Dimi owns Gate 2.
+
+### Gate 2 verification status — 2026-09-06
+
+The [readiness review](./wave-survivor-implementation-plan.md#gate-2-readiness-review--2026-09-06-verification-not-approval)
+records the clean `b8965ee` baseline, exact command results, staged-criteria
+closure, bounded fix proposals and manual evidence table. All nine requested
+commands pass. Supplemental whole-game lint finds three existing unused-symbol
+warnings; a separate real-progression diagnostic reproduces stale milestone
+events when nonterminal status callbacks restart. These are existing findings,
+not regressions introduced by this documentation-only review. Terminal result
+publication/replay fixtures pass; that does not cover every nonterminal callback.
+
+The production path has no repeat-last-wave progression, upgrade-exhaustion
+ending, automatic initial demo start or event fall-through. Defensive custom-state
+regressions remain relevant. Dimi's task-level manual PASS reports are retained;
+the EPIC 5 short-viewport/input follow-up and current-build measured PC/phone
+pacing/balance acceptance remain open. This review does not alter any gate
+approval record or implement the proposed fixes.
 
 ### 15.9 WS-6.10 provisional full-run balance
 

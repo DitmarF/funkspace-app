@@ -4,7 +4,8 @@ Wave Survivor is the first standalone FunkSpace game package. It exposes a
 minimal lifecycle API for portfolio integration and currently renders a
 responsive grey-box arena with deterministic player movement, keyboard and
 virtual-joystick input, automatic projectile combat, health, enemy defeat,
-finite waves, between-wave upgrades, loss, and clean restart.
+four normal waves, between-wave upgrades, one boss, won/lost results, and replay.
+The standalone demo starts idle until its native Start button is activated.
 
 The current gameplay slice uses seeded randomness to sample fair offscreen
 spawn candidates by perimeter length. Entering enemies receive static
@@ -24,7 +25,10 @@ includes movement, enemy pressure, automatic projectile combat, enemy defeat
 and kill count, player health and invulnerability, terminal loss, semantic
 status, and clean restart.
 
-### Current Gate 1 tuning
+### Historical Gate 1 tuning
+
+This is the Gate 1 acceptance snapshot. Finite-wave scheduling/capacity below
+supersedes its single spawn interval and live-enemy limit.
 
 | Value                         | Accepted setting |
 | ----------------------------- | ---------------: |
@@ -52,6 +56,13 @@ both now have fixes and automated regressions. Those follow-up fixes have not
 had a new real-device review. Gate 2 is not yet passed.
 
 ## WS-6.1 finite run candidate
+
+The [Gate 2 verification record](../../docs/features/wave-survivor-implementation-plan.md#gate-2-readiness-review--2026-09-06-verification-not-approval)
+records all nine requested commands passing on `b8965ee`, a reproduced nonterminal
+callback publication defect, an existing scoped game-test lint failure, and the
+manual evidence table. Completion/boss staging is implemented; no Gate 2 approval
+is implied. The EPIC 5 short-viewport/input device recheck and measured duration
+decision remain open. Runtime fixes are proposed, not implemented by that review.
 
 The internal `PROVISIONAL_RUN_DEFINITION` now specifies four existing normal
 waves followed by one explicit boss encounter. Finite lookup rejects invalid
