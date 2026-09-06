@@ -53,16 +53,26 @@ Implementation is complete. Dimi reported PASS for PC and smartphone gameplay
 and the standalone upgrade flow (recorded September 4, 2026). The subsequent
 EPIC 5 review identified upgrade exhaustion and short-viewport layout issues;
 both now have fixes and automated regressions. Those follow-up fixes have not
-had a new real-device review. Gate 2 is not yet passed.
+had a separately documented targeted real-device review. Dimi subsequently
+confirmed current PC/smartphone PASS and approved Gate 2 on September 6, 2026;
+the specific short-viewport/input recheck remains a follow-up evidence item.
 
 ## WS-6.1 finite run candidate
 
-The [Gate 2 verification record](../../docs/features/wave-survivor-implementation-plan.md#gate-2-readiness-review--2026-09-06-verification-not-approval)
-records all nine requested commands passing on `b8965ee`, a reproduced nonterminal
-callback publication defect, an existing scoped game-test lint failure, and the
-manual evidence table. Completion/boss staging is implemented; no Gate 2 approval
-is implied. The EPIC 5 short-viewport/input device recheck and measured duration
-decision remain open. Runtime fixes are proposed, not implemented by that review.
+The [Gate 2 follow-up](../../docs/features/wave-survivor-implementation-plan.md#gate-2-review-follow-up--2026-09-06)
+fixes the review's nonterminal callback publication defect and scoped test-lint
+warnings. Dimi explicitly confirmed PC/smartphone PASS, Gate 2 approval and
+accepted current pacing on September 6, 2026. Earlier task-level pending
+statements below are historical and superseded by that decision. Human duration
+measurements and the specifically documented EPIC 5 short-viewport/input recheck
+remain unrecorded; approval does not manufacture either.
+
+Status callbacks may restart, pause or destroy the same controller. Follow-on
+wave milestones require the same live run; pausing preserves an already entered
+encounter's milestone but schedules no gameplay. Upgrade requests require that
+run still to be choosing. Controller scheduling checks the actual phase after
+callbacks. Valid upgrade acceptance still returns true if a callback subsequently
+changes lifecycle. No public event/type or second callback system is added.
 
 The internal `PROVISIONAL_RUN_DEFINITION` now specifies four existing normal
 waves followed by one explicit boss encounter. Finite lookup rejects invalid
@@ -90,8 +100,9 @@ waves in `6.95 / 8.58 / 10.48 / 11.88s`, totaling `37.90` simulation seconds
 with 28 kills and 2 health remaining.
 Earlier tuning measurements are historical. Measurements exclude choice time and the
 absent boss; scheduled offsets alone exclude capacity waiting.
-PC/phone pacing observations, structure approval, the original 5–7-minute
-target, and Gate 2 approval remain pending with Dimi.
+Current structure and pacing are accepted by Dimi. The original 5–7-minute target
+is superseded for this build without a replacement numerical target; human
+duration observations have not been supplied.
 
 ## WS-6.2 charger candidate
 
@@ -297,8 +308,10 @@ score weights remain unchanged. A test-only 18-run matrix covers three build
 paths, spawn seeds 1/42/2026 (upgrade seed 2), and rectangular/stationary input.
 Each build wins at least one moving run; all nine stationary controls lose.
 Successful scripts take 72.47–93.08 simulation seconds, including boss entry,
-excluding choices/pauses. They do not validate the retained 5–7-minute target.
-Human pacing, build balance and Gate 2 remain pending.
+excluding choices/pauses. They do not establish a human visit duration. Dimi
+accepted current pacing and approved Gate 2 on September 6, superseding the
+original 5–7-minute target for this build. No balance values change in the
+callback cleanup.
 
 ## WS-6.6 score candidate
 
@@ -455,12 +468,15 @@ From the repository root:
 ```bash
 pnpm --filter @funkspace/wave-survivor typecheck
 pnpm --filter @funkspace/wave-survivor test
+pnpm exec eslint --config frontend/eslint.config.mjs games/wave-survivor/src games/wave-survivor/demo/main.js e2e/wave-survivor/demo.spec.ts --max-warnings=0
 pnpm --filter @funkspace/wave-survivor build
 pnpm --filter @funkspace/wave-survivor demo
 pnpm --filter @funkspace/wave-survivor demo:build
 pnpm exec cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.demo.config.ts
 ```
 
+Run the explicit scoped ESLint command as well as `pnpm lint`: root lint covers
+frontend ESLint and repository formatting, but does not lint game TypeScript.
 Build output is emitted to `dist/` and is not source-controlled.
 
 ## Standalone demo

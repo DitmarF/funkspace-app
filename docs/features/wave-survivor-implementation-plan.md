@@ -4,11 +4,11 @@
 
 ## Document metadata
 
-- **Status:** EPIC 6 complete-run implementation and provisional balance delivered; Gate 2 review records open callback/quality findings and manual evidence gaps; Gate 1 approved, Gate 2 pending
+- **Status:** EPIC 6 delivered; Dimi approved Gate 2 and current pacing on 2026-09-06; bounded callback/lint review fixes implemented
 - **Owner:** Dimi
 - **Product:** FunkSpace Wave Survivor
 - **Planning level:** Epic and implementation-task roadmap
-- **Last updated:** 2026-09-05
+- **Last updated:** 2026-09-06
 - **Concept source:** [`docs/features/wave-survivor.md`](./wave-survivor.md)
 - **Game package:** `games/wave-survivor/`
 - **Portfolio integration:** `frontend/features/games/`
@@ -914,21 +914,89 @@ EPIC 5.
 
 ## Work items
 
-| ID          | Task                                      | Planned behavior                                                                                                            | Acceptance criteria                                                                                                       |
-| ----------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **WS-6.1**  | Resolve the minimal run structure.        | Implemented provisional four normal waves + boss, finite lookup/successors, wave validation, and upgrade-capacity safety.   | Configuration and pacing evidence recorded; Dimi's PC/phone pacing and candidate approval pending.                        |
-| **WS-6.2**  | Define one boss.                          | Implemented provisional charger cycle with locked aim, bounded charge, recovery, and existing combat.                       | Active Domain/session fixtures pass; entry/telegraphs integrated by WS-6.3/6.4; Dimi's movement-challenge review pending. |
-| **WS-6.3**  | Implement boss entry.                     | Implemented single top-center boss after fourth upgrade; repeat bridge removed, static warning and host announcement added. | Automated handoff, escape, eligibility, cleanup, and lifecycle checks; Dimi's PC/phone fairness review pending.           |
-| **WS-6.4**  | Implement boss action telegraphing.       | Implemented static action cues, shared charge geometry and swept contact.                                                   | Automated checks pass; Dimi reports all task manual checks PASS (2026-09-05).                                             |
-| **WS-6.5**  | Implement victory.                        | Confirmed final-boss defeat commits won through shared win/loss finalization with frozen score/result.                      | Terminal suspension and callback safety tested; Dimi's visible-end check pending. Result publication is WS-6.8.           |
-| **WS-6.6**  | Define score calculation.                 | Implemented pure 10/100/500/100 candidate; WS-6.5 integrates authoritative terminal inputs.                                 | Numeric safety and integrated win/loss scores tested; final reward approval pending.                                      |
-| **WS-6.7**  | Define `RunResult`.                       | Implemented validated/frozen public record, committed by WS-6.5 and published by WS-6.8.                                    | Value/immutability/public compatibility tests pass; Dimi's result-information review pending.                             |
-| **WS-6.8**  | Implement result event and UI.            | One guarded frozen completion event; deliberate Start, semantic result fields and Replay in the standalone demo.            | Automated checks pass; Dimi reports task manual checks PASS (2026-09-05).                                                 |
-| **WS-6.9**  | Implement immediate replay.               | Existing fresh-state replay extended for callback, held-key and hidden-page safety.                                         | Automated tests pass; Dimi reports task manual checks PASS (2026-09-05).                                                  |
-| **WS-6.10** | Balance the full run.                     | Measured cap 6→5 for wave 4; other parameters retained; 18-run build/input/seed matrix added.                               | Provisional candidate only; human balance, duration target and Gate 2 pending.                                            |
-| **WS-6.11** | Add deterministic full-run test fixtures. | Implemented actual production combat win/loss/replay and naturally reached boss interruption companions.                    | Bounded scripts verify events/results/terminal freeze/replay; rerun after WS-6.10 tuning.                                 |
+| ID          | Task                                      | Planned behavior                                                                                                 | Acceptance criteria                                                                                                          |
+| ----------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **WS-6.1**  | Resolve the minimal run structure.        | Four normal waves + boss, finite successors, data and upgrade-capacity validation.                               | Staging closed by WS-6.3; Dimi accepts structure/current pacing at Gate 2. Human durations unrecorded.                       |
+| **WS-6.2**  | Define one boss.                          | Charger with locked aim, bounded charge and recovery using existing combat.                                      | Domain/session fixtures and integrated entry/telegraphs pass; current build accepted at Gate 2.                              |
+| **WS-6.3**  | Implement boss entry.                     | Single announced top-center boss after fourth upgrade; repeat bridge removed.                                    | Handoff, escape, eligibility, cleanup/lifecycle tests pass; current PC/phone build accepted.                                 |
+| **WS-6.4**  | Implement boss action telegraphing.       | Implemented static action cues, shared charge geometry and swept contact.                                        | Automated checks pass; Dimi reports all task manual checks PASS (2026-09-05).                                                |
+| **WS-6.5**  | Implement victory.                        | Confirmed boss defeat uses shared frozen win/loss finalization.                                                  | Terminal tests pass; publication/UI staging closed by WS-6.8; current build accepted at Gate 2.                              |
+| **WS-6.6**  | Define score calculation.                 | Pure 10/100/500/100 rule; authoritative terminal inputs.                                                         | Numeric safety and win/loss scores tested; current formula retained in accepted build.                                       |
+| **WS-6.7**  | Define `RunResult`.                       | Validated/frozen public record, committed and published.                                                         | Value/immutability/public compatibility tests pass; result flow accepted at Gate 2.                                          |
+| **WS-6.8**  | Implement result event and UI.            | One guarded frozen completion event; deliberate Start, semantic result fields and Replay in the standalone demo. | Automated checks pass; Dimi reports task manual checks PASS (2026-09-05).                                                    |
+| **WS-6.9**  | Implement immediate replay.               | Existing fresh-state replay extended for callback, held-key and hidden-page safety.                              | Automated tests pass; Dimi reports task manual checks PASS (2026-09-05).                                                     |
+| **WS-6.10** | Balance the full run.                     | Wave 4 cap 6→5; other parameters retained; 18-run diagnostic matrix.                                             | Current pacing accepted by Dimi at Gate 2; original 5–7-minute target superseded for this build, human durations unrecorded. |
+| **WS-6.11** | Add deterministic full-run test fixtures. | Implemented actual production combat win/loss/replay and naturally reached boss interruption companions.         | Bounded scripts verify events/results/terminal freeze/replay; rerun after WS-6.10 tuning.                                    |
+
+### Gate 2 review follow-up — 2026-09-06
+
+Baseline: `e439a13` on `feature/wave-survivor`, initially clean. This bounded
+cleanup changes Application callback guards and tests, the spawn-test random
+stub, and current documentation. Gameplay configuration, public types, rendering,
+score and result construction remain unchanged.
+
+- Start, restart and upgrade-apply milestones check the captured run-state
+  identity after status callbacks. Abandoned/destroyed runs cannot publish
+  follow-on wave events. A paused encounter in the same run still publishes its
+  one entry milestone; pause does not undo encounter entry.
+- Upgrade-entry publication requires the same live run still choosing. A choice
+  accepted synchronously from its status callback is not requested again.
+- Controller start/resume/chooseUpgrade schedule only if callbacks leave the
+  current session playing. A valid choice still returns true if accepted before
+  a callback pauses, restarts or destroys the run.
+- Thirteen focused controller cases cover restart/pause/destroy at initial start,
+  resume, upgrade application and choosing status, plus synchronous choice
+  acceptance. These use constructed wave-completion boundaries; actual full-run
+  production fixtures remain separate. Assertions cover event contents/counts,
+  valid options, phase, one/zero pending frames, fresh clock and single teardown.
+- SpawnGeometry's stub now uses `RandomSource["nextFloat"]` without unused
+  implementation arguments. Its existing argument assertions remain intact.
+  Whole-game ESLint is an explicit README validation command; root lint alone
+  checks frontend ESLint and repository formatting.
+
+**Manual decision:** Dimi explicitly answered “Record PASS and Gate 2 approval;
+accept current pacing” during this follow-up. See the [Gate 2 decision](#gate-2-decision).
+This supersedes earlier pending gate/current-balance statements below, which are
+retained as dated task history. It does not invent measurements or detailed
+device configurations. Automated validation for this cleanup is recorded below.
+
+#### Follow-up validation
+
+Executed from the repository root on `e439a13` plus this uncommitted cleanup;
+all commands below exited 0:
+
+| Command                                                                                                                                                         | Result                                                                                                                              |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm --filter @funkspace/wave-survivor test src/application/GameControllerImpl.test.ts src/domain/spawning/SpawnGeometry.test.ts`                              | PASS: 88 tests / 2 files; 13 new callback regressions.                                                                              |
+| `pnpm --filter @funkspace/wave-survivor typecheck`                                                                                                              | PASS.                                                                                                                               |
+| `pnpm --filter @funkspace/wave-survivor test`                                                                                                                   | PASS: 920 tests / 58 files, including real win/loss/replay and 18-case balance matrix.                                              |
+| `pnpm --filter @funkspace/wave-survivor exec tsc -p /private/tmp/ws-gate2-tests.tsconfig.json`                                                                  | PASS: temporary config extends package options, includes all source/tests, excludes nothing, sets noEmit.                           |
+| `pnpm exec eslint --config frontend/eslint.config.mjs games/wave-survivor/src games/wave-survivor/demo/main.js e2e/wave-survivor/demo.spec.ts --max-warnings=0` | PASS: prior three unused-symbol warnings resolved. Existing React/pages config-discovery notices remain.                            |
+| `pnpm --filter @funkspace/wave-survivor build`                                                                                                                  | PASS.                                                                                                                               |
+| `pnpm --filter @funkspace/wave-survivor demo:build`                                                                                                             | PASS.                                                                                                                               |
+| `pnpm -F frontend exec tsc --noEmit`                                                                                                                            | PASS.                                                                                                                               |
+| `pnpm test`                                                                                                                                                     | PASS: 1256 tests / 80 files, including game tests and host/loader compatibility; not an independent second game suite.              |
+| `pnpm lint`                                                                                                                                                     | PASS: frontend ESLint and repository formatting; existing Next-lint deprecation notice.                                             |
+| `pnpm exec cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.demo.config.ts`                                                             | PASS: 18 Chromium tests. Mocked result/upgrade events prove UI only; actual complete gameplay remains application-fixture evidence. |
+| `pnpm build`                                                                                                                                                    | PASS: common types, game build, Next production/static build.                                                                       |
+
+Final documentation formatting and `git diff --check` are verified after this
+record is added. No failures or unavailable checks remain in this executed set.
+No assertions were weakened. Diff review found no new dependencies, state
+authorities, resources, gameplay tuning or public type changes. Storybook and
+Lighthouse were not rerun: this cleanup changes callback control flow, not
+portfolio components, presentation or performance tuning; the standalone
+interaction suite and both production builds cover the affected integration.
+The agent performed no new real-device playtest. Dimi's manual approval is
+recorded separately above and in the gate decision; measured human durations
+and the specific short-viewport/input follow-up remain unrecorded.
 
 ### Gate 2 readiness review — 2026-09-06 (verification, not approval)
+
+Historical baseline review: the follow-up above resolves its callback/lint
+findings; Dimi's subsequent decision supersedes its hold recommendation and
+pending approval statements. The original executions and evidence gaps remain
+recorded accurately here.
 
 **Reviewed baseline:** clean `feature/wave-survivor`, commit
 `b8965eef26e84a175c894f4f4745003a7a41de73`. No production or test source changed
@@ -1673,7 +1741,30 @@ bundle. No commit, push, merge, deployment, or repository-setting change.
 
 ## Gate 2 decision
 
-Proceed only when:
+**Approved by Dimi on 2026-09-06.** In the review follow-up Dimi explicitly
+confirmed current-build PC/smartphone PASS, Gate 2 approval and acceptance of
+current pacing. Reviewed build: `e439a13` (gameplay from `b8965ee`); this cleanup
+does not retune it. EPIC 7 may proceed after the bounded technical cleanup checks.
+
+**Pacing decision:** accept the current four normal waves + one boss, with enemy
+totals 4/6/8/10 and concurrent caps 2/3/4/5. The original approximately 5–7-minute
+target is superseded for this accepted build; there is no replacement numerical
+human-duration target. Successful scripted runs take 72.47–93.08 gameplay
+simulation seconds. They exclude choices/pauses and are not human visit-duration
+measurements. No PC/phone wave, boss or wall-clock durations were supplied.
+Do not pad content or boss health to satisfy the historical target.
+
+| Manual criterion                         | Current evidence                                                                                                                                                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Understandable start and result          | WS-6.8 PASS plus current-build PASS/approval.                                                                                                                                                                |
+| Clear escalation and meaningful upgrades | Current-build PC/smartphone PASS and accepted pacing; no build-by-build human measurements supplied.                                                                                                         |
+| Readable/fair boss                       | WS-6.4 PASS plus current-build PASS/approval.                                                                                                                                                                |
+| Real win/loss and repeated replay        | WS-6.9 PASS plus current-build PASS/approval.                                                                                                                                                                |
+| PC and smartphone coverage               | Explicit current confirmation; device/browser/input models not supplied.                                                                                                                                     |
+| Compact measured duration                | Current pacing accepted; human measurements remain unrecorded, not a claim that 5–7 minutes was achieved.                                                                                                    |
+| EPIC 5 short viewport/input follow-up    | Specific portrait/landscape/enlarged-text recheck still not separately documented. Retain as targeted follow-up; do not reinterpret blanket PASS as detailed device evidence or revoke Dimi's gate decision. |
+
+Gate criteria retained for reference:
 
 - The game can be won or lost without developer intervention.
 - Start-to-result flow is complete.
@@ -2066,18 +2157,18 @@ Gate 3 approval.
 
 ## 10. Open decisions and resolution timing
 
-| Decision                                    | Resolve in                                          | Decision rule                                                                                 |
-| ------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Final title, fiction, and visual identity   | After Gate 1, before final assets                   | Choose a theme that fits proven mechanics without changing hitboxes or scope.                 |
-| Exact wave count and durations              | WS-6.1 candidate; manual review and WS-6.10 pending | Four normal waves + boss provisionally; validate human pacing without padding to 5–7 minutes. |
-| Boss behavior                               | EPIC 6                                              | Reuse existing systems and test learned movement skills.                                      |
-| Final upgrade roster                        | EPIC 5, finalized EPIC 10                           | Prefer modifiers to current rules; reject filler.                                             |
-| Score formula                               | WS-6.6 candidate implemented; Dimi approval pending | Reward defeats, normal clears, victory, and victory health percentage; no time or currency.   |
-| Sound/music direction                       | EPIC 8                                              | Match available feedback needs and asset budget.                                              |
-| Portfolio route and case-study presentation | Route in EPIC 7; case study in EPIC 10              | Keep playable route dedicated and game lazily loaded.                                         |
-| Entity and frame budgets                    | EPIC 9                                              | Derive from representative measurements.                                                      |
-| Additional attack family                    | EPIC 10                                             | Add only if the single attack plus upgrades cannot provide sufficient variety.                |
-| Object pooling                              | EPIC 9                                              | Add only after profiling demonstrates allocation pressure.                                    |
+| Decision                                    | Resolve in                                                      | Decision rule                                                                              |
+| ------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Final title, fiction, and visual identity   | After Gate 1, before final assets                               | Choose a theme that fits proven mechanics without changing hitboxes or scope.              |
+| Exact wave count and durations              | Structure/pacing accepted at Gate 2; human durations unrecorded | Four normal waves + boss; original 5–7-minute target superseded for current build.         |
+| Boss behavior                               | EPIC 6                                                          | Reuse existing systems and test learned movement skills.                                   |
+| Final upgrade roster                        | EPIC 5, finalized EPIC 10                                       | Prefer modifiers to current rules; reject filler.                                          |
+| Score formula                               | Current formula retained in Gate 2 accepted build               | Reward defeats, normal clears, victory and victory health percentage; no time or currency. |
+| Sound/music direction                       | EPIC 8                                                          | Match available feedback needs and asset budget.                                           |
+| Portfolio route and case-study presentation | Route in EPIC 7; case study in EPIC 10                          | Keep playable route dedicated and game lazily loaded.                                      |
+| Entity and frame budgets                    | EPIC 9                                                          | Derive from representative measurements.                                                   |
+| Additional attack family                    | EPIC 10                                                         | Add only if the single attack plus upgrades cannot provide sufficient variety.             |
+| Object pooling                              | EPIC 9                                                          | Add only after profiling demonstrates allocation pressure.                                 |
 
 ## 11. Rollout and rollback
 

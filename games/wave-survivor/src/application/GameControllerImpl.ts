@@ -29,7 +29,7 @@ export class GameControllerImpl implements GameController {
   }
 
   start(): void {
-    if (this.session?.start()) {
+    if (this.session?.start() && this.session?.phase === "playing") {
       this.loop?.start();
     }
   }
@@ -42,7 +42,7 @@ export class GameControllerImpl implements GameController {
   }
 
   resume(): void {
-    if (this.session?.resume()) {
+    if (this.session?.resume() && this.session?.phase === "playing") {
       this.loop?.start();
     }
   }
@@ -58,7 +58,7 @@ export class GameControllerImpl implements GameController {
   chooseUpgrade(id: string): boolean {
     if (!this.session?.chooseUpgrade(id)) return false;
 
-    this.loop?.start();
+    if (this.session?.phase === "playing") this.loop?.start();
     return true;
   }
 

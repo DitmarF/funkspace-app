@@ -21,9 +21,7 @@ import {
 } from "./SpawnGeometry.js";
 
 function createControlledRandomSource(distance: number) {
-  const nextFloat = vi.fn(
-    (_minInclusive: number, _maxExclusive: number) => distance,
-  );
+  const nextFloat = vi.fn<RandomSource["nextFloat"]>(() => distance);
 
   return {
     nextFloat,

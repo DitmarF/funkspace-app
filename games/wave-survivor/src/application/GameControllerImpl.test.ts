@@ -181,6 +181,151 @@ describe("createGame", () => {
 });
 
 describe("GameController runtime lifecycle", () => {
+  describe.each(["start", "resume", "chooseUpgrade"] as const)(
+    "%s status callback boundary",
+    (transition) => {
+      it.each(["restart", "pause", "destroy"] as const)(
+        "honors callback %s without obsolete events or frames",
+        (action) => {
+          let armed = false;
+          const events: GameEvent[] = [];
+          const harness = createHarness(
+            null,
+            (status) => {
+              if (!armed || status.phase !== "playing") return;
+              armed = false;
+              harness.controller[action]();
+            },
+            (event) => events.push(event),
+          );
+          if (transition === "resume") {
+            harness.controller.start();
+            harness.controller.pause();
+          } else if (transition === "chooseUpgrade") {
+            // Constructed wave-completion boundary, not full-run evidence.
+            reachUpgradeChoice(harness);
+          }
+          events.length = 0;
+          armed = true;
+          if (transition === "chooseUpgrade") {
+            const choice = harness.session.pendingUpgradeOptionIds[0]!;
+            // Acceptance stays true even when its notification abandons the run.
+            expect(harness.controller.chooseUpgrade(choice)).toBe(true);
+          } else {
+            harness.controller[transition]();
+          }
+
+          expect(events).toEqual(
+            action === "destroy" ||
+              (action === "pause" && transition === "resume")
+              ? []
+              : [
+                  {
+                    type: "wave-started",
+                    waveNumber:
+                      action === "pause" && transition === "chooseUpgrade"
+                        ? 2
+                        : 1,
+                  },
+                ],
+          );
+          expect(harness.controller.lifecycleState).toBe(
+            action === "restart"
+              ? "running"
+              : action === "pause"
+                ? "paused"
+                : "destroyed",
+          );
+          expect(harness.frameScheduler.pendingFrameCount).toBe(
+            action === "restart" ? 1 : 0,
+          );
+          if (action === "restart") {
+            harness.frameScheduler.runNextFrame();
+            expect(harness.snapshots.at(-1)?.simulationTimeSeconds).toBe(0);
+            expect(events).toHaveLength(1);
+          }
+          harness.controller.destroy();
+          expect(harness.frameScheduler.pendingFrameCount).toBe(0);
+          expect(harness.input.destroy).toHaveBeenCalledTimes(1);
+          expect(harness.presentation.destroy).toHaveBeenCalledTimes(1);
+        },
+      );
+    },
+  );
+
+  it.each(["restart", "pause", "destroy"] as const)(
+    "honors %s from choosing status without an abandoned upgrade request",
+    (action) => {
+      let armed = true;
+      const events: GameEvent[] = [];
+      const harness = createHarness(
+        null,
+        (status) => {
+          if (!armed || status.phase !== "choosing-upgrade") return;
+          armed = false;
+          harness.controller[action]();
+        },
+        (event) => events.push(event),
+      );
+      reachUpgradeChoice(harness);
+      expect(events.slice(0, 2)).toEqual([
+        { type: "wave-started", waveNumber: 1 },
+        { type: "wave-cleared", waveNumber: 1 },
+      ]);
+      if (action === "pause") {
+        // Pause is intentionally a no-op during the already suspended choice.
+        expect(harness.controller.lifecycleState).toBe("choosing-upgrade");
+        const request = events[2];
+        expect(request?.type).toBe("upgrade-choice-requested");
+        if (request?.type !== "upgrade-choice-requested")
+          throw new Error("Expected a valid upgrade request");
+        expect(request.options.map((option) => option.id)).toEqual(
+          harness.session.pendingUpgradeOptionIds,
+        );
+        expect(request.options).toHaveLength(3);
+        expect(events).toHaveLength(3);
+      } else {
+        expect(events.slice(2)).toEqual(
+          action === "restart" ? [{ type: "wave-started", waveNumber: 1 }] : [],
+        );
+        expect(harness.controller.lifecycleState).toBe(
+          action === "restart" ? "running" : "destroyed",
+        );
+      }
+      expect(harness.frameScheduler.pendingFrameCount).toBe(
+        action === "restart" ? 1 : 0,
+      );
+      harness.controller.destroy();
+      expect(harness.frameScheduler.pendingFrameCount).toBe(0);
+    },
+  );
+
+  it("does not request a choice already accepted from its status callback", () => {
+    const events: GameEvent[] = [];
+    const harness = createHarness(
+      null,
+      (status) => {
+        if (status.phase !== "choosing-upgrade") return;
+        expect(
+          harness.controller.chooseUpgrade(
+            harness.session.pendingUpgradeOptionIds[0]!,
+          ),
+        ).toBe(true);
+        harness.controller.pause();
+      },
+      (event) => events.push(event),
+    );
+    reachUpgradeChoice(harness);
+    expect(events).toEqual([
+      { type: "wave-started", waveNumber: 1 },
+      { type: "wave-cleared", waveNumber: 1 },
+      { type: "wave-started", waveNumber: 2 },
+    ]);
+    expect(harness.controller.lifecycleState).toBe("paused");
+    expect(harness.frameScheduler.pendingFrameCount).toBe(0);
+    harness.controller.destroy();
+  });
+
   it.each(["restart", "pause", "destroy"] as const)(
     "respects a %s callback during replay without duplicate wave notifications",
     (action) => {

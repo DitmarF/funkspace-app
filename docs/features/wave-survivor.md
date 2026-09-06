@@ -5,7 +5,7 @@
 ## Document metadata
 
 - **Status:** Approved starting concept
-- **Product stage:** Complete standalone finite run implemented; Gate 2 verification records open technical/manual findings, without approval
+- **Product stage:** Complete standalone finite run; Gate 2 and current pacing approved by Dimi on 2026-09-06; bounded callback/lint review fixes implemented
 - **Owner:** Dimi
 - **Working title:** Wave Survivor
 - **Target platform:** Modern web browsers
@@ -56,7 +56,7 @@ The player makes one continuous decision: where to move. There is no manual aimi
 
 ### 4.2 Short, finite runs
 
-The game is wave-based rather than endless. WS-6.1 establishes **four normal waves followed by one boss** as the provisional candidate, pending Dimi's approval and measured pacing review. The original **5–7 minute** target remains pending validation; the current normal-wave diagnostic is much shorter and content must not be padded to hit that target.
+The game is wave-based rather than endless. Dimi accepted **four normal waves followed by one boss** and current pacing with Gate 2 approval on 2026-09-06. The original **5–7 minute** target is superseded for this build, without a replacement numerical human-duration target. Successful scripts take 72.47–93.08 simulation seconds; human visit durations have not been measured in the supplied evidence. Do not pad content to meet the historical target.
 
 ### 4.3 Simple rules, meaningful pressure
 
@@ -852,20 +852,20 @@ human scoring approval or Gate 2 acceptance.
 
 The following values are production limits for the first complete version, not a promise that every item must be implemented before playtesting:
 
-| Element                 |                                           Initial limit |
-| ----------------------- | ------------------------------------------------------: |
-| Arena                   |                                  1 fixed portrait arena |
-| Playable characters     |                                                       1 |
-| Primary input           |                                           Movement only |
-| Manual aiming           |                                                    None |
-| Basic attacks           | 1 for Gate 1; at most 2–3 in the first complete version |
-| Normal enemy archetypes |                                               At most 3 |
-| Bosses                  |                                                       1 |
-| Upgrade definitions     |                                       Approximately 6–8 |
-| Run length              |                               Approximately 5–7 minutes |
-| Game modes              |                                                       1 |
-| Persistent data         |                                 Settings and best score |
-| Major screens/states    |                      Start, play, pause/upgrade, result |
+| Element                 |                                                        Initial limit |
+| ----------------------- | -------------------------------------------------------------------: |
+| Arena                   |                                               1 fixed portrait arena |
+| Playable characters     |                                                                    1 |
+| Primary input           |                                                        Movement only |
+| Manual aiming           |                                                                 None |
+| Basic attacks           |              1 for Gate 1; at most 2–3 in the first complete version |
+| Normal enemy archetypes |                                                            At most 3 |
+| Bosses                  |                                                                    1 |
+| Upgrade definitions     |                                                    Approximately 6–8 |
+| Run length              | Current compact pacing accepted at Gate 2; human duration unmeasured |
+| Game modes              |                                                                    1 |
+| Persistent data         |                                              Settings and best score |
+| Major screens/states    |                                   Start, play, pause/upgrade, result |
 
 New enemies, attacks, and upgrades should eventually be configuration plus small isolated behavior modules, not new global subsystems.
 
@@ -1183,21 +1183,23 @@ prove correctness, not human playability, pacing or boss fairness; Dimi owns Gat
 
 ### Gate 2 verification status — 2026-09-06
 
-The [readiness review](./wave-survivor-implementation-plan.md#gate-2-readiness-review--2026-09-06-verification-not-approval)
-records the clean `b8965ee` baseline, exact command results, staged-criteria
-closure, bounded fix proposals and manual evidence table. All nine requested
-commands pass. Supplemental whole-game lint finds three existing unused-symbol
-warnings; a separate real-progression diagnostic reproduces stale milestone
-events when nonterminal status callbacks restart. These are existing findings,
-not regressions introduced by this documentation-only review. Terminal result
-publication/replay fixtures pass; that does not cover every nonterminal callback.
+The historical [readiness review](./wave-survivor-implementation-plan.md#gate-2-readiness-review--2026-09-06-verification-not-approval)
+records the `b8965ee` baseline and reproduced callback/lint findings. The
+[bounded follow-up](./wave-survivor-implementation-plan.md#gate-2-review-follow-up--2026-09-06)
+fixes those findings using existing state-identity and phase guards. Thirteen
+focused controller regressions cover callback restart/pause/destroy and
+synchronous upgrade acceptance. These constructed transition tests supplement
+the actual full-run fixtures; they do not replace them.
 
 The production path has no repeat-last-wave progression, upgrade-exhaustion
 ending, automatic initial demo start or event fall-through. Defensive custom-state
-regressions remain relevant. Dimi's task-level manual PASS reports are retained;
-the EPIC 5 short-viewport/input follow-up and current-build measured PC/phone
-pacing/balance acceptance remain open. This review does not alter any gate
-approval record or implement the proposed fixes.
+regressions remain relevant. Dimi explicitly confirmed current PC/smartphone
+PASS, Gate 2 approval and acceptance of current pacing during the follow-up.
+The [decision record](./wave-survivor-implementation-plan.md#gate-2-decision)
+supersedes historical pending approval/balance statements in the task records
+below and earlier sections. Human wave/boss/visit duration measurements and
+the specific EPIC 5 short-viewport/input recheck remain unrecorded. No device
+models, measurements or granular checks are inferred from the approval.
 
 ### 15.9 WS-6.10 provisional full-run balance
 
@@ -1434,10 +1436,10 @@ The concept succeeds when:
 These decisions are intentionally deferred and do not block Gate 1:
 
 1. Final game title, fiction, setting, and player/enemy visual identity.
-2. Approval and measured pacing of the WS-6.1 four-normal-wave candidate; boss duration and the original 5–7-minute target remain pending.
+2. Human wave/boss and visit-duration measurements remain unrecorded; the four-normal-wave structure and current pacing are accepted, superseding the original 5–7-minute target for Gate 2.
 3. Final enemy archetype roster and boss behavior.
 4. Final upgrade list and choice-generation rules.
-5. Approval of the WS-6.6 score candidate; result integration and best-score presentation remain pending.
+5. Current score/result behavior is part of the accepted Gate 2 build; best-score presentation belongs to later scope.
 6. Sound and music direction.
 7. Exact portfolio play route and case-study presentation.
 8. Measured performance budget and active-entity cap.

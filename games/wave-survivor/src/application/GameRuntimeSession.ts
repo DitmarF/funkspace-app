@@ -139,8 +139,9 @@ export class GameRuntimeSession {
     if (this.destroyed || this.state.phase !== "idle") return false;
 
     this.state.phase = "playing";
+    const startedState = this.state;
     this.emitStatusIfChanged();
-    this.emitWaveStarted();
+    this.emitWaveStarted(startedState);
     return true;
   }
 
@@ -164,6 +165,7 @@ export class GameRuntimeSession {
   /** Enter upgrade choice after the application has prepared valid options. */
   beginUpgradeSelection(): boolean {
     if (
+      this.destroyed ||
       this.state.waveSchedule === null ||
       this.state.phase !== "wave-cleared" ||
       this.state.pendingUpgradeOptionIds.length === 0
@@ -172,8 +174,13 @@ export class GameRuntimeSession {
     }
 
     this.state.phase = "choosing-upgrade";
+    const choosingState = this.state;
     this.emitStatusIfChanged();
-    return true;
+    return (
+      !this.destroyed &&
+      this.state === choosingState &&
+      this.phase === "choosing-upgrade"
+    );
   }
 
   /** Apply one pending choice and prepare the next finite wave. */
@@ -231,8 +238,9 @@ export class GameRuntimeSession {
     this.state.nextAttackAtSeconds = 0;
     this.resetMovementInput();
 
+    const upgradedState = this.state;
     const completed = this.completeUpgradeSelection();
-    if (completed) this.emitWaveStarted();
+    if (completed) this.emitWaveStarted(upgradedState);
     return completed;
   }
 
@@ -255,8 +263,7 @@ export class GameRuntimeSession {
     this.lastStatusSnapshot = null;
     const restartedState = this.state;
     this.emitStatusIfChanged();
-    if (!this.destroyed && this.state === restartedState)
-      this.emitWaveStarted();
+    this.emitWaveStarted(restartedState);
   }
 
   fixedUpdate(deltaSeconds: number): void {
@@ -711,6 +718,7 @@ export class GameRuntimeSession {
 
   private prepareUpgradeSelection(clearedWaveNumber: number): void {
     if (
+      this.destroyed ||
       this.state.phase !== "wave-cleared" ||
       this.state.pendingUpgradeOptionIds.length > 0
     ) {
@@ -724,8 +732,8 @@ export class GameRuntimeSession {
       this.upgradeRandomSource,
     );
     if (this.state.pendingUpgradeOptionIds.length === 0) {
-      // Temporary EPIC 5 endpoint: publish wave-cleared so hosts can offer
-      // restart when every upgrade is capped. Do not request an empty choice.
+      // Defensive custom-state handling; the finite production run validates
+      // enough upgrade capacity. Never publish an empty choice.
       this.emitStatusIfChanged();
       return;
     }
@@ -759,7 +767,16 @@ export class GameRuntimeSession {
     return Object.freeze(options);
   }
 
-  private emitWaveStarted(): void {
+  private emitWaveStarted(expectedState: RuntimeState): void {
+    // A status callback may abandon the run. Pausing the same entered
+    // encounter still warrants its milestone, without scheduling gameplay.
+    if (
+      this.destroyed ||
+      this.state !== expectedState ||
+      (this.state.phase !== "playing" && this.state.phase !== "paused")
+    )
+      return;
+
     this.emitEvent(
       Object.freeze({
         type: "wave-started",
