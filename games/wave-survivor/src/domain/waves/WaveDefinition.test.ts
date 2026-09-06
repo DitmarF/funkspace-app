@@ -184,7 +184,7 @@ describe("PROVISIONAL_EPIC_5_WAVES", () => {
             intervalSeconds: 0.6,
           },
         ],
-        maxActiveEnemies: 6,
+        maxActiveEnemies: 5,
       },
     ]);
   });

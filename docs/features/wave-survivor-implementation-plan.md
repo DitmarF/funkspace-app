@@ -869,8 +869,9 @@ implemented. Dimi reports WS-6.4 manual checks PASS. WS-6.5 terminal completion
 is implemented. WS-6.8 delivers the completion event and standalone Start/result/Replay
 flow; Dimi reports WS-6.8 manual checks PASS. WS-6.9 replay hardening and
 deterministic equivalence checks are implemented; Dimi reports WS-6.9 manual checks
-PASS. WS-6.11 adds actual production full-run win/loss/replay fixtures. Full-run
-tuning and Gate 2 remain pending.
+PASS. WS-6.11 adds actual production full-run win/loss/replay fixtures. WS-6.10
+implements a measured provisional wave-4 cap reduction and three-build matrix;
+human balance acceptance, 5–7-minute pacing validation and Gate 2 remain pending.
 
 ## Goal
 
@@ -923,8 +924,65 @@ EPIC 5.
 | **WS-6.7**  | Define `RunResult`.                       | Implemented validated/frozen public record, committed by WS-6.5 and published by WS-6.8.                                    | Value/immutability/public compatibility tests pass; Dimi's result-information review pending.                             |
 | **WS-6.8**  | Implement result event and UI.            | One guarded frozen completion event; deliberate Start, semantic result fields and Replay in the standalone demo.            | Automated checks pass; Dimi reports task manual checks PASS (2026-09-05).                                                 |
 | **WS-6.9**  | Implement immediate replay.               | Existing fresh-state replay extended for callback, held-key and hidden-page safety.                                         | Automated tests pass; Dimi reports task manual checks PASS (2026-09-05).                                                  |
-| **WS-6.10** | Balance the full run.                     | Tune enemy speed, health, spawn timing, attack cooldown, upgrade strength, and upgrade frequency.                           | Player power grows, but movement remains important through the boss.                                                      |
+| **WS-6.10** | Balance the full run.                     | Measured cap 6→5 for wave 4; other parameters retained; 18-run build/input/seed matrix added.                               | Provisional candidate only; human balance, duration target and Gate 2 pending.                                            |
 | **WS-6.11** | Add deterministic full-run test fixtures. | Implemented actual production combat win/loss/replay and naturally reached boss interruption companions.                    | Bounded scripts verify events/results/terminal freeze/replay; rerun after WS-6.10 tuning.                                 |
+
+### WS-6.10 measured provisional balance and pending acceptance
+
+Baseline `e795312` was clean on `feature/wave-survivor`. One capacity pass changes
+wave 4 from 6 to 5 entering/active enemies, smoothing caps to 2/3/4/5. Counts remain
+Dimi's 4/6/8/10. Spawn offsets/intervals, health/speeds, attack, upgrades, boss timing,
+collision and score stay unchanged. No extra content or duration padding.
+
+The [current balance record](./wave-survivor.md#159-ws-610-provisional-full-run-balance)
+contains old/new values, hypotheses, before/after results and Dimi's compact device
+record. The existing full-run fixture now measures Rapid Fire, Swift Movement and
+Vitality with spawn seeds 1/42/2026, upgrade seed 2, rectangular/stationary input,
+production fixed steps and a 9000-step bound. It reports per-encounter simulated
+duration, damage HP, peak occupancy and capacity waiting without state injection.
+The rectangle reuses the earlier boss test's four waypoints for the entire run.
+
+Moving wins remain 2/3, 1/3 and 3/3 by build. Swift Movement seed 1 now reaches
+the boss instead of losing in wave 4, but still loses. All nine stationary runs
+lose. Retained successful run times are 72.47–93.08 simulation seconds, including
+entry and excluding choices/pauses. These are small scripted samples, not human
+win rates or proof of equal build strength. No wall-clock visits were measured.
+The approximately 5–7-minute target remains current and unvalidated; the scripted
+gap is substantial. More count/health/time changes would be speculative now.
+
+Executed automated validation (2026-09-05):
+
+- Before editing: `pnpm --filter @funkspace/wave-survivor test` — **906 tests /
+  58 files pass**. Bounded before/after diagnostic scripts measured the same
+  18 seed/build/input combinations against real combat.
+- After cap change: full-run and normal-run fixtures — **16 tests / 2 files pass**.
+- Expanded matrix/full-run file — **15 tests pass**; final package suite
+  `pnpm --filter @funkspace/wave-survivor test` — **907 tests / 58 files pass**.
+- `pnpm --filter @funkspace/wave-survivor typecheck` and strict source/test
+  `pnpm --filter @funkspace/wave-survivor exec tsc -p /private/tmp/ws63-tests.tsconfig.json`
+  pass. The temporary config extends the package config and includes tests.
+- `pnpm --filter @funkspace/wave-survivor demo:build` passes package TypeScript
+  and standalone Vite production builds. Public contracts did not change, so
+  frontend types/host tests are not rerun.
+- Scoped `pnpm exec eslint --config frontend/eslint.config.mjs` with
+  `--max-warnings=0` passes on the four changed TypeScript files. `pnpm lint`
+  (frontend lint and repository formatting) and `git diff --check` pass after
+  scope, duplication, lifecycle and generated-output review.
+- `pnpm exec cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.demo.config.ts`
+  — **18 browser tests pass**. Mocked result/UI cases remain separate from real
+  runtime balance evidence. Existing Next-lint deprecation, React/pages discovery
+  and Playwright color-environment notices are non-failing.
+
+Only two configuration assertions change cap 6→5; no clear-time expectations
+were altered. The first expanded matrix run had 14 passes / 1 failure because an
+old Rapid-Fire-only assertion required health below base max 3. It now checks
+effective upgraded max, and original full-run damage evidence remains explicitly
+asserted. Score, event, terminal, replay and collision assertions are retained.
+
+**Manual pending:** Dimi supplies build/commit; device/input; upgrade choices;
+wave/boss durations; outcome; unfair damage; empty/repetitive/overwhelming moments.
+No additional full-run observations arrived for this pass. Prior task PASS reports
+do not approve this new balance candidate or Gate 2. No commit/push/deployment.
 
 ### WS-6.11 implementation and dependent acceptance
 

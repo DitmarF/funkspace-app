@@ -109,7 +109,7 @@ export function createWaveDefinition(definition: {
   });
 }
 
-/** WS-6.1 tuning: Dimi's explicit totals 4/6/8/10 and caps 2/3/4/6. */
+/** Dimi's totals 4/6/8/10; WS-6.10 provisional cap progression 2/3/4/5. */
 export const PROVISIONAL_EPIC_5_WAVES: readonly Readonly<WaveDefinition>[] =
   Object.freeze([
     createWaveDefinition({
@@ -172,6 +172,6 @@ export const PROVISIONAL_EPIC_5_WAVES: readonly Readonly<WaveDefinition>[] =
           pattern: "random-perimeter",
         }),
       ],
-      maxActiveEnemies: 6,
+      maxActiveEnemies: 5,
     }),
   ]);

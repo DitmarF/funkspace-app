@@ -416,10 +416,10 @@ Normal-wave completion still requires an empty queue and no entering/active
 enemies. WS-6.5 implements boss terminal handling; an empty boss arena is not
 treated as victory or another normal-wave clear.
 
-If every upgrade has reached its cap, completing the wave leaves the game
-frozen in `wave-cleared`. The standalone demo displays “All upgrades maxed”
-and offers Restart. With three five-level upgrades this occurs after clearing
-Wave 16. This is a temporary recovery endpoint, not the final victory rule.
+If every upgrade has reached its cap, the defensive completion path freezes in
+`wave-cleared` and offers Restart. This is only reachable in constructed/custom
+states: the finite production run offers four choices from fifteen available
+levels, then enters the boss. It does not continue to Wave 16.
 
 ### 10.6 WS-6.1 candidate pacing record — 2026-09-05
 
@@ -427,24 +427,24 @@ Content remains in the existing `PROVISIONAL_EPIC_5_WAVES` definitions and is
 validated when constructing `PROVISIONAL_RUN_DEFINITION`. All normal enemies
 remain the existing basic type using random-perimeter spawning.
 
-Dimi's latest explicit table sets totals `4 / 6 / 8 / 10` and entering/active
-caps `2 / 3 / 4 / 6`, superseding the earlier tuning tables and percentage
-adjustments. Existing groups are retained: Wave 3 uses `4 + 4`, and Wave 4
-uses `6 + 4` enemies. Wave 4 retains its concurrent cap of 6.
-Group start offsets, spawn intervals, combat stats, and upgrades are unchanged.
+Dimi's explicit totals remain `4 / 6 / 8 / 10`. WS-6.10 provisionally changes
+only wave 4's entering/active cap from 6 to 5, yielding `2 / 3 / 4 / 5`.
+Existing groups remain: wave 3 uses `4 + 4`, wave 4 uses `6 + 4`. Group offsets,
+spawn intervals, combat stats and upgrades are unchanged. See the later WS-6.10
+record for before/after evidence and pending human acceptance.
 
 | Encounter        | Enemy count | Group start offsets / spawn intervals   |     Entering + active cap | Last scheduled spawn offset | Upgrade afterward | Provisional clear-time review target           |
 | ---------------- | ----------: | --------------------------------------- | ------------------------: | --------------------------: | ----------------- | ---------------------------------------------- |
 | Normal Wave 1    |           4 | `0.5s / 1s`                             |                         2 |                      `3.5s` | One               | About `7s`, diagnostic only                    |
 | Normal Wave 2    |           6 | `0.5s / 0.85s`                          |                         3 |                     `4.75s` | One               | About `9s`, diagnostic only                    |
 | Normal Wave 3    |       4 + 4 | `0.5s / 0.8s`; `4.5s / 0.7s`            |                         4 |                      `6.6s` | One               | About `10s`, diagnostic only                   |
-| Normal Wave 4    |       6 + 4 | `0.5s / 0.7s`; `5s / 0.6s`              |                         6 |                      `6.8s` | One, before boss  | About `12s`, diagnostic only                   |
+| Normal Wave 4    |       6 + 4 | `0.5s / 0.7s`; `5s / 0.6s`              |                         5 |                      `6.8s` | One, before boss  | About `12s`, diagnostic only                   |
 | Boss, position 5 | One charger | Top-center, 1.5s lead / 2.5s full entry | One boss, no normal queue |         Not a wave schedule | None after boss   | Active fixtures recorded; human review pending |
 
 The clear-time review targets are provisional, not approved human pacing or
 gameplay timers. Earlier diagnostic targets are superseded by this explicit
 tuning and still need human pacing validation. Pressure rises through counts
-`4 → 6 → 8 → 10` and caps `2 → 3 → 4 → 6`; overlapping spawn groups still
+`4 → 6 → 8 → 10` and caps `2 → 3 → 4 → 5`; overlapping spawn groups still
 respect the existing queue and capacity rules. Human acceptance is pending.
 
 **Executed deterministic evidence:** `GameRuntimeSessionRun.test.ts` drives the
@@ -1180,6 +1180,94 @@ labelled boundary coverage. Browser mocked public events prove UI behavior only.
 WS-6.10 must rerun these production fixtures after tuning and investigate changed
 outcomes without changing balance solely to satisfy a script. Successful scripts
 prove correctness, not human playability, pacing or boss fairness; Dimi owns Gate 2.
+
+### 15.9 WS-6.10 provisional full-run balance
+
+**Build:** baseline `e795312`; candidate is that commit plus the uncommitted
+WS-6.10 changes (2026-09-05). Earlier too-easy/too-hard feedback led to Dimi's
+4/6/8/10 enemy table. Task-specific entry, telegraph and replay PASS reports do
+not supply full-run PC/phone pacing measurements. No newer duration target or
+device observations were supplied during this pass. Human balance and Gate 2
+remain pending; the current target is still approximately **5–7 minutes**.
+
+**One related parameter group, one retained provisional pass:**
+
+| Parameter                                    | Old                                                                        | New  | Hypothesis / observed effect                                                                                                                                                              |
+| -------------------------------------------- | -------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wave 4 entering + active cap                 | 6                                                                          | 5    | Smooth the 4→6 capacity jump. Peak occupancy is now bounded at five. Swift Movement seed 1 reaches the boss instead of losing in wave 4; it still loses. Sample win counts do not change. |
+| Wave totals / other caps                     | 4/6/8/10; 2/3/4                                                            | Same | Retain Dimi's counts; no extra repetitive enemies.                                                                                                                                        |
+| Spawn offsets / intervals                    | See §10.6                                                                  | Same | Existing completed-wave times generally increase; slowing schedules alone would add waiting, not prove meaningful 5–7-minute content.                                                     |
+| Normal health / speed                        | 1 / 72 units/s                                                             | Same | No new evidence warrants a second combat parameter pass.                                                                                                                                  |
+| Base player health / speed / attack cooldown | 3 / 120 units/s / 1.5s                                                     | Same | All three upgraded paths have real wins in the sample; avoid inferring mandatory Rapid Fire from stationary losses.                                                                       |
+| Upgrade effects                              | Fire rate +10%/level; speed +10%/level; vitality +1 max/current HP         | Same | At four levels: 1.0714s cooldown, 168 units/s, or 7 max HP respectively. Gains are deterministic; relative value still needs human review.                                                |
+| Boss health / timings                        | 24 HP; entry 2.5s; approach 1.25s; wind-up 0.8s; charge ≤0.8s; recovery 1s | Same | Completed boss fights take 33.35–48.65s in this sample including entry; no health inflation to meet a duration target. Human durability/fairness judgment is pending.                     |
+
+Player/enemy radii, contact invulnerability, locked charge direction, speeds,
+swept collision, entry warning and semantic presentation remain unchanged.
+Score weights remain 10/100/500/100; the health bonus uses effective max health.
+
+**Reproducible method:** the existing WS-6.11 test-only session fixture now also
+measures a matrix of spawn seeds **1, 42, 2026**, upgrade seed **2**, each of
+Rapid Fire / Swift Movement / Vitality selected whenever offered, and two input
+scripts. Rectangle follows `(60,480) → (60,160) → (300,160) → (300,480)`, switching
+within 4 units, from the actual initial position. Stationary supplies zero intent.
+Both use the production fixed step, real spawns/combat and a 9000-step bound;
+there are no health, queue or entity edits. These fixed paths are diagnostics,
+not adaptive players or a representative difficulty sample.
+
+**Before → after (total simulation seconds, rectangle):** a loss row stops at
+death and must not be interpreted as a complete-run duration.
+
+| Spawn seed | Build          | Cap 6 baseline | Cap 5 candidate | Outcome / progress      |
+| ---------- | -------------- | -------------: | --------------: | ----------------------- |
+| 1          | Rapid Fire     |          73.67 |           73.67 | Won → won               |
+| 42         | Rapid Fire     |          72.48 |           72.47 | Won → won               |
+| 2026       | Rapid Fire     |          35.63 |           35.63 | Wave 4 loss → same      |
+| 1          | Swift Movement |          40.65 |           50.68 | Wave 4 loss → boss loss |
+| 42         | Swift Movement |          88.93 |           88.92 | Won → won               |
+| 2026       | Swift Movement |          27.97 |           27.97 | Wave 3 loss → same      |
+| 1          | Vitality       |          91.53 |           91.48 | Won → won               |
+| 42         | Vitality       |          93.08 |           93.08 | Won → won               |
+| 2026       | Vitality       |          91.22 |           91.28 | Won → won               |
+
+Moving wins remain **2/3, 1/3, 3/3** for attack/movement/health builds. Every
+stationary control loses before or during the boss, both before and after.
+This demonstrates a viable path for each upgrade focus and that extra health
+does not make standing still safe. It does not prove equal upgrade strength or
+that no choice could become mandatory for a human player. Vitality seed 2026
+takes no damage on the rectangle; this is one successful avoidance script,
+not proof that the health build trivializes all attacks.
+
+**Candidate encounter durations for seed 42, rectangle (seconds):**
+
+| Build          | Wave 1 | Wave 2 | Wave 3 | Wave 4 | Boss including entry | Final HP / max |
+| -------------- | -----: | -----: | -----: | -----: | -------------------: | -------------- |
+| Rapid Fire     |   6.40 |   8.65 |  10.92 |  12.10 |                34.40 | 2 / 3          |
+| Swift Movement |   6.40 |   9.50 |  12.17 |  15.25 |                45.60 | 1 / 3          |
+| Vitality       |   6.40 |   9.40 |  12.50 |  16.13 |                48.65 | 2 / 7          |
+
+The test prints each encounter's duration, damage HP, peak entering/active count
+and capacity-wait seconds. Damage includes the terminal hit and excludes upgrade
+healing. For seed 42, wave 4 capacity waiting is **0.73 / 2.10 / 3.12s**
+respectively. The unchanged schedule's final offsets are only
+**3.5 / 4.75 / 6.6 / 6.8s**; they are not encounter clear times.
+
+All timings above are **gameplay simulation time**, including capacity waiting,
+entry and wind-up, excluding pauses and upgrade selection. Wall-clock visit time
+also includes reading and choice decisions and has not been measured. Successful
+scripts finish in **72.47–93.08s**, well short of 300–420s. Neither this gap nor
+boss fairness is resolved by the capacity pass. No padding, repeated waves or
+boss-health inflation was applied. Further tuning awaits device observations.
+
+**Compact record for Dimi (one per run):**
+
+`build/commit: e795312 + WS-6.10 working tree; device/input: ___; upgrade choices:
+___; wave 1/2/3/4 and boss durations: ___ (simulation/result time and wall-clock
+visit time labelled separately); outcome: ___; unfair damage: ___;
+empty/repetitive/overwhelming moments: ___`
+
+Rerun the matrix and WS-6.11 fixtures after future tuning. Human acceptance of
+this cap candidate, the 5–7-minute pacing target and Gate 2 remain pending.
 
 ## 16. Accessibility and user control
 

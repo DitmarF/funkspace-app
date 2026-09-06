@@ -10,14 +10,17 @@ import {
   createInitialRuntimeState,
   type RuntimeState,
 } from "../domain/state/index.js";
-import { getEffectiveMaximumHealth } from "../domain/upgrades/index.js";
+import {
+  getEffectiveMaximumHealth,
+  type UpgradeId,
+} from "../domain/upgrades/index.js";
 import { PROVISIONAL_RUN_DEFINITION } from "../domain/waves/index.js";
 import { FIXED_SIMULATION_STEP_SECONDS as STEP } from "../infrastructure/loop/FixedStepLoop.js";
 import { SeededRandomSource } from "../infrastructure/random/SeededRandomSource.js";
 import { GameRuntimeSession } from "./GameRuntimeSession.js";
 
 const MAX_STEPS = 9000; // Safety bound (150 simulated seconds), not a completion timer.
-type Script = "circle-at-boss" | "stationary";
+type Script = "circle-at-boss" | "stationary" | "rectangle";
 type BossStage = "entering" | "wind-up" | "charge" | "recovery";
 
 /** Read-only inspection, following existing internal session tests; never exposed to hosts. */
@@ -26,10 +29,31 @@ function inspect(session: GameRuntimeSession): Readonly<RuntimeState> {
 }
 
 /** Real production configuration/combat only. No state writes or manufactured outcomes. */
-function fixture(script: Script) {
+function fixture(
+  script: Script,
+  upgrade: UpgradeId = "rapid-fire",
+  spawnSeed = 1,
+) {
   const events: GameEvent[] = [];
   const notifications: string[] = [];
   const samples: number[][] = [];
+  const encounters: Array<{
+    seconds: number;
+    damage: number;
+    peak: number;
+    capacityWait: number;
+  }> = [];
+  const route = [
+    { x: 60, y: 480 },
+    { x: 60, y: 160 },
+    { x: 300, y: 160 },
+    { x: 300, y: 480 },
+  ];
+  let waypoint = 0;
+  let encounterStarted = 0;
+  let damage = 0;
+  let peak = 0;
+  let capacityWait = 0;
   let steps = 0;
   let bossStartedAtStep: number | null = null;
   let latest: GameRenderSnapshot | null = null;
@@ -54,13 +78,19 @@ function fixture(script: Script) {
     createInitialRuntimeState(),
     input,
     presentation,
-    new SeededRandomSource(1),
+    new SeededRandomSource(spawnSeed),
     new SeededRandomSource(2),
     null,
     (status) => notifications.push(status.phase),
     (event) => {
       events.push(event);
       notifications.push(event.type);
+      if (event.type === "wave-started") {
+        encounterStarted = inspect(session).simulationTimeSeconds;
+        damage = 0;
+        peak = 0;
+        capacityWait = 0;
+      }
       if (event.type === "wave-started" && event.encounterKind === "boss")
         bossStartedAtStep = steps;
     },
@@ -72,6 +102,8 @@ function fixture(script: Script) {
     events.length = 0;
     notifications.length = 0;
     samples.length = 0;
+    encounters.length = 0;
+    waypoint = 0;
     if (replay) session.restart();
     else session.start();
   }
@@ -80,7 +112,8 @@ function fixture(script: Script) {
     const state = inspect(session);
     return JSON.stringify({
       script,
-      seeds: [1, 2],
+      seeds: [spawnSeed, 2],
+      upgrade,
       steps,
       maxSteps: MAX_STEPS,
       phase: session.phase,
@@ -111,13 +144,13 @@ function fixture(script: Script) {
       if (offer?.type !== "upgrade-choice-requested")
         throw new Error(diagnostic());
       expect(
-        offer.options.some(({ id }) => id === "rapid-fire"),
+        offer.options.some(({ id }) => id === upgrade),
         diagnostic(),
       ).toBe(true);
       const time = inspect(session).simulationTimeSeconds;
       session.fixedUpdate(STEP); // Selection consumes no gameplay time.
       expect(inspect(session).simulationTimeSeconds).toBe(time);
-      expect(session.chooseUpgrade("rapid-fire"), diagnostic()).toBe(true);
+      expect(session.chooseUpgrade(upgrade), diagnostic()).toBe(true);
     }
     expect(session.phase, diagnostic()).toBe("playing");
     // Stand still for normal waves. At boss entry rotate the input by 1 radian/s.
@@ -127,8 +160,32 @@ function fixture(script: Script) {
       script === "circle-at-boss" && bossStartedAtStep !== null
         ? createMovementIntent(Math.cos(bossSeconds), Math.sin(bossSeconds))
         : ZERO_MOVEMENT_INTENT;
+    const state = inspect(session);
+    if (script === "rectangle") {
+      const target = route[waypoint]!;
+      const x = target.x - state.player.position.x;
+      const y = target.y - state.player.position.y;
+      if (Math.hypot(x, y) < 4) waypoint = (waypoint + 1) % route.length;
+      input.intent = createMovementIntent(x, y);
+    }
+    const live = state.enemies.filter(
+      (enemy) => enemy.phase !== "dying",
+    ).length;
+    peak = Math.max(peak, live);
+    if (state.waveSchedule && live >= state.waveSchedule.maxActiveEnemies)
+      capacityWait += STEP;
+    const healthBefore = state.player.currentHealth;
     session.fixedUpdate(STEP);
     steps += 1;
+    damage += Math.max(0, healthBefore - state.player.currentHealth);
+    if (session.phase === "choosing-upgrade" || session.result) {
+      encounters.push({
+        seconds: state.simulationTimeSeconds - encounterStarted,
+        damage,
+        peak,
+        capacityWait,
+      });
+    }
     if (steps % 60 === 0 || session.result) {
       session.render();
       if (latest)
@@ -152,6 +209,7 @@ function fixture(script: Script) {
       samples: samples.map((sample) => [...sample]),
       result: session.result,
       steps,
+      encounters: encounters.map((encounter) => ({ ...encounter })),
     };
   }
 
@@ -226,7 +284,9 @@ function assertCompletion(
   expect(state.killCount).toBe(normalEnemies + Number(outcome === "won"));
   const boss = state.enemies.find((enemy) => enemy.kind === "charger");
   expect(boss?.phase).toBe(outcome === "won" ? "dying" : "active");
-  expect(state.player.currentHealth).toBeLessThan(state.player.maximumHealth);
+  expect(state.player.currentHealth).toBeLessThanOrEqual(
+    getEffectiveMaximumHealth(state.player.maximumHealth, state.upgrades),
+  );
   if (outcome === "lost") expect(state.player.currentHealth).toBe(0);
   else expect(state.player.currentHealth).toBeGreaterThan(0);
   const healthBonus =
@@ -269,6 +329,86 @@ function assertCompletion(
 }
 
 describe("production full runs without state injection", () => {
+  it("measures three build paths with moving and stationary controls across three seeds", () => {
+    const reports: Array<{
+      seed: number;
+      upgrade: UpgradeId;
+      script: Script;
+      outcome: string;
+      seconds: number;
+      health: number;
+      encounters: string;
+    }> = [];
+    for (const upgrade of [
+      "rapid-fire",
+      "swift-movement",
+      "vitality",
+    ] as const) {
+      let movingWins = 0;
+      for (const seed of [1, 42, 2026]) {
+        for (const script of ["rectangle", "stationary"] as const) {
+          const harness = fixture(script, upgrade, seed);
+          try {
+            harness.begin();
+            const run = harness.finish();
+            const state = inspect(harness.session);
+            expect(run.result.elapsedSeconds).toBeCloseTo(run.steps * STEP, 8);
+            expect(
+              run.events.filter((event) => event.type === "run-finished"),
+            ).toHaveLength(1);
+            for (const [index, encounter] of run.encounters.entries()) {
+              expect(encounter.peak).toBeLessThanOrEqual(
+                PROVISIONAL_RUN_DEFINITION.normalWaves[index]
+                  ?.maxActiveEnemies ?? 1,
+              );
+              expect(encounter.seconds).toBeGreaterThan(0);
+            }
+            if (script === "stationary") {
+              expect(run.result.outcome, harness.diagnostic()).toBe("lost");
+              expect(state.player.currentHealth).toBe(0);
+              expect(
+                run.encounters.reduce(
+                  (total, encounter) => total + encounter.damage,
+                  0,
+                ),
+              ).toBeGreaterThanOrEqual(state.player.maximumHealth);
+            } else if (run.result.outcome === "won") {
+              movingWins += 1;
+              assertCompletion(harness, "won");
+            }
+            reports.push({
+              seed,
+              upgrade,
+              script,
+              outcome: run.result.outcome,
+              seconds: Number(run.result.elapsedSeconds.toFixed(2)),
+              health: state.player.currentHealth,
+              // Each tuple: simulated duration, damage HP, peak entering/active, capacity-wait seconds.
+              encounters: run.encounters
+                .map((encounter) =>
+                  [
+                    encounter.seconds.toFixed(2),
+                    encounter.damage,
+                    encounter.peak,
+                    encounter.capacityWait.toFixed(2),
+                  ].join("/"),
+                )
+                .join(" | "),
+            });
+          } finally {
+            harness.session.destroy();
+          }
+        }
+      }
+      expect(
+        movingWins,
+        `${upgrade} needs at least one real win in this seed sample`,
+      ).toBeGreaterThan(0);
+    }
+    // Test-only balance diagnostics, never a production analytics path.
+    console.table(reports);
+  });
+
   it.each([
     ["circle-at-boss", "won"],
     ["stationary", "lost"],
@@ -280,6 +420,9 @@ describe("production full runs without state injection", () => {
       try {
         fresh.begin();
         const expected = fresh.finish();
+        expect(
+          expected.encounters.some((encounter) => encounter.damage > 0),
+        ).toBe(true);
         expect(expected.result.elapsedSeconds).toBeCloseTo(
           expected.steps * STEP,
           8,

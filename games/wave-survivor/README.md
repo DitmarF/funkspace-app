@@ -68,11 +68,11 @@ plus no entering/active enemies. WS-6.5 implements victory and terminal stop;
 an empty boss arena is not treated as victory.
 
 See the [candidate pacing record](../../docs/features/wave-survivor.md#106-ws-61-candidate-pacing-record--2026-09-05)
-for counts, intervals, caps, and provisional review targets. Dimi's latest
-explicit table sets enemy totals to `4 / 6 / 8 / 10` and entering/active caps to
-`2 / 3 / 4 / 6`, superseding earlier tuning. Wave 3 uses groups of `4 + 4`;
-Wave 4 uses `6 + 4` and retains its cap of 6. Group start offsets and intervals
-are unchanged. The old repeat bridge has been removed by WS-6.3.
+for counts, intervals, caps, and provisional review targets. Dimi's explicit
+enemy totals remain `4 / 6 / 8 / 10`. WS-6.10 provisionally reduces wave 4's
+entering/active cap from 6 to 5, yielding `2 / 3 / 4 / 5`. Wave 3 uses `4 + 4`
+and wave 4 uses `6 + 4`; group offsets/intervals are unchanged.
+The old repeat bridge has been removed by WS-6.3.
 A reproducible session test (spawn seed 1, upgrade seed 2, stationary player,
 `1/60s` updates, Rapid Fire after each completed wave) clears all four normal
 waves in `6.95 / 8.58 / 10.48 / 11.88s`, totaling `37.90` simulation seconds
@@ -276,6 +276,18 @@ Older constructed-combat/queue tests remain boundary evidence; browser mocked
 result events prove UI behavior only. **Rerun after WS-6.10 tuning** without
 altering production balance merely to make scripts pass. Successful scripts prove
 correctness, not human playability, pacing or boss fairness. Dimi retains Gate 2.
+
+## WS-6.10 provisional balance
+
+For current full-run tuning and device handoff, see the
+[WS-6.10 evidence record](../../docs/features/wave-survivor.md#159-ws-610-provisional-full-run-balance).
+Only wave 4's cap changes (6 → 5); counts, combat, upgrades, boss timings and
+score weights remain unchanged. A test-only 18-run matrix covers three build
+paths, spawn seeds 1/42/2026 (upgrade seed 2), and rectangular/stationary input.
+Each build wins at least one moving run; all nine stationary controls lose.
+Successful scripts take 72.47–93.08 simulation seconds, including boss entry,
+excluding choices/pauses. They do not validate the retained 5–7-minute target.
+Human pacing, build balance and Gate 2 remain pending.
 
 ## WS-6.6 score candidate
 
