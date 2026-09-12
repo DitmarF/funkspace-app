@@ -5,8 +5,8 @@ import type { AnimationRuntime } from "@funkspace/common/motion";
 describe("HTMLTimeline", () => {
   let mockElement1: HTMLElement;
   let mockElement2: HTMLElement;
-  let rafSpy: ReturnType<typeof vi.fn>;
-  let cancelRafSpy: ReturnType<typeof vi.fn>;
+  let rafSpy: ReturnType<typeof vi.fn<typeof requestAnimationFrame>>;
+  let cancelRafSpy: ReturnType<typeof vi.fn<typeof cancelAnimationFrame>>;
   const activeTimelines: HTMLTimeline[] = [];
   const pendingTimeouts: (number | NodeJS.Timeout)[] = [];
 

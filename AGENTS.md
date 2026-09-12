@@ -2,6 +2,8 @@
 
 This file is the primary operating guide for AI coding agents working in this repository. Read it before planning or editing. Use `docs/architecture.md` for the detailed architecture model, `docs/decisions/` for accepted decisions, and `docs/features/` for feature-specific plans.
 
+For the current portfolio milestone, start with [Minimum Usable Experience](docs/features/funkspace-minimum-usable.md), including its publication limits and linked baseline/task evidence. Follow the plan's current scope instead of historical layout proposals. Game continuation remains in the separate [Wave Survivor plan](docs/features/wave-survivor-implementation-plan.md).
+
 ## Project purpose
 
 FunkSpace is a design-system-first web experience and experimentation space for accessible, high-performance interfaces, motion, and interactive experiences. It is a pnpm workspace with a Next.js frontend, shared design tokens, Storybook, Vitest, Playwright, and Lighthouse CI.
@@ -24,7 +26,7 @@ Project priorities, in order:
 - `frontend/application/` - use cases, services, orchestration, and providers.
 - `frontend/infrastructure/` - browser, DOM, storage, and motion adapters plus service construction.
 - `frontend/data/` - declarative feature data and animation configuration.
-- `games/` - parent workspace for isolated standalone game packages. `games/wave-survivor/` is the framework-free TypeScript scaffold for the first game.
+- `games/` - parent workspace for isolated standalone game packages. `games/wave-survivor/` contains the accepted standalone TypeScript/Canvas game baseline; portfolio integration is separate work.
 - `tokens/` - source design and motion tokens.
 - `styles/` - generated CSS token output; regenerate it instead of hand-editing it.
 - `common/generated/` - generated framework-neutral TypeScript token output; never hand-edit it.

@@ -65,7 +65,9 @@ vi.mock("@/hooks/useReducedMotion", () => ({
 }));
 
 vi.mock("@/infrastructure/motion/htmlTimeline", () => ({
-  HTMLTimeline: vi.fn().mockImplementation(() => mockTimeline),
+  HTMLTimeline: vi.fn().mockImplementation(function () {
+    return mockTimeline;
+  }),
 }));
 
 describe("About", () => {

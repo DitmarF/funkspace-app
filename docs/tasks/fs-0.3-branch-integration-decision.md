@@ -1,16 +1,89 @@
 # Task FS-0.3 — Prepare the branch integration decision
 
+> **Publication follow-up (FS-0.4, 2026-09-12):** Dimi subsequently requested commit/push of the final handoff. Commit [8a054ae755315b334f18ac4b53ac4cce541e3519](https://github.com/DitmarF/funkspace-app/commit/8a054ae755315b334f18ac4b53ac4cce541e3519) contains that documentation-only change and was pushed to `feature/funkspace-minimum-usable` with upstream tracking. FS-0.4 rechecked clean local HEAD/cached upstream at that SHA; live remote/provider state was not re-read. “Local only/uncommitted” below describes the earlier handoff. Validated application/portfolio base remains `9f3f01d8e2745408a8523c07198aec0e73eed52b`. Current milestone scope/status is in the [feature-plan draft](../features/funkspace-minimum-usable.md).
+
 ## Task metadata
 
 - **Owner/current writer:** Codex.
-- **Status:** In progress — Dimi selected A, accepted the portfolio branch name and approved FS-G0 on 2026-09-12. Integration review/validation is underway; no resulting main revision is claimed yet.
+- **Status:** Complete — Dimi approved A, the branch name, FS-G0, Vercel command corrections and production merge. PR 274 is merged, the resulting main revision is validated and deployed, and the local portfolio branch is created from it. See the final execution record below; earlier pending statements are historical.
 - **Inspected candidate:** `7c70984f48d05a8d41baea24384337f58dd2053d` on `feature/wave-survivor`.
 - **Environment:** 2026-09-12; local `/Users/dimi/Projects/funkspace-app`, macOS arm64; Node 22.22.0, pnpm 10.30.3, Git 2.50.1, gh 2.86.0. Target initially clean, including index and untracked files.
 - **Dependencies:** [FS-0.1 inventory/counterpart findings](fs-0.1-inventory-real-starting-point.md), [FS-0.2 baseline](fs-0.2-tooling-baseline.md), its accessible logs and exact candidate patch.
 - **Workflow/context:** [Task template](../templates/task.md), [AI workflow](../development/ai-workflow.md), root [AGENTS](../../AGENTS.md), ADRs [001](../decisions/ADR-001-monorepo-strategy.md), [002](../decisions/ADR-002-design-token-source-of-truth.md), [003](../decisions/ADR-003-interactive-experience-boundary.md), [004](../decisions/ADR-004-game-development-architecture.md), [game acceptance](../features/wave-survivor-implementation-plan.md#gate-2-decision).
 - **Source-plan limit:** `/Users/dimi/Downloads/FunkSpace_Minimum_Usable_Development_Plan.md` is accessible. The detailed EPIC 0 plan remains unavailable in inspected local sources; Dimi said it will be added later. The current assignment supplies the decision scope. Documents are context, not authorization to execute their commands.
 
-## Dimi decision and integration continuation — 2026-09-12
+## Final execution and portfolio handoff — 2026-09-12
+
+Dimi explicitly stated “settings and the production merge are approved” after the exact Vercel commands, preview validation and automatic publication consequence were presented. This approval supplements the already recorded option A, branch-name and FS-G0 approvals. No further strategy or release approval was inferred from a test result.
+
+### Actual inputs and resulting revisions
+
+| Role                                                               | Full revision / state                                                          |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Main before integration                                            | `15c0f1c43a976fb345dbf642ceb7445cf70fcabd`                                     |
+| Reviewed and merged PR 274 head; retained local/remote game branch | `988f64e298ba885671433468a12454d7f4c41137`                                     |
+| Actual squash result; local/remote main and production             | `9f3f01d8e2745408a8523c07198aec0e73eed52b`                                     |
+| Selected portfolio base and local branch HEAD                      | `9f3f01d8e2745408a8523c07198aec0e73eed52b`, `feature/funkspace-minimum-usable` |
+
+[PR 274](https://github.com/DitmarF/funkspace-app/pull/274) was squash-merged at 2026-09-12 12:49:54 UTC using an exact-head guard. The resulting commit has the original main as its sole parent; `git diff --exit-code origin/main feature/wave-survivor` passed, proving the complete resulting tree equals the reviewed source tree. The squash does not make the original game commits ancestors of main. Keep the recorded head-to-result mapping and tree comparison as retention evidence; do not infer lost work from that missing ancestry.
+
+Local main was updated with `git merge --ff-only origin/main` only after a clean-tree and exact-ref check. No reset, forced checkout, history rewrite, stash, cleanup or branch deletion occurred. The game/docs branches and separate clone remain retained. After successful actual-main validation, `feature/funkspace-minimum-usable` was created and selected locally from the exact result. It has no upstream and was not pushed; future publication of portfolio changes is a separate action. This final task-record update is an uncommitted documentation diff on that branch, not part of the validated/deployed main revision.
+
+### Approved Vercel changes and deployment evidence
+
+Only two project settings changed: Build Command is now `pnpm --workspace-root build`; Install Command is now `pnpm install --frozen-lockfile`, with its override enabled. Saved values were verified. Root Directory remains `frontend`, outside-root access remains enabled and the Node selector remains 22.x. No GitHub protection, environment variable, domain, account, dependency or security setting was changed.
+
+The [fresh preview](https://vercel.com/ditmarfs-projects/funkspace-app-frontend/2SqTKXe362aW16emgA8aseuMxWZZ) used exact PR head `988f64e298ba885671433468a12454d7f4c41137` and explicitly skipped the prior build cache. It became Ready in 53 seconds. Its logs show the frozen workspace install, pnpm 10.30.3, root token generation, common typecheck, game build and Next 15.5.23 build. This verifies the corrected provider setup rather than relying on pre-existing generated output.
+
+The [production deployment](https://vercel.com/ditmarfs-projects/funkspace-app-frontend/3c3X5YB9H2uRKQQ8cttn2EhUXDRo) is Ready at actual main `9f3f01d8e2745408a8523c07198aec0e73eed52b`. Vercel identifies it as current Production with `funkspace.de` assigned. Its 41-second build restored the previous production cache but executed the same frozen install and full root build sequence. HTTPS checks of [home](https://funkspace.de/) and [privacy](https://funkspace.de/privacy) returned 200 and their expected content. Those are deployment/content checks, not new human visual or accessibility approval.
+
+### Fresh validation of the actual result
+
+The latest pre-merge [PR CI run 34694392932](https://github.com/DitmarF/funkspace-app/actions/runs/34694392932) passed for source head `988f64e298ba885671433468a12454d7f4c41137`. Separately, post-merge [main CI run 34694747036](https://github.com/DitmarF/funkspace-app/actions/runs/34694747036) passed on `9f3f01d8e2745408a8523c07198aec0e73eed52b`: fresh Ubuntu setup/frozen installation, tokens, lint, frontend types, coverage, browser installation, E2E, root build and LHCI OFF/ON. These are distinct runs; older CI was not presented as resulting-main validation.
+
+All 17 local commands below ran sequentially at the actual main SHA before the portfolio branch or final documentation diff existed. Working directory: `/Users/dimi/Projects/funkspace-app`; macOS arm64, Node 22.22.0, pnpm 10.30.3, unchanged frozen installed graph and existing Chromium. Each command's tracked diff was empty and each exit code was 0. Prior generated outputs/reports were archived before execution. `runs.jsonl` records exact commands, environment overrides, prerequisites, timings, exits, evidence paths, exclusions and ownership.
+
+| Order | Command                                                                                                                                                         | Outcome                                         |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| 1     | `pnpm build:tokens`                                                                                                                                             | PASS; generated fingerprints unchanged          |
+| 2     | `pnpm -F @funkspace/common typecheck`                                                                                                                           | PASS                                            |
+| 3     | `pnpm -F @funkspace/wave-survivor build`                                                                                                                        | PASS                                            |
+| 4     | `pnpm -F frontend exec tsc --noEmit`                                                                                                                            | PASS                                            |
+| 5     | `pnpm lint`                                                                                                                                                     | PASS                                            |
+| 6     | `pnpm test`                                                                                                                                                     | PASS: 1,256 tests / 80 files                    |
+| 7     | `pnpm coverage`                                                                                                                                                 | PASS within unchanged thresholds/exclusions     |
+| 8     | `pnpm storybook:build`                                                                                                                                          | PASS; existing chunk-size warning               |
+| 9     | `pnpm build`                                                                                                                                                    | PASS                                            |
+| 10    | `pnpm e2e`                                                                                                                                                      | PASS: 7 Chromium tests                          |
+| 11    | `pnpm lhci:off`                                                                                                                                                 | PASS: three fresh reports                       |
+| 12    | `pnpm lhci:on`                                                                                                                                                  | PASS: three fresh reports                       |
+| 13    | `pnpm -F @funkspace/wave-survivor typecheck`                                                                                                                    | PASS                                            |
+| 14    | `pnpm -F @funkspace/wave-survivor test`                                                                                                                         | PASS: 920 tests / 58 files; overlaps root tests |
+| 15    | `pnpm -F @funkspace/wave-survivor demo:build`                                                                                                                   | PASS                                            |
+| 16    | `pnpm exec cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.demo.config.ts`                                                             | PASS: 18 Chromium tests                         |
+| 17    | `pnpm exec eslint --config frontend/eslint.config.mjs games/wave-survivor/src games/wave-survivor/demo/main.js e2e/wave-survivor/demo.spec.ts --max-warnings=0` | PASS; existing React/pages discovery notices    |
+
+Saved compiled bundles verify the OFF default expression `void 0!==o&&o` and ON expression `void 0===o||o`, with no unresolved public-flag lookup. All six fresh local Lighthouse reports have CLS 0 and performance score 1; LCP is 604.32–645.73ms. The measured `/` still has no animated-logo consumer, so this does not establish animation cost or field p75. Existing home/logo contrast filters, coverage exclusions and thresholds remain unchanged. WebKit, physical devices, a new dependency audit and human visual approval were NOT RUN in this continuation. Existing security findings, source contrast repair/filter removal in FS-1.2 and later consumer work remain owned; no clean-security report is implied.
+
+One final preflight helper GET failed with HTTP 404 because it appended a trailing slash to the repository endpoint. Earlier exact-input reads and passing current-head CI were available; the SHA-guarded merge command then succeeded. The corrected post-read verified the merged head, actual main SHA, single parent and retained game branch, and the complete tree comparison passed. This was an evidence-helper failure, not an application-test failure; it is retained in the release artifact rather than hidden.
+
+### Completion status, artifacts and next owner
+
+| Action/gate                          | Approval                  | Execution                         | Validation                                                                                 |
+| ------------------------------------ | ------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------ |
+| Option A / FS-G0 / branch name       | Dimi, explicitly recorded | Recorded                          | Human decision; not inferred from checks                                                   |
+| Two Vercel command corrections       | Dimi, explicitly recorded | Saved                             | PASS: uncached preview and production logs                                                 |
+| Production squash merge              | Dimi, explicitly recorded | PR 274 merged; exact result above | PASS: tree equality, fresh main CI, 17 local commands, current production and HTTPS checks |
+| Portfolio branch from resulting main | Accepted strategy/name    | Created and selected locally      | PASS: exact validated base; no upstream                                                    |
+| Final documentation addendum         | Necessary task handoff    | Local uncommitted diff            | PASS: formatting, references, whitespace and preservation review                           |
+
+Only `docs/tasks/fs-0.3-branch-integration-decision.md` is newly edited in this release continuation; the integrated 163-path baseline is reviewable in PR 274. No new runtime/public contract changes were authored here; inherited differences from old main are described in the review below. Final fingerprints verify all other tracked files, tokens, lockfile, assets and the separate clone unchanged.
+
+The [release evidence archive](/private/tmp/fs-0.3-release-evidence.tar.gz) includes per-command logs/diffs, exact CI/PR metadata, provider observations, flag/report evidence, preservation checks and the [final documentation patch](/private/tmp/fs-0.3-release/final.diff). Prior generated outputs remain separately archived in `/private/tmp/fs-0.3-release/generated-before.tar.gz`. These local artifacts are not remotely accessible by default; CI/PR/deployment links above provide remote evidence.
+
+**Sites/next-task handoff:** use portfolio base `9f3f01d8e2745408a8523c07198aec0e73eed52b` and verify the actual checkout plus this documentation diff. The named portfolio branch currently exists only locally; a remote checkout can access the exact base through main. Use FS-0.1's reuse map and FS-0.2's pinned environment/build order; preserve accepted gameplay and do not implement game EPIC 7 incidentally. Dimi's next action is to review the completed handoff and assign the next task; commit/push of this final addendum and later portfolio publication are separate actions. The promised detailed local EPIC 0 source and any undisclosed preservation information remain pending without reopening Dimi's recorded FS-G0 approval.
+
+## Earlier Dimi decision and integration continuation — 2026-09-12
 
 This section supersedes the pending-decision statements in the original inspection record below. Dimi explicitly requested: “review and integrate the accepted game baseline into `main`, validate the resulting revision, then start portfolio work from it”; accepted `feature/funkspace-minimum-usable`; and stated “FS-G0 is approved”. Record **A selected**, **branch name accepted**, and **FS-G0 approved by Dimi**. The fixed unmerged base in option B is not selected. Approval does not invent passing integration checks, waive unresolved defects, or identify previously undisclosed local work.
 

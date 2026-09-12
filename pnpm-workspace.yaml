@@ -3,3 +3,7 @@ packages:
   - "backend"
   - "common"
   - "games/*"
+
+# Next 15 pins an older PostCSS; retain its 8.x API with the reviewed security fixes.
+overrides:
+  "next@15.5.24>postcss": "8.5.26"

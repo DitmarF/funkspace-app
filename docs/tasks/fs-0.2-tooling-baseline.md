@@ -1,5 +1,7 @@
 # Task FS-0.2 — Reconcile tooling and run the baseline
 
+> **Recovery pointer (FS-0.4, 2026-09-12):** this record preserves the original maintenance evidence. Later [FS-0.3 execution](fs-0.3-branch-integration-decision.md#final-execution-and-portfolio-handoff--2026-09-12) records the actual main integration, fresh CI/local validation, production and Dimi's FS-G0 approval; statements below about unpushed configuration or pending FS-G0 are historical. Current milestone scope/status is in the [feature-plan draft](../features/funkspace-minimum-usable.md). Security findings are not cleared by integration success.
+
 ## Task metadata
 
 - **Owner/current writer:** Codex. Counterpart findings are inputs; no concurrent writer.
