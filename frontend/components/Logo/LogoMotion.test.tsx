@@ -58,27 +58,29 @@ const mockManifest = {
 };
 
 vi.mock("@/application/animations/AnimationOrchestrator", () => ({
-  AnimationOrchestratorImpl: vi.fn().mockImplementation(() => ({
-    buildLogoManifest: vi.fn(() => mockManifest),
-  })),
+  AnimationOrchestratorImpl: vi.fn().mockImplementation(function () {
+    return { buildLogoManifest: vi.fn(() => mockManifest) };
+  }),
 }));
 
 // Mock the AnimationTimeline to avoid needing actual SVG elements in tests
 vi.mock("@/infrastructure/motion/timeline", () => ({
-  AnimationTimeline: vi.fn().mockImplementation(() => ({
-    play: vi.fn(),
-    pause: vi.fn(),
-    reverse: vi.fn(),
-    seek: vi.fn(),
-    setSpeed: vi.fn(),
-    destroy: vi.fn(),
-    get duration() {
-      return 1880;
-    },
-    get time() {
-      return 0;
-    },
-  })),
+  AnimationTimeline: vi.fn().mockImplementation(function () {
+    return {
+      play: vi.fn(),
+      pause: vi.fn(),
+      reverse: vi.fn(),
+      seek: vi.fn(),
+      setSpeed: vi.fn(),
+      destroy: vi.fn(),
+      get duration() {
+        return 1880;
+      },
+      get time() {
+        return 0;
+      },
+    };
+  }),
 }));
 
 // Mock useReducedMotion hook
@@ -298,9 +300,11 @@ describe("LogoMotion", () => {
         time: 0,
       };
 
-      vi.mocked(AnimationTimeline).mockImplementation(
-        () => mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
-      );
+      vi.mocked(AnimationTimeline).mockImplementation(function () {
+        return mockTimeline as unknown as InstanceType<
+          typeof AnimationTimeline
+        >;
+      });
 
       render(<LogoMotion enabled={true} autoPlay={true} />);
 
@@ -333,9 +337,11 @@ describe("LogoMotion", () => {
         time: 0,
       };
 
-      vi.mocked(AnimationTimeline).mockImplementation(
-        () => mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
-      );
+      vi.mocked(AnimationTimeline).mockImplementation(function () {
+        return mockTimeline as unknown as InstanceType<
+          typeof AnimationTimeline
+        >;
+      });
 
       render(<LogoMotion enabled={true} autoPlay={false} />);
 
@@ -368,9 +374,11 @@ describe("LogoMotion", () => {
         time: 0,
       };
 
-      vi.mocked(AnimationTimeline).mockImplementation(
-        () => mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
-      );
+      vi.mocked(AnimationTimeline).mockImplementation(function () {
+        return mockTimeline as unknown as InstanceType<
+          typeof AnimationTimeline
+        >;
+      });
 
       render(<LogoMotion enabled={true} autoPlay={false} startAtMs={99999} />);
 
@@ -395,9 +403,11 @@ describe("LogoMotion", () => {
         time: 0,
       };
 
-      vi.mocked(AnimationTimeline).mockImplementation(
-        () => mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
-      );
+      vi.mocked(AnimationTimeline).mockImplementation(function () {
+        return mockTimeline as unknown as InstanceType<
+          typeof AnimationTimeline
+        >;
+      });
 
       const ref = createRef<LogoMotionRef>();
       render(<LogoMotion ref={ref} enabled={true} autoPlay={false} />);
@@ -447,9 +457,11 @@ describe("LogoMotion", () => {
         time: 0,
       };
 
-      vi.mocked(AnimationTimeline).mockImplementation(
-        () => mockTimeline as unknown as InstanceType<typeof AnimationTimeline>,
-      );
+      vi.mocked(AnimationTimeline).mockImplementation(function () {
+        return mockTimeline as unknown as InstanceType<
+          typeof AnimationTimeline
+        >;
+      });
 
       const { unmount } = render(<LogoMotion enabled={true} />);
 
