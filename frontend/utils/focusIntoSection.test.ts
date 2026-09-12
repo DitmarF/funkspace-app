@@ -5,8 +5,10 @@ describe("focusIntoSection", () => {
   let mockSection: HTMLElement;
   let mockButton: HTMLButtonElement;
   let mockInput: HTMLInputElement;
-  let scrollIntoViewSpy: ReturnType<typeof vi.fn>;
-  let focusSpy: ReturnType<typeof vi.fn>;
+  let scrollIntoViewSpy: ReturnType<
+    typeof vi.fn<HTMLElement["scrollIntoView"]>
+  >;
+  let focusSpy: ReturnType<typeof vi.fn<HTMLElement["focus"]>>;
 
   beforeEach(() => {
     // Create mock elements
@@ -177,7 +179,9 @@ describe("focusIntoSection", () => {
 
 describe("handleAnchorNavigation", () => {
   let mockSection: HTMLElement;
-  let scrollIntoViewSpy: ReturnType<typeof vi.fn>;
+  let scrollIntoViewSpy: ReturnType<
+    typeof vi.fn<HTMLElement["scrollIntoView"]>
+  >;
 
   beforeEach(() => {
     mockSection = document.createElement("section");

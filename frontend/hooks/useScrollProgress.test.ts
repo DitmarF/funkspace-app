@@ -19,28 +19,28 @@ describe("useScrollProgress", () => {
       disconnect: vi.fn(),
     };
 
-    mockIntersectionObserver = vi.fn(
-      (callback: IntersectionObserverCallback) => {
-        // Simulate intersection change
-        setTimeout(() => {
-          callback(
-            [
-              {
-                target: mockElement,
-                isIntersecting: true,
-                intersectionRatio: 0.5,
-                boundingClientRect: {} as DOMRectReadOnly,
-                rootBounds: null,
-                intersectionRect: {} as DOMRectReadOnly,
-                time: 0,
-              },
-            ] as IntersectionObserverEntry[],
-            {} as IntersectionObserver,
-          );
-        }, 0);
-        return mockObserverInstance as unknown as IntersectionObserver;
-      },
-    ) as unknown as typeof IntersectionObserver;
+    mockIntersectionObserver = vi.fn(function (
+      callback: IntersectionObserverCallback,
+    ) {
+      // Simulate intersection change
+      setTimeout(() => {
+        callback(
+          [
+            {
+              target: mockElement,
+              isIntersecting: true,
+              intersectionRatio: 0.5,
+              boundingClientRect: {} as DOMRectReadOnly,
+              rootBounds: null,
+              intersectionRect: {} as DOMRectReadOnly,
+              time: 0,
+            },
+          ] as IntersectionObserverEntry[],
+          {} as IntersectionObserver,
+        );
+      }, 0);
+      return mockObserverInstance as unknown as IntersectionObserver;
+    }) as unknown as typeof IntersectionObserver;
 
     global.IntersectionObserver = mockIntersectionObserver;
 
