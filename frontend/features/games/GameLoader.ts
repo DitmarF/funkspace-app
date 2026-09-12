@@ -1,4 +1,11 @@
+import type {
+  GameEvent as PackageGameEvent,
+  RuntimePhase,
+  UpgradeOption as PackageUpgradeOption,
+} from "@funkspace/wave-survivor";
 import type { GameTheme } from "./theme";
+
+export type { RunResult } from "@funkspace/wave-survivor";
 
 export type GameId = "wave-survivor";
 
@@ -7,13 +14,33 @@ export interface HostedGameController {
   pause(): void;
   resume(): void;
   restart(): void;
+  chooseUpgrade(id: string): boolean;
   setTheme(theme: GameTheme): void;
   destroy(): void;
 }
 
+export interface GameStatusSnapshot {
+  readonly phase: RuntimePhase;
+  readonly waveNumber: number;
+  readonly currentHealth: number;
+  readonly maximumHealth: number;
+  readonly killCount: number;
+}
+
+export interface UpgradeOption {
+  readonly id: PackageUpgradeOption["id"];
+  readonly title: string;
+  readonly description: string;
+}
+
+export type GameEvent = PackageGameEvent;
+
 export interface GameMountOptions {
   readonly canvas: HTMLCanvasElement;
+  readonly viewport: HTMLElement;
   readonly theme: GameTheme;
+  readonly onStatusChange?: (snapshot: GameStatusSnapshot) => void;
+  readonly onEvent?: (event: GameEvent) => void;
 }
 
 export interface GameModule {

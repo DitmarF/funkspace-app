@@ -12,19 +12,21 @@ motion).
 
 ## Requirements
 
-- Node.js 22+
-- PNPM 10+
+- Node.js 22.22.0 for the verified baseline (`.nvmrc`); package minimum 22.13.1.
+- pnpm 10.30.3 (`packageManager` in the root manifest; CI uses this pin).
 
 ## Install & run
 
 ```bash
-pnpm install -r          # installs every active workspace
+pnpm install --frozen-lockfile # installs every active workspace without resolving a new graph
 pnpm build:tokens        # regenerate CSS and TypeScript token artifacts
 pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 ```
 
 - Storybook: `pnpm storybook` (opens on http://localhost:6006).
-- Production build: `pnpm build` (compiles the frontend).
+- Production build: `pnpm build` (tokens → common typecheck → game build → frontend build).
+- Direct frontend builds require generated tokens first; use the root build for the complete prerequisite order.
+- Baseline results, security limitations and the full command sequence: [FS-0.2 task record](docs/tasks/fs-0.2-tooling-baseline.md).
 
 ## Project layout
 
@@ -60,7 +62,7 @@ system preference changes.
 pnpm lint           # Next.js lint + prettier --check
 pnpm test           # Vitest in CI mode
 pnpm test:watch     # Vitest watch mode
-pnpm coverage       # Vitest with V8 coverage thresholds (80% global)
+pnpm coverage       # V8: 75% lines/functions/statements, 80% branches; configured exclusions apply
 pnpm e2e            # Playwright end-to-end suite (Chromium only)
 ```
 
@@ -70,37 +72,35 @@ only in CI but can be run locally via `pnpm coverage`.
 
 ## Playwright browser downloads
 
-The postinstall hook installs the Chromium browser under `node_modules` so CI
-caches can reuse the artifact. On Vercel, downloads are skipped automatically.
+Browser installation is explicit; dependency installation no longer downloads browsers.
+CI and E2E use `PLAYWRIGHT_BROWSERS_PATH=0`, so they resolve the same project-local Chromium.
+The locked Playwright 1.53.2 downloader has a certificate-verification advisory; the
+FS-0.2 baseline used an already present browser. Review the dependency proposal in
+the task record before a fresh download. After that prerequisite is resolved:
 
 ```bash
-pnpm install
+pnpm setup:browsers
+pnpm e2e
+pnpm exec cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.demo.config.ts
 ```
 
-If downloads are blocked, direct the installer to an allow-listed mirror before
-installing dependencies:
+The default E2E configuration covers Desktop Chromium and excludes the standalone
+game demo. The separate demo suite uses Chromium with its own Vite server. Neither
+configuration establishes WebKit or real-device coverage. Keep ports 3000 and 5173
+free when checking a particular candidate; local configurations may reuse servers.
 
-```bash
-export PLAYWRIGHT_DOWNLOAD_HOST=https://playwright.azureedge.net
-pnpm install
-```
+For a dependency-only setup check, `pnpm install --frozen-lockfile --ignore-scripts`
+skips lifecycle scripts deliberately. This is not proof that browser prerequisites
+are installed. Add `--offline` only when the pnpm store already contains the locked graph.
 
-To install only Chromium outside of CI:
-
-```bash
-PLAYWRIGHT_BROWSERS_PATH=0 pnpm exec playwright install chromium --with-deps
-```
-
-Or fall back to the official Docker image, which ships with browsers preloaded:
-
-```bash
-docker run --rm -it mcr.microsoft.com/playwright:v1.53.2-jammy
-```
+Lighthouse commands set `NEXT_PUBLIC_ANIMATIONS_ENABLED` **during the build**:
+`pnpm lhci:off`, then `pnpm lhci:on`. Both measure `/`; the current home route has no
+animated logo, so these measurements do not establish an animation-on cost comparison.
 
 ## Deployment
 
 Deploy the `frontend` workspace on Vercel. Set the install command to
-`pnpm install` so workspaces are linked correctly, and enable **Include source
+`pnpm install --frozen-lockfile` so workspaces are linked correctly, and enable **Include source
 files outside of the Root Directory** to access shared packages. Builds run
 `pnpm build` from the workspace root.
 

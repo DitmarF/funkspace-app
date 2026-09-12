@@ -49,6 +49,7 @@ function createController(): HostedGameController {
     pause: vi.fn(),
     resume: vi.fn(),
     restart: vi.fn(),
+    chooseUpgrade: vi.fn(() => false),
     setTheme: vi.fn(),
     destroy: vi.fn(),
   };
@@ -61,6 +62,45 @@ function createLoader(gameModule: GameModule): GameModuleLoader {
 }
 
 describe("GameHost", () => {
+  it("announces boss entry through the public wave event and clears it for a new run", async () => {
+    useServicesMock.mockReturnValue({
+      themeService: createThemeSource().themeService,
+    });
+    const createGame = vi.fn<GameModule["createGame"]>(() =>
+      createController(),
+    );
+    const { unmount } = render(
+      <GameHost loader={createLoader({ createGame })} />,
+    );
+    await waitFor(() => expect(createGame).toHaveBeenCalledOnce());
+    const onEvent = createGame.mock.calls[0]![0].onEvent!;
+    act(() =>
+      onEvent({ type: "wave-started", waveNumber: 5, encounterKind: "boss" }),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Boss entering from the top. Move clear of the entry point.",
+    );
+    act(() => onEvent({ type: "wave-started", waveNumber: 1 }));
+    expect(screen.getByRole("status")).toHaveTextContent("Wave 1 started.");
+    act(() =>
+      onEvent({
+        type: "run-finished",
+        result: {
+          outcome: "won",
+          score: 1290,
+          waveReached: 5,
+          elapsedSeconds: 60,
+        },
+      }),
+    );
+    expect(screen.getByRole("status")).toHaveTextContent("Wave 1 started.");
+    expect(screen.queryByRole("button", { name: "Replay" })).toBeNull();
+    unmount();
+    act(() =>
+      onEvent({ type: "wave-started", waveNumber: 5, encounterKind: "boss" }),
+    );
+  });
+
   it("mounts a lazy game, forwards themes, and owns its lifecycle", async () => {
     const hidden = vi.spyOn(document, "hidden", "get").mockReturnValue(false);
     const theme = createThemeSource();
@@ -69,10 +109,19 @@ describe("GameHost", () => {
     const createGame = vi.fn(() => controller);
     const loader = createLoader({ createGame });
 
-    const { unmount } = render(<GameHost loader={loader} />);
+    const { unmount } = render(
+      <GameHost loader={loader} className="game-placement" />,
+    );
     const canvas = screen.getByLabelText("Wave Survivor game canvas");
 
     expect(canvas).toBeInstanceOf(HTMLCanvasElement);
+    expect(canvas).not.toHaveAttribute("width");
+    expect(canvas).not.toHaveAttribute("height");
+    expect(canvas.parentElement).toHaveClass("game-placement");
+    expect(canvas.parentElement).toHaveStyle({
+      overflow: "hidden",
+      position: "relative",
+    });
     expect(screen.getByRole("status")).toHaveTextContent("Loading game…");
 
     await waitFor(() => expect(createGame).toHaveBeenCalledOnce());
@@ -80,6 +129,8 @@ describe("GameHost", () => {
     expect(loader.load).toHaveBeenCalledWith("wave-survivor");
     expect(createGame).toHaveBeenCalledWith({
       canvas,
+      viewport: canvas.parentElement,
+      onEvent: expect.any(Function),
       theme: {
         colors: {
           background: "#e6e6e6",
@@ -118,6 +169,10 @@ describe("GameHost", () => {
     unmount();
     expect(theme.unsubscribe).toHaveBeenCalledOnce();
     expect(controller.destroy).toHaveBeenCalledOnce();
+
+    hidden.mockReturnValue(true);
+    document.dispatchEvent(new Event("visibilitychange"));
+    expect(controller.pause).toHaveBeenCalledOnce();
   });
 
   it("reports a lazy-load failure without creating a game", async () => {

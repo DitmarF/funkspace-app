@@ -19,12 +19,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version-file: ".nvmrc"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -44,13 +42,13 @@ jobs:
         run: pnpm coverage
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm setup:browsers
 
       - name: E2E tests (Playwright)
         run: pnpm e2e
 
       - name: Build frontend
-        run: pnpm -F frontend build
+        run: pnpm build
 
       - name: Lighthouse CI (flag OFF)
         run: pnpm lhci:off

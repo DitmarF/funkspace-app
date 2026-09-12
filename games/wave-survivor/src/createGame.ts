@@ -1,7 +1,24 @@
 import type { GameController } from "./GameController.js";
 import type { GameMountOptions } from "./GameMountOptions.js";
 import { GameControllerImpl } from "./application/GameControllerImpl.js";
+import { GameRuntimeSession } from "./application/GameRuntimeSession.js";
+import { createInitialRuntimeState } from "./domain/state/RuntimeState.js";
+import { BrowserInputInterruptionGuard } from "./infrastructure/input/BrowserInputInterruptionGuard.js";
+import { BrowserKeyboardInput } from "./infrastructure/input/BrowserKeyboardInput.js";
+import { BrowserVirtualJoystickInput } from "./infrastructure/input/BrowserVirtualJoystickInput.js";
+import { CompositeMovementInput } from "./infrastructure/input/CompositeMovementInput.js";
+import { ZeroMovementInput } from "./infrastructure/input/ZeroMovementInput.js";
+import {
+  BrowserFrameScheduler,
+  BrowserMonotonicClock,
+} from "./infrastructure/loop/BrowserRuntimeTiming.js";
+import { FixedStepLoop } from "./infrastructure/loop/FixedStepLoop.js";
+import { SeededRandomSource } from "./infrastructure/random/SeededRandomSource.js";
 import { CanvasGameRenderer } from "./renderer/CanvasGameRenderer.js";
+
+const DEFAULT_GAMEPLAY_RANDOM_SEED = 0x5eed_c0de;
+const SPAWN_RANDOM_SEED_SALT = 0x2c92_7a4d;
+const UPGRADE_RANDOM_SEED_SALT = 0x79b9_f123;
 
 /**
  * Create an isolated Wave Survivor game instance.
@@ -11,6 +28,46 @@ import { CanvasGameRenderer } from "./renderer/CanvasGameRenderer.js";
  * use, but portfolio hosts provide them when embedding the game.
  */
 export function createGame(options?: GameMountOptions): GameController {
-  const renderer = options ? new CanvasGameRenderer(options) : null;
-  return new GameControllerImpl(renderer);
+  const presentation = options ? new CanvasGameRenderer(options) : null;
+  const joystickInput = options
+    ? new BrowserVirtualJoystickInput(options.canvas)
+    : null;
+  const deviceInput =
+    options && joystickInput
+      ? new CompositeMovementInput(
+          // The interruption guard owns the production window-blur listener.
+          new BrowserKeyboardInput(options.canvas, null),
+          joystickInput,
+        )
+      : new ZeroMovementInput();
+  const input = options
+    ? new BrowserInputInterruptionGuard(deviceInput)
+    : deviceInput;
+  const session = new GameRuntimeSession(
+    createInitialRuntimeState(),
+    input,
+    presentation,
+    new SeededRandomSource(
+      (DEFAULT_GAMEPLAY_RANDOM_SEED ^ SPAWN_RANDOM_SEED_SALT) >>> 0,
+    ),
+    new SeededRandomSource(
+      (DEFAULT_GAMEPLAY_RANDOM_SEED ^ UPGRADE_RANDOM_SEED_SALT) >>> 0,
+    ),
+    joystickInput ? () => joystickInput.readPresentationSnapshot() : null,
+    options?.onStatusChange ?? null,
+    options?.onEvent ?? null,
+  );
+  const loop = options
+    ? new FixedStepLoop(
+        new BrowserMonotonicClock(),
+        new BrowserFrameScheduler(),
+        {
+          fixedUpdate: (deltaSeconds) => session.fixedUpdate(deltaSeconds),
+          render: () => session.render(),
+          shouldSuspend: () => session.phase !== "playing",
+        },
+      )
+    : null;
+
+  return new GameControllerImpl(session, loop);
 }

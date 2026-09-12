@@ -5,5 +5,9 @@
  */
 export { createGame } from "./createGame.js";
 export type { GameController } from "./GameController.js";
+export type { GameEvent, UpgradeOption } from "./GameEvent.js";
 export type { GameMountOptions } from "./GameMountOptions.js";
+export type { GameStatusSnapshot } from "./GameStatusSnapshot.js";
 export type { GameTheme } from "./GameTheme.js";
+export type { RunResult } from "./domain/result/RunResult.js";
+export type { RuntimePhase } from "./domain/state/RuntimeState.js";

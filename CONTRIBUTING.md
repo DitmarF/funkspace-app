@@ -8,14 +8,14 @@ _Guide for new contributors (junior developers)_
 
 Before you start, make sure you have the following tools installed:
 
-| Tool                            | Minimum Version | Description                           |
-| ------------------------------- | --------------- | ------------------------------------- |
-| **Git**                         | 2.40+           | Version control                       |
-| **Node.js**                     | 22.13.1+        | JavaScript runtime                    |
-| **pnpm**                        | 10+             | Package manager (instead of npm/Yarn) |
-| **GitHub CLI** (`gh`, optional) | 2.5+            | For creating PRs from terminal        |
+| Tool                            | Minimum Version  | Description                           |
+| ------------------------------- | ---------------- | ------------------------------------- |
+| **Git**                         | 2.40+            | Version control                       |
+| **Node.js**                     | 22.22.0 baseline | JavaScript runtime                    |
+| **pnpm**                        | 10.30.3          | Package manager (instead of npm/Yarn) |
+| **GitHub CLI** (`gh`, optional) | 2.5+             | For creating PRs from terminal        |
 
-> **Setup:** If you’re an external contributor, first **fork** this repository (if internal, accept the invite to the repo). Clone your fork to your machine (ensure your SSH key is added to GitHub for easy access). Then, in the project directory, run `pnpm install -r` to install all dependencies in this monorepo (the `-r` flag installs every workspace). See the [README.md](README.md) for more details on setting up the project and using `pnpm`. After installing, you can run `pnpm dev` to start the development server locally.
+> **Setup:** If you’re an external contributor, first **fork** this repository (if internal, accept the invite to the repo). Clone your fork to your machine (ensure your SSH key is added to GitHub for easy access). Then, in the project directory, run `pnpm install --frozen-lockfile` to install all active workspaces using the existing lockfile. See the [README.md](README.md) for more details on setting up the project and using `pnpm`. After installing, run `pnpm build:tokens`, then `pnpm -F frontend dev` to start the development server locally.
 
 ## 1. Branching Strategy (Trunk-Based Git Flow)
 
@@ -50,12 +50,12 @@ We use a **trunk-based development** workflow: the `main` branch is the stable t
 
    ```bash
    cp .env.example .env.local   # create local env config (if applicable)
-   pnpm dev                     # start Next.js dev server (with hot-reload)
+   pnpm -F frontend dev         # start Next.js dev server (with hot-reload)
    pnpm test                    # run unit tests (Vitest)
    pnpm lint                    # run linter and format check (ESLint + Prettier)
    ```
 
-   Keep the `pnpm dev` server running as you work (open [http://localhost:3000](http://localhost:3000) to see the app). Make sure `pnpm test` and `pnpm lint` pass to catch issues early. This project uses **Vitest** for unit tests and **Playwright** for end-to-end tests, and all code must meet our linting rules (ESLint/Prettier). See the DevOps Playbook for more about our testing and lint setup.
+   Keep the `pnpm -F frontend dev` server running as you work (open [http://localhost:3000](http://localhost:3000) to see the app). Make sure `pnpm test` and `pnpm lint` pass to catch issues early. This project uses **Vitest** for unit tests and **Playwright** for end-to-end tests, and all code must meet our linting rules (ESLint/Prettier). See the DevOps Playbook for more about our testing and lint setup.
 
    > **AI Assistant:** Feel free to leverage our AI tooling during development. We recommend using the **OpenAI Codex CLI** (an AI coding assistant) to help generate boilerplate code or even suggest commit message text. It’s a helpful way to speed up development and ensure consistent style – just remember to review and polish any AI-generated code or messages before committing.
 

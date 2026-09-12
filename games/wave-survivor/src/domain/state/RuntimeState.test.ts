@@ -1,0 +1,230 @@
+import { describe, expect, it } from "vitest";
+import { ARENA } from "../arena/index.js";
+import { createBasicEnemyState } from "../enemies/index.js";
+import { ZERO_MOVEMENT_INTENT } from "../movement/index.js";
+import { createBasicProjectileState } from "../projectiles/index.js";
+import {
+  compileWaveSchedule,
+  PROVISIONAL_EPIC_5_WAVES,
+} from "../waves/index.js";
+import {
+  createInitialRunUpgradeState,
+  createRunUpgradeState,
+} from "../upgrades/index.js";
+import {
+  createInitialRuntimeState,
+  PLAYER_COLLISION_RADIUS,
+  PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
+  PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
+} from "./RuntimeState.js";
+
+describe("createInitialRuntimeState", () => {
+  it("centers the player in the logical arena", () => {
+    expect(createInitialRuntimeState().player.position).toEqual({
+      x: ARENA.width / 2,
+      y: ARENA.height / 2,
+    });
+  });
+
+  it("starts in the idle phase", () => {
+    expect(createInitialRuntimeState().phase).toBe("idle");
+  });
+
+  it("starts at zero simulation seconds", () => {
+    expect(createInitialRuntimeState().simulationTimeSeconds).toBe(0);
+  });
+
+  it("starts with zero movement intention", () => {
+    expect(createInitialRuntimeState().movementIntent).toBe(
+      ZERO_MOVEMENT_INTENT,
+    );
+  });
+
+  it("starts with deterministic empty enemy state", () => {
+    const state = createInitialRuntimeState();
+
+    expect(state.enemies).toEqual([]);
+    expect(state.nextEnemyId).toBe(1);
+    expect(state.waveSchedule).toEqual({
+      currentWaveNumber: 1,
+      maxActiveEnemies: PROVISIONAL_EPIC_5_WAVES[0]!.maxActiveEnemies,
+      elapsedSeconds: 0,
+      nextScheduledSpawnIndex: 0,
+      requests: compileWaveSchedule(PROVISIONAL_EPIC_5_WAVES[0]!),
+    });
+    expect(state.killCount).toBe(0);
+  });
+
+  it("starts with deterministic empty projectile state", () => {
+    const state = createInitialRuntimeState();
+
+    expect(state.projectiles).toEqual([]);
+    expect(state.nextProjectileId).toBe(1);
+    expect(state.nextAttackAtSeconds).toBe(0);
+  });
+
+  it("starts with independent neutral run-upgrade state", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first.upgrades).toEqual(createInitialRunUpgradeState());
+    expect(first.upgrades).not.toBe(second.upgrades);
+    expect(first.upgrades.levels).not.toBe(second.upgrades.levels);
+    expect(first.pendingUpgradeOptionIds).toEqual([]);
+    expect(Object.isFrozen(first.pendingUpgradeOptionIds)).toBe(true);
+  });
+
+  it("uses the marker radius and provisional movement speed", () => {
+    const state = createInitialRuntimeState();
+
+    expect(PLAYER_COLLISION_RADIUS).toBe(12);
+    expect(PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND).toBe(120);
+    expect(state.player.collisionRadius).toBe(PLAYER_COLLISION_RADIUS);
+    expect(state.player.movementSpeedUnitsPerSecond).toBe(
+      PROVISIONAL_PLAYER_SPEED_UNITS_PER_SECOND,
+    );
+  });
+
+  it("starts the player at full provisional health", () => {
+    const state = createInitialRuntimeState();
+
+    expect(PROVISIONAL_PLAYER_MAXIMUM_HEALTH).toBe(3);
+    expect(state.player.maximumHealth).toBe(PROVISIONAL_PLAYER_MAXIMUM_HEALTH);
+    expect(state.player.currentHealth).toBe(state.player.maximumHealth);
+    expect(state.player.invulnerableUntilSeconds).toBe(0);
+  });
+
+  it("creates independent state and player instances", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first).not.toBe(second);
+    expect(first.player).not.toBe(second.player);
+  });
+
+  it("does not share player positions between sessions", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first.player.position).not.toBe(second.player.position);
+
+    first.player.position.x = 0;
+
+    expect(second.player.position.x).toBe(ARENA.width / 2);
+  });
+
+  it("does not share mutable enemy collections between sessions", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first.enemies).not.toBe(second.enemies);
+
+    first.enemies.push(
+      createBasicEnemyState(first.nextEnemyId, { x: 0, y: 0 }),
+    );
+
+    expect(second.enemies).toEqual([]);
+  });
+
+  it("does not share mutable projectile collections between sessions", () => {
+    const first = createInitialRuntimeState();
+    const second = createInitialRuntimeState();
+
+    expect(first.projectiles).not.toBe(second.projectiles);
+
+    first.projectiles.push(
+      createBasicProjectileState(
+        first.nextProjectileId,
+        first.player.position,
+        { x: first.player.position.x + 1, y: first.player.position.y },
+        first.simulationTimeSeconds,
+      ),
+    );
+
+    expect(second.projectiles).toEqual([]);
+  });
+
+  it("creates clean enemy state for a restarted session", () => {
+    const progressedState = createInitialRuntimeState();
+    progressedState.enemies.push(
+      createBasicEnemyState(progressedState.nextEnemyId, { x: -12, y: 320 }),
+    );
+    progressedState.nextEnemyId += 1;
+    progressedState.waveSchedule!.elapsedSeconds = 99;
+    progressedState.waveSchedule!.nextScheduledSpawnIndex = 3;
+    progressedState.enemies[0]!.phase = "dying";
+    progressedState.enemies[0]!.removeAtSimulationSeconds = 99;
+    progressedState.killCount = 1;
+
+    const restartedState = createInitialRuntimeState();
+
+    expect(restartedState.enemies).toEqual([]);
+    expect(restartedState.nextEnemyId).toBe(1);
+    expect(restartedState.waveSchedule!.currentWaveNumber).toBe(1);
+    expect(restartedState.waveSchedule!.maxActiveEnemies).toBe(
+      PROVISIONAL_EPIC_5_WAVES[0]!.maxActiveEnemies,
+    );
+    expect(restartedState.waveSchedule!.elapsedSeconds).toBe(0);
+    expect(restartedState.waveSchedule!.nextScheduledSpawnIndex).toBe(0);
+    expect(restartedState.waveSchedule!.requests).toEqual(
+      compileWaveSchedule(PROVISIONAL_EPIC_5_WAVES[0]!),
+    );
+    expect(restartedState.killCount).toBe(0);
+  });
+
+  it("creates clean projectile state for a restarted session", () => {
+    const progressedState = createInitialRuntimeState();
+    progressedState.projectiles.push(
+      createBasicProjectileState(
+        progressedState.nextProjectileId,
+        progressedState.player.position,
+        {
+          x: progressedState.player.position.x + 1,
+          y: progressedState.player.position.y,
+        },
+        progressedState.simulationTimeSeconds,
+      ),
+    );
+    progressedState.nextProjectileId += 1;
+    progressedState.nextAttackAtSeconds = 99;
+
+    const restartedState = createInitialRuntimeState();
+
+    expect(restartedState.projectiles).toEqual([]);
+    expect(restartedState.nextProjectileId).toBe(1);
+    expect(restartedState.nextAttackAtSeconds).toBe(0);
+  });
+
+  it("restores full player health for a restarted session", () => {
+    const progressedState = createInitialRuntimeState();
+    progressedState.player.currentHealth = 0;
+    progressedState.player.invulnerableUntilSeconds = 99;
+
+    const restartedState = createInitialRuntimeState();
+
+    expect(restartedState.player.currentHealth).toBe(
+      restartedState.player.maximumHealth,
+    );
+    expect(restartedState.player.currentHealth).toBe(
+      PROVISIONAL_PLAYER_MAXIMUM_HEALTH,
+    );
+    expect(restartedState.player.invulnerableUntilSeconds).toBe(0);
+  });
+
+  it("restores neutral upgrades for a restarted session", () => {
+    const progressedState = createInitialRuntimeState();
+    progressedState.upgrades = createRunUpgradeState({
+      "rapid-fire": 2,
+      "swift-movement": 3,
+      vitality: 1,
+    });
+    progressedState.pendingUpgradeOptionIds = Object.freeze([
+      "vitality" as const,
+    ]);
+
+    const restartedState = createInitialRuntimeState();
+
+    expect(restartedState.upgrades).toEqual(createInitialRunUpgradeState());
+    expect(restartedState.pendingUpgradeOptionIds).toEqual([]);
+  });
+});

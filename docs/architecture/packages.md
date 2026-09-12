@@ -26,7 +26,12 @@ The configured locations are not all active packages. A pnpm workspace package r
 `pnpm list -r --depth -1` recognizes the root package, `frontend`,
 `@funkspace/common`, and `@funkspace/wave-survivor`. `backend` remains a
 README-only placeholder. The first game package is buildable TypeScript
-scaffolding with no gameplay implementation or runtime dependencies.
+with a deterministic fixed-step runtime and no external runtime dependencies.
+Its current runtime includes seeded fair offscreen spawning, enemy lifecycle and
+direct pursuit, visible-border activation, and despawn cleanup. The renderer
+draws the responsive grey-box arena, directional entry warnings, visible
+enemies, moving player, and fixed virtual joystick from immutable
+logical-coordinate snapshots.
 
 The current dependency shape is:
 
@@ -43,13 +48,15 @@ wave-survivor      -> independent TypeScript build
 
 common  [active private package; explicit motion and token exports]
 backend [placeholder; no runtime or deployment]
-games/* [active collection; wave-survivor scaffold]
+games/* [active collection; wave-survivor enemy-entry and pursuit slice]
 ```
 
 The root production build type-checks `common` before building the frontend.
 Wave Survivor builds independently through its package script. Repository tests
-cover the core and both frontend motion adapters. No current application code
-imports from `backend` or the Wave Survivor package.
+cover the shared core, frontend adapters, and Wave Survivor package. No current
+application code imports from `backend`. The approved frontend integration at
+`frontend/features/games/GameLoader.ts` lazily imports Wave Survivor through its
+public package entry point.
 
 ## Package boundary contract
 
@@ -200,14 +207,21 @@ Organize exports by explicit areas such as `tokens`, `motion`, `utilities`, and 
 ### Current state
 
 `games/*` is a configured workspace collection. It currently contains the
-private `@funkspace/wave-survivor` TypeScript package scaffold. The package has
-no gameplay or drawing implementation yet and declares no runtime dependencies.
-Its renderer layer owns the mounted canvas and theme state without drawing to
-it yet. The public entry point exposes `createGame()` and the `GameController`
-lifecycle contract (`start`, `pause`, `resume`, `restart`, and `destroy`) plus a
-canvas/theme mount contract so a portfolio adapter can own an instance without
-accessing game internals. Theme changes cross the same public boundary through
-`setTheme()`. The parent
+private `@funkspace/wave-survivor` TypeScript package. The package has no
+external runtime dependencies. It owns deterministic runtime state, normalized
+keyboard and virtual-joystick input, bounded fixed-step scheduling, pure player
+movement and arena clamping, seeded randomness, perimeter-weighted fair
+offscreen spawning, enemy phases, direct pursuit, circle-based activation,
+despawn cleanup, interruption cleanup, and immutable render snapshots. Its
+renderer owns responsive Canvas presentation, draws the themed arena, border,
+directional entry warnings, active enemies, moving player, and fixed joystick
+in `360 × 640` logical coordinates, and observes an independently sized
+viewport boundary. The public entry point exposes `createGame()` and the
+`GameController` lifecycle contract
+(`start`, `pause`, `resume`, `restart`, and `destroy`) plus a
+canvas/viewport/theme mount contract so a portfolio adapter can own an instance
+without accessing game internals. Theme changes cross the same public boundary
+through `setTheme()`. The parent
 [`games/README.md`](../../games/README.md) defines creation and isolation
 requirements.
 
@@ -223,6 +237,15 @@ Each `games/<game-slug>` package is responsible for its complete game product bo
 - Its own manifest, dependencies, build, tests, documentation, and deployment configuration.
 
 The first game follows [`ADR-004`](../decisions/ADR-004-game-development-architecture.md): its lightweight engine remains private to that game until a second real consumer proves a shareable primitive.
+
+### Coordinate boundary
+
+Browser input adapters may read the Canvas client rectangle and the renderer's
+display scale and translation to convert pointer or touch positions into
+logical arena coordinates. That conversion remains outside Domain. Movement
+rules receive only normalized movement intent or logical coordinates; they
+never receive CSS pixels, Canvas backing-buffer dimensions, or device-pixel
+ratio values.
 
 ### Allowed dependencies
 
@@ -261,9 +284,16 @@ resolved game color token layer into an immutable `GameTheme` object and maps
 values through its integration contract; it does not read portfolio CSS
 variables, DOM theme attributes, or frontend services. `GameLoader` lazily
 imports explicit game package entry points, while `GameHost` mounts the canvas,
-starts the controller, pauses or resumes it with document visibility, forwards
-theme updates, and destroys it on unmount. React owns none of the simulation or
-rendering loop.
+passes an independently sized generic viewport boundary, starts the controller,
+pauses or resumes it with document visibility, forwards theme updates, and
+destroys it on unmount. The game renderer owns Canvas presentation and backing
+dimensions. React owns none of the simulation or rendering loop.
+
+`GameHost` deliberately provides no game-specific width, height, or aspect
+ratio. A portfolio-page consumer must allocate explicit inline and block space
+for the host viewport through its own responsive layout. That shell-level
+placement must remain separate from the game renderer's logical arena and
+aspect-fit calculations.
 
 Portfolio routes and components depend on a frontend-owned adapter interface, not on game types. The adapter must provide teardown and must not expose the game's engine, renderer, or mutable state to the rest of `frontend`.
 

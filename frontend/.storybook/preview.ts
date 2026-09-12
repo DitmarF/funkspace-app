@@ -3,7 +3,6 @@ import { withThemeByDataAttribute } from "@storybook/addon-themes";
 import { createElement } from "react";
 import React from "react";
 import { ServiceProvider } from "../application/providers/ServiceProvider";
-import { createServices } from "../infrastructure/services/createServices";
 
 import "../app/globals.css";
 
@@ -38,18 +37,10 @@ if (process.env.NODE_ENV !== "production") {
   }
 }
 
-// Create services for Storybook
-const storybookServices = createServices();
-
 const preview: Preview = {
   decorators: [
     // Wrap all stories with ServiceProvider
-    (Story) =>
-      createElement(
-        ServiceProvider,
-        { services: storybookServices },
-        createElement(Story),
-      ),
+    (Story) => createElement(ServiceProvider, null, createElement(Story)),
     withThemeByDataAttribute({
       themes: {
         default: "",

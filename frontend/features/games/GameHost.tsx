@@ -20,8 +20,6 @@ const statusMessages: Record<GameHostStatus, string> = {
 
 export interface GameHostProps {
   readonly gameId?: GameId;
-  readonly width?: number;
-  readonly height?: number;
   readonly label?: string;
   readonly className?: string;
   readonly loader?: GameModuleLoader;
@@ -35,19 +33,20 @@ export interface GameHostProps {
  */
 export function GameHost({
   gameId = "wave-survivor",
-  width = 960,
-  height = 540,
   label = "Wave Survivor game canvas",
   className,
   loader = gameLoader,
 }: GameHostProps) {
+  const viewportRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<GameHostStatus>("loading");
+  const [announcement, setAnnouncement] = useState("");
   const { themeService } = useServices();
 
   useEffect(() => {
+    const viewport = viewportRef.current;
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!viewport || !canvas) return;
 
     let cancelled = false;
     let controller: HostedGameController | null = null;
@@ -55,6 +54,7 @@ export function GameHost({
     let currentTheme = themeAdapter.getCurrentTheme();
 
     setStatus("loading");
+    setAnnouncement("");
 
     const unsubscribeTheme = themeAdapter.subscribe((theme) => {
       currentTheme = theme;
@@ -76,7 +76,28 @@ export function GameHost({
       .then((gameModule) => {
         if (cancelled) return;
 
-        controller = gameModule.createGame({ canvas, theme: currentTheme });
+        controller = gameModule.createGame({
+          canvas,
+          viewport,
+          theme: currentTheme,
+          onEvent: (event) => {
+            if (cancelled) return;
+            switch (event.type) {
+              case "wave-started":
+                setAnnouncement(
+                  event.encounterKind === "boss"
+                    ? "Boss entering from the top. Move clear of the entry point."
+                    : `Wave ${event.waveNumber} started.`,
+                );
+                return;
+              case "wave-cleared":
+              case "upgrade-choice-requested":
+              case "run-finished":
+                // Portfolio milestone/result UI belongs to EPIC 7.
+                return;
+            }
+          },
+        });
         controller.start();
         if (document.hidden) {
           controller.pause();
@@ -101,12 +122,19 @@ export function GameHost({
   }, [gameId, loader, themeService]);
 
   return (
-    <div className={className} data-game-status={status}>
-      <canvas ref={canvasRef} width={width} height={height} aria-label={label}>
+    <div
+      ref={viewportRef}
+      className={className}
+      data-game-status={status}
+      style={{ overflow: "hidden", position: "relative" }}
+    >
+      <canvas ref={canvasRef} aria-label={label}>
         Your browser does not support the canvas element.
       </canvas>
       <p className="sr-only" role="status" aria-live="polite">
-        {statusMessages[status]}
+        {status === "ready" && announcement
+          ? announcement
+          : statusMessages[status]}
       </p>
     </div>
   );
