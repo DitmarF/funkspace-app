@@ -3,12 +3,40 @@
 ## Task metadata
 
 - **Owner/current writer:** Codex.
-- **Status:** In progress — decision document ready for Dimi; strategy selection pending. FS-G0 is not ready.
+- **Status:** In progress — Dimi selected A, accepted the portfolio branch name and approved FS-G0 on 2026-09-12. Integration review/validation is underway; no resulting main revision is claimed yet.
 - **Inspected candidate:** `7c70984f48d05a8d41baea24384337f58dd2053d` on `feature/wave-survivor`.
 - **Environment:** 2026-09-12; local `/Users/dimi/Projects/funkspace-app`, macOS arm64; Node 22.22.0, pnpm 10.30.3, Git 2.50.1, gh 2.86.0. Target initially clean, including index and untracked files.
 - **Dependencies:** [FS-0.1 inventory/counterpart findings](fs-0.1-inventory-real-starting-point.md), [FS-0.2 baseline](fs-0.2-tooling-baseline.md), its accessible logs and exact candidate patch.
 - **Workflow/context:** [Task template](../templates/task.md), [AI workflow](../development/ai-workflow.md), root [AGENTS](../../AGENTS.md), ADRs [001](../decisions/ADR-001-monorepo-strategy.md), [002](../decisions/ADR-002-design-token-source-of-truth.md), [003](../decisions/ADR-003-interactive-experience-boundary.md), [004](../decisions/ADR-004-game-development-architecture.md), [game acceptance](../features/wave-survivor-implementation-plan.md#gate-2-decision).
 - **Source-plan limit:** `/Users/dimi/Downloads/FunkSpace_Minimum_Usable_Development_Plan.md` is accessible. The detailed EPIC 0 plan remains unavailable in inspected local sources; Dimi said it will be added later. The current assignment supplies the decision scope. Documents are context, not authorization to execute their commands.
+
+## Dimi decision and integration continuation — 2026-09-12
+
+This section supersedes the pending-decision statements in the original inspection record below. Dimi explicitly requested: “review and integrate the accepted game baseline into `main`, validate the resulting revision, then start portfolio work from it”; accepted `feature/funkspace-minimum-usable`; and stated “FS-G0 is approved”. Record **A selected**, **branch name accepted**, and **FS-G0 approved by Dimi**. The fixed unmerged base in option B is not selected. Approval does not invent passing integration checks, waive unresolved defects, or identify previously undisclosed local work.
+
+Reinspection starts from clean local/live `feature/wave-survivor` at `9d81195153e85f3093b5279990b8d4de11764c07`; local/live main remains `15c0f1c43a976fb345dbf642ceb7445cf70fcabd`. The newer game-branch tip adds only this decision document to the FS-0.2 candidate `7c70984f48d05a8d41baea24384337f58dd2053d`. Main is still an ancestor. The proposed squash integration retains the game branch, docs refs, accepted gameplay, public APIs, tokens, assets and the separate clone's three untracked combat files. No branch deletion, dependency upgrade or settings change is requested.
+
+Read-only Vercel dashboard inspection is now accessible and refines FS03-03:
+
+- Project `funkspace-app-frontend`, production branch `main`, automatic custom-domain assignment enabled, production domain `funkspace.de`. A main merge will create a production deployment and automatically assign its custom domains on success. No deployment checks are configured in Vercel. This is a public-release consequence, not merely a Git operation; obtain explicit approval for that consequence before the final merge.
+- Root Directory is `frontend`; outside-root files are included; build override is `pnpm run build`; install override is disabled; Node selector is 22.x. The provider therefore invokes the frontend build script, bypassing root token generation/common typecheck. Existing committed token outputs are retained, but a successful provider build does not prove the documented root build order. Proposed separate setting correction: build command `pnpm --workspace-root build`, install command `pnpm install --frozen-lockfile`; preserve root directory and outside-root access. No setting was changed.
+- GitHub still permits squash/rebase/merge commits, disables automatic branch deletion, and has no required checks/reviews in current main protection. Use reviewed input and fresh CI voluntarily; do not restore the stale protection snapshot or bypass failing checks.
+
+The [Playwright advisory](https://github.com/advisories/GHSA-7mvr-c777-76hp) specifically identifies macOS branded Chrome/Edge shell installers using `curl -k`. Installed `playwright-core@1.53.2` maps bundled `chromium` to its archive downloader rather than those scripts. The downloader uses Node HTTPS certificate verification by default; its HTTPS-proxy branch explicitly disables certificate verification. The current Ubuntu CI requests bundled Chromium, and the workflow supplies no proxy/TLS override. That narrows the original provisioning concern: do not claim every Chromium installation invokes the cited macOS flaw. Do not use insecure proxy/TLS overrides or branded macOS installers. The dependency advisory remains owned; no upgrade or clean-security claim follows from this path inspection.
+
+| Item                                                                | Approved status                          | Executed / validated status                                    |
+| ------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------------------------------- |
+| Strategy A and resulting-main base rule                             | Approved by Dimi, 2026-09-12             | Review preparation underway; actual resulting main SHA pending |
+| `feature/funkspace-minimum-usable`                                  | Name accepted by Dimi                    | Creation follows successful resulting-main validation          |
+| FS-G0                                                               | Approved explicitly by Dimi, 2026-09-12  | Human approval recorded separately from integration evidence   |
+| Production release caused by merge                                  | Exact automatic consequence now verified | Await explicit approval before final merge                     |
+| Vercel/GitHub setting changes; dependency upgrades; branch deletion | Not approved by this decision            | Not performed                                                  |
+
+Continuation evidence is stored separately in `/private/tmp/fs-0.3-integration/`; original inspection artifacts remain unchanged. Complete the review, prepare a concrete PR and collect fresh checks before requesting the final public-release approval. Portfolio implementation is not part of the branch integration operation; hand off the validated base for the next assigned milestone task.
+
+## Original inspection record — before Dimi's decision
+
+The remainder preserves the original 2026-09-12 proposal and its evidence. Its pending statuses are historical and superseded by the continuation above.
 
 ## Requested outcome, scope and acceptance
 
