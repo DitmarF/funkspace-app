@@ -2,11 +2,11 @@
 
 > Dated follow-up: [FS-0.2 tooling and executed baseline](fs-0.2-tooling-baseline.md) records maintenance against the later committed inventory revision. The FS-0.1 evidence below remains a historical snapshot.
 
-> **Recovery pointer (FS-0.4, 2026-09-12):** current milestone scope/status lives in the [feature-plan draft](../features/funkspace-minimum-usable.md). [FS-0.3's final execution](fs-0.3-branch-integration-decision.md#final-execution-and-portfolio-handoff--2026-09-12) supersedes this snapshot's pending strategy/FS-G0 and absent integration/CI claims. Missing detailed-source reconciliation and undisclosed preservation information remain unresolved; no historical command evidence is rewritten.
+> **Recovery pointer (updated after FS-G0 review, 2026-09-12):** current milestone scope/status lives in the [feature-plan draft](../features/funkspace-minimum-usable.md). [FS-0.3's final execution](fs-0.3-branch-integration-decision.md#final-execution-and-portfolio-handoff--2026-09-12) supersedes this snapshot's pending strategy/FS-G0 and absent integration/CI claims. Dimi subsequently confirmed preservation requirements; the [dated follow-up](#preservation-confirmation--2026-09-12) supersedes older pending-confirmation statements. Detailed-source reconciliation is now complete in [FS-0.4](fs-0.4-authoritative-feature-plan.md#detailed-source-reconciliation-and-current-readiness--2026-09-12); earlier missing-source/confirmation statements below are historical. No command evidence is rewritten.
 
 ## Task metadata
 
-- **Status:** In progress — accessible inventory and Sites-role feedback incorporated; detailed-plan reconciliation and Dimi preservation/acceptance pending.
+- **Status:** Complete inventory and source reconciliation; Sites-role feedback incorporated and Dimi preservation confirmation received 2026-09-12. Dimi separately approved current-candidate FS-G0 on 2026-09-12; see the [actual decision](fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12).
 - **Task group or epic:** FunkSpace Minimum Usable Experience; FS EPIC 0 — Repository baseline, maintenance, and durable planning.
 - **Owner / current writer:** Codex lead and current writer. Sites-role read-only counterpart feedback received in the same task/session and incorporated; ownership has not transferred.
 - **Last updated:** 2026-09-12.
@@ -22,13 +22,19 @@ Document a trustworthy starting point from actual repository evidence without ch
 - [x] Record actual local identity, full SHA, upstream, working-tree state, assets, and access limits; compare the historical reference.
 - [x] Inspect applicable instructions, ADRs, workflow/templates, manifests, CI, and test configuration.
 - [x] Read the accessible minimum-usable source plan and latest repository handoff.
-- [ ] Read and reconcile `FunkSpace_EPIC_0_Detailed_Plan.md` once accessible. Dimi reports uploading it to project sources; this task's local `sources/` remains empty. Dimi will add the local source later.
+- [x] Read and reconcile `FunkSpace_EPIC_0_Detailed_Plan.md`, supplied 2026-09-12; [archived source](../global/FunkSpace_EPIC_0_Detailed_Plan.md) and [complete evidence mapping](fs-0.4-authoritative-feature-plan.md#detailed-source-reconciliation-and-current-readiness--2026-09-12).
 - [x] Map requested reuse surfaces with actual paths, status, contract, tests/stories, recommendation, and later consumer.
 - [x] Inspect branch ancestry, unique commits, retained content, tracking, and exact-revision CI/acceptance evidence; make no deletion recommendation from naming or age.
 - [x] Reinspect the three reported contrast/scan/typography issues and assign them to the correct later tasks.
 - [x] Create one documentation-only record and review its paths, formatting, references, and complete diff.
 - [x] Receive and incorporate Sites-role read-only counterpart feedback while Codex owns this file. This was a same-task/session review pass, not a separately staffed independent review.
-- [ ] Receive Dimi's preservation confirmation. FS-G0 and all portfolio acceptance decisions remain pending.
+- [x] Receive Dimi's preservation confirmation; actual answer and limits are recorded below. Historical FS-G0 approval is preserved; no new candidate approval is inferred.
+
+### Preservation confirmation — 2026-09-12
+
+After the independent FS-G0 readiness review of `156c28c8486352328a184d587a6540eee42b8bc1`, Dimi stated: **“preservation requirements are confirmed.”** This confirms the documented retention requirements and closes the missing-confirmation blocker. Keep the separate project-mirror clone, its three untracked combat files, original assets and unrelated work intact. It authorizes no deletion, migration, overwrite or cleanup. No new asset location or assertion that all private work has been inspected was supplied; future discoveries still receive normal protection.
+
+The same response authorized adding the supplied minimum-usable plan to repository docs. Its [archived source copy](../global/FunkSpace_Minimum_Usable_Development_Plan.md) removes dependence on Downloads for that source. It was the same minimum source previously inspected. Dimi subsequently supplied the separate detailed EPIC 0 plan, now fully read and reconciled in [FS-0.4's latest follow-up](fs-0.4-authoritative-feature-plan.md#detailed-source-reconciliation-and-current-readiness--2026-09-12). Both source and preservation blockers are resolved; no current gate approval is inferred.
 
 ## Context and repository evidence
 

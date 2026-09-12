@@ -1,8 +1,10 @@
 # Task FS-0.5 — Product answers, technical options and decision register
 
+> **Latest recovery pointer, 2026-09-12:** Dimi confirmed preservation requirements and subsequently supplied the detailed EPIC 0 plan. Both original sources are archived in `docs/global/` and [fully reconciled in FS-0.4](fs-0.4-authoritative-feature-plan.md#detailed-source-reconciliation-and-current-readiness--2026-09-12). Earlier missing-source/preservation and “no repeat vote” statements below describe the original FS-0.5 snapshot. Its dependency is satisfied; the refreshed independent review is complete and [Dimi’s actual FS-G0 approval](fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12) is recorded. Later implementation/service approvals remain separately owned.
+
 ## Task metadata
 
-- **Status:** Decision preparation complete; later approvals/input remain pending in the linked register. This does not close the FS-0.4 source blocker or authorize implementation.
+- **Status:** Decision preparation complete; FS-0.4 source reconciliation complete. Later approvals/input remain owned in the canonical register; current-candidate FS-G0 approval and implementation authorization are separate.
 - **Task group or epic:** Minimum Usable Experience, EPIC 0.
 - **Owner:** Dimi, lead/approver. Codex is technical counterpart and designated documentation writer; Sites supplies the design/content checklist and later consumer reviews.
 - **Last updated:** 2026-09-12.
