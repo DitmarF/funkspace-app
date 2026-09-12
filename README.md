@@ -33,6 +33,7 @@ pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 - Production build: `pnpm build` (tokens → common typecheck → game build → frontend build).
 - Direct frontend builds require generated tokens first; use the root build for the complete prerequisite order.
 - Baseline results, security limitations and the full command sequence: [FS-0.2 task record](docs/tasks/fs-0.2-tooling-baseline.md).
+- Current dependency versions, branch integration, validation and remaining security findings: [dependency maintenance record](docs/tasks/2026-09-12-branch-and-dependabot-review.md#authorized-integration-continuation). This later evidence supersedes the original FS-0.2 dependency inventory where explicitly recorded.
 
 ## Project layout
 
@@ -80,9 +81,9 @@ when coverage runs. CI enables coverage by default; `pnpm coverage` also enables
 
 Browser installation is explicit; dependency installation no longer downloads browsers.
 CI and E2E use `PLAYWRIGHT_BROWSERS_PATH=0`, so they resolve the same project-local Chromium.
-The locked Playwright 1.53.2 downloader has a certificate-verification advisory; the
-FS-0.2 baseline used an already present browser. Review the dependency proposal in
-the task record before a fresh download. After that prerequisite is resolved:
+Playwright is locked to the reviewed 1.55.1 release, which fixes the earlier
+downloader certificate-verification advisory. Browser installation and both
+Chromium suites passed in the dependency maintenance record:
 
 ```bash
 pnpm setup:browsers
