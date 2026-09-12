@@ -1,5 +1,7 @@
 # Task FS-0.3 — Prepare the branch integration decision
 
+> **Publication follow-up (FS-0.4, 2026-09-12):** Dimi subsequently requested commit/push of the final handoff. Commit [8a054ae755315b334f18ac4b53ac4cce541e3519](https://github.com/DitmarF/funkspace-app/commit/8a054ae755315b334f18ac4b53ac4cce541e3519) contains that documentation-only change and was pushed to `feature/funkspace-minimum-usable` with upstream tracking. FS-0.4 rechecked clean local HEAD/cached upstream at that SHA; live remote/provider state was not re-read. “Local only/uncommitted” below describes the earlier handoff. Validated application/portfolio base remains `9f3f01d8e2745408a8523c07198aec0e73eed52b`. Current milestone scope/status is in the [feature-plan draft](../features/funkspace-minimum-usable.md).
+
 ## Task metadata
 
 - **Owner/current writer:** Codex.

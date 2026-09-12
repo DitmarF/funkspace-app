@@ -2,6 +2,8 @@
 
 > Dated follow-up: [FS-0.2 tooling and executed baseline](fs-0.2-tooling-baseline.md) records maintenance against the later committed inventory revision. The FS-0.1 evidence below remains a historical snapshot.
 
+> **Recovery pointer (FS-0.4, 2026-09-12):** current milestone scope/status lives in the [feature-plan draft](../features/funkspace-minimum-usable.md). [FS-0.3's final execution](fs-0.3-branch-integration-decision.md#final-execution-and-portfolio-handoff--2026-09-12) supersedes this snapshot's pending strategy/FS-G0 and absent integration/CI claims. Missing detailed-source reconciliation and undisclosed preservation information remain unresolved; no historical command evidence is rewritten.
+
 ## Task metadata
 
 - **Status:** In progress — accessible inventory and Sites-role feedback incorporated; detailed-plan reconciliation and Dimi preservation/acceptance pending.

@@ -10,6 +10,12 @@ The guiding principles for agents and contributors are captured in
 and optimize for accessibility and performance (respect dark mode and reduced
 motion).
 
+## Current milestone and entry points
+
+Start with [FunkSpace — Minimum Usable Experience](docs/features/funkspace-minimum-usable.md) for the single intended portfolio plan, current statuses and publication limits. It preserves 44 tasks; final source reconciliation remains pending. The [FS-0.1 baseline](docs/tasks/fs-0.1-inventory-real-starting-point.md) owns reuse/inspection evidence, [FS-0.2](docs/tasks/fs-0.2-tooling-baseline.md) owns tooling/command evidence, and [FS-0.3](docs/tasks/fs-0.3-branch-integration-decision.md) records the approved integration and validated portfolio base. Substantial tasks follow the [AI workflow](docs/development/ai-workflow.md).
+
+The portfolio milestone plans ordinary scrolling, content-driven sections and one bounded Canvas scene with a static alternative. These are future portfolio behavior, not claims about the current homepage. Game continuation remains [Wave Survivor EPIC 7](docs/features/wave-survivor-implementation-plan.md#epic-7--portfolio-play-shell-and-accessible-application-ui), after portfolio acceptance.
+
 ## Requirements
 
 - Node.js 22.22.0 for the verified baseline (`.nvmrc`); package minimum 22.13.1.
@@ -33,14 +39,14 @@ pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 - `frontend/` – Next.js App Router UI, Tailwind themed with CSS variables from
   `styles/tokens.css`, Storybook configuration, and component library (Base,
   Controls, Modules, Layouts, Templates).
-- `src/` – shared UI primitives consumed by Vitest demos (e.g. `Hello`).
+- `games/wave-survivor/` – accepted standalone TypeScript/Canvas game and demo; portfolio hosting remains separate work.
 - `tokens/` – source of truth for design and motion tokens.
 - `styles/` – generated CSS custom properties for default, dark, muted, and
   high-contrast themes.
 - `common/generated/` – generated, framework-neutral TypeScript token constants.
 - `common/motion/` – pure easing, interpolation, tween, and timeline utilities.
 - `e2e/` – Playwright tests; configuration lives in `playwright.config.ts`.
-- `__tests__/` – Vitest suites run with React Testing Library.
+- Colocated `*.test.ts`/`*.test.tsx` – Vitest suites; dedicated game tests also have a separate Node configuration.
 - `backend/` – stub reserved for possible future server capabilities.
 - `common/` – private framework-neutral package exporting generated TypeScript
   token artifacts and the shared motion core.
@@ -68,7 +74,7 @@ pnpm e2e            # Playwright end-to-end suite (Chromium only)
 
 Vitest is configured to reuse the frontend React installation and loads
 `vitest.setup.ts` for Testing Library matchers. Coverage thresholds are enforced
-only in CI but can be run locally via `pnpm coverage`.
+when coverage runs. CI enables coverage by default; `pnpm coverage` also enables it locally.
 
 ## Playwright browser downloads
 
@@ -101,8 +107,11 @@ animated logo, so these measurements do not establish an animation-on cost compa
 
 Deploy the `frontend` workspace on Vercel. Set the install command to
 `pnpm install --frozen-lockfile` so workspaces are linked correctly, and enable **Include source
-files outside of the Root Directory** to access shared packages. Builds run
-`pnpm build` from the workspace root.
+files outside of the Root Directory** to access shared packages. With Root Directory
+`frontend`, the verified Build Command override is `pnpm --workspace-root build`;
+the root build performs tokens, common typecheck, game build and Next build.
+FS-0.3 records the approved settings and deployment at its exact revision. Recheck
+the target and obtain action-specific approval before later deployment/settings changes.
 
 ## Further reading
 

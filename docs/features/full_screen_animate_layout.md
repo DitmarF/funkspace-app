@@ -1,5 +1,11 @@
 # Full-screen Animated Layout (Storybook Epic)
 
+> **Historical proposal — superseded for the portfolio milestone (FS-0.4, 2026-09-12).** Start with the [Minimum Usable Experience plan](funkspace-minimum-usable.md), including its publication limits. Sections 1–11 below preserve the earlier Storybook experiment; their snapping/full-viewport requirements, scaffold paths, micro-tasks and editor commands are not the current portfolio assignment. Existing demonstrations are retained, not removed or declared production-ready.
+
+For this portfolio, use ordinary document scrolling and content-driven Start, About and Contact sections. No forced snapping, slide navigation, nested section scroller, carousel, counter, dots, previous/next controls or visual editor is planned. One bounded Canvas scene has a deliberate static alternative. A single decorative-motion preference for logo and scene is planned in FS-3.4; it does not yet exist and will not control gameplay time. The portrait game arena remains governed by the separate Wave Survivor plan.
+
+Still-applicable principles below include semantic sections, keyboard/focus access, reduced-motion fallback, token reuse, reserved geometry and resource cleanup. Proposed file paths/token examples are historical, not proof of existing APIs or permission to create another motion system. Use current [motion boundaries](../motion.md) and the [AI workflow](../development/ai-workflow.md).
+
 **reasoning_effort:** medium
 
 ## 1) Checklist (conceptual steps)
