@@ -3,7 +3,7 @@
     "collect": {
       "url": ["http://localhost:3000/"],
       "startServerCommand": "NEXT_PUBLIC_ANIMATIONS_ENABLED=true pnpm -F frontend start -p 3000",
-      "startServerReadyPattern": "started server on",
+      "startServerReadyPattern": "Ready in",
       "numberOfRuns": 3,
       "settings": {
         "preset": "desktop"
@@ -29,4 +29,3 @@
     }
   }
 }
-

@@ -1,5 +1,7 @@
 # Task FS-0.1 — Inventory the real starting point
 
+> Dated follow-up: [FS-0.2 tooling and executed baseline](fs-0.2-tooling-baseline.md) records maintenance against the later committed inventory revision. The FS-0.1 evidence below remains a historical snapshot.
+
 ## Task metadata
 
 - **Status:** In progress — accessible inventory and Sites-role feedback incorporated; detailed-plan reconciliation and Dimi preservation/acceptance pending.
@@ -314,3 +316,17 @@ Any subsequent reviewer must verify the current SHA/worktree and supplied docume
 3. Any personal preservation/acceptance constraints not in current repository records. Existing Gate 2 approval is retained; missing detailed device measurements are not invented.
 
 **Dimi's next acceptance action:** supply the detailed EPIC 0 local source when ready, confirm the protected-work/assets list, and review this baseline with the incorporated counterpart findings. Baseline acceptance, FS-G0, FS-0.3 actions, and all external actions remain separate decisions.
+
+## FS-0.2 follow-up — 2026-09-12
+
+Codex continued from committed inventory revision `a0f22e91f2f1250ea5536973ed30598365fceffd`; see the [FS-0.2 record](fs-0.2-tooling-baseline.md) for exact commands, environment, before/after logs, diff and security proposals. All 15 requested command pairs passed locally; the full dependency audit returned findings and is not a clean security result. This does not rewrite the original FS-0.1 NOT RUN evidence or establish live CI/visual approval.
+
+- FS01-T01: shared Node/pnpm declarations and frozen installation/build order verified; no dependency upgrade or lockfile change.
+- FS01-T02: config-relative features scan corrected; actual GameHost sr-only emission verified from feature files alone. The class already appears elsewhere, so no prior visible defect is inferred.
+- FS01-T04: Lighthouse readiness and build-time flags corrected and verified in compiled output; measured home route still has no animation-on consumer.
+- FS01-T05 / FS01-S01: unused services/provider mismatch corrected; preview.ts is canonical and preview.tsx delegates. Build and two browser story smoke checks passed. Font/theme presentation remains FS-1.7; token/typography repair remains FS-1.2.
+- FS01-T03 coverage/browser limits remain explicit. Default and separate demo Chromium suites ran; WebKit/real devices/live CI did not.
+- FS01-L01: FS-0.2 also found the existing 2.4 filter in logo-animation E2E, whose missing-ratio treatment differs from home E2E. Both filters remain unchanged for atomic source-color/suppression repair in FS-1.2.
+- FS01-S02/S03/S04 later logo/theme/API repairs retain their assigned tasks; no application cleanup was folded into maintenance.
+
+Detailed-plan reconciliation, Dimi's preservation confirmation and human gate acceptance remain pending. Sites can consume the verified setup/command instructions in FS-0.2 without treating security findings or missing acceptance evidence as resolved.

@@ -2,6 +2,7 @@
   "name": "funkspace-app",
   "private": true,
   "version": "0.0.0",
+  "packageManager": "pnpm@10.30.3",
   "workspaces": [
     "frontend",
     "backend",
@@ -9,7 +10,8 @@
     "games/*"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13.1",
+    "pnpm": "10.30.3"
   },
   "scripts": {
     "lint": "pnpm --filter frontend exec next lint --max-warnings=0 && prettier --check .",
@@ -20,15 +22,15 @@
     "e2e:ui": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --ui",
     "e2e:report": "playwright show-report",
     "e2e:smoke": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test e2e/home.a11y.spec.ts",
-    "postinstall": "if [ \"$VERCEL\" != \"1\" ]; then cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium --with-deps; fi",
-    "build": "pnpm -F @funkspace/common typecheck && pnpm -F frontend build",
+    "setup:browsers": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium --with-deps",
+    "build": "pnpm build:tokens && pnpm -F @funkspace/common typecheck && pnpm -F frontend build",
     "build:tokens": "pnpm exec style-dictionary build --config style-dictionary.config.mjs",
     "format": "prettier --write .",
     "storybook": "pnpm --filter frontend run storybook",
     "storybook:build": "pnpm --filter frontend run storybook:build",
-    "lhci:build": "pnpm build:tokens && pnpm build",
-    "lhci:off": "pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.off.json",
-    "lhci:on": "pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.on.json",
+    "lhci:build": "pnpm build",
+    "lhci:off": "cross-env NEXT_PUBLIC_ANIMATIONS_ENABLED=false pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.off.json",
+    "lhci:on": "cross-env NEXT_PUBLIC_ANIMATIONS_ENABLED=true pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.on.json",
     "lhci:ci": "pnpm run lhci:off && pnpm run lhci:on"
   },
   "devDependencies": {
