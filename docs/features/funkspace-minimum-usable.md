@@ -2,12 +2,12 @@
 
 ## Plan metadata
 
-- **Status:** Authoritative feature plan — both supplied sources reconciled; FS-0.4 documentation complete. FS-G0 APPROVED by Dimi on 2026-09-12 for the reviewed candidate/patch; [actual decision](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12). FS-1.1 is next; EPIC 1 implementation has not started.
+- **Status:** Authoritative feature plan — both supplied sources reconciled; FS-0.4 documentation complete. FS-G0 APPROVED by Dimi on 2026-09-12 for the reviewed candidate/patch; [actual decision](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12). FS-1.1 contract complete: Codex technical review recorded and Dimi accepted the recommended matrix on 2026-09-15; [actual decision and limits](../tasks/fs-1.1-asset-and-component-contract.md#dimi-contract-decision--2026-09-15). EPIC 1 component/token implementation has not started.
 - **Owner/current writer:** Codex; product owner/final acceptance: Dimi. Sites supplies read-only counterpart review and later owns its assigned implementation tasks.
 - **Related epic/task:** Portfolio EPICs 0–6; publication task [FS-0.4](../tasks/fs-0.4-authoritative-feature-plan.md).
 - **Decision entry point:** [Authoritative decision register](#pending-decisions-and-latest-needed-points); [FS-0.5 technical rationale and answer provenance](../tasks/fs-0.5-product-and-technical-decisions.md). Dimi leads/approves FS-0.5; Codex is its designated documentation writer.
 - **Target release:** Minimum Usable Experience, before separate Wave Survivor EPIC 7; no portfolio release date assigned.
-- **Last updated:** 2026-09-12.
+- **Last updated:** 2026-09-15.
 - **Related ADRs:** [001](../decisions/ADR-001-monorepo-strategy.md), [002](../decisions/ADR-002-design-token-source-of-truth.md), [003](../decisions/ADR-003-interactive-experience-boundary.md), [004](../decisions/ADR-004-game-development-architecture.md).
 
 ### Authority and source provenance
@@ -379,7 +379,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.1 — Prepare the asset and component contract
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Sites recorded Codex's technical review and the inspected 36-unit Menu SVG export in the [asset and component contract](../tasks/fs-1.1-asset-and-component-contract.md). Dimi accepted the recommended treatments, dimensions, control typography and necessary text-only substitutions on 2026-09-15; [actual decision](../tasks/fs-1.1-asset-and-component-contract.md#dimi-contract-decision--2026-09-15). Production export/integration and later visual checks retain their owners. FS-1.2 is not started and requires its own stage authorization.
 
 **Lead:** Dimi
 
