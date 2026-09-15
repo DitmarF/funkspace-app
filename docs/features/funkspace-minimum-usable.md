@@ -1079,11 +1079,13 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 ## Implementation handoff
 
+- **Completed reference work:** The [Storybook color reference](../tasks/storybook-color-reference.md) presents the current palettes and semantic roles without changing tokens. Implementation and validation are complete; Dimi authorized documentation finalization, commit and push on 2026-09-16. FS-1.3 remains complete; FS-1.4 is not started.
+
 - **Recommended first step:** read this plan, the accepted FS-1.1 contract and completed FS-1.2 task record; verify the current branch, HEAD and accessible diff before continuing. The FS-1.2 record identifies its accepted implementation patch on base `655f53857ebf55da57e928532e8c74b9990881cc`. Earlier SHAs are historical provenance, not reset targets.
 - **Codex next action:** review Standard Button compatibility at FS-1.7. FS-1.2 acceptance and commit/push are complete; no further foundation acceptance vote is needed.
 - **Sites handoff:** FS-1.3 is complete; implementation, source assets, native API examples, pending/focus policy, checks and manual/visual acceptance are recorded in the [Standard Button task](../tasks/fs-1.3-standard-button-family.md#final-dimi-acceptance-and-completion--2026-09-15).
 - **Dimi next action:** No FS-1.3 acceptance action remains. Dimi chooses when to start FS-1.4; it is not started automatically. Codex compatibility review remains at FS-1.7. Later content/provider/mobile-browser details remain scheduled in the [decision register](#pending-decisions-and-latest-needed-points).
-- **Do not change:** accepted gameplay/public contracts, original assets, unrelated work, generated token outputs by hand, or later milestone scope. Dimi's latest authorization covers the accepted FS-1.3 documentation, commit and push; no PR, merge, settings, deployment, branch deletion or live email is authorized.
+- **Do not change:** accepted gameplay/public contracts, original assets, unrelated work, generated token outputs by hand, or later milestone scope. Dimi's latest authorization covers the completed color-reference documentation, commit and push; no PR, merge, settings, deployment, branch deletion or live email is authorized.
 - **Completion summary expected:** task ID, qualified revision and accessible diff, actual files, contract changes, checks/outcomes and limits, owned follow-ups, counterpart findings and Dimi's recorded acceptance.
 
 Game continuation is the separate [Wave Survivor EPIC 7](wave-survivor-implementation-plan.md#epic-7--portfolio-play-shell-and-accessible-application-ui) after portfolio FS-6.6/FS-G3. `/play/wave-survivor` remains future integration work. Do not apply homepage particle/global-control or ordinary-scroll layout choices to the portrait game arena.
