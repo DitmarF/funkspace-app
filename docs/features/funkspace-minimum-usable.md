@@ -2,7 +2,7 @@
 
 ## Plan metadata
 
-- **Status:** Authoritative feature plan — both supplied sources reconciled; FS-0.4 documentation complete. FS-G0 APPROVED by Dimi on 2026-09-12 for the reviewed candidate/patch; [actual decision](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12). FS-1.1 contract complete: Codex technical review recorded and Dimi accepted the recommended matrix on 2026-09-15; [actual decision and limits](../tasks/fs-1.1-asset-and-component-contract.md#dimi-contract-decision--2026-09-15). EPIC 1 component/token implementation has not started.
+- **Status:** Authoritative feature plan — both supplied sources reconciled; FS-0.4 documentation complete. FS-G0 APPROVED by Dimi on 2026-09-12 for the reviewed candidate/patch; [actual decision](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12). FS-1.1 contract complete: Codex technical review recorded and Dimi accepted the recommended matrix on 2026-09-15; [actual decision and limits](../tasks/fs-1.1-asset-and-component-contract.md#dimi-contract-decision--2026-09-15). FS-1.2 is complete: Sites consumer review passed and Dimi accepted all corrections on 2026-09-15; [acceptance](../tasks/fs-1.2-token-and-contrast-foundations.md#dimi-acceptance--2026-09-15).
 - **Owner/current writer:** Codex; product owner/final acceptance: Dimi. Sites supplies read-only counterpart review and later owns its assigned implementation tasks.
 - **Related epic/task:** Portfolio EPICs 0–6; publication task [FS-0.4](../tasks/fs-0.4-authoritative-feature-plan.md).
 - **Decision entry point:** [Authoritative decision register](#pending-decisions-and-latest-needed-points); [FS-0.5 technical rationale and answer provenance](../tasks/fs-0.5-product-and-technical-decisions.md). Dimi leads/approves FS-0.5; Codex is its designated documentation writer.
@@ -379,7 +379,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.1 — Prepare the asset and component contract
 
-**Current status:** Complete — Sites recorded Codex's technical review and the inspected 36-unit Menu SVG export in the [asset and component contract](../tasks/fs-1.1-asset-and-component-contract.md). Dimi accepted the recommended treatments, dimensions, control typography and necessary text-only substitutions on 2026-09-15; [actual decision](../tasks/fs-1.1-asset-and-component-contract.md#dimi-contract-decision--2026-09-15). Production export/integration and later visual checks retain their owners. FS-1.2 is not started and requires its own stage authorization.
+**Current status:** Complete — Sites recorded Codex's technical review and the inspected 36-unit Menu SVG export in the [asset and component contract](../tasks/fs-1.1-asset-and-component-contract.md). Dimi accepted the recommended treatments, dimensions, control typography and necessary text-only substitutions on 2026-09-15; [actual decision](../tasks/fs-1.1-asset-and-component-contract.md#dimi-contract-decision--2026-09-15). Production export/integration and later visual checks retain their owners. FS-1.2 foundation corrections are also complete and accepted; later component work remains separate.
 
 **Lead:** Dimi
 
@@ -395,7 +395,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.2 — Reconcile required tokens and repair contrast evidence
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Codex implemented the [token and contrast foundations](../tasks/fs-1.2-token-and-contrast-foundations.md), with before/after rendering evidence and unfiltered checks. Sites' separate consumer review passed after the transition-contrast correction, and Dimi accepted all corrections on 2026-09-15; [actual decision and commit/push authorization](../tasks/fs-1.2-token-and-contrast-foundations.md#dimi-acceptance--2026-09-15). The pre-existing E2E type mismatch and future component coverage limits remain recorded. No later component-family implementation is started.
 
 **Lead:** Codex
 
@@ -1079,11 +1079,11 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 ## Implementation handoff
 
-- **Recommended first step:** read this plan, its decision register and linked baseline/task records; verify `156c28c8486352328a184d587a6540eee42b8bc1` plus the complete six-file patch from FS-0.4 before consuming the handoff. Earlier input SHAs are dated provenance, not current candidate claims.
-- **Codex next action:** complete the explicitly authorized documentation commit/push, then support the Dimi-led FS-1.1 handoff when that task starts. The exact FS-G0 decision is recorded; no additional gate vote or source/preservation confirmation is requested.
-- **Sites handoff:** consume the approved candidate and resulting documentation commit, reuse map and command evidence; identify any environment gap honestly. Prepare FS-1.1 actual-asset inventory and minimal control matrix with Dimi. Counterpart sufficiency is not Dimi visual acceptance.
-- **Dimi next action:** lead FS-1.1 asset/control inputs with Sites: actual original SVG/editable sources, essential variants and named substitutes. Later content/provider/mobile-browser details remain scheduled in the [decision register](#pending-decisions-and-latest-needed-points). No secret submission is needed here.
-- **Do not change:** accepted gameplay/public contracts, original assets, independent clone/untracked work, generated token outputs by hand, or later milestone scope. No commit, push, PR, merge, settings, deployment, branch deletion or live email is authorized by this documentation task.
-- **Completion summary expected:** task ID, qualified revision/worktree and accessible diff, actual files, contract changes (none for FS-0.4), checks/outcomes and limits, owned blockers, counterpart findings and Dimi's next action.
+- **Recommended first step:** read this plan, the accepted FS-1.1 contract and completed FS-1.2 task record; verify the current branch, HEAD and accessible diff before continuing. The FS-1.2 record identifies its accepted implementation patch on base `655f53857ebf55da57e928532e8c74b9990881cc`. Earlier SHAs are historical provenance, not reset targets.
+- **Codex next action:** finish the explicitly authorized FS-1.2 acceptance documentation, commit and push, then support later counterpart review when requested. No further FS-1.2 acceptance vote is needed.
+- **Sites handoff:** use the accepted asset/control contract, semantic binding/pairing table and consumer-review evidence for FS-1.3 when separately started. Preserve existing callers and verify actual component states beyond the foundation fixtures.
+- **Dimi next action:** start the next task stage when ready. FS-1.2 corrections are accepted; later content/provider/mobile-browser details remain scheduled in the [decision register](#pending-decisions-and-latest-needed-points).
+- **Do not change:** accepted gameplay/public contracts, original assets, unrelated work, generated token outputs by hand, or later milestone scope. Dimi's latest authorization covers the scoped FS-1.2 commit/push only; no PR, merge, settings, deployment, branch deletion or live email is authorized.
+- **Completion summary expected:** task ID, qualified revision and accessible diff, actual files, contract changes, checks/outcomes and limits, owned follow-ups, counterpart findings and Dimi's recorded acceptance.
 
 Game continuation is the separate [Wave Survivor EPIC 7](wave-survivor-implementation-plan.md#epic-7--portfolio-play-shell-and-accessible-application-ui) after portfolio FS-6.6/FS-G3. `/play/wave-survivor` remains future integration work. Do not apply homepage particle/global-control or ordinary-scroll layout choices to the portrait game arena.

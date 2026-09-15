@@ -14,17 +14,23 @@ const config: Config = {
     extend: {
       fontFamily: {
         display: [
-          "var(--font-work-sans)",
+          "var(--font-work-sans, var(--fs-font-family-display))",
           "ui-sans-serif",
           "system-ui",
           "sans-serif",
         ],
         sans: [
-          "var(--font-space-grotesk)",
+          "var(--font-space-grotesk, var(--fs-font-family-base))",
           "ui-sans-serif",
           "system-ui",
           "sans-serif",
         ],
+      },
+      spacing: {
+        "fs-xs": "var(--fs-space-xs)",
+        "fs-md": "var(--fs-space-md)",
+        "fs-lg": "var(--fs-space-lg)",
+        "fs-2xl": "var(--fs-space-2xl)",
       },
       transitionDuration: {
         100: "var(--fs-motion-duration-100)",

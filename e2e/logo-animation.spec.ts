@@ -1,9 +1,10 @@
 // E2E test for logo animation with accessibility scan
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { settleStyles } from "./helpers/foundation";
 
 test.describe("Logo Animation", () => {
-  test("animation completes and reaches final state with no serious a11y violations", async ({
+  test("animation completes and reaches final state with zero unfiltered axe violations", async ({
     page,
   }) => {
     // Navigate to logo animation test page and wait for network to be idle
@@ -174,36 +175,16 @@ test.describe("Logo Animation", () => {
     expect(fillOpacity5).toBeGreaterThan(0.95);
     expect(fillOpacity6).toBeGreaterThan(0.95);
 
-    // Run axe accessibility scan
+    await settleStyles(page);
+
+    // Run the unfiltered accessibility scan
     const axeResults = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa", "best-practice"])
       .analyze();
 
-    // Filter out minor violations (similar to home.a11y.spec.ts pattern)
-    const seriousViolations = axeResults.violations.filter((violation) => {
-      // Filter out minor color-contrast issues that are close to AA
-      if (violation.id === "color-contrast") {
-        const hasSeriousContrast = violation.nodes.some((node) => {
-          const anyWithContrast = node.any.find(
-            (check) => check.id === "color-contrast",
-          );
-          const ratio = (anyWithContrast as any)?.data?.contrastRatio as
-            | number
-            | undefined;
-          // Accept current color contrast (>= 2.4:1) to allow existing design
-          // Note: This is below WCAG AA (4.5:1) but accepts the current design
-          return typeof ratio === "number" && ratio < 2.4;
-        });
-        return hasSeriousContrast;
-      }
-      // Keep all other violations
-      return true;
-    });
-
-    // Fail if there are any serious violations
     expect(
-      seriousViolations,
-      `Found ${seriousViolations.length} serious accessibility violations:\n${JSON.stringify(seriousViolations, null, 2)}`,
+      axeResults.violations,
+      JSON.stringify(axeResults.violations, null, 2),
     ).toEqual([]);
   });
 

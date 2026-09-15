@@ -29,7 +29,7 @@ export const colors = {
     },
     "semantic": {
       "action-disabled": "#808080",
-      "action-hover": "#cc673b",
+      "action-hover": "#9c4b2b",
       "action-link": "#7a3bcc",
       "action-primary": "#3b47cc",
       "border-focus": "#3b47cc",
@@ -88,7 +88,7 @@ export const colors = {
       "action-hover": "#cc8668",
       "action-link": "#9368cc",
       "action-primary": "#3b94cc",
-      "border-focus": "#3b94cc",
+      "border-focus": "#cccccc",
       "border-strong": "#cccccc",
       "border-subtle": "#808080",
       "content-disabled": "#808080",

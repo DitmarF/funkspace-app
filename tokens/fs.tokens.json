@@ -216,7 +216,7 @@
           "dark-high-contrast": { "$value": "rgba(74,186,255,1)" }
         },
         "color-action-hover": {
-          "default": { "$value": "rgba(204,103,59,1)" },
+          "default": { "$value": "rgba(156,75,43,1)" },
           "muted": { "$value": "rgba(102,51,30,1)" },
           "dark": { "$value": "rgba(204,134,104,1)" },
           "dark-high-contrast": { "$value": "rgba(255,168,130,1)" }
@@ -278,7 +278,9 @@
         "color-border-focus": {
           "default": { "$value": "rgba(59,71,204,1)" },
           "muted": { "$value": "rgba(30,36,102,1)" },
-          "dark": { "$value": "rgba(59,148,204,1)" },
+          "dark": {
+            "$value": "{fs-colors.FS-Semantic-Colors.Borders.color-border-strong.dark}"
+          },
           "dark-high-contrast": { "$value": "rgba(74,186,255,1)" }
         }
       }
@@ -303,7 +305,12 @@
     "FontFamilies": {
       "font-family-base": {
         "default": {
-          "$value": "\"Inter\", \"Helvetica Neue\", Arial, sans-serif"
+          "$value": "\"Space Grotesk\", \"Helvetica Neue\", Arial, sans-serif"
+        }
+      },
+      "font-family-display": {
+        "default": {
+          "$value": "\"Work Sans\", \"Helvetica Neue\", Arial, sans-serif"
         }
       },
       "font-family-mono": {

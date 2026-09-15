@@ -5,6 +5,12 @@ import React from "react";
 import { ServiceProvider } from "../application/providers/ServiceProvider";
 
 import "../app/globals.css";
+import { workSans, spaceGrotesk } from "../app/fonts";
+
+document.documentElement.classList.add(
+  workSans.variable,
+  spaceGrotesk.variable,
+);
 
 if (process.env.NODE_ENV !== "production") {
   const reactElementPrototype = Object.getPrototypeOf(createElement("div"));
