@@ -7,11 +7,21 @@ import {
 } from "../helpers/foundation";
 
 for (const theme of themes) {
-  for (const variant of ["primary", "secondary"]) {
+  for (const variant of [
+    "primary",
+    "secondary",
+    "outlined",
+    "accent-outlined",
+  ]) {
     test(`${theme} ${variant}: real Button fonts, spacing and contrast through hover`, async ({
       page,
     }, testInfo) => {
-      const global = theme === "dark-high-contrast" ? "highContrast" : theme;
+      const global =
+        theme === "default"
+          ? "light"
+          : theme === "dark-high-contrast"
+            ? "highContrast"
+            : theme;
       await page.goto(
         `/iframe.html?id=controls-button--${variant}&viewMode=story&globals=theme:${global}`,
       );
@@ -31,16 +41,20 @@ for (const theme of themes) {
       expect(base.ratio).toBeGreaterThanOrEqual(4.5);
       const font = await page.evaluate(() =>
         getComputedStyle(document.documentElement)
-          .getPropertyValue("--font-space-grotesk")
+          .getPropertyValue("--font-work-sans")
           .trim()
           .replace(/["']/g, ""),
       );
       expect(font).not.toBe("");
       expect(base.fontFamily).toContain(font);
+      expect(base.fontSize).toBe("24px");
+      expect(base.fontWeight).toBe("700");
       await button.hover();
       const frames = await transitionPairs(button);
+      // Dimi approved Figma's large-text pairing. The 24px minimum is
+      // asserted above; ordinary text retains its separate 4.5:1 checks.
       for (const frame of frames)
-        expect(frame.ratio, JSON.stringify(frame)).toBeGreaterThanOrEqual(4.5);
+        expect(frame.ratio, JSON.stringify(frame)).toBeGreaterThanOrEqual(3);
       await page.mouse.down();
       expect((await renderedPair(button)).ratio).toBeGreaterThanOrEqual(4.5);
       await page.mouse.move(0, 0);

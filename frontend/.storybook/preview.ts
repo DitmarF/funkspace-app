@@ -1,8 +1,12 @@
 import type { Preview } from "@storybook/nextjs-vite";
 import { withThemeByDataAttribute } from "@storybook/addon-themes";
-import { createElement } from "react";
+import { createElement, useEffect, type ReactNode } from "react";
 import React from "react";
-import { ServiceProvider } from "../application/providers/ServiceProvider";
+import {
+  ServiceProvider,
+  useServices,
+} from "../application/providers/ServiceProvider";
+import type { Theme } from "../domain/theme/Theme";
 
 import "../app/globals.css";
 import { workSans, spaceGrotesk } from "../app/fonts";
@@ -43,13 +47,43 @@ if (process.env.NODE_ENV !== "production") {
   }
 }
 
+const storybookThemes: Record<string, Theme> = {
+  default: "system",
+  light: "default",
+  dark: "dark",
+  muted: "muted",
+  highContrast: "dark-high-contrast",
+};
+
+function StorybookTheme({
+  theme,
+  children,
+}: {
+  theme: Theme;
+  children: ReactNode;
+}) {
+  const { themeService } = useServices();
+  // The empty body theme inherits root variables. Keep the existing service's
+  // root selection aligned so explicit light cannot inherit system dark.
+  useEffect(() => themeService.setTheme(theme), [theme, themeService]);
+  return children;
+}
+
 const preview: Preview = {
   decorators: [
-    // Wrap all stories with ServiceProvider
-    (Story) => createElement(ServiceProvider, null, createElement(Story)),
+    (Story, context) =>
+      createElement(
+        ServiceProvider,
+        null,
+        createElement(StorybookTheme, {
+          theme: storybookThemes[context.globals.theme] ?? "system",
+          children: createElement(Story),
+        }),
+      ),
     withThemeByDataAttribute({
       themes: {
         default: "",
+        light: "",
         dark: "dark",
         muted: "muted",
         highContrast: "dark-high-contrast",

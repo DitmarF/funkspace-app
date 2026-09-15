@@ -30,6 +30,7 @@ export const colors = {
     "semantic": {
       "action-disabled": "#808080",
       "action-hover": "#9c4b2b",
+      "action-hover-large": "#cc673b",
       "action-link": "#7a3bcc",
       "action-primary": "#3b47cc",
       "border-focus": "#3b47cc",
@@ -86,6 +87,7 @@ export const colors = {
     "semantic": {
       "action-disabled": "#808080",
       "action-hover": "#cc8668",
+      "action-hover-large": "#cc8668",
       "action-link": "#9368cc",
       "action-primary": "#3b94cc",
       "border-focus": "#cccccc",
@@ -142,6 +144,7 @@ export const colors = {
     "semantic": {
       "action-disabled": "#808080",
       "action-hover": "#66331e",
+      "action-hover-large": "#66331e",
       "action-link": "#3d1e66",
       "action-primary": "#1e2466",
       "border-focus": "#1e2466",
@@ -198,6 +201,7 @@ export const colors = {
     "semantic": {
       "action-disabled": "#808080",
       "action-hover": "#ffa882",
+      "action-hover-large": "#ffa882",
       "action-link": "#b882ff",
       "action-primary": "#4abaff",
       "border-focus": "#4abaff",

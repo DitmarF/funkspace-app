@@ -1,5 +1,20 @@
 # Task FS-1.1 — Asset and component contract
 
+**Subsequent Standard revision (2026-09-15):** Dimi's FS-1.3 review expands the
+accepted Standard contract to all four Figma treatments and 48/72/96px sizes,
+including paired decorative icon slots. Dimi also approved Figma's 3:1
+large-label hover pairing while retaining the ordinary-text contrast repair.
+The [FS-1.3 correction record](fs-1.3-standard-button-family.md#figma-matrix-correction--2026-09-15)
+contains the exact answers, source nodes, revised matrix and validation.
+Historical FS-1.1 approval below remains recorded; its narrower Standard
+restrictions are superseded by that revision. Other families remain unchanged.
+
+Dimi subsequently accepted the corrected Button appearance and explicitly
+requested the existing seven-family icon library in Storybook. The
+[FS-1.3 icon-library record](fs-1.3-standard-button-family.md#button-acceptance-and-storybook-icon-library--2026-09-15)
+authorizes that catalogue and records all 21 source exports. This supersedes
+the earlier catalogue prohibition for those existing assets only.
+
 ## Task metadata
 
 - **Status:** Complete — contract accepted by Dimi on 2026-09-15; Codex technical review and the 36-unit export evidence recorded. Production asset/control/token implementation remains separate.
