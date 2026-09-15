@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { workSans, spaceGrotesk } from "./fonts";
 import { ServiceProvider } from "@/application/providers/ServiceProvider";
-import { THEME_VALUES } from "@/domain/theme/Theme";
+import { ThemeBootstrapScript } from "@/application/providers/ThemeBootstrapScript";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,46 +21,7 @@ export default function RootLayout({
       className={`${workSans.variable} ${spaceGrotesk.variable}`}
     >
       <body className="antialiased">
-        <Script
-          id="theme-script"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var validThemes = ${JSON.stringify(THEME_VALUES)};
-                  var applyTheme = function(theme) {
-                    if (theme && theme !== 'default') {
-                      document.documentElement.setAttribute('data-theme', theme);
-                    } else {
-                      document.documentElement.removeAttribute('data-theme');
-                    }
-                  };
-
-                  var getSystemTheme = function() {
-                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                      return 'dark';
-                    }
-                    return 'default';
-                  };
-
-                  var storedTheme = localStorage.getItem('theme');
-
-                  if (validThemes.indexOf(storedTheme) === -1) {
-                    storedTheme = 'system';
-                    localStorage.setItem('theme', 'system');
-                  }
-
-                  applyTheme(storedTheme === 'system' ? getSystemTheme() : storedTheme);
-                } catch (error) {
-                  if (${process.env.NODE_ENV !== "production"}) {
-                    console.error("Theme initialization failed", error);
-                  }
-                }
-              })();
-            `,
-          }}
-        />
+        <ThemeBootstrapScript />
         <ServiceProvider>{children}</ServiceProvider>
       </body>
     </html>

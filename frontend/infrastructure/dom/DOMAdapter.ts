@@ -25,15 +25,26 @@ export class DOMAdapter implements DOMPort {
   }
 
   hasMatchMedia(): boolean {
-    return (
-      typeof window !== "undefined" && typeof window.matchMedia === "function"
-    );
+    try {
+      return (
+        typeof window !== "undefined" && typeof window.matchMedia === "function"
+      );
+    } catch {
+      return false;
+    }
   }
 
   matchMedia(query: string): MediaQueryList | null {
     if (!this.hasMatchMedia()) {
       return null;
     }
-    return window.matchMedia(query);
+    try {
+      const media = window.matchMedia(query);
+      // Access can fail independently of invoking matchMedia (restricted hosts).
+      void media.matches;
+      return media;
+    } catch {
+      return null;
+    }
   }
 }

@@ -3,7 +3,12 @@
  * Application service for theme management
  */
 
-import { isTheme, type Theme, type ResolvedTheme } from "@/domain/theme/Theme";
+import {
+  isTheme,
+  THEME_STORAGE_KEY,
+  type Theme,
+  type ResolvedTheme,
+} from "@/domain/theme/Theme";
 import type { StoragePort } from "@/domain/ports/StoragePort";
 import type { DOMPort } from "@/domain/ports/DOMPort";
 
@@ -58,7 +63,7 @@ export interface ThemeService {
 }
 
 export class ThemeServiceImpl implements ThemeService {
-  private readonly storageKey = "theme";
+  private readonly storageKey = THEME_STORAGE_KEY;
   private readonly subscribers = new Set<ThemeSubscriber>();
   private unsubscribeSystemTheme: (() => void) | null = null;
 

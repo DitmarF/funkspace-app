@@ -170,8 +170,23 @@ Tests should be colocated with source files (`*.test.tsx` next to source).
 - `components/ThemeSwitcher` delegates theme persistence and application to
   `ThemeService`; it owns only selection UI state.
 
-The pre-hydration script in `app/layout.tsx` performs a one-time application of
-the stored theme to prevent a visual flash. After hydration, `ThemeService` is
+`app/layout.tsx` renders `application/providers/ThemeBootstrapScript.tsx`, a thin
+startup composition boundary alongside ServiceProvider. It imports only trusted
+generated script data, not an executing browser initializer. The maintained
+`infrastructure/theme/themeBootstrap.ts` reuses domain validation/storage key and
+the small existing DOM/storage adapters. `scripts/build-theme-bootstrap.mjs`
+compiles it into the tracked `frontend/generated/theme-bootstrap.ts`; normal
+TypeScript imports do not run startup effects. No service factory, runtime manager
+or new Presentation-to-Infrastructure import pattern is introduced.
+
+The existing inline `theme-script` / `beforeInteractive` delivery applies appearance
+once before provider hydration. Storage read/media access failures fall back;
+normalization writes happen independently after application. This timing does not
+guarantee application before first paint on every device/network: the installed
+Next App Router executes its inline queue after bootstrap chunks arrive. See the
+[task evidence](tasks/maintenance-theme-bootstrap.md) and
+[Next 15 Script contract](https://nextjs.org/docs/15/app/api-reference/components/script#beforeinteractive).
+After hydration, `ThemeService` is
 the sole runtime authority: it validates and persists selections, updates the
 document theme, responds to system preference changes, and owns listener
 cleanup through `ServiceProvider`. Consumers use `ThemeService.subscribe()` to

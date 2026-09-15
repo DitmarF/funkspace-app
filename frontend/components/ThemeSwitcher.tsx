@@ -8,7 +8,7 @@ export default function ThemeSwitcher() {
   const { themeService } = useServices();
 
   // Do not assume an initial theme for button highlight to avoid visual flip.
-  // The page theme itself is applied by the inline script in layout.tsx.
+  // ThemeBootstrapScript applies the initial page appearance before hydration.
   const [currentTheme, setCurrentTheme] = useState<Theme | null>(null);
 
   useEffect(() => {

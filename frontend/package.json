@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @funkspace/wave-survivor build && next dev -p 3000",
-    "build": "pnpm --filter @funkspace/wave-survivor build && next build",
+    "dev": "pnpm --workspace-root build:theme-bootstrap && pnpm --filter @funkspace/wave-survivor build && next dev -p 3000",
+    "build": "pnpm --workspace-root build:theme-bootstrap && pnpm --filter @funkspace/wave-survivor build && next build",
     "start": "next start",
     "lint": "next lint",
     "build:tokens": "pnpm --workspace-root build:tokens",

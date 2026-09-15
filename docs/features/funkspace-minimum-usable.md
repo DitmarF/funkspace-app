@@ -647,6 +647,8 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-3.3 — Connect appearance controls to ThemeService
 
+**Related bounded maintenance:** [Typed inline theme bootstrap](../tasks/maintenance-theme-bootstrap.md) records the extraction, initialization failure correction and validation separately; it does not complete this task or change its ownership/dependencies.
+
 **Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
 
 **Lead:** Sites

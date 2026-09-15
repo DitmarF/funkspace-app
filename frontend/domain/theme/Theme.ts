@@ -13,6 +13,9 @@ export const THEME_VALUES = [
 
 export type Theme = (typeof THEME_VALUES)[number];
 
+/** Persisted selection shared by startup and the runtime theme authority. */
+export const THEME_STORAGE_KEY = "theme";
+
 /**
  * Validates if a string is a valid theme value
  */
