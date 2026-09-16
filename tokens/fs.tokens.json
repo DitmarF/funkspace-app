@@ -286,7 +286,7 @@
           "default": { "$value": "rgba(59,71,204,1)" },
           "muted": { "$value": "rgba(30,36,102,1)" },
           "dark": {
-            "$value": "{fs-colors.FS-Semantic-Colors.Borders.color-border-strong.dark}"
+            "$value": "rgba(74,186,255,1)"
           },
           "dark-high-contrast": { "$value": "rgba(74,186,255,1)" }
         }

@@ -2,14 +2,12 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import Button from "./Button";
 import HexButton, { type HexButtonSize } from "./HexButton";
-import styles from "./HexButton.stories.module.css";
 
 // Gallery samples use the native accessible-name prop without a visible label.
 // The production control's default Menu label remains unchanged.
 const iconOnly = {
   children: "",
   "aria-label": "Menu",
-  className: styles.iconOnly,
 };
 
 const meta = {
@@ -18,6 +16,7 @@ const meta = {
   tags: ["autodocs"],
   args: { ...iconOnly, variant: "primary" },
   argTypes: {
+    icon: { control: "select", options: ["settings-burger", "close"] },
     size: { control: "select", options: ["small", "medium", "large"] },
     variant: {
       control: "select",
@@ -37,6 +36,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Menu: Story = {};
+
+export const Close: Story = {
+  args: {
+    icon: "close",
+    variant: "secondary",
+    size: "small",
+    "aria-label": "Close",
+  },
+};
 
 export const FigmaMatrix: Story = {
   render: () => (

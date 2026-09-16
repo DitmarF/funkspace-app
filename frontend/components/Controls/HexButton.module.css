@@ -23,6 +23,12 @@
   overflow: visible;
 }
 
+.iconOnly {
+  padding: 0;
+  gap: 0;
+  flex-shrink: 0;
+}
+
 .small {
   --hex-size: var(--fs-space-2xl);
   --hex-label-size: var(--fs-font-size-md);

@@ -35,8 +35,9 @@ export type HexButtonProps = Omit<
   ComponentPropsWithoutRef<"button">,
   "children" | "dangerouslySetInnerHTML" | "aria-pressed"
 > & {
-  /** A visible, wrapping name remains inside the same native target. */
+  /** Visible name, or an empty string with a caller-supplied aria-label. */
   children?: string;
+  icon?: "settings-burger" | "close";
   variant?: ControlVariant;
   size?: HexButtonSize;
 };
@@ -44,7 +45,8 @@ export type HexButtonProps = Omit<
 const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
   (
     {
-      children = "Menu",
+      icon = "settings-burger",
+      children = icon === "close" ? "" : "Menu",
       variant = "primary",
       size = "medium",
       type = "button",
@@ -59,7 +61,7 @@ const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
         {...props}
         ref={ref}
         type={type}
-        className={`${styles.control} ${styles[size]} ${controlAppearanceClassName(variant)} ${className}`.trim()}
+        className={`${styles.control} ${styles[size]} ${children ? "" : styles.iconOnly} ${controlAppearanceClassName(variant)} ${className}`.trim()}
       >
         <span className={styles.artwork} aria-hidden="true" inert>
           <svg
@@ -74,13 +76,9 @@ const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
             {/* Size-specific Figma exports; only paint is bound to shared roles. */}
             <path d={artwork.path} strokeWidth={artwork.stroke} />
           </svg>
-          <Icon
-            className={styles.icon}
-            name="settings-burger"
-            size={artwork.icon}
-          />
+          <Icon className={styles.icon} name={icon} size={artwork.icon} />
         </span>
-        <span className={styles.label}>{children}</span>
+        {children && <span className={styles.label}>{children}</span>}
       </button>
     );
   },

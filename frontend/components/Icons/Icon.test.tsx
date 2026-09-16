@@ -4,6 +4,23 @@ import { describe, expect, it } from "vitest";
 import { Icon } from "./Icon";
 
 describe("Icon", () => {
+  it.each([
+    [24, 26],
+    [36, 40],
+    [48, 48],
+  ] as const)(
+    "displays Close at %ipx without cropping its %i-unit source frame",
+    (size, sourceSize) => {
+      render(<Icon name="close" size={size} label="Close artwork" />);
+      const icon = screen.getByRole("img", { name: "Close artwork" });
+      expect(icon).toHaveAttribute("width", String(size));
+      expect(icon).toHaveAttribute("height", String(size));
+      expect(icon).toHaveAttribute(
+        "viewBox",
+        `0 0 ${sourceSize} ${sourceSize}`,
+      );
+    },
+  );
   it("hides decorative artwork and preserves native props/ref", () => {
     const ref = createRef<SVGSVGElement>();
     render(

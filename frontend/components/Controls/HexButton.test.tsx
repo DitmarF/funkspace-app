@@ -5,6 +5,26 @@ import { describe, expect, it, vi } from "vitest";
 import HexButton from "./HexButton";
 
 describe("HexButton native contract", () => {
+  it("provides a named icon-only Close action without a Menu label", async () => {
+    const click = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <HexButton
+        icon="close"
+        variant="secondary"
+        size="small"
+        aria-label="Close"
+        onClick={click}
+      />,
+    );
+    const button = screen.getByRole("button", { name: "Close" });
+    expect(button).toHaveTextContent("");
+    expect(screen.queryByText("Menu")).not.toBeInTheDocument();
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    await user.tab();
+    await user.keyboard("{Enter}");
+    expect(click).toHaveBeenCalledOnce();
+  });
   it("has one visible Menu name and inert decorative artwork", () => {
     const ref = createRef<HTMLButtonElement>();
     render(

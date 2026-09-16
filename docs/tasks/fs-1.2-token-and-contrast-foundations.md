@@ -5,7 +5,7 @@
 - **Status:** Complete — foundation corrections validated, Sites consumer review passed, and Dimi accepted all corrections on 2026-09-15; [actual decision](#dimi-acceptance--2026-09-15).
 - **Stage/owner:** Acceptance and authorized commit/push; Codex is the only writer. Sites completed the separate consumer review; Dimi approved visible changes.
 - **Base:** `feature/funkspace-minimum-usable`, `655f53857ebf55da57e928532e8c74b9990881cc`, initially clean checkout at `/Users/dimi/Projects/funkspace-app`.
-- **Last updated:** 2026-09-15.
+- **Last updated:** 2026-09-16; later requested focus-color amendment below preserves the original acceptance evidence.
 - **Prerequisites:** [accepted FS-1.1 contract](fs-1.1-asset-and-component-contract.md#dimi-contract-decision--2026-09-15), [FS-0.2 command evidence](fs-0.2-tooling-baseline.md), [feature scope](../features/funkspace-minimum-usable.md), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [token ADR](../decisions/ADR-002-design-token-source-of-truth.md).
 
 ## Requested outcome and scope
@@ -289,6 +289,61 @@ Sites separately reviewed the final patch on base `655f53857ebf55da57e928532e8c7
 - **Coverage limits:** accepted Standard dimensions/typography, pending/disabled behavior, actual outlined anchors and Menu geometry, live fields/status and dialog lifecycle remain later component work. Flat-panel fixtures do not certify translucent overlays, OS forced-colors, enlarged text, other browsers/devices or assistive technology. The pre-existing axe/Playwright type mismatch remains a separately scoped Codex/Dimi follow-up.
 
 Local review artifacts are `fs-1.2-prompt-b-consumer-review.md` and `fs-1.2-prompt-b-evidence.zip` in the session workspace's `artifacts/` directory. The evidence ZIP SHA-256 is `b95efb4f65f2d51f1d93039b9dc560bb88d2ef809a2ac0c4ee8bf4fb997bc697`. Raw review data is also at `/private/tmp/fs-1.2-prompt-b-review/`; these local artifacts are not repository dependencies. This task record preserves the durable results and limitations.
+
+## Requested blue focus amendment — 2026-09-16
+
+Dimi requested blue input focus in every theme after reviewing the dialog.
+Sites implements this bounded foundation correction on
+`feature/funkspace-minimum-usable`, base
+`16cc8b1bcd2e3f338123696e31ce453ca8857675`, preserving the existing uncommitted
+FS-1.6/Close-icon candidate. This request supersedes only the earlier gray
+dark-focus choice; original acceptance/evidence above remains historical.
+
+Inputs already consume `--fs-color-border-focus`. The confirmed cause was
+the dark source alias to `border-strong` (`#cccccc`). Change only that semantic
+value to the existing brighter palette blue `#4abaff`; other themes retain
+their blue values. The ordinary dark action blue `#3b94cc` is unsuitable on
+elevation-1 (the original 2.533:1 finding above). The brighter blue requires
+no new role, palette change or per-component patch. Buttons, dialog titles
+and other focus-role consumers inherit the same correction. Forced-colors
+still uses the system Highlight color.
+
+Measured rendered normal, invalid and read-only input outlines before/after:
+
+| Dark surface | Before foreground / background | Before ratio | After foreground / background | After ratio | Target |
+| ------------ | ------------------------------ | ------------ | ----------------------------- | ----------- | ------ |
+| background   | `#cccccc` / `#1a1a1a`          | 10.838:1     | `#4abaff` / `#1a1a1a`         | 8.088:1     | 3:1    |
+| elevation-1  | `#cccccc` / `#4d4d4d`          | 5.264:1      | `#4abaff` / `#4d4d4d`         | 3.928:1     | 3:1    |
+
+These are opaque rendered pairings from the existing browser fixture, with
+the actual 2px outline and 2px offset. The prior gray was contrast-safe but
+did not meet Dimi's requested blue treatment. Existing field tests now assert
+the exact theme-resolved blue as well as the contrast target in all themes.
+
+Changed files for this correction: `tokens/fs.tokens.json`, generator-produced
+`styles/tokens.css` and `common/generated/colors.ts`,
+`e2e/storybook/form-fields.spec.ts`, this task record, and the historical-evidence
+note in `docs/tasks/fs-1.6-shared-dialog-primitive.md`.
+
+Validation: bootstrap freshness PASS before generation; `pnpm build:tokens`
+twice produced identical hashes. Full generated review found exactly one dark
+semantic value changed; all primitive/game values and motion/theme exports
+are unchanged. `pnpm test` PASS (1,351 tests / 90 files), frontend/common/game
+types PASS, `pnpm lint` PASS, application and Storybook builds PASS. The
+Storybook browser suite PASS (95 tests, zero skips/retries), including focused
+field colors/contrast, shared button/hex/dialog rings, forced colors and
+unfiltered accessibility. Application home smoke and foundation pairing checks
+also PASS (eight Chromium tests, unfiltered). The initial baseline command selected no tests
+because its grep was anchored; rerunning with the corrected selector produced
+the one passing pre-change dark-field measurement. No evidence is claimed
+from the empty selection.
+
+Evidence and the exact full candidate patch are retained under the session
+workspace's `artifacts/fs-focus-blue/`; the previous Close-icon artifact is
+preserved. No dependency, component API, game contract or bootstrap change.
+No commit/push. Sites owns fixes; Codex retains FS-1.7 review ownership and
+Dimi can verify the corrected dark input focus visually. No new device or
+assistive-technology acceptance is inferred.
 
 ## Dimi acceptance — 2026-09-15
 

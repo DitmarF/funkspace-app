@@ -11,6 +11,7 @@ import { LocalStorageAdapter } from "@/infrastructure/storage/LocalStorageAdapte
 import { DOMAdapter } from "@/infrastructure/dom/DOMAdapter";
 import { AnimationAdapter } from "@/infrastructure/motion/AnimationAdapter";
 import type { ServiceContextValue } from "@/application/providers/ServiceProvider";
+import { bindNativeDialog } from "@/infrastructure/dom/NativeDialogBinding";
 
 /**
  * Create all services with their dependencies
@@ -31,5 +32,6 @@ export function createServices(): ServiceContextValue {
     themeService,
     scrollService,
     animationService,
+    bindDialog: bindNativeDialog,
   };
 }

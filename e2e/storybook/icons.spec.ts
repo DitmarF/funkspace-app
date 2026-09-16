@@ -17,7 +17,7 @@ for (const theme of themes) {
       `/iframe.html?id=icons-library--gallery&viewMode=story&globals=theme:${global}`,
     );
     const root = page.locator("#storybook-root");
-    await expect(root.locator("svg")).toHaveCount(21);
+    await expect(root.locator("svg")).toHaveCount(24);
     await expect
       .poll(
         async () =>
@@ -27,12 +27,19 @@ for (const theme of themes) {
     await settleStyles(page);
     for (const size of [24, 36, 48]) {
       const section = page.getByRole("region", { name: `${size}px icons` });
-      await expect(section.getByRole("listitem")).toHaveCount(7);
+      await expect(section.getByRole("listitem")).toHaveCount(8);
       for (const item of await section.getByRole("listitem").all()) {
         expect((await renderedPair(item)).ratio).toBeGreaterThanOrEqual(4.5);
         const svg = item.locator("svg");
         await expect(svg).toHaveAttribute("aria-hidden", "true");
-        await expect(svg).toHaveAttribute("viewBox", `0 0 ${size} ${size}`);
+        const sourceSize =
+          (await item.innerText()).trim() === "close"
+            ? ({ 24: 26, 36: 40, 48: 48 } as const)[size as 24 | 36 | 48]
+            : size;
+        await expect(svg).toHaveAttribute(
+          "viewBox",
+          `0 0 ${sourceSize} ${sourceSize}`,
+        );
         const box = await svg.boundingBox();
         expect(box!.width).toBe(size);
         expect(box!.height).toBe(size);

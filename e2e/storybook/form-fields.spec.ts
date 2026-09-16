@@ -109,6 +109,13 @@ for (const theme of themes) {
         expect(boundary.ratio).toBeGreaterThanOrEqual(3);
         await field.focus();
         const focus = await renderedPair(field, "outlineColor", true);
+        const expectedFocus = {
+          default: "rgb(59, 71, 204)",
+          dark: "rgb(74, 186, 255)",
+          muted: "rgb(30, 36, 102)",
+          "dark-high-contrast": "rgb(74, 186, 255)",
+        };
+        expect(focus.foreground).toBe(expectedFocus[theme]);
         expect(focus.ratio).toBeGreaterThanOrEqual(3);
         expect(focus.outlineStyle).toBe("solid");
         expect(focus.outlineOffset).toBe("2px");

@@ -310,6 +310,17 @@ This accepts M1, D1/T1, the 36px Menu choice in A1 and the text-only A2/A3 treat
 
 The 40px compact control, smaller Menu alternative, text-only Menu fallback and optional More/Customize/Send icons are unselected. Future A4 icons and C1 color/pairing repairs retain their named later tasks; this answer does not establish measured contrast, production provenance or rendered visual approval. Required FS-1.1 contract decisions are now accepted and the task is complete. FS-1.2 has not started and needs a separate task-stage instruction.
 
+### Later Close substitution amendment — 2026-09-16
+
+During FS-1.6, Dimi supplied a new Figma Close icon and explicitly requested
+the secondary HexButton for dialog dismissal. This supersedes the text-only
+Close substitute for that consumer. Other substitutions retain their own
+recorded decisions. The [icon source register](../../frontend/components/Icons/README.md#close-addition--2026-09-16-fs-16)
+records all three available exports, provenance, actual frame exceptions,
+paint/ID behavior and ownership. The [FS-1.6 record](fs-1.6-shared-dialog-primitive.md)
+records implementation and validation. This product choice does not invent
+FS-1.7 technical acceptance or device approval for the updated control.
+
 ### Sites recording validation and handoff — 2026-09-15
 
 - **PASS:** targeted Prettier check and `git diff --check`; 89 local Markdown links/anchors resolve across the two documents. Source/export paths retain actual-versus-proposed distinctions; no production Menu asset is asserted.

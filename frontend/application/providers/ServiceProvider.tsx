@@ -16,11 +16,13 @@ import { createServices } from "@/infrastructure/services/createServices";
 import type { ThemeService } from "../theme/ThemeService";
 import type { ScrollService } from "../scroll/ScrollService";
 import type { AnimationService } from "../animations/AnimationService";
+import type { DialogBindingFactory } from "@/domain/ports/DialogBindingPort";
 
 export interface ServiceContextValue {
   themeService: ThemeService;
   scrollService: ScrollService;
   animationService: AnimationService;
+  bindDialog: DialogBindingFactory<HTMLDialogElement, HTMLElement>;
 }
 
 const ServiceContext = createContext<ServiceContextValue | null>(null);

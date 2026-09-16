@@ -177,7 +177,7 @@
   /* @presenter Border */
   --fs-color-border-subtle: rgba(128,128,128,1);
   --fs-color-border-strong: rgba(204,204,204,1);
-  --fs-color-border-focus: var(--fs-color-border-strong);
+  --fs-color-border-focus: rgba(74,186,255,1);
   /* @tokens Game/Colors */
   /* @presenter Color */
   --fs-color-game-player: var(--fs-color-action-primary);

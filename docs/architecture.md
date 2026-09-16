@@ -151,6 +151,20 @@ Services are injected via React Context:
 const { themeService } = useServices();
 ```
 
+### Shared dialog binding
+
+`Controls/Dialog` uses the thin `useDialog` hook and the existing provider's
+`bindDialog` factory. The factory creates one native binding per mounted dialog;
+it has no global open state or overlay stack. `createServices` injects
+`NativeDialogBinding`, which owns modal operations, focus, document scroll/style
+ownership and cleanup. Presentation never imports the concrete adapter.
+
+`DialogBindingPort<TDialog, TFocus>` contains only generic handles, callbacks and
+lifecycle methods. DOM types are supplied at the provider/adapter boundary, not
+imported or constrained in Domain. ThemeService/bootstrap and game boundaries
+remain unchanged. The [FS-1.6 record](tasks/fs-1.6-shared-dialog-primitive.md)
+contains the reviewed consumer contract, lifecycle policy and browser evidence.
+
 ## Testing Strategy
 
 - **Unit Tests**: Test domain logic and application services in isolation

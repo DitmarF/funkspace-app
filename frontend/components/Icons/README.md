@@ -1,6 +1,6 @@
 # FunkSpace icons
 
-Seven existing Figma families, each exported at 24, 36 and 48 units.
+Eight existing Figma families, displayed at 24, 36 and 48 CSS pixels.
 The gallery is **Icons / Library / Gallery** in Storybook. Playground exposes
 name and size controls; Accent demonstrates inherited semantic color.
 
@@ -22,10 +22,11 @@ when it performs an action.
 [UI Library Icons page](https://www.figma.com/design/o39DgxXnQ0jogb2ez6WKfq?node-id=6-2),
 exported 2026-09-15. Raw SVGs below are exact exports with original paint/IDs.
 They are provenance/download files; consume the inline Icon for theme-aware UI.
-Each viewBox is `0 0 size size`. All 21 exports are available.
+The original seven families use `0 0 size size`; Close preserves the actual
+26/40/48-unit frames described below. All 24 exports are available.
 Replacement/design owner: Dimi; latest-needed task: this requested FS-1.3
 Storybook extension. Existing logo and Next starter assets are separate from
-the seven-family UI library pictured in the request.
+the UI icon library.
 
 | Logical asset      | Figma source name  | Node       | Raw export                                           |
 | ------------------ | ------------------ | ---------- | ---------------------------------------------------- |
@@ -59,6 +60,29 @@ Source issues preserved in this register:
   Code names describe the actual direction: up is 138:1021, down is 138:1022.
   No path is rotated or redrawn to compensate.
 
+### Close addition — 2026-09-16, FS-1.6
+
+Dimi supplied and requested this artwork for dialog dismissal, replacing the
+earlier text-only Close substitute. Source file/page is the same UI Library.
+
+| Logical asset | Actual Figma name / node | Raw export                                 | Actual viewBox | Display size |
+| ------------- | ------------------------ | ------------------------------------------ | -------------- | ------------ |
+| close-24      | close-24 / `188:255`     | [SVG](../../public/svg/icons/close-24.svg) | `0 0 26 26`    | 24px         |
+| close-36      | close-36 / `188:251`     | [SVG](../../public/svg/icons/close-36.svg) | `0 0 40 40`    | 36px         |
+| close-48      | close-48 / `188:242`     | [SVG](../../public/svg/icons/close-48.svg) | `0 0 48 48`    | 48px         |
+
+All three are available, exported directly from Figma without geometry edits.
+Raw exports retain black paint. Inline `Icon name="close"` adapts it to
+`currentColor`; the 48-unit clip ID is namespaced per instance. The smaller
+exports have no internal IDs. Frame/name differences are preserved rather than
+cropping or redrawing the artwork. These SVGs contain only paths and, at 48,
+a clip group/definition: no scripts, handlers, external references, raster or
+metadata. Consumer: icon gallery and `HexButton icon="close"`; decorative
+inside the dialog's native button, whose accessible name is Close. Standalone
+meaningful usage supplies `label`. Replacement owner: Dimi; latest-needed task:
+FS-1.6. User requested the design substitution; final FS-1.7 acceptance remains
+separate.
+
 `iconArtwork.tsx` preserves each size-specific exported path, transform, stroke
 and clip geometry. It adapts only JSX attributes, dark paint to currentColor,
 light arrow interiors to the surface binding, and local IDs/references to a
@@ -74,7 +98,8 @@ embedded raster images or metadata. Clip paths are retained.
 2. Add the unmodified export under `frontend/public/svg/icons/` and a row above.
 3. Add its logical name and exact geometry to `iconArtwork.tsx`, following the
    current paint/ID adaptation. Add no loader, runtime SVG parser or dependency.
-   The strict size record requires 24/36/48 evidence before publishing a family.
+   The strict size record requires evidence for all three display sizes before
+   publishing a family; retain and document any differing source viewBoxes.
 4. The gallery and name control use `iconNames`, so they include the family
    automatically. Check all themes, accessible labeling and repeated IDs;
    run the focused icon tests and Storybook build.

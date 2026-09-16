@@ -1,0 +1,77 @@
+.dialog {
+  box-sizing: border-box;
+  width: min(40rem, calc(100% - 2 * var(--fs-space-md)));
+  max-height: calc(
+    100dvh - 2 * var(--fs-space-md) - env(safe-area-inset-top) -
+      env(safe-area-inset-bottom)
+  );
+  margin: auto;
+  padding: 0;
+  border: 2px solid var(--fs-color-border-strong);
+  border-radius: var(--fs-space-sm);
+  color: var(--fs-color-content-primary);
+  background: var(--fs-color-surface-background);
+  font-family: var(--font-space-grotesk, var(--fs-font-family-base));
+  font-size: var(--fs-font-size-md);
+  line-height: var(--fs-line-height-normal);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* Do not override the browser's hiding of a closed dialog. */
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog::backdrop {
+  background: color-mix(
+    in srgb,
+    var(--fs-color-surface-overlay) 65%,
+    transparent
+  );
+}
+
+.header {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fs-space-md);
+  padding: var(--fs-space-md);
+  border-bottom: 2px solid var(--fs-color-border-strong);
+}
+
+.title {
+  flex: 1 1 10rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-work-sans, var(--fs-font-family-display));
+  font-size: var(--fs-font-size-xl);
+  font-weight: var(--fs-font-weight-semibold);
+  line-height: var(--fs-line-height-tight);
+}
+
+.title:focus-visible {
+  outline: 2px solid var(--fs-color-border-focus);
+  outline-offset: 2px;
+}
+
+.content {
+  display: grid;
+  gap: var(--fs-space-md);
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--fs-space-md);
+  overflow-wrap: anywhere;
+}
+
+@media (forced-colors: active) {
+  .dialog {
+    border-color: CanvasText;
+  }
+  .title:focus-visible {
+    outline-color: Highlight;
+  }
+}
