@@ -1,0 +1,146 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { useState } from "react";
+import Button from "./Button";
+import HexButton, { type HexButtonSize } from "./HexButton";
+import styles from "./HexButton.stories.module.css";
+
+// Gallery samples use the native accessible-name prop without a visible label.
+// The production control's default Menu label remains unchanged.
+const iconOnly = {
+  children: "",
+  "aria-label": "Menu",
+  className: styles.iconOnly,
+};
+
+const meta = {
+  title: "Controls/HexButton",
+  component: HexButton,
+  tags: ["autodocs"],
+  args: { ...iconOnly, variant: "primary" },
+  argTypes: {
+    size: { control: "select", options: ["small", "medium", "large"] },
+    variant: {
+      control: "select",
+      options: ["primary", "secondary", "outlined", "accent-outlined"],
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "48/72/96px Figma artwork with matching 24/36/48px icons. Gallery samples omit visible text and retain an accessible Menu name. The default production control still includes its visible label. Hover and momentary press use the Standard treatments. Use keyboard Tab to inspect the unclipped focus ring.",
+      },
+    },
+  },
+} satisfies Meta<typeof HexButton>;
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Menu: Story = {};
+
+export const FigmaMatrix: Story = {
+  render: () => (
+    <div className="grid gap-fs-lg">
+      {(["large", "medium", "small"] as const).map((size) => (
+        <section key={size} aria-label={size} className="grid gap-fs-md">
+          <h2>
+            {size}: {size === "large" ? 96 : size === "medium" ? 72 : 48}px
+          </h2>
+          {(
+            ["accent-outlined", "primary", "outlined", "secondary"] as const
+          ).map((variant) => (
+            <section
+              key={variant}
+              aria-label={`${size}-${variant}`}
+              className="grid gap-fs-xs"
+            >
+              <h3>{variant}</h3>
+              <div className="flex flex-wrap items-start gap-fs-md">
+                <HexButton {...iconOnly} size={size} variant={variant} />
+                <HexButton
+                  {...iconOnly}
+                  size={size}
+                  variant={variant}
+                  disabled
+                />
+              </div>
+            </section>
+          ))}
+        </section>
+      ))}
+    </div>
+  ),
+};
+export const Disabled: Story = { args: { disabled: true } };
+export const LongLabel: Story = {
+  args: {
+    "aria-label": undefined,
+    children: "Menu with more information about the available sections",
+    className: "max-w-xs",
+  },
+};
+export const EnlargedText: Story = {
+  args: {
+    "aria-label": undefined,
+    children: "Menu and navigation",
+    className: "max-w-xs",
+    style: { fontSize: "2rem" },
+  },
+};
+
+export const Treatments: Story = {
+  render: () => (
+    <div className="grid gap-fs-lg">
+      <p>
+        72px artwork, 36px icon. Hover, hold, or Tab to each available control.
+      </p>
+      {(["accent-outlined", "primary", "outlined", "secondary"] as const).map(
+        (variant) => (
+          <section
+            key={variant}
+            aria-label={variant}
+            className="grid gap-fs-xs"
+          >
+            <h2>{variant}</h2>
+            <div className="flex flex-wrap items-start gap-fs-md">
+              <HexButton {...iconOnly} variant={variant} />
+              <HexButton {...iconOnly} variant={variant} disabled />
+            </div>
+          </section>
+        ),
+      )}
+    </div>
+  ),
+};
+
+function InteractionExample({ size }: { size?: HexButtonSize }) {
+  const [activations, setActivations] = useState(0);
+  const [neighbors, setNeighbors] = useState(0);
+  return (
+    <div className="grid gap-fs-md">
+      <div className="flex flex-wrap items-start gap-fs-md">
+        <HexButton
+          {...iconOnly}
+          size={size}
+          onClick={() => setActivations((n) => n + 1)}
+        />
+        <HexButton
+          {...iconOnly}
+          aria-label="Unavailable menu"
+          size={size}
+          disabled
+          onClick={() => setActivations((n) => n + 1)}
+        />
+        <Button variant="outlined" onClick={() => setNeighbors((n) => n + 1)}>
+          Next action
+        </Button>
+      </div>
+      <p role="status">
+        Menu activations: {activations}; next action: {neighbors}
+      </p>
+    </div>
+  );
+}
+export const Interaction: Story = {
+  render: (args) => <InteractionExample size={args.size} />,
+};

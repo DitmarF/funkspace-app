@@ -1,0 +1,108 @@
+.control {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fs-space-xs);
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--hex-size);
+  padding: var(--fs-space-xs) var(--fs-space-md);
+  border: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--fs-color-content-primary);
+  font-family: var(--font-work-sans, var(--fs-font-family-display));
+  font-size: var(--hex-label-size);
+  font-weight: var(--hex-label-weight);
+  line-height: var(--fs-line-height-normal);
+  text-align: start;
+  vertical-align: middle;
+  cursor: pointer;
+  /* The native target and its focus ring must never be clipped to the hexagon. */
+  overflow: visible;
+}
+
+.small {
+  --hex-size: var(--fs-space-2xl);
+  --hex-label-size: var(--fs-font-size-md);
+  --hex-label-weight: var(--fs-font-weight-semibold);
+}
+
+.medium {
+  --hex-size: calc(var(--fs-space-2xl) * 1.5);
+  --hex-label-size: var(--fs-font-size-md);
+  --hex-label-weight: var(--fs-font-weight-semibold);
+}
+
+.large {
+  --hex-size: calc(var(--fs-space-2xl) * 2);
+  --hex-label-size: var(--fs-font-size-xl);
+  --hex-label-weight: var(--fs-font-weight-bold);
+}
+
+.artwork {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 var(--hex-size);
+  width: var(--hex-size);
+  height: var(--hex-size);
+  color: var(--control-foreground);
+  pointer-events: none;
+}
+
+.artwork * {
+  pointer-events: none;
+}
+
+.shape {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: var(--control-background);
+  stroke: var(--control-border);
+}
+
+.icon {
+  --fs-icon-background: var(--control-background);
+  position: relative;
+  width: calc(var(--hex-size) / 2);
+  height: calc(var(--hex-size) / 2);
+}
+
+.label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.control:disabled {
+  color: var(--fs-color-content-disabled);
+  cursor: not-allowed;
+}
+
+@media (forced-colors: active) {
+  .control {
+    border-color: ButtonText;
+    color: ButtonText;
+    background: ButtonFace;
+  }
+
+  .artwork {
+    --control-foreground: ButtonText;
+    --control-background: ButtonFace;
+    --control-border: ButtonText;
+    forced-color-adjust: none;
+  }
+
+  .control:disabled {
+    border-color: GrayText;
+    color: GrayText;
+  }
+
+  .control:disabled .artwork {
+    --control-foreground: GrayText;
+    --control-border: GrayText;
+  }
+}

@@ -427,7 +427,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.4 — Implement the Hexagonal Button family
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Dimi reports manual and visual tests PASS on 2026-09-16 and authorizes documentation finalization, commit and push. The [FS-1.4 acceptance record](../tasks/fs-1.4-hexagonal-button-family.md#final-dimi-acceptance-and-completion--2026-09-16) covers the full size matrix and icon-only Storybook correction. Codex review remains at FS-1.7.
 
 **Lead:** Sites
 
@@ -437,7 +437,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 **Depends on:** `FS-1.2`, `FS-1.3`
 
-**Work:** Build a focused hexagonal presentation with accessible names and selected/disabled treatments. Prefer a generous rectangular control area with the hexagon inside; retain a visible, unclipped focus indicator. Use a proposed 48-pixel mobile target rather than copying the smallest screenshot artwork as the hit area.
+**Work:** Native rectangular target containing the decorative hexagon, custom icon and visible Menu label. Dimi's subsequent full-matrix request adds 48/72/96px artwork with 24/36/48px icons; the accepted default Menu remains 72/36px. Storybook Figma Matrix shows all four Standard treatments at every size with unclipped focus. No genuine selected state is currently accepted; a future named consumer must supply semantics and a non-color cue.
 
 **Complete when:** Mouse, touch, keyboard, and focus states work without relying only on color. Decorative clipping does not hide focus or unnecessarily shrink the intended touch area.
 
@@ -1079,13 +1079,14 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 ## Implementation handoff
 
-- **Completed reference work:** The [Storybook color reference](../tasks/storybook-color-reference.md) presents the current palettes and semantic roles without changing tokens. Implementation and validation are complete; Dimi authorized documentation finalization, commit and push on 2026-09-16. FS-1.3 remains complete; FS-1.4 is not started.
+- **Completed reference work:** The [Storybook color reference](../tasks/storybook-color-reference.md) presents the current palettes and semantic roles without changing tokens. Implementation and validation are complete; Dimi authorized documentation finalization, commit and push on 2026-09-16. FS-1.3 remains complete. FS-1.4 implementation and validation are now recorded separately.
 
 - **Recommended first step:** read this plan, the accepted FS-1.1 contract and completed FS-1.2 task record; verify the current branch, HEAD and accessible diff before continuing. The FS-1.2 record identifies its accepted implementation patch on base `655f53857ebf55da57e928532e8c74b9990881cc`. Earlier SHAs are historical provenance, not reset targets.
-- **Codex next action:** review Standard Button compatibility at FS-1.7. FS-1.2 acceptance and commit/push are complete; no further foundation acceptance vote is needed.
+- **Codex next action:** review Standard and Hexagonal Button compatibility, semantics and actual reuse at FS-1.7. FS-1.2 acceptance and commit/push are complete; no further foundation acceptance vote is needed.
 - **Sites handoff:** FS-1.3 is complete; implementation, source assets, native API examples, pending/focus policy, checks and manual/visual acceptance are recorded in the [Standard Button task](../tasks/fs-1.3-standard-button-family.md#final-dimi-acceptance-and-completion--2026-09-15).
-- **Dimi next action:** No FS-1.3 acceptance action remains. Dimi chooses when to start FS-1.4; it is not started automatically. Codex compatibility review remains at FS-1.7. Later content/provider/mobile-browser details remain scheduled in the [decision register](#pending-decisions-and-latest-needed-points).
-- **Do not change:** accepted gameplay/public contracts, original assets, unrelated work, generated token outputs by hand, or later milestone scope. Dimi's latest authorization covers the completed color-reference documentation, commit and push; no PR, merge, settings, deployment, branch deletion or live email is authorized.
+- **FS-1.4 handoff:** implementation, full Figma matrix, icon-only Storybook samples, native behavior and validation are complete and manually/visually accepted; see the [Hexagonal Button task](../tasks/fs-1.4-hexagonal-button-family.md).
+- **Dimi next action:** No FS-1.4 acceptance action remains. Dimi chooses when to begin FS-1.5; it is not started automatically. Codex compatibility review remains at FS-1.7. Unreported device/browser details are not inferred; later content/provider/mobile-browser details remain scheduled in the [decision register](#pending-decisions-and-latest-needed-points).
+- **Do not change:** accepted gameplay/public contracts, original assets, unrelated work, generated token outputs by hand, or later milestone scope. Current authorization includes FS-1.4 documentation finalization, commit and push only; no PR, merge, settings, deployment, branch deletion or live email is authorized.
 - **Completion summary expected:** task ID, qualified revision and accessible diff, actual files, contract changes, checks/outcomes and limits, owned follow-ups, counterpart findings and Dimi's recorded acceptance.
 
 Game continuation is the separate [Wave Survivor EPIC 7](wave-survivor-implementation-plan.md#epic-7--portfolio-play-shell-and-accessible-application-ui) after portfolio FS-6.6/FS-G3. `/play/wave-survivor` remains future integration work. Do not apply homepage particle/global-control or ordinary-scroll layout choices to the portrait game arena.

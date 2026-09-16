@@ -1,11 +1,9 @@
 import type { ReactElement, ReactNode } from "react";
 import styles from "./standardControl.module.css";
+import { controlAppearanceClassName } from "./controlAppearance";
 
-export type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outlined"
-  | "accent-outlined";
+import type { ControlVariant } from "./controlAppearance";
+export type ButtonVariant = ControlVariant;
 export type ButtonSize = "small" | "medium" | "large";
 
 // Preserve the original single-slot API. Named slots also support the revised
@@ -29,7 +27,7 @@ export function standardControlClassName(
   className: string,
   size: ButtonSize = "small",
 ) {
-  return `${styles.control} ${styles[variant]} ${styles[size]} ${className}`.trim();
+  return `${styles.control} ${controlAppearanceClassName(variant)} ${styles[size]} ${className}`.trim();
 }
 
 export function StandardControlContent({

@@ -1,0 +1,81 @@
+.focus:focus-visible {
+  outline: 2px solid var(--fs-color-border-focus);
+  outline-offset: 2px;
+  /* Preserve the focus role, with contrasting inner/outer bands for existing
+     callers on artwork colors such as Hero's blue surface. */
+  box-shadow:
+    0 0 0 2px var(--fs-color-content-primary),
+    0 0 0 6px var(--fs-color-content-inverse);
+}
+
+.primary {
+  --control-foreground: var(--fs-color-content-inverse);
+  --control-background: var(--fs-color-action-primary);
+  --control-border: var(--fs-color-content-inverse);
+}
+
+.primary:hover:not(:disabled):not([aria-busy="true"]),
+.secondary:hover:not(:disabled):not([aria-busy="true"]) {
+  --control-background: var(--fs-color-action-hover-large);
+}
+
+.secondary {
+  --control-foreground: var(--fs-color-content-inverse);
+  --control-background: var(--fs-color-content-primary);
+  --control-border: var(--fs-color-content-inverse);
+}
+
+.outlined,
+.accent-outlined {
+  --control-foreground: var(--fs-color-content-primary);
+  --control-background: var(--fs-color-content-inverse);
+  --control-border: var(--control-foreground);
+}
+
+.accent-outlined {
+  --control-foreground: var(--fs-color-action-primary);
+}
+
+.outlined:hover:not(:disabled):not([aria-busy="true"]),
+.accent-outlined:hover:not(:disabled):not([aria-busy="true"]) {
+  --control-foreground: var(--fs-color-action-hover-large);
+}
+
+.primary:active:not(:disabled):not([aria-busy="true"]) {
+  --control-foreground: var(--fs-color-action-primary);
+  --control-background: var(--fs-color-content-inverse);
+  --control-border: var(--control-foreground);
+}
+
+.secondary:active:not(:disabled):not([aria-busy="true"]) {
+  --control-foreground: var(--fs-color-content-primary);
+  --control-background: var(--fs-color-content-inverse);
+  --control-border: var(--control-foreground);
+}
+
+.outlined:active:not(:disabled):not([aria-busy="true"]),
+.accent-outlined:active:not(:disabled):not([aria-busy="true"]) {
+  --control-foreground: var(--fs-color-content-inverse);
+  --control-background: var(--fs-color-content-primary);
+  --control-border: var(--control-foreground);
+}
+
+.accent-outlined:active:not(:disabled):not([aria-busy="true"]) {
+  --control-background: var(--fs-color-action-primary);
+}
+
+.primary:disabled,
+.secondary:disabled {
+  --control-background: var(--fs-color-content-disabled);
+}
+
+.outlined:disabled,
+.accent-outlined:disabled {
+  --control-foreground: var(--fs-color-content-disabled);
+}
+
+@media (forced-colors: active) {
+  .focus:focus-visible {
+    outline-color: Highlight;
+  }
+}

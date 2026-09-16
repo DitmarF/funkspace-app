@@ -8,10 +8,10 @@
   min-width: 0;
   max-width: 100%;
   padding: var(--standard-gap) var(--standard-padding);
-  border: var(--standard-stroke) solid var(--standard-border);
+  border: var(--standard-stroke) solid var(--control-border);
   border-radius: var(--standard-radius);
-  color: var(--standard-foreground);
-  background: var(--standard-background);
+  color: var(--control-foreground);
+  background: var(--control-background);
   font-family: var(--font-work-sans, var(--fs-font-family-display));
   font-size: var(--standard-font-size);
   font-weight: var(--standard-font-weight);
@@ -55,82 +55,6 @@
   --standard-stroke: 3px;
 }
 
-.control:focus-visible {
-  outline: 2px solid var(--fs-color-border-focus);
-  outline-offset: 2px;
-  /* Preserve the focus role, with contrasting inner/outer bands for existing
-     callers on artwork colors such as Hero's blue surface. */
-  box-shadow:
-    0 0 0 2px var(--fs-color-content-primary),
-    0 0 0 6px var(--fs-color-content-inverse);
-}
-
-.primary {
-  --standard-foreground: var(--fs-color-content-inverse);
-  --standard-background: var(--fs-color-action-primary);
-  --standard-border: var(--fs-color-content-inverse);
-}
-
-.primary:hover:not(:disabled):not([aria-busy="true"]),
-.secondary:hover:not(:disabled):not([aria-busy="true"]) {
-  --standard-background: var(--fs-color-action-hover-large);
-}
-
-.secondary {
-  --standard-foreground: var(--fs-color-content-inverse);
-  --standard-background: var(--fs-color-content-primary);
-  --standard-border: var(--fs-color-content-inverse);
-}
-
-.outlined,
-.accent-outlined {
-  --standard-foreground: var(--fs-color-content-primary);
-  --standard-background: var(--fs-color-content-inverse);
-  --standard-border: var(--standard-foreground);
-}
-
-.accent-outlined {
-  --standard-foreground: var(--fs-color-action-primary);
-}
-
-.outlined:hover:not(:disabled):not([aria-busy="true"]),
-.accent-outlined:hover:not(:disabled):not([aria-busy="true"]) {
-  --standard-foreground: var(--fs-color-action-hover-large);
-}
-
-.primary:active:not(:disabled):not([aria-busy="true"]) {
-  --standard-foreground: var(--fs-color-action-primary);
-  --standard-background: var(--fs-color-content-inverse);
-  --standard-border: var(--standard-foreground);
-}
-
-.secondary:active:not(:disabled):not([aria-busy="true"]) {
-  --standard-foreground: var(--fs-color-content-primary);
-  --standard-background: var(--fs-color-content-inverse);
-  --standard-border: var(--standard-foreground);
-}
-
-.outlined:active:not(:disabled):not([aria-busy="true"]),
-.accent-outlined:active:not(:disabled):not([aria-busy="true"]) {
-  --standard-foreground: var(--fs-color-content-inverse);
-  --standard-background: var(--fs-color-content-primary);
-  --standard-border: var(--standard-foreground);
-}
-
-.accent-outlined:active:not(:disabled):not([aria-busy="true"]) {
-  --standard-background: var(--fs-color-action-primary);
-}
-
-.primary:disabled,
-.secondary:disabled {
-  --standard-background: var(--fs-color-content-disabled);
-}
-
-.outlined:disabled,
-.accent-outlined:disabled {
-  --standard-foreground: var(--fs-color-content-disabled);
-}
-
 .control:disabled {
   cursor: not-allowed;
 }
@@ -145,7 +69,7 @@
 }
 
 .icon {
-  --fs-icon-background: var(--standard-background);
+  --fs-icon-background: var(--control-background);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -191,9 +115,5 @@
   .control:disabled {
     color: GrayText;
     border-color: GrayText;
-  }
-
-  .control:focus-visible {
-    outline-color: Highlight;
   }
 }
