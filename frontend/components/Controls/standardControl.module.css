@@ -1,13 +1,15 @@
 .control {
   box-sizing: border-box;
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: var(--standard-gap);
   min-height: var(--standard-height);
   min-width: 0;
   max-width: 100%;
-  padding: var(--standard-gap) var(--standard-padding);
+  /* A viewport cap avoids circular percentage sizing in pending's intrinsic grid. */
+  padding: var(--standard-gap) min(var(--standard-padding), 5vw);
   border: var(--standard-stroke) solid var(--control-border);
   border-radius: var(--standard-radius);
   color: var(--control-foreground);
@@ -64,6 +66,9 @@
 }
 
 .label {
+  /* Move onto its own row instead of collapsing between fixed icon slots. */
+  flex-shrink: 0;
+  max-width: 100%;
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -96,6 +101,14 @@
   max-width: 100%;
   min-width: 0;
   vertical-align: middle;
+}
+
+.pendingGroup .control {
+  flex-wrap: nowrap;
+}
+
+.pendingGroup .label {
+  flex-shrink: 1;
 }
 
 .status {

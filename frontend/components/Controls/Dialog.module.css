@@ -1,8 +1,12 @@
 .dialog {
+  /* Keep text enlargement from spending the narrow viewport on empty gutters. */
+  --dialog-gutter: min(var(--fs-space-md), 3vw, 3dvh);
   box-sizing: border-box;
-  width: min(40rem, calc(100% - 2 * var(--fs-space-md)));
+  width: min(40rem, calc(100% - 2 * var(--dialog-gutter)));
+  /* Width above already bounds the surface; override the native em-based cap. */
+  max-width: none;
   max-height: calc(
-    100dvh - 2 * var(--fs-space-md) - env(safe-area-inset-top) -
+    100dvh - 2 * var(--dialog-gutter) - env(safe-area-inset-top) -
       env(safe-area-inset-bottom)
   );
   margin: auto;
@@ -37,8 +41,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--fs-space-md);
-  padding: var(--fs-space-md);
+  gap: var(--dialog-gutter);
+  padding: var(--dialog-gutter);
   border-bottom: 2px solid var(--fs-color-border-strong);
 }
 
@@ -63,7 +67,7 @@
   min-height: 0;
   overflow: auto;
   overscroll-behavior: contain;
-  padding: var(--fs-space-md);
+  padding: var(--dialog-gutter);
   overflow-wrap: anywhere;
 }
 

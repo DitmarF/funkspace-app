@@ -2,6 +2,87 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { renderedPair, settleStyles, themes } from "../helpers/foundation";
 
+test("large paired icons retain readable labels at 320px and 200% text", async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto(
+    "/iframe.html?id=controls-button--figma-matrix&viewMode=story&globals=theme:light",
+  );
+  const buttons = page.locator("#storybook-root button");
+  await expect(buttons).toHaveCount(24);
+  await settleStyles(page);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(
+    320,
+  );
+  const checkLayout = async () => {
+    const samples = await buttons.evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const box = node.getBoundingClientRect();
+        const children = [...node.children].map((child) =>
+          child.getBoundingClientRect(),
+        );
+        return {
+          name: node.textContent,
+          fontSize: parseFloat(getComputedStyle(node).fontSize),
+          width: box.width,
+          labelWidth: children[1].width,
+          contained: children.every(
+            (child) =>
+              child.left >= box.left &&
+              child.right <= box.right &&
+              child.top >= box.top &&
+              child.bottom <= box.bottom,
+          ),
+          noOverlap: children.every((child, index) =>
+            children
+              .slice(index + 1)
+              .every(
+                (next) =>
+                  child.right <= next.left ||
+                  next.right <= child.left ||
+                  child.bottom <= next.top ||
+                  next.bottom <= child.top,
+              ),
+          ),
+        };
+      }),
+    );
+    for (const sample of samples) {
+      expect(sample.contained, JSON.stringify(sample)).toBe(true);
+      expect(sample.noOverlap, JSON.stringify(sample)).toBe(true);
+      expect(sample.labelWidth, JSON.stringify(sample)).toBeGreaterThanOrEqual(
+        sample.fontSize * 2,
+      );
+    }
+    return samples;
+  };
+  const matrix = await checkLayout();
+  expect(matrix[0].fontSize).toBe(96); // Enlargement must not be capped to pass.
+  await page.screenshot({ path: testInfo.outputPath("matrix-enlarged.png") });
+  // Reproduce the reviewer's constrained parent separately from the gallery's
+  // grid. Move the actual control so SVG IDs remain unique in this fixture.
+  await page.evaluate(() => {
+    const button = document.querySelector("#storybook-root button")!;
+    const parent = document.createElement("div");
+    parent.style.width = "240px";
+    parent.append(button);
+    document.getElementById("storybook-root")!.append(parent);
+  });
+  const constrained = await checkLayout();
+  await testInfo.attach("reflow-layout", {
+    body: JSON.stringify({ matrix, constrained: constrained.at(-1) }, null, 2),
+    contentType: "application/json",
+  });
+  expect(
+    (await new AxeBuilder({ page }).include("#storybook-root").analyze())
+      .violations,
+  ).toEqual([]);
+});
+
 for (const theme of themes) {
   test(`${theme}: Figma sizes, treatments and both icon paints through native states`, async ({
     page,

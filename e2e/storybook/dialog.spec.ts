@@ -385,17 +385,24 @@ test("narrow enlarged text, forced colors and reduced motion remain usable", asy
 
 test("touch scrolling is contained in the modal on a mobile viewport", async ({
   browser,
+  baseURL,
 }, testInfo) => {
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     hasTouch: true,
     isMobile: true,
+    baseURL,
   });
   const page = await context.newPage();
   try {
     await page.goto(
-      "http://127.0.0.1:6006/iframe.html?id=controls-dialog--full-document&viewMode=story&globals=theme:light",
+      "/iframe.html?id=controls-dialog--full-document&viewMode=story&globals=theme:light",
     );
+    expect(new URL(page.url()).origin).toBe(new URL(baseURL!).origin);
+    await testInfo.attach("served-origin", {
+      body: page.url(),
+      contentType: "text/plain",
+    });
     await page.getByRole("button", { name: "Menu", exact: true }).tap();
     const session = await context.newCDPSession(page);
     const swipe = async (x: number, y: number) => {

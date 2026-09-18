@@ -101,18 +101,38 @@ for (const suffix of ["interaction", "leading-icon", "trailing-icon"]) {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 320, height: 800 });
     await page.goto(story(`controls-button--pending-${suffix}`));
     const button = page.getByRole("button", { name: "Send message" });
     await settleStyles(page);
     await button.focus();
     const before = await button.boundingBox();
+    expect(before!.height).toBe(48);
+    await expect(button.locator("svg")).toHaveCount(1);
     const labelBefore = await button
       .locator("span")
       .filter({ hasText: /^Send message$/ })
       .boundingBox();
     const groupBefore = await button.locator("..").boundingBox();
+    const slot = button.locator(':scope > span[aria-hidden="true"]');
+    const iconBefore = (await slot.boundingBox())!;
+    if (suffix !== "leading-icon") {
+      expect(iconBefore.x).toBeGreaterThanOrEqual(
+        labelBefore!.x + labelBefore!.width,
+      );
+    }
+    expect(
+      Math.abs(
+        iconBefore.y +
+          iconBefore.height / 2 -
+          (labelBefore!.y + labelBefore!.height / 2),
+      ),
+    ).toBeLessThan(1);
     await page.keyboard.press("Space");
     await expect(button).toHaveAttribute("aria-busy", "true");
+    await expect(slot).toHaveText("…");
+    await expect(button.locator("svg")).toHaveCount(0);
+    expect(await slot.boundingBox()).toEqual(iconBefore);
     await expect(button).toBeFocused();
     expect(
       await button.evaluate((node: HTMLButtonElement) => node.disabled),
@@ -139,6 +159,7 @@ for (const suffix of ["interaction", "leading-icon", "trailing-icon"]) {
     );
     await page.getByRole("button", { name: "Finish example" }).click();
     await expect(button).not.toHaveAttribute("aria-busy", "true");
+    await expect(button.locator("svg")).toHaveCount(1);
     await button.click();
     await expect(page.getByText("Activations: 2")).toBeVisible();
   });

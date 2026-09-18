@@ -236,16 +236,22 @@ for (const size of ["small", "medium", "large"]) {
 
   test(`${size}: touch corners outside the visible hexagon activate once`, async ({
     browser,
+    baseURL,
   }, testInfo) => {
     const context = await browser.newContext({
       hasTouch: true,
       isMobile: true,
       viewport: { width: 390, height: 844 },
-      baseURL: "http://127.0.0.1:6006",
+      baseURL,
     });
     const page = await context.newPage();
     try {
       await open(page, "interaction", "default", size);
+      expect(new URL(page.url()).origin).toBe(new URL(baseURL!).origin);
+      await testInfo.attach("served-origin", {
+        body: page.url(),
+        contentType: "text/plain",
+      });
       const button = page.getByRole("button", { name: "Menu", exact: true });
       const box = (await button.locator("svg").first().boundingBox())!;
       for (const [i, [x, y]] of [

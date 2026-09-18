@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 
 import Button, { type ButtonProps } from "./Button";
-import type { StandardIconProps } from "./standardControl";
+import { Icon } from "../Icons/Icon";
 import { ButtonArrow, ButtonSettings } from "./Button.story-icons";
 
 const meta = {
@@ -81,19 +81,17 @@ export const LongLabel: Story = {
 };
 
 function PendingExample({
-  iconPosition,
+  iconPosition = "trailing",
 }: {
   iconPosition?: "leading" | "trailing";
 }) {
   const [pending, setPending] = useState(false);
   const [activations, setActivations] = useState(0);
-  const iconProps: StandardIconProps = iconPosition
-    ? { icon: <span>→</span>, iconPosition }
-    : { icon: undefined };
   return (
     <div className="flex flex-wrap items-start gap-fs-md">
       <Button
-        {...iconProps}
+        icon={<Icon name="arrow-right" />}
+        iconPosition={iconPosition}
         pending={pending}
         onClick={() => {
           setActivations((count) => count + 1);
@@ -179,9 +177,13 @@ export const SurfaceMatrix: Story = {
 // selected or disabled-link state is added to the public component API.
 export const FigmaMatrix: Story = {
   render: () => (
-    <div className="grid gap-fs-lg">
+    <div className="grid min-w-0 grid-cols-1 gap-fs-lg">
       {(["large", "medium", "small"] as const).map((size) => (
-        <section key={size} aria-label={size} className="grid gap-fs-md">
+        <section
+          key={size}
+          aria-label={size}
+          className="grid min-w-0 grid-cols-1 gap-fs-md"
+        >
           <h2>
             {size}: {size === "large" ? 96 : size === "medium" ? 72 : 48}px
           </h2>
