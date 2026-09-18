@@ -261,11 +261,20 @@ These are portfolio gates, independent of the earlier Wave Survivor Gate 1/Gate 
 | Gate  | Current state                | Evidence / remaining boundary                                                                                                                                                                                                                                           |
 | ----- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | FS-G0 | APPROVED by Dimi, 2026-09-12 | Explicit approval of `156c28c…` plus reviewed patch `677b435d…`, following independent readiness review and closure of preservation/source blockers. [Actual answer and full candidate](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12). |
-| FS-G1 | Pending                      | Static-site/navigation/theme/motion acceptance in FS-3.6 not performed.                                                                                                                                                                                                 |
+| FS-G1 | Pending                      | Dimi confirms EPIC 1 acceptance only and explicitly keeps FS-G1 pending on 2026-09-18. EPIC 2–3 implementation and FS-3.6 static-site/navigation/settings acceptance remain future work.                                                                                |
 | FS-G2 | Pending                      | Integrated scene and genuine contact acceptance not performed.                                                                                                                                                                                                          |
 | FS-G3 | Pending                      | Whole portfolio candidate and Dimi acceptance not performed. The game-baseline production release is not this portfolio gate.                                                                                                                                           |
 
 The source sequence anticipated all EPIC 0 planning before FS-G0. The first Dimi approval preceded FS-0.4/0.5 completion; those records are now reconciled, independently reviewed and covered by Dimi’s explicit refreshed-candidate approval. Retain both dated decisions and the original prerequisites. Later choices keep their named owners and deadlines.
+
+#### FS-G1 scope clarification — 2026-09-18
+
+After reporting manual/visual PASS and requesting FS-G1 closure, Dimi clarified:
+**“Confirm EPIC 1; keep FS-G1 pending.”** EPIC 1 component acceptance remains
+complete at `37b9554`, as recorded below. FS-G1 requires the real website,
+navigation/settings and FS-3.6 evidence from EPICs 2–3; those tasks are still
+not started in the inspected checkout at `c4baf3f`. No gate closure or further
+implementation is requested by this clarification.
 
 ## Task breakdown and current milestone status
 
