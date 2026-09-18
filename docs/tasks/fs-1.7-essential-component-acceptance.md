@@ -2,21 +2,22 @@
 
 ## Task metadata
 
-- **Stage:** C — Sites implements the assigned R3 correction and returns a new candidate. Earlier acceptance/commit records below are historical.
-- **Status:** R3 correction implemented and awaiting Codex re-review plus Dimi's decision on changed wrapping. Dimi's acceptance of `fbfea569` remains recorded; it does not automatically accept this changed candidate. FS-G1 remains open.
-- **Latest candidate:** R3 correction on `fbfea569a999134a28c5432313ded96f58ba5f57`; the containing Git commit identifies the committed candidate. `artifacts/fs-1.7-r3-correction/candidate-manifest.json` records the validated pre-commit patch and file hashes; only commit-authorization documentation was added afterward. Sites' checks are not renewed Codex approval.
-- **Owner:** Sites owns R3; Codex owns its recheck. **Visual/device approver:** Dimi.
+- **Stage:** C — complete; EPIC 1 component acceptance recorded by Dimi's explicit closure decision.
+- **Status:** Complete — Dimi declares EPIC 1 finished on 2026-09-18, including the R3 correction committed in `37b955484083ffb232241945a4a4dacd63bb7a13`. FS-G1 remains open.
+- **Accepted implementation:** `37b955484083ffb232241945a4a4dacd63bb7a13` on `feature/funkspace-minimum-usable`. This closure changes documentation only; the containing Git commit records that update. Earlier candidate manifests remain historical validation evidence.
+- **Owner:** Sites delivered the component set; Codex review history is retained below. **Acceptance owner:** Dimi.
 - **Last updated:** 2026-09-18.
-- **Base:** Current correction: clean `feature/funkspace-minimum-usable` at `fbfea569a999134a28c5432313ded96f58ba5f57`. Earlier Stage A/C base `05b25a461fa9308ae5a787fa94e6030cd5c56495` remains historical provenance.
-- **Scope:** R3 pending reflow, its existing Storybook fixture/browser regression and task documentation only. Dimi subsequently authorized committing and pushing this correction on 2026-09-18. No deployment or new product flow is authorized.
+- **Base:** Documentation closure starts from clean `37b955484083ffb232241945a4a4dacd63bb7a13`. Earlier correction base `fbfea569` and Stage A/C base `05b25a4` remain historical provenance.
+- **Scope:** Record EPIC 1 completion and commit/push the documentation as requested. No source, deployment or new product flow is included.
 - **Related:** [feature plan](../features/funkspace-minimum-usable.md), [workflow](../development/ai-workflow.md), [template](../templates/task.md), [architecture](../architecture.md), [asset contract](fs-1.1-asset-and-component-contract.md), [foundation evidence](fs-1.2-token-and-contrast-foundations.md).
 
 ## Prerequisites and approval boundary
 
-The dated final decision at the end of this record supersedes earlier statements
-that Dimi's complete-set acceptance or commit/push authorization was missing.
-Historical test results keep their original scope. The subsequent R3 correction
-below requires re-review and acceptance of the changed presentation.
+The EPIC 1 completion decision at the end of this record is the current status
+and supersedes earlier awaiting-acceptance statements. Earlier stage descriptions,
+review verdicts and test results retain their original candidate scope. No
+unperformed review or device check is inferred from the completion decision.
+The following table records the prerequisites as they stood when FS-1.7 began.
 
 | Prerequisite                                                | Recorded implementation / acceptance                                                                                              | Remaining boundary                                               |
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
@@ -25,10 +26,10 @@ below requires re-review and acceptance of the changed presentation.
 | [FS-1.5 fields/status](fs-1.5-essential-form-primitives.md) | Readability approved and manual/visual PASS                                                                                       | Contact validation/delivery decisions belong to EPIC 5           |
 | [FS-1.6 dialog](fs-1.6-shared-dialog-primitive.md)          | Stage B architecture reviewed; implementation and final manual/visual PASS including Close icon and blue focus; committed in base | Complete-set Codex review and Dimi acceptance are still required |
 
-Prior component approvals are real evidence, not approval of the new combined
-candidate. Device/browser versions were not supplied for those manual checks.
-This stage neither infers those versions nor closes EPIC 1 or FS-G1. FS-G1 also
-needs the real static website and navigation/settings work of EPICs 2–3.
+Prior component approvals remain evidence for their recorded candidates;
+Dimi's latest decision accepts the final component set. Device/browser versions
+were not supplied for those manual checks. FS-G1 remains separate and needs
+the real static website and navigation/settings work of EPICs 2–3.
 
 ## Inspection and decisions
 
@@ -370,8 +371,8 @@ EPIC 1 component acceptance. **FS-G1 remains the later static-site/navigation/se
 
 ## EPIC 2 handoff — available foundation and limitations
 
-This inventory enables the next owner to plan integration. Dimi's later
-acceptance and the remaining R3 limitation are recorded below. Page
+This inventory is the handoff from completed EPIC 1 at `37b9554`, including
+the R3 correction. Dimi's closure decision is recorded below. Page
 implementation requires its own task; it is not part of this finalization.
 
 | Available import                                              | Supported contract and example                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
@@ -656,3 +657,44 @@ stories and tests are unchanged from that validated candidate. Commit and push
 target the existing `feature/funkspace-minimum-usable` branch. This authorization
 does not supply Codex re-review or Dimi's approval of the changed wrapping;
 those remain pending, and FS-G1 remains open.
+
+## EPIC 1 completion decision — 2026-09-18
+
+Dimi explicitly instructed:
+
+> Epic 1 is finished, update the documentation and then commit and push it.
+
+**FS-1.7 and EPIC 1 component acceptance are complete by this decision.** It
+applies to the current committed implementation
+`37b955484083ffb232241945a4a4dacd63bb7a13`, which includes the R3 correction.
+The checkout was clean at this revision. This update records the decision in
+this task and the authoritative feature plan; no implementation or API changes.
+
+R1 ordinary-control reflow and R2 configured-origin testing were resolved in
+the recorded renewed review. R3 is addressed by `37b9554`: the constrained
+enlarged paired-icon label retains 202px width, while normal pending buttons
+keep their 48px arrow/ellipsis presentation. The correction's recorded checks
+include types, lint, 1,351 unit tests, application/Storybook builds, final
+111/111 source and 111/111 static component-browser checks, and 14 application
+checks. The initial dialog-touch failure and successful isolated/full reruns
+remain visible in the preceding evidence; these suites were not rerun for
+this documentation-only closure.
+
+The completion decision supersedes the earlier request to await acceptance.
+It does not assert that a separate post-R3 Codex re-review took place: no such
+additional review is recorded. Existing review provenance, the Axe/Playwright
+typing follow-up, and missing device/browser-version and screen-reader details
+are retained as evidence/tooling limitations. They are not silently reported
+as passing checks or newly reopened acceptance gates.
+
+The accepted asset contract, component APIs/imports, approved substitutions
+and replacement ownership remain linked in this record and its EPIC 2 handoff.
+The next implementation owner is Sites for the separately requested EPIC 2
+work; Codex retains technical/tooling follow-ups. **FS-G1 remains open** for
+the later static-site/navigation/settings gate. No EPIC 2 implementation,
+deployment, settings change or live sending is authorized by this closure.
+
+Validation for this update is documentation formatting, local-link/anchor
+consistency, exact two-file diff review and confirmation that source remains
+unchanged from `37b9554`. Dimi expressly authorizes committing and pushing the
+documentation on the existing feature branch.
