@@ -2,20 +2,21 @@
 
 ## Task metadata
 
-- **Stage:** C — acceptance documentation and authorized commit/push. Earlier preparation records below are historical.
-- **Status:** Accepted by Dimi, who declares FS-1.7 done on 2026-09-18. Technical finding R3 remains open; the latest Codex verdict is changes required. This records the human decision without claiming a clean technical close or FS-G1 completion.
-- **Latest candidate:** source matches the reviewed pending-button patch `cb87e907c612a1bdb06bde5ac156399350795a83c8df3e64ac404eb2b8a1bbb5` on the base below. This finalization changes only this document and the feature plan; the containing Git commit identifies the committed candidate. Local manifests retain the earlier exact review snapshots.
+- **Stage:** C — Sites implements the assigned R3 correction and returns a new candidate. Earlier acceptance/commit records below are historical.
+- **Status:** R3 correction implemented and awaiting Codex re-review plus Dimi's decision on changed wrapping. Dimi's acceptance of `fbfea569` remains recorded; it does not automatically accept this changed candidate. FS-G1 remains open.
+- **Latest candidate:** R3 correction on `fbfea569a999134a28c5432313ded96f58ba5f57`; the containing Git commit identifies the committed candidate. `artifacts/fs-1.7-r3-correction/candidate-manifest.json` records the validated pre-commit patch and file hashes; only commit-authorization documentation was added afterward. Sites' checks are not renewed Codex approval.
 - **Owner:** Sites owns R3; Codex owns its recheck. **Visual/device approver:** Dimi.
 - **Last updated:** 2026-09-18.
-- **Base:** `feature/funkspace-minimum-usable`, `05b25a461fa9308ae5a787fa94e6030cd5c56495`, clean at Stage A start. Stage C preserved the six-file uncommitted Stage A candidate and adds only the assigned corrections below.
-- **Scope:** Essential-set stories, bounded integration/browser evidence, responsive CSS corrections and existing task documentation. Dimi explicitly authorizes committing and pushing these changes on 2026-09-18. No deployment or new product flow is authorized.
+- **Base:** Current correction: clean `feature/funkspace-minimum-usable` at `fbfea569a999134a28c5432313ded96f58ba5f57`. Earlier Stage A/C base `05b25a461fa9308ae5a787fa94e6030cd5c56495` remains historical provenance.
+- **Scope:** R3 pending reflow, its existing Storybook fixture/browser regression and task documentation only. Dimi subsequently authorized committing and pushing this correction on 2026-09-18. No deployment or new product flow is authorized.
 - **Related:** [feature plan](../features/funkspace-minimum-usable.md), [workflow](../development/ai-workflow.md), [template](../templates/task.md), [architecture](../architecture.md), [asset contract](fs-1.1-asset-and-component-contract.md), [foundation evidence](fs-1.2-token-and-contrast-foundations.md).
 
 ## Prerequisites and approval boundary
 
 The dated final decision at the end of this record supersedes earlier statements
 that Dimi's complete-set acceptance or commit/push authorization was missing.
-Historical test results keep their original scope. R3 is not recorded as fixed.
+Historical test results keep their original scope. The subsequent R3 correction
+below requires re-review and acceptance of the changed presentation.
 
 | Prerequisite                                                | Recorded implementation / acceptance                                                                                              | Remaining boundary                                               |
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
@@ -543,3 +544,115 @@ EPIC 1 has Dimi's component acceptance but retains the open technical finding;
 it is not represented as an unqualified technical pass. **FS-G1 remains open**
 for the later static-site/navigation/settings gate. No later task or deployment
 is started by this commit/push authorization.
+
+## Sites R3 correction and review handoff — 2026-09-18
+
+Dimi supplied an external review of `fbfea569` confirming the same pending
+layout defect, and explicitly requested changes where necessary. The pasted
+review is available evidence; its `sandbox:/mnt/data/` Markdown/ZIP downloads
+are not present in this local environment and were not claimed as inspected.
+The external review's 72 isolated Chromium/Linux CSS samples remain that
+reviewer's measurements, distinct from the real-component checks below.
+
+### Bounded repair
+
+The clean branch/HEAD was confirmed at `fbfea569a999134a28c5432313ded96f58ba5f57`.
+Sites used the portable execution profile (`configured:false`), preserved
+existing scripts and dependencies, and read the current instructions, workflow,
+plan, task records, reviewed source and tests. One writer; no shared-token or
+architecture ownership change.
+
+Removed only the pending-specific `flex-wrap: nowrap` and label-shrink overrides
+from `standardControl.module.css`. Pending controls now inherit the existing
+wrapping recipe and nonshrinking, width-bounded label. The previously repaired
+`min(existing padding token, 5vw)` remains, so removing the overrides does not
+reintroduce the circular percentage sizing that caused the unwanted extra row.
+Fixed icon/indicator slots, status reservation, native props, focus retention,
+event guards, accessible names and all supported sizes/icon arrangements remain.
+There are no new variants, tokens, effects, dependencies or public API changes.
+
+Extended the existing private `PendingExample` story fixture to respect the
+size control and support the existing paired-icon contract. Added
+`Controls → Button → Pending Paired Icons` with large size selected by default.
+Existing normal/leading/trailing stories keep their defaults and share the
+same fixture; no separate component or production demonstration logic is added.
+
+### Regression and rendered evidence
+
+Three browser cases in `e2e/storybook/button.spec.ts` cover leading, trailing
+and paired icons across small/medium/large and 16px/32px root text: 18 layout
+configurations, each exercised idle, pending and restored. They use the real
+React component, local fonts and theme at a 320px viewport in a 240px wrapper.
+Assertions cover unchanged requested font size, label width of at least two
+font-size units, contained/nonoverlapping children, text-line paint bounds,
+document width, reserved slot/label/control/group geometry, accessible name,
+retained focus and repeat blocking. These are additional browser assertions,
+not 18 new product variants. Existing normal-height tests still require 48px
+and exact idle/active icon and label coordinates.
+
+The new paired regression failed before the CSS change (78px label versus a
+96px minimum in its small/enlarged sample), demonstrating detection of the
+constrained pending path. After the repair, an initial assertion compared
+viewport coordinates across legitimate focus scrolling of tall controls.
+Using document coordinates corrects that test setup while retaining exact
+geometry, containment, paint and behavior assertions. All six focused pending
+tests then passed. No production change was needed for that test correction.
+
+| Actual rendered sample                                | Before                                                                                                                                      | After correction                                                                              |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Large paired, 240px parent, 320px viewport, 200% text | 0px label, 1337.06px button height in supplied review; actual-component zero-width failure independently recorded in the prior Codex review | **202px label, 901.9375px button height**; no overlap; identical idle/pending/restored layout |
+| Normal trailing Pending Interaction, 320px viewport   | Accepted 48px presentation                                                                                                                  | **235.65625 × 48px** idle and pending; arrow replaced in-place by ellipsis                    |
+
+The stress control grows to accommodate 96px text; it is not fixed to 48px or
+clipped. The normal small control retains the requested single row. Source and
+built screenshots were inspected. Evidence, command logs, test reports and the
+reproducible patch are retained at
+`/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/fs-1.7-r3-correction/`.
+
+### Validation and next owners
+
+Bootstrap freshness passed before builds. Frontend types, explicit story types,
+lint, 1,351 unit tests, Storybook build and the application build passed in the
+established token/common/game/bootstrap/frontend order. All 111 static
+Storybook browser tests on port 6019 passed; all 14 application browser tests
+passed, including unfiltered home/foundation checks. The first full source run
+passed 110/111: the unchanged dialog touch test found no open content after its
+tap (`dialog.spec.ts:431`). The failed screenshot shows the dialog closed.
+Its isolated rerun passed unchanged. This is retained as a non-reproduced
+run failure, without asserting an unproven cause or weakening the test.
+The subsequent complete source confirmation passed **111/111**, with no skips
+or retries, matching the static build. The original real-component diagnostic
+was also rerun: at its 256px available width, large paired controls now have
+the same 218px label and 786.75px height with pending absent, false or true.
+Normal idle/active static screenshots confirm identical 235.65625 × 48px bounds.
+An earlier diagnostic invocation hit a stopped test-owned preview server;
+the successful rerun used the live source preview. It was an unavailable
+server attempt, not a layout failure.
+
+No token/generated/bootstrap/asset/logo/game source or lockfile differs from
+the base. Root tests/build cover common/game dependencies; separate standalone
+game browser tests were not repeated for this CSS-only correction. Chromium
+checks are not physical-device, Firefox/WebKit or screen-reader evidence.
+The existing Axe/Playwright type-alignment follow-up remains separate.
+
+Changed files are `standardControl.module.css`, `Button.stories.tsx`,
+`e2e/storybook/button.spec.ts`, this record and the authoritative feature plan.
+The latest patch manifest identifies exactly those five files on `fbfea569`.
+No commit, push or independent Codex review is performed in this implementation
+stage. **Next owner: Codex**, to verify the R3 correction and normal-height
+regression against this exact patch, including the recorded dialog test failure.
+**Dimi:** approve the constrained/enlarged wrapping and confirm the normal
+48px arrow/ellipsis appearance. Prior acceptance is preserved for its source
+candidate, not reused as approval of this change. R3 is implemented/awaiting
+review; EPIC 1 is not newly declared technically accepted. FS-G1 stays open.
+
+### R3 commit and push authorization — 2026-09-18
+
+Dimi requested **“commir and push the changes”** after the R3 implementation
+handoff. All five file hashes matched validated patch
+`629d9f85eece093c16de4b7cd3ffea75c7f234764263881f4ab8d6b84c384d5f`
+before this documentation-only authorization update. The correction's source,
+stories and tests are unchanged from that validated candidate. Commit and push
+target the existing `feature/funkspace-minimum-usable` branch. This authorization
+does not supply Codex re-review or Dimi's approval of the changed wrapping;
+those remain pending, and FS-G1 remains open.

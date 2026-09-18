@@ -165,6 +165,121 @@ for (const suffix of ["interaction", "leading-icon", "trailing-icon"]) {
   });
 }
 
+for (const arrangement of ["leading-icon", "trailing-icon", "paired-icons"]) {
+  test(`pending ${arrangement}: constrained enlarged labels retain layout and behavior`, async ({
+    page,
+  }, testInfo) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    for (const size of ["small", "medium", "large"]) {
+      await page.goto(
+        `${story(`controls-button--pending-${arrangement}`)}&args=size:${size}`,
+      );
+      const button = page.getByRole("button", { name: "Send message" });
+      await settleStyles(page);
+      // Constrain the real pending wrapper, without changing its layout rules.
+      await button.locator("..").evaluate((node) => {
+        node.style.width = "240px";
+      });
+      for (const rootSize of [16, 32]) {
+        await page.evaluate((value) => {
+          document.documentElement.style.fontSize = `${value}px`;
+        }, rootSize);
+        await button.focus();
+        const layout = () =>
+          button.evaluate((node) => {
+            const rect = (element: Element) => {
+              const { x, y, width, height, right, bottom } =
+                element.getBoundingClientRect();
+              // Returning from Finish may scroll a tall enlarged control into
+              // view. Compare document geometry, not that viewport movement.
+              return {
+                x: x + window.scrollX,
+                y: y + window.scrollY,
+                width,
+                height,
+                right: right + window.scrollX,
+                bottom: bottom + window.scrollY,
+              };
+            };
+            const children = [...node.children].map(rect);
+            const label = node.querySelector("span:not([aria-hidden])")!;
+            const range = document.createRange();
+            range.selectNodeContents(label);
+            return {
+              button: rect(node),
+              group: rect(node.parentElement!),
+              children,
+              label: rect(label),
+              text: [...range.getClientRects()].map((r) => ({
+                x: r.x + window.scrollX,
+                right: r.right + window.scrollX,
+              })),
+              fontSize: parseFloat(getComputedStyle(node).fontSize),
+              documentWidth: document.documentElement.scrollWidth,
+            };
+          });
+        const before = await layout();
+        expect(before.fontSize).toBe(
+          rootSize * (size === "large" ? 3 : size === "medium" ? 2.25 : 1.5),
+        );
+        expect(before.documentWidth).toBe(320);
+        expect(before.label.width).toBeGreaterThanOrEqual(before.fontSize * 2);
+        for (const [index, child] of before.children.entries()) {
+          expect(child.x).toBeGreaterThanOrEqual(before.button.x);
+          expect(child.right).toBeLessThanOrEqual(before.button.right);
+          expect(child.y).toBeGreaterThanOrEqual(before.button.y);
+          expect(child.bottom).toBeLessThanOrEqual(before.button.bottom);
+          for (const other of before.children.slice(index + 1)) {
+            expect(
+              child.right <= other.x ||
+                other.right <= child.x ||
+                child.bottom <= other.y ||
+                other.bottom <= child.y,
+            ).toBe(true);
+          }
+        }
+        for (const line of before.text) {
+          expect(line.x).toBeGreaterThanOrEqual(before.label.x);
+          expect(line.right).toBeLessThanOrEqual(before.label.right);
+        }
+        await page.keyboard.press("Space");
+        await expect(button).toHaveAttribute("aria-busy", "true");
+        await expect(button).toBeFocused();
+        await expect(button).toHaveAccessibleName("Send message");
+        await expect(
+          button
+            .locator(':scope > span[aria-hidden="true"]')
+            .filter({ hasText: "…" }),
+        ).toHaveCount(1);
+        await expect(button.locator("svg")).toHaveCount(
+          arrangement === "paired-icons" ? 1 : 0,
+        );
+        expect(await layout()).toEqual(before);
+        const count = await page.getByText(/^Activations:/).textContent();
+        await button.click({ force: true });
+        await page.keyboard.press("Enter");
+        await page.keyboard.press("Space");
+        await expect(page.getByText(/^Activations:/)).toHaveText(count!);
+        await testInfo.attach(`${size}-${rootSize}px-root`, {
+          body: JSON.stringify(before, null, 2),
+          contentType: "application/json",
+        });
+        if (size === "large" && rootSize === 32) {
+          await page.screenshot({
+            path: testInfo.outputPath(`pending-${arrangement}-enlarged.png`),
+            fullPage: true,
+          });
+        }
+        await page.getByRole("button", { name: "Finish example" }).click();
+        await expect(button).not.toHaveAttribute("aria-busy", "true");
+        await button.focus();
+        expect(await layout()).toEqual(before);
+      }
+    }
+  });
+}
+
 test("native links preserve Space, Enter, click and new-tab navigation", async ({
   page,
   context,

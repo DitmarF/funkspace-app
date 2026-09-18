@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 
 import Button, { type ButtonProps } from "./Button";
+import type { StandardIconProps } from "./standardControl";
 import { Icon } from "../Icons/Icon";
 import { ButtonArrow, ButtonSettings } from "./Button.story-icons";
 
@@ -81,17 +82,26 @@ export const LongLabel: Story = {
 };
 
 function PendingExample({
-  iconPosition = "trailing",
+  icons = "trailing",
+  size = "small",
 }: {
-  iconPosition?: "leading" | "trailing";
+  icons?: "leading" | "trailing" | "paired";
+  size?: ButtonProps["size"];
 }) {
   const [pending, setPending] = useState(false);
   const [activations, setActivations] = useState(0);
+  const iconProps: StandardIconProps =
+    icons === "paired"
+      ? {
+          leadingIcon: <Icon name="arrow-left" />,
+          trailingIcon: <Icon name="arrow-right" />,
+        }
+      : { icon: <Icon name="arrow-right" />, iconPosition: icons };
   return (
     <div className="flex flex-wrap items-start gap-fs-md">
       <Button
-        icon={<Icon name="arrow-right" />}
-        iconPosition={iconPosition}
+        {...iconProps}
+        size={size}
         pending={pending}
         onClick={() => {
           setActivations((count) => count + 1);
@@ -108,12 +118,18 @@ function PendingExample({
   );
 }
 
-export const PendingInteraction: Story = { render: () => <PendingExample /> };
+export const PendingInteraction: Story = {
+  render: ({ size }) => <PendingExample size={size} />,
+};
 export const PendingLeadingIcon: Story = {
-  render: () => <PendingExample iconPosition="leading" />,
+  render: ({ size }) => <PendingExample size={size} icons="leading" />,
 };
 export const PendingTrailingIcon: Story = {
-  render: () => <PendingExample iconPosition="trailing" />,
+  render: ({ size }) => <PendingExample size={size} icons="trailing" />,
+};
+export const PendingPairedIcons: Story = {
+  args: { size: "large" },
+  render: ({ size }) => <PendingExample size={size} icons="paired" />,
 };
 
 function NativeFormExample() {

@@ -103,14 +103,6 @@
   vertical-align: middle;
 }
 
-.pendingGroup .control {
-  flex-wrap: nowrap;
-}
-
-.pendingGroup .label {
-  flex-shrink: 1;
-}
-
 .status {
   min-height: calc(var(--fs-font-size-sm) * var(--fs-line-height-normal));
   color: var(--fs-color-content-primary);
