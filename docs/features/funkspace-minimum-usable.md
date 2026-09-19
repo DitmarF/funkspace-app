@@ -7,7 +7,7 @@
 - **Related epic/task:** Portfolio EPICs 0–6; publication task [FS-0.4](../tasks/fs-0.4-authoritative-feature-plan.md).
 - **Decision entry point:** [Authoritative decision register](#pending-decisions-and-latest-needed-points); [FS-0.5 technical rationale and answer provenance](../tasks/fs-0.5-product-and-technical-decisions.md). Dimi leads/approves FS-0.5; Codex is its designated documentation writer.
 - **Target release:** Minimum Usable Experience, before separate Wave Survivor EPIC 7; no portfolio release date assigned.
-- **Last updated:** 2026-09-15.
+- **Last updated:** 2026-09-19.
 - **Related ADRs:** [001](../decisions/ADR-001-monorepo-strategy.md), [002](../decisions/ADR-002-design-token-source-of-truth.md), [003](../decisions/ADR-003-interactive-experience-boundary.md), [004](../decisions/ADR-004-game-development-architecture.md).
 
 ### Authority and source provenance
@@ -50,7 +50,7 @@ Reachable real content, usable static fallbacks, approved scene/controls, verifi
 
 ## Current problem
 
-The current home route is a heading plus theme switcher, with demonstrations and reusable foundations elsewhere. Working standalone gameplay is retained, but the proposed three-section portfolio, shared decorative preference, integrated Canvas scene and real contact journey are not delivered. See the baseline's [reuse map](../tasks/fs-0.1-inventory-real-starting-point.md#reuse-map) for paths/contracts and limitations; a story or particle placeholder is not integrated behavior.
+FS-2.1 now supplies the accepted destination contract and shared Home/Privacy shell, stable homepage section IDs and expressly permitted bounded About/Contact drafts. Final section content, secondary pages, shared decorative preference, integrated Canvas scene and real contact journey are not delivered. Working standalone gameplay and reusable foundations are retained. See the baseline's [reuse map](../tasks/fs-0.1-inventory-real-starting-point.md#reuse-map) and the [FS-2.1 record](../tasks/fs-2.1-page-structure-and-navigation.md) for paths/contracts and limitations; a story or particle placeholder is not integrated behavior.
 
 The earlier layout plan mandates snapping and fullscreen panels, conflicting with this milestone's ordinary scrolling. Without one scope entry point, a fresh agent could implement those historical proposals or repeat already completed tooling work. The narrow documentation reconciliation is recorded in FS-0.4; unrelated architecture migration remains deferred.
 
@@ -518,7 +518,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-2.1 — Define page structure and shared navigation data
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Codex route/shell technical review passed without actionable findings, then Dimi approved the seven labels/destinations and bounded shell on 2026-09-19 and authorized commit/push. [FS-2.1 acceptance, contract and exact-candidate evidence](../tasks/fs-2.1-page-structure-and-navigation.md#dimi-acceptance-and-commitpush-authorization--2026-09-19). Home and existing Privacy share the opt-in shell. Contact navigation, `/about`, `/impressum` and final content/legal approval remain with their later tasks; FS-G1 is not approved.
 
 **Lead:** Sites
 
@@ -1095,15 +1095,15 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 - **Completed reference work:** The [Storybook color reference](../tasks/storybook-color-reference.md) presents the current palettes and semantic roles without changing tokens. Implementation and validation are complete; Dimi authorized documentation finalization, commit and push on 2026-09-16. FS-1.3 remains complete. FS-1.4 implementation and validation are now recorded separately.
 
 - **Recommended first step:** read this plan, the accepted FS-1.1 contract and completed FS-1.2 task record; verify the current branch, HEAD and accessible diff before continuing. The FS-1.2 record identifies its accepted implementation patch on base `655f53857ebf55da57e928532e8c74b9990881cc`. Earlier SHAs are historical provenance, not reset targets.
-- **Next implementation:** EPIC 1 is complete by [Dimi's decision](../tasks/fs-1.7-essential-component-acceptance.md#epic-1-completion-decision--2026-09-18). Sites can use the accepted component/API handoff when EPIC 2 is requested; no page work starts as part of documentation closure.
+- **Current implementation:** EPIC 1 and FS-2.1 are complete. FS-2.1's reviewed destination contract and bounded Home/Privacy shell were [accepted by Dimi on 2026-09-19](../tasks/fs-2.1-page-structure-and-navigation.md#dimi-acceptance-and-commitpush-authorization--2026-09-19). FS-2.2 is the next planned task; later implementation starts only when requested.
 - **Codex follow-up:** preserve the review provenance and separately scoped Axe/Playwright typing follow-up. No separate post-R3 Codex review is recorded; Dimi's explicit completion decision closes the epic without inventing that evidence.
 - **Sites handoff:** FS-1.3 is complete; implementation, source assets, native API examples, pending/focus policy, checks and manual/visual acceptance are recorded in the [Standard Button task](../tasks/fs-1.3-standard-button-family.md#final-dimi-acceptance-and-completion--2026-09-15).
 - **FS-1.4 handoff:** implementation, full Figma matrix, icon-only Storybook samples, native behavior and validation are complete and manually/visually accepted; see the [Hexagonal Button task](../tasks/fs-1.4-hexagonal-button-family.md).
 - **FS-1.5 handoff:** native fields, associations, controlled fixtures and status presentation are complete and accepted; see the [task record](../tasks/fs-1.5-essential-form-primitives.md#final-manualvisual-acceptance-and-commit-authorization--2026-09-16). Complete-set compatibility evidence is retained in FS-1.7.
 - **FS-1.6 handoff:** complete and accepted, with both triggers, secondary hexagonal Close, Escape, blue focus, focus fallback/override and owned scroll cleanup. Complete-set dialog checks and their actual outcomes are retained in FS-1.7.
 - **FS-1.7 handoff:** complete at accepted implementation `37b9554`, including the R3 correction. The existing task record provides the EPIC 2 control/API/import inventory, approved substitutes, validation history and limitations; production APIs and architecture are unchanged.
-- **Dimi decision:** EPIC 1 is finished. Actual device/browser versions and the [assistive-technology spot-check](../tasks/fs-1.7-essential-component-acceptance.md#dimi-phonedesktop-checklist--pending-for-this-candidate) outcome remain unspecified; those evidence limitations are retained without requesting acceptance again for this revision.
-- **Do not change:** accepted gameplay/public contracts, original assets, unrelated work, generated token outputs by hand, or later milestone scope. Current authorization is EPIC 1 completion documentation plus commit/push. No PR, merge, settings, deployment, branch deletion, live email or page implementation is authorized. FS-G1 remains a later gate.
+- **Dimi decision:** EPIC 1 is finished; FS-2.1 labels/destinations and bounded shell are approved. Draft/final content, later pages and FS-G1 remain separate. Actual device/browser versions and the [assistive-technology spot-check](../tasks/fs-1.7-essential-component-acceptance.md#dimi-phonedesktop-checklist--pending-for-this-candidate) outcome remain unspecified; no device results are invented from these approvals.
+- **Do not change:** accepted gameplay/public contracts, original assets, unrelated work, generated outputs by hand, or later milestone scope. Dimi expressly authorized documentation closure, commit and push of FS-2.1 on 2026-09-19. No PR, merge, settings, deployment, branch deletion or live email is authorized. FS-G1 remains a later gate.
 - **Completion summary expected:** task ID, qualified revision and accessible diff, actual files, contract changes, checks/outcomes and limits, owned follow-ups, counterpart findings and Dimi's recorded acceptance.
 
 Game continuation is the separate [Wave Survivor EPIC 7](wave-survivor-implementation-plan.md#epic-7--portfolio-play-shell-and-accessible-application-ui) after portfolio FS-6.6/FS-G3. `/play/wave-survivor` remains future integration work. Do not apply homepage particle/global-control or ordinary-scroll layout choices to the portrait game arena.
