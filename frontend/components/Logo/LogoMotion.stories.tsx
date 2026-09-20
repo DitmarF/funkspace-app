@@ -58,6 +58,23 @@ const meta: Meta<typeof LogoMotion> = {
 export default meta;
 type Story = StoryObj<typeof LogoMotion>;
 
+export const MultipleInstances: Story = {
+  render: (args) => (
+    <div className="space-y-fs-lg">
+      <LogoMotion
+        {...args}
+        enabled={false}
+        aria-label="Static FunkSpace logo"
+      />
+      <LogoMotion
+        {...args}
+        enabled={true}
+        aria-label="Animated FunkSpace logo"
+      />
+    </div>
+  ),
+};
+
 /**
  * Default story - auto-plays the animation
  */

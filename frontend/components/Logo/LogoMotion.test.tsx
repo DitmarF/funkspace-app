@@ -125,6 +125,49 @@ describe("LogoMotion", () => {
   });
 
   describe("rendering", () => {
+    it.each(["empty", "error"])(
+      "restores the whole static logo when manifest construction returns %s",
+      (failure) => {
+        const warning = vi
+          .spyOn(console, "warn")
+          .mockImplementation(() => undefined);
+        mockAnimationOrchestrator.buildLogoManifest.mockImplementationOnce(
+          () => {
+            if (failure === "error") throw new Error("Test manifest failure");
+            return { steps: [] };
+          },
+        );
+        try {
+          render(<LogoMotion enabled />);
+          for (const element of screen
+            .getByRole("img")
+            .querySelectorAll<SVGElement>("path, polygon, circle")) {
+            expect(element.style.opacity).toBe("1");
+          }
+          expect(AnimationTimeline).not.toHaveBeenCalled();
+        } finally {
+          warning.mockRestore();
+        }
+      },
+    );
+
+    it("restores all dots and letters when an initialized animation is disabled", () => {
+      const { rerender } = render(<LogoMotion enabled autoPlay={false} />);
+      const svg = screen.getByRole("img");
+      const dots = [...svg.querySelectorAll("circle")];
+      expect(dots).toHaveLength(9);
+      expect(dots.every((dot) => dot.style.opacity === "0")).toBe(true);
+      rerender(<LogoMotion enabled={false} autoPlay={false} />);
+      expect(dots.every((dot) => dot.style.opacity === "1")).toBe(true);
+      for (const path of svg.querySelectorAll<SVGElement>("path, polygon")) {
+        expect(path.style.fillOpacity).toBe("1");
+        expect(path.style.strokeDashoffset).toBe("0");
+      }
+      const timeline = vi.mocked(AnimationTimeline).mock.results[0]
+        .value as MockTimeline;
+      expect(timeline.destroy).toHaveBeenCalledOnce();
+    });
+
     it("should render the SVG logo", () => {
       render(<LogoMotion enabled={true} />);
       const svg = screen.getByRole("img", { name: /funkspace logo/i });
@@ -146,7 +189,9 @@ describe("LogoMotion", () => {
     it("should fall back to a fully visible logo when animations are disabled", () => {
       render(<LogoMotion enabled={false} />);
       const svg = screen.getByRole("img");
-      const path = svg.querySelector("#logo-path-1") as SVGPathElement | null;
+      const path = svg.querySelector(
+        '[data-logo-part="logo-path-1"]',
+      ) as SVGPathElement | null;
 
       expect(path).not.toBeNull();
       expect(path?.style.strokeDashoffset).toBe("0");
@@ -163,7 +208,7 @@ describe("LogoMotion", () => {
 
       // logoMark (path 1) is NOT animated - should remain visible
       const logoMark = svg.querySelector(
-        "#logo-path-1",
+        '[data-logo-part="logo-path-1"]',
       ) as SVGPathElement | null;
       expect(logoMark).not.toBeNull();
       expect(logoMark?.style.opacity).toBe("1");
@@ -171,7 +216,7 @@ describe("LogoMotion", () => {
 
       // Letter paths should be initialized for animation (fillOpacity 0)
       const letterPath = svg.querySelector(
-        "#logo-path-7",
+        '[data-logo-part="logo-path-7"]',
       ) as SVGPathElement | null; // F
       expect(letterPath).not.toBeNull();
       expect(letterPath?.style.opacity).toBe("1");
@@ -198,13 +243,13 @@ describe("LogoMotion", () => {
       // Verify logoMark elements exist
       const svg = screen.getByRole("img");
       const logoMark = svg.querySelector(
-        "#logo-path-1",
+        '[data-logo-part="logo-path-1"]',
       ) as SVGPathElement | null;
       expect(logoMark).not.toBeNull();
 
       // Circles should start hidden (opacity 0) - they'll be shown during animation
       const circle1 = svg.querySelector(
-        "#lmd-dot-1",
+        '[data-logo-part="lmd-dot-1"]',
       ) as SVGCircleElement | null;
       expect(circle1).not.toBeNull();
       // Note: In test environment, setStaticState runs first, so we verify

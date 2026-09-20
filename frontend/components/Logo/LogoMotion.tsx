@@ -90,10 +90,9 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       const setStaticState = () => {
         // Show all paths (including logoMark path 1)
         for (let i = 1; i <= TOTAL_LOGO_PATHS; i++) {
-          const element = svg.querySelector(`#logo-path-${i}`) as
-            | SVGPathElement
-            | SVGPolygonElement
-            | null;
+          const element = svg.querySelector(
+            `[data-logo-part="logo-path-${i}"]`,
+          ) as SVGPathElement | SVGPolygonElement | null;
 
           if (element) {
             element.style.strokeDashoffset = "0";
@@ -101,11 +100,14 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
             element.style.fillOpacity = "1";
           }
         }
+        for (const circle of svg.querySelectorAll<SVGCircleElement>("circle")) {
+          circle.style.opacity = "1";
+        }
       };
 
       const setAnimationStartState = () => {
         // Initialize logoMark (path 1) for animation
-        const logoMark = svg.querySelector(`#logo-path-1`) as
+        const logoMark = svg.querySelector(`[data-logo-part="logo-path-1"]`) as
           | SVGPathElement
           | SVGPolygonElement
           | null;
@@ -118,7 +120,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
         // lmd-dot-1 will be shown immediately by the animation manifest
         for (let i = 1; i <= 9; i++) {
           const circle = svg.querySelector(
-            `#lmd-dot-${i}`,
+            `[data-logo-part="lmd-dot-${i}"]`,
           ) as SVGCircleElement | null;
           if (circle) {
             circle.style.opacity = "0";
@@ -129,10 +131,9 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
         // Letter order: F(7), U(8), N(9), K(10), S(2), P(3), A(4), C(5), E(6)
         const letterPaths = [7, 8, 9, 10, 2, 3, 4, 5, 6];
         letterPaths.forEach((pathId) => {
-          const element = svg.querySelector(`#logo-path-${pathId}`) as
-            | SVGPathElement
-            | SVGPolygonElement
-            | null;
+          const element = svg.querySelector(
+            `[data-logo-part="logo-path-${pathId}"]`,
+          ) as SVGPathElement | SVGPolygonElement | null;
 
           if (element) {
             applyStrokeDrawInit(element);

@@ -26,7 +26,7 @@ export default function Dialog({
       aria-labelledby={`${id}-title`}
       aria-describedby={description?.trim() ? `${id}-description` : undefined}
     >
-      <header className={styles.header}>
+      <div className={styles.header}>
         <h2
           id={`${id}-title`}
           ref={titleRef}
@@ -42,7 +42,7 @@ export default function Dialog({
           aria-label="Close"
           onClick={requestClose}
         />
-      </header>
+      </div>
       <div className={styles.content}>
         {description?.trim() && <p id={`${id}-description`}>{description}</p>}
         {children}

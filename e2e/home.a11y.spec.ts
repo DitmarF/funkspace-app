@@ -5,6 +5,8 @@ import {
   settleStyles,
   themes,
   transitionPairs,
+  openSettings,
+  closeSettings,
 } from "./helpers/foundation";
 
 test.describe("A11y — Home", () => {
@@ -14,6 +16,7 @@ test.describe("A11y — Home", () => {
     }) => {
       await page.emulateMedia({ colorScheme: "light" });
       await page.goto("/");
+      await openSettings(page);
       // Storage normalization is best effort; the resolved UI establishes
       // readiness even when browser storage cannot be written.
       await expect(
@@ -32,6 +35,7 @@ test.describe("A11y — Home", () => {
 
       await page.mouse.move(0, 0);
       await assertAccessible();
+      await openSettings(page);
       const unselected = page.locator('button[aria-pressed="false"]').first();
       await unselected.hover();
       for (const sample of await transitionPairs(unselected)) {
@@ -52,6 +56,7 @@ test.describe("A11y — Home", () => {
         "solid",
       );
       await assertAccessible();
+      await closeSettings(page);
     });
   }
 });

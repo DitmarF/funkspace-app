@@ -15,7 +15,9 @@ test.describe("Logo Animation", () => {
     // So we wait for the SVG to have a computed width > 0
     await page.waitForFunction(
       () => {
-        const svg = document.querySelector("svg#logo") as SVGSVGElement | null;
+        const svg = document.querySelector(
+          "svg[data-funkspace-logo]",
+        ) as SVGSVGElement | null;
         if (!svg) return false;
         const rect = svg.getBoundingClientRect();
         return rect.width > 0 && rect.height > 0;
@@ -24,13 +26,16 @@ test.describe("Logo Animation", () => {
     );
 
     // Also wait for at least one path element to exist, indicating the SVG is fully rendered
-    await page.waitForSelector("svg#logo #logo-path-1", {
-      state: "attached",
-      timeout: 10000,
-    });
+    await page.waitForSelector(
+      "svg[data-funkspace-logo] [data-logo-part='logo-path-1']",
+      {
+        state: "attached",
+        timeout: 10000,
+      },
+    );
 
     // Wait for path-6 to exist (last letter in animation sequence)
-    await page.waitForSelector("#logo-path-6", {
+    await page.waitForSelector("[data-logo-part='logo-path-6']", {
       state: "attached",
       timeout: 10000,
     });
@@ -41,7 +46,7 @@ test.describe("Logo Animation", () => {
     // Get initial strokeDashoffset value (should be path length)
     // Check both inline style and computed style
     const initialOffset = await page.evaluate(() => {
-      const path6 = document.querySelector("#logo-path-6") as
+      const path6 = document.querySelector("[data-logo-part='logo-path-6']") as
         | SVGPathElement
         | SVGPolygonElement
         | null;
@@ -59,10 +64,9 @@ test.describe("Logo Animation", () => {
     // Wait for offset to decrease from initial value, indicating animation has started
     await page.waitForFunction(
       (initial) => {
-        const path6 = document.querySelector("#logo-path-6") as
-          | SVGPathElement
-          | SVGPolygonElement
-          | null;
+        const path6 = document.querySelector(
+          "[data-logo-part='logo-path-6']",
+        ) as SVGPathElement | SVGPolygonElement | null;
         if (!path6) return false;
         const inlineOffset = path6.style.strokeDashoffset;
         const computed = window.getComputedStyle(path6);
@@ -84,10 +88,9 @@ test.describe("Logo Animation", () => {
     // But allow extra time for the last path to complete
     await page.waitForFunction(
       () => {
-        const path6 = document.querySelector("#logo-path-6") as
-          | SVGPathElement
-          | SVGPolygonElement
-          | null;
+        const path6 = document.querySelector(
+          "[data-logo-part='logo-path-6']",
+        ) as SVGPathElement | SVGPolygonElement | null;
         if (!path6) return false;
         const inlineOffset = path6.style.strokeDashoffset;
         const computed = window.getComputedStyle(path6);
@@ -111,9 +114,9 @@ test.describe("Logo Animation", () => {
 
     // Assert final state: strokeDashoffset should be ≈ 0 (fully drawn)
     // Check first, middle, and last paths
-    const path1 = page.locator("#logo-path-1");
-    const path5 = page.locator("#logo-path-5");
-    const path6 = page.locator("#logo-path-6");
+    const path1 = page.locator("[data-logo-part='logo-path-1']");
+    const path5 = page.locator("[data-logo-part='logo-path-5']");
+    const path6 = page.locator("[data-logo-part='logo-path-6']");
 
     // Check strokeDashoffset is approximately 0 (fully drawn)
     const strokeDashoffset1 = await path1.evaluate((el) => {
@@ -199,7 +202,7 @@ test.describe("Logo Animation", () => {
 
     // With reduced motion, animation should be skipped
     // Check that paths are immediately in final state
-    const path1 = page.locator("#logo-path-1");
+    const path1 = page.locator("[data-logo-part='logo-path-1']");
     const strokeDashoffset1 = await path1.evaluate((el) => {
       const computed = window.getComputedStyle(el);
       return parseFloat(computed.strokeDashoffset) || 0;

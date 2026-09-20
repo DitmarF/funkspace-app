@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Inline SVG version of the FunkSpace logo with stable IDs for animation. Each path has a deterministic `id='logo-path-N'` for timeline targeting.",
+          "Inline SVG version of the FunkSpace logo with stable IDs for animation. Each instance has unique IDs and stable data-logo-part attributes for local timeline targeting.",
       },
     },
   },
@@ -55,7 +55,7 @@ export const Verification: Story = {
             run:
           </p>
           <code className="block mt-2 p-2 bg-gray-100 rounded">
-            document.querySelectorAll(&apos;[id^=&quot;logo-path-&quot;]&apos;).length
+            document.querySelectorAll(&apos;[data-logo-part^=&quot;logo-path-&quot;]&apos;).length
           </code>
           <p className="mt-2">
             Expected: <strong>10</strong> paths with stable IDs

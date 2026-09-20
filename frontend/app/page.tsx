@@ -1,25 +1,14 @@
-import ThemeSwitcher from "@/components/ThemeSwitcher";
+import Start from "@/components/sections/Start";
 import PortfolioShell from "@/components/Layouts/PortfolioShell";
 
 export default function Home() {
   return (
     <PortfolioShell>
       <div className="space-y-fs-2xl">
-        <section
-          id="start"
-          aria-labelledby="start-heading"
-          className="space-y-fs-lg"
-        >
-          <h1
-            id="start-heading"
-            className="text-3xl font-bold text-fs-action-primary"
-          >
-            FunkSpace
-          </h1>
-          <ThemeSwitcher />
-        </section>
+        <Start />
         <section
           id="about"
+          tabIndex={-1}
           aria-labelledby="about-heading"
           className="space-y-fs-md"
         >
@@ -32,6 +21,7 @@ export default function Home() {
         </section>
         <section
           id="contact"
+          tabIndex={-1}
           aria-labelledby="contact-heading"
           className="space-y-fs-md"
         >

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { openSettings } from "./helpers/foundation";
 
 test.describe("Theme switching", () => {
   test.beforeEach(async ({ page }) => {
@@ -12,6 +13,7 @@ test.describe("Theme switching", () => {
 
   test("persists explicit themes across reloads", async ({ page }) => {
     await page.goto("/");
+    await openSettings(page);
 
     const darkButton = page.getByRole("button", { name: "Dark" });
     await darkButton.click();
@@ -23,6 +25,7 @@ test.describe("Theme switching", () => {
       .toBe("dark");
 
     await page.reload();
+    await openSettings(page);
 
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
     await expect(page.getByRole("button", { name: "Dark" })).toHaveAttribute(
@@ -36,6 +39,7 @@ test.describe("Theme switching", () => {
   }) => {
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/");
+    await openSettings(page);
 
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 

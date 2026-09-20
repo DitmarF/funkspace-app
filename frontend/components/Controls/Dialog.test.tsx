@@ -33,6 +33,7 @@ describe("Dialog presentation and binding", () => {
       </>,
     );
     const nodes = screen.getAllByRole("dialog", { hidden: true });
+    expect(screen.queryByRole("banner", { hidden: true })).toBeNull();
     expect(nodes[0]).toHaveAttribute(
       "aria-labelledby",
       screen.getByText("First").id,

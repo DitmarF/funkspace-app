@@ -1,0 +1,47 @@
+.identity {
+  display: block;
+  width: calc(var(--fs-space-2xl) * 3);
+  max-width: 100%;
+}
+
+.main {
+  padding-top: var(--fs-space-xs);
+}
+
+.identity:focus-visible {
+  outline: 2px solid var(--fs-color-border-focus);
+  outline-offset: var(--fs-space-xs);
+}
+
+.launcher {
+  --shell-gutter: var(--fs-space-md);
+  /* Medium artwork: 72-unit viewBox, right path edge 66.1768, stroke 2.
+     Include the native button's 2px border without changing its hit target. */
+  --artwork-right-inset: calc(2px + var(--fs-space-2xl) * 1.5 / 72 * 4.8232);
+  position: fixed;
+  z-index: 20;
+  /* Match Container's centered wide (80rem) shell and responsive gutters. */
+  right: max(
+    env(safe-area-inset-right),
+    calc(
+      max(0px, (100% - 80rem) / 2) + var(--shell-gutter) -
+        var(--artwork-right-inset)
+    )
+  );
+  bottom: max(var(--fs-space-md), env(safe-area-inset-bottom));
+}
+
+@media (min-width: 48rem) {
+  .launcher {
+    --shell-gutter: var(--fs-space-lg);
+    top: max(var(--fs-space-xl), env(safe-area-inset-top));
+    bottom: auto;
+  }
+}
+
+.footer {
+  display: grid;
+  gap: var(--fs-space-lg);
+  /* Any footer link can scroll fully above the fixed settings trigger. */
+  padding-bottom: calc(var(--fs-space-2xl) * 3 + env(safe-area-inset-bottom));
+}

@@ -231,7 +231,7 @@ test("full document: inactivity, backdrop/drag policy, internal scrolling and re
   await expect(page.getByTestId("fixture-events")).toContainText(
     "background: 0",
   );
-  const content = page.locator("dialog > div");
+  const content = page.locator("dialog > div:last-child");
   await content.evaluate((node) => {
     node.scrollTop = 0;
   });
@@ -426,7 +426,7 @@ test("touch scrolling is contained in the modal on a mobile viewport", async ({
     await page.screenshot({
       path: testInfo.outputPath("mobile-long-content.png"),
     });
-    const content = page.locator("dialog > div");
+    const content = page.locator("dialog > div:last-child");
     const box = await content.boundingBox();
     expect(box).not.toBeNull();
     await swipe(box!.x + box!.width / 2, box!.y + box!.height * 0.8);

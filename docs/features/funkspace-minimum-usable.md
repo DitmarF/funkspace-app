@@ -534,7 +534,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-2.2 — Build the static Start section and reuse the logo
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Dimi reports manual/visual tests PASS and explicitly closes FS-2.2 on 2026-09-20 after the Codex logo/static-rendering review PASS. See [review and acceptance](../tasks/fs-2.2-static-start-and-logo.md#codex-review-and-dimi-completion--2026-09-20). The delivered static Start includes the reused logo, responsive scene, asymmetric SVG corners and authorized navigation/theme overlay: bottom-right on mobile, top-right opposite the logo from 768px. README wording remains identified as draft content accepted for this bounded delivery; final publication copy is not inferred. Motion activation remains FS-3.4/FS-3.5 work.
 
 **Lead:** Sites
 
@@ -628,7 +628,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-3.1 — Compose the combined navigation and settings overlay
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Bounded navigation/appearance subset brought forward with explicit Dimi authorization during the FS-2.2 wireframe revision. It reuses Dialog, HexButton, destinations and ThemeSwitcher. Motion settings and full task acceptance remain open; see [FS-2.2](../tasks/fs-2.2-static-start-and-logo.md).
 
 **Lead:** Sites
 
@@ -644,7 +644,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-3.2 — Implement navigation lifecycle across mobile and desktop
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Shared Dialog dismissal/focus restoration and native anchor closure are used by the authorized FS-2.2 overlay subset. The full navigation/history/customization lifecycle and Dimi's real-device acceptance remain open.
 
 **Lead:** Sites
 
@@ -662,7 +662,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 **Related bounded maintenance:** [Typed inline theme bootstrap](../tasks/maintenance-theme-bootstrap.md) records the extraction, initialization failure correction and validation separately; it does not complete this task or change its ownership/dependencies.
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Existing ThemeSwitcher is relocated into the authorized FS-2.2 overlay subset, retaining ThemeService and bootstrap ownership. Full task review and Dimi's appearance acceptance remain open.
 
 **Lead:** Sites
 
@@ -1095,7 +1095,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 - **Completed reference work:** The [Storybook color reference](../tasks/storybook-color-reference.md) presents the current palettes and semantic roles without changing tokens. Implementation and validation are complete; Dimi authorized documentation finalization, commit and push on 2026-09-16. FS-1.3 remains complete. FS-1.4 implementation and validation are now recorded separately.
 
 - **Recommended first step:** read this plan, the accepted FS-1.1 contract and completed FS-1.2 task record; verify the current branch, HEAD and accessible diff before continuing. The FS-1.2 record identifies its accepted implementation patch on base `655f53857ebf55da57e928532e8c74b9990881cc`. Earlier SHAs are historical provenance, not reset targets.
-- **Current implementation:** EPIC 1 and FS-2.1 are complete. FS-2.1's reviewed destination contract and bounded Home/Privacy shell were [accepted by Dimi on 2026-09-19](../tasks/fs-2.1-page-structure-and-navigation.md#dimi-acceptance-and-commitpush-authorization--2026-09-19). FS-2.2 is the next planned task; later implementation starts only when requested.
+- **Current implementation:** EPIC 1, FS-2.1 and FS-2.2 are complete. FS-2.1's labels/destinations and bounded shell were accepted on 2026-09-19; [FS-2.2](../tasks/fs-2.2-static-start-and-logo.md#codex-review-and-dimi-completion--2026-09-20) was reviewed and explicitly closed by Dimi on 2026-09-20. Its authorized navigation/theme overlay subset does not close full FS-3.1–FS-3.3 or activate motion. FS-2.3 is the next planned task and starts when requested; final content/legal inputs and FS-G1 remain separate.
 - **Codex follow-up:** preserve the review provenance and separately scoped Axe/Playwright typing follow-up. No separate post-R3 Codex review is recorded; Dimi's explicit completion decision closes the epic without inventing that evidence.
 - **Sites handoff:** FS-1.3 is complete; implementation, source assets, native API examples, pending/focus policy, checks and manual/visual acceptance are recorded in the [Standard Button task](../tasks/fs-1.3-standard-button-family.md#final-dimi-acceptance-and-completion--2026-09-15).
 - **FS-1.4 handoff:** implementation, full Figma matrix, icon-only Storybook samples, native behavior and validation are complete and manually/visually accepted; see the [Hexagonal Button task](../tasks/fs-1.4-hexagonal-button-family.md).

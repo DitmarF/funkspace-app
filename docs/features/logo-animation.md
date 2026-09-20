@@ -2,6 +2,15 @@
 
 > Epic: Signature Logo Animation & Modular Timeline Engine (SVG-first)
 
+> Current portfolio integration (FS-2.2): Home explicitly disables LogoMotion.
+> SVG geometry is unchanged; IDs are now instance-scoped using React useId.
+> Stable data-logo-part attributes identify paths/dots locally, and the actual
+> Application AnimationOrchestrator emits those elements' scoped IDs in manifests.
+> Historical bare #logo-path-N selectors below illustrate the original plan;
+> consumers must use the current instance contract described in
+> [FS-2.2](../tasks/fs-2.2-static-start-and-logo.md). Legacy proposed file locations
+> below do not supersede current Application/Infrastructure ownership.
+
 ## 1) Summary
 
 Create a timeline-based animation for the **FunkSpace** SVG logo in which the **strokes draw first (path-by-path, staggered)** and the **fills fade in** on the same master timeline. Ship a small, modular **timeline engine** (GSAP‑style) with **play / pause / reverse / seek / speed** controls, a declarative **manifest**, and an **SVG DOM renderer**. Develop and demo the feature in **Storybook**, with **reduced‑motion** fallback and a **feature flag** for rollout.

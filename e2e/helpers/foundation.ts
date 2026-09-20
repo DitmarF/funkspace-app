@@ -49,7 +49,27 @@ export async function transitionPairs(locator: Locator) {
   return samples;
 }
 
+export async function openSettings(page: Page) {
+  const dialog = page.getByRole("dialog", { name: "Navigation and settings" });
+  if (!(await dialog.isVisible())) {
+    await page
+      .getByRole("button", {
+        name: "Menu: navigation and settings",
+        exact: true,
+      })
+      .click();
+  }
+  await expect(dialog).toBeVisible();
+}
+
+export async function closeSettings(page: Page) {
+  const dialog = page.getByRole("dialog", { name: "Navigation and settings" });
+  await dialog.getByRole("button", { name: "Close", exact: true }).click();
+  await expect(dialog).not.toBeVisible();
+}
+
 export async function selectTheme(page: Page, theme: FoundationTheme) {
+  await openSettings(page);
   await expect(page.locator('button[aria-pressed="true"]')).toBeVisible();
   const choice = page.getByRole("button", { name: labels[theme], exact: true });
   await choice.click();
@@ -58,6 +78,7 @@ export async function selectTheme(page: Page, theme: FoundationTheme) {
     await expect(page.locator("html")).not.toHaveAttribute("data-theme");
   else await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
   await settleStyles(page);
+  await closeSettings(page);
 }
 
 // Composite actual browser colors through ancestor backgrounds. Reject images

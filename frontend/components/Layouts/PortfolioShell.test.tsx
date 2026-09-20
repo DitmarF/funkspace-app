@@ -37,13 +37,20 @@ describe("server-rendered portfolio documents", () => {
       );
       expect(new Set(ids).size).toBe(ids.length);
       const header = within(screen.getByRole("banner"));
-      for (const destination of [
-        destinations.home,
-        destinations.start,
-        destinations.about,
-      ]) {
+      expect(
+        header.getByRole("link", { name: destinations.home.label }),
+      ).toHaveAttribute("href", destinations.home.href);
+      expect(
+        header
+          .getByRole("link", { name: destinations.home.label })
+          .querySelector("svg"),
+      ).not.toBeNull();
+      for (const destination of [destinations.start, destinations.about]) {
         expect(
-          header.getByRole("link", { name: destination.label }),
+          within(screen.getByRole("navigation", { name: "Primary" })).getByRole(
+            "link",
+            { name: destination.label },
+          ),
         ).toHaveAttribute("href", destination.href);
       }
       expect(

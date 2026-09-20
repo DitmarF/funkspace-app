@@ -1,3 +1,4 @@
+import { openSettings } from "../helpers/foundation";
 import { expect, test, type Page } from "@playwright/test";
 
 type Early = {
@@ -152,6 +153,7 @@ for (const [stored, expected] of [
             : stored === "dark-high-contrast"
               ? "High Contrast"
               : "System";
+    await openSettings(page);
     await expect(
       page.getByRole("button", { name: label, exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
@@ -183,11 +185,13 @@ for (const fault of [
       fault.startsWith("media") ? null : "dark",
       fault === "access" ? 2 : 1, // getter is also accessed by best-effort normalization
     );
+    await openSettings(page);
     await expect(
       page.getByRole("button", { name: "System", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
     await page.getByRole("button", { name: "Muted", exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "muted");
+    await openSettings(page);
     await expect(
       page.getByRole("button", { name: "Muted", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
@@ -199,6 +203,7 @@ test("negative control fails the early check although hydrated ThemeService fixe
 }) => {
   await instrument(page, "dark", "", true);
   await page.goto("/");
+  await openSettings(page);
   await expect(
     page.getByRole("button", { name: "Dark", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
@@ -217,6 +222,7 @@ test("reload, OS changes, controls and same-layout history navigation preserve a
 }) => {
   await instrument(page, "system");
   await page.goto("/");
+  await openSettings(page);
   await expect(
     page.getByRole("button", { name: "System", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
@@ -233,6 +239,7 @@ test("reload, OS changes, controls and same-layout history navigation preserve a
     .poll(() => page.evaluate(() => window.themeProbe.early.length))
     .toBe(1);
   assertEarly(await page.evaluate(() => window.themeProbe.early[0]), "muted");
+  await openSettings(page);
   await expect(
     page.getByRole("button", { name: "Muted", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
@@ -254,6 +261,7 @@ test("cold throttled load records paint timing separately from pre-provider evid
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
   await instrument(page, "dark");
   await page.goto("/");
+  await openSettings(page);
   await expect(
     page.getByRole("button", { name: "Dark", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");

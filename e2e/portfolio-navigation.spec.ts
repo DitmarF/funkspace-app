@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { portfolioDestinations as destinations } from "../frontend/data/portfolioDestinations";
+import { openSettings } from "./helpers/foundation";
 
 for (const javaScriptEnabled of [true, false]) {
   test.describe(`portfolio navigation, JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
@@ -52,6 +53,7 @@ for (const javaScriptEnabled of [true, false]) {
     }) => {
       await page.goto("/privacy");
       for (const destination of [destinations.start, destinations.about]) {
+        if (javaScriptEnabled) await openSettings(page);
         const link = page
           .getByRole("navigation", { name: "Primary" })
           .getByRole("link", { name: destination.label, exact: true });
