@@ -6,8 +6,8 @@ for (const javaScriptEnabled of [true, false]) {
   test.describe(`portfolio navigation, JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
     test.use({ javaScriptEnabled });
 
-    for (const route of ["/", "/about", "/privacy"]) {
-      test(`${route} has unique landmarks, a working skip link and no unfinished links`, async ({
+    for (const route of ["/", "/about", "/impressum", "/privacy"]) {
+      test(`${route} has unique landmarks, a working skip link and native footer destinations`, async ({
         page,
       }) => {
         const errors: string[] = [];
@@ -27,10 +27,16 @@ for (const javaScriptEnabled of [true, false]) {
           .locator("[id]")
           .evaluateAll((nodes) => nodes.map((node) => node.id));
         expect(new Set(ids).size).toBe(ids.length);
-        for (const destination of [destinations.impressum]) {
+        for (const destination of [
+          destinations.contact,
+          destinations.impressum,
+          destinations.privacy,
+        ]) {
           await expect(
-            page.locator(`a[href="${destination.href}"]`),
-          ).toHaveCount(0);
+            page
+              .getByRole("navigation", { name: "Footer" })
+              .getByRole("link", { name: destination.label }),
+          ).toHaveAttribute("href", destination.href);
         }
         await page.keyboard.press("Tab");
         await expect(
@@ -77,7 +83,7 @@ for (const javaScriptEnabled of [true, false]) {
       await expect(page).toHaveURL("/privacy");
       await expect(
         page.getByText(
-          "No cookies. Self-hosted fonts. No third-party requests on first load.",
+          "Fonts are self-hosted. Work Sans and Space Grotesk are loaded from this site.",
         ),
       ).toBeVisible();
     });

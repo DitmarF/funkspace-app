@@ -4,6 +4,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import Home from "@/app/page";
 import PrivacyPage from "@/app/privacy/page";
 import AboutPage from "@/app/about/page";
+import ImpressumPage from "@/app/impressum/page";
+import { contactEmail, contactHref } from "@/data/contactContent";
 import { aboutContent } from "@/data/aboutContent";
 import { ServiceProvider } from "@/application/providers/ServiceProvider";
 import { portfolioDestinations as destinations } from "@/data/portfolioDestinations";
@@ -15,6 +17,7 @@ describe("server-rendered portfolio documents", () => {
     ["Home", Home],
     ["Privacy", PrivacyPage],
     ["About", AboutPage],
+    ["Impressum", ImpressumPage],
   ] as const) {
     it(`${name} supplies one shell and only readable native destinations before hydration`, () => {
       document.body.innerHTML = renderToStaticMarkup(
@@ -65,16 +68,25 @@ describe("server-rendered portfolio documents", () => {
           name: destinations.privacy.label,
         }),
       ).toHaveAttribute("href", destinations.privacy.href);
-      expect(screen.getAllByRole("link")).toHaveLength(name === "Home" ? 7 : 6);
-      for (const destination of [destinations.impressum]) {
+      expect(screen.getAllByRole("link")).toHaveLength(
+        name === "Home" ? 10 : name === "About" ? 8 : 9,
+      );
+      for (const destination of [
+        destinations.contact,
+        destinations.impressum,
+        destinations.privacy,
+      ]) {
         expect(
-          document.querySelector(`a[href="${destination.href}"]`),
-        ).toBeNull();
+          within(screen.getByRole("navigation", { name: "Footer" })).getByRole(
+            "link",
+            { name: destination.label },
+          ),
+        ).toHaveAttribute("href", destination.href);
       }
     });
   }
 
-  it("renders the ordered homepage targets with bounded draft content, without fabricating contact", () => {
+  it("renders ordered homepage targets with the supplied email and no simulated form", () => {
     document.body.innerHTML = renderToStaticMarkup(
       <ServiceProvider>
         <Home />
@@ -95,12 +107,11 @@ describe("server-rendered portfolio documents", () => {
       ).toBe(`/#${section.id}`);
     }
     expect(screen.getByText(aboutContent.preview)).toBeVisible();
-    expect(
-      screen.getByText("A public contact address is not available yet."),
-    ).toBeVisible();
-    expect(
-      document.querySelector('a[href^="mailto:"], form, canvas'),
-    ).toBeNull();
+    expect(screen.getByRole("link", { name: contactEmail })).toHaveAttribute(
+      "href",
+      contactHref,
+    );
+    expect(document.querySelector("form, input, textarea, canvas")).toBeNull();
     expect(
       screen.queryByRole("button", { name: /menu|send/i }),
     ).not.toBeInTheDocument();

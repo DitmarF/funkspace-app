@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { aboutContent } from "../frontend/data/aboutContent";
+import { contactEmail } from "../frontend/data/contactContent";
 import { openSettings, selectTheme, themes } from "./helpers/foundation";
 
 for (const javaScriptEnabled of [true, false]) {
@@ -54,7 +55,7 @@ for (const javaScriptEnabled of [true, false]) {
       await expect(page).toHaveURL("/#contact");
       await expect(page.locator("#contact")).toBeInViewport();
       await expect(
-        page.getByText("A public contact address is not available yet."),
+        page.getByRole("link", { name: contactEmail }),
       ).toBeVisible();
       await page.goBack();
       await expect(page).toHaveURL("/about");

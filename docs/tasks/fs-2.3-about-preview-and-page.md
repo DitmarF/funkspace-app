@@ -86,7 +86,7 @@ Inspect mobile and desktop screenshots, supported themes and enlarged text. Auto
 ## Completion record
 
 - **Outcome:** Bounded FS-2.3 implementation delivered, technically validated and explicitly accepted as complete by Dimi. Final publication copy is deferred; acceptance comes from the user's completion decision, not automated checks.
-- **Destination contract:** All seven labels/hrefs remain unchanged. `/about` becomes implemented with visibly marked development copy; Contact is now exposed at `/#contact` by explicit user decision. Impressum remains unimplemented/unexposed (FS-2.5); real contact information remains Dimi/FS-2.4 work. Privacy is existing content, not newly accepted legal copy.
+- **Destination contract at FS-2.3 handoff:** All seven labels/hrefs remain unchanged. `/about` became implemented with visibly marked development copy; Contact was exposed at `/#contact` by explicit user decision. Impressum remained unimplemented/unexposed; legal-page structure belongs to FS-2.4 (the earlier FS-2.5 attribution was incorrect). Real contact information was Dimi/FS-2.4 work. Privacy was existing content, not newly accepted legal copy. Current progress is tracked in [FS-2.4](fs-2.4-contact-footer-and-legal-structure.md).
 - **Shell placement:** Each portfolio page explicitly opts into PortfolioShell. Root layout is unchanged. PortfolioSection decorates only its explicit Start/About consumers; no future play route is created or forced into it.
 - **Remaining work:** Dimi supplies/approves final short/long publication copy; integrated FS-2.6 review, later Contact/legal implementation and FS-G1 remain open. Commit/push is authorized for this task; public release is not.
 

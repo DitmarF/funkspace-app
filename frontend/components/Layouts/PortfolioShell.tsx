@@ -4,6 +4,7 @@ import Container from "./Container";
 import { portfolioDestinations as destinations } from "../../data/portfolioDestinations";
 import { LogoMotion } from "../Logo/LogoMotion";
 import PortfolioNavigation from "./PortfolioNavigation";
+import PortfolioLegalLinks from "./PortfolioLegalLinks";
 import styles from "./PortfolioShell.module.css";
 
 export default function PortfolioShell({ children }: { children: ReactNode }) {
@@ -41,10 +42,15 @@ export default function PortfolioShell({ children }: { children: ReactNode }) {
       </Container>
       <Container as="footer" width="wide" className={styles.footer}>
         <PortfolioNavigation />
-        <nav aria-label="Legal">
-          <ButtonLink href={destinations.privacy.href}>
-            {destinations.privacy.label}
-          </ButtonLink>
+        <nav aria-label="Footer">
+          <ul className="flex flex-wrap gap-fs-md">
+            <li>
+              <ButtonLink href={destinations.contact.href}>
+                {destinations.contact.label}
+              </ButtonLink>
+            </li>
+            <PortfolioLegalLinks />
+          </ul>
         </nav>
       </Container>
     </>

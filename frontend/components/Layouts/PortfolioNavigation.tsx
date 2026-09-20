@@ -7,6 +7,7 @@ import ButtonLink from "../Controls/ButtonLink";
 import Dialog from "../Controls/Dialog";
 import HexButton from "../Controls/HexButton";
 import ThemeSwitcher from "../ThemeSwitcher";
+import PortfolioLegalLinks from "./PortfolioLegalLinks";
 import styles from "./PortfolioShell.module.css";
 
 /** Progressively enhance ordinary footer links with the shared modal. */
@@ -69,9 +70,9 @@ export default function PortfolioNavigation() {
             <ThemeSwitcher />
           </fieldset>
           <nav aria-label="Legal">
-            <ButtonLink href={destinations.privacy.href}>
-              {destinations.privacy.label}
-            </ButtonLink>
+            <ul className="flex flex-wrap gap-fs-md">
+              <PortfolioLegalLinks />
+            </ul>
           </nav>
         </Dialog>
       )}
