@@ -19,7 +19,7 @@ export default function PortfolioNavigation() {
 
   const links = (
     <nav aria-label="Primary">
-      <ul className="flex flex-wrap gap-fs-md">
+      <ul className={styles.links}>
         {[destinations.start, destinations.about, destinations.contact].map(
           (destination) => (
             <li key={destination.href}>
@@ -70,7 +70,7 @@ export default function PortfolioNavigation() {
             <ThemeSwitcher />
           </fieldset>
           <nav aria-label="Legal">
-            <ul className="flex flex-wrap gap-fs-md">
+            <ul className={styles.links}>
               <PortfolioLegalLinks />
             </ul>
           </nav>

@@ -33,7 +33,7 @@ for (const viewport of [
 ]) {
   test.describe(`portfolio settings at ${viewport.width}×${viewport.height}`, () => {
     test.use({ viewport });
-    test("fixed trigger, modal keyboard lifecycle, theme and native section navigation", async ({
+    test("responsive trigger, modal keyboard lifecycle, theme and native section navigation", async ({
       page,
     }, testInfo) => {
       await page.goto("/");

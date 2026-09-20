@@ -1,6 +1,7 @@
 .section {
   position: relative;
-  padding: var(--fs-space-lg);
+  /* Preserve reading width when text/rem spacing doubles on narrow screens. */
+  padding: min(var(--fs-space-lg), 5vw);
 }
 
 .corner {

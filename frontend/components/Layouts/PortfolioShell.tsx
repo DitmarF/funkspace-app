@@ -9,14 +9,19 @@ import styles from "./PortfolioShell.module.css";
 
 export default function PortfolioShell({ children }: { children: ReactNode }) {
   return (
-    <>
+    <div className={styles.shell}>
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-10 focus:p-fs-md bg-fs-surface-background text-fs-action-link focus:outline focus:outline-2 focus:outline-fs-border-focus"
+        className={`${styles.skipLink} sr-only focus:not-sr-only focus:fixed focus:z-10 focus:p-fs-md bg-fs-surface-background text-fs-action-link focus:outline focus:outline-2 focus:outline-fs-border-focus`}
       >
         Skip to main content
       </a>
-      <Container as="header" width="wide">
+      <Container
+        as="header"
+        width="wide"
+        padding="none"
+        className={`${styles.frame} ${styles.header}`}
+      >
         <a
           href={destinations.home.href}
           aria-label={destinations.home.label}
@@ -36,14 +41,20 @@ export default function PortfolioShell({ children }: { children: ReactNode }) {
         id="main-content"
         tabIndex={-1}
         width="wide"
-        className={styles.main}
+        padding="none"
+        className={`${styles.frame} ${styles.main}`}
       >
         {children}
       </Container>
-      <Container as="footer" width="wide" className={styles.footer}>
+      <Container
+        as="footer"
+        width="wide"
+        padding="none"
+        className={`${styles.frame} ${styles.footer}`}
+      >
         <PortfolioNavigation />
         <nav aria-label="Footer">
-          <ul className="flex flex-wrap gap-fs-md">
+          <ul className={styles.links}>
             <li>
               <ButtonLink href={destinations.contact.href}>
                 {destinations.contact.label}
@@ -53,6 +64,6 @@ export default function PortfolioShell({ children }: { children: ReactNode }) {
           </ul>
         </nav>
       </Container>
-    </>
+    </div>
   );
 }
