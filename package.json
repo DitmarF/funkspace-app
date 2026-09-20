@@ -23,6 +23,7 @@
     "watch:theme-bootstrap": "node scripts/build-theme-bootstrap.mjs --watch",
     "test:watch": "vitest",
     "e2e": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
+    "e2e:production": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.production.config.ts",
     "e2e:theme-bootstrap": "pnpm check:theme-bootstrap && cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.theme.config.ts",
     "e2e:ui": "cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --ui",
     "e2e:report": "playwright show-report",

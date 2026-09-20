@@ -11,7 +11,9 @@ export default function AboutPreview() {
           About
         </h2>
         <p className="text-sm leading-6">{aboutContent.draftNotice}</p>
-        <p className="text-base leading-7">{aboutContent.preview}</p>
+        <p lang="la" className="text-base leading-7">
+          {aboutContent.preview}
+        </p>
         <ButtonLink
           href={destinations.aboutPage.href}
           className="scroll-mb-fs-2xl"

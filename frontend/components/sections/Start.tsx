@@ -1,4 +1,5 @@
 import { LogoMotion } from "../Logo/LogoMotion";
+import { startIntroduction } from "@/data/startContent";
 import PortfolioSection from "../Layouts/PortfolioSection";
 import styles from "./Start.module.css";
 
@@ -17,10 +18,7 @@ export default function Start() {
           className="block h-auto w-full"
         />
       </div>
-      <p className={styles.introduction}>
-        FunkSpace is a design-system-first web experience built as a PNPM
-        workspace.
-      </p>
+      <p className={styles.introduction}>{startIntroduction}</p>
     </PortfolioSection>
   );
 }

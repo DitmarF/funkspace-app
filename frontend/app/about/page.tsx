@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import PortfolioShell from "@/components/Layouts/PortfolioShell";
 import { aboutContent } from "@/data/aboutContent";
 
-export const metadata: Metadata = { title: "About FunkSpace" };
+export const metadata: Metadata = {
+  title: "About FunkSpace",
+  description: aboutContent.draftNotice,
+};
 
 export default function AboutPage() {
   return (
@@ -11,7 +14,7 @@ export default function AboutPage() {
         <h1 className="text-3xl font-bold">About FunkSpace</h1>
         <p className="text-sm leading-6">{aboutContent.draftNotice}</p>
         {aboutContent.paragraphs.map((paragraph) => (
-          <p key={paragraph} className="text-base leading-7">
+          <p key={paragraph} lang="la" className="text-base leading-7">
             {paragraph}
           </p>
         ))}

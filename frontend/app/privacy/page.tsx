@@ -3,16 +3,19 @@ import type { Metadata } from "next";
 import ButtonLink from "@/components/Controls/ButtonLink";
 import { contactEmail, contactHref } from "@/data/contactContent";
 
-export const metadata: Metadata = { title: "Privacy — FunkSpace" };
+const draftNotice = "Draft — this privacy information is incomplete.";
+
+export const metadata: Metadata = {
+  title: "Privacy | FunkSpace",
+  description: draftNotice,
+};
 
 export default function PrivacyPage() {
   return (
     <PortfolioShell>
       <article className="max-w-prose space-y-fs-lg break-words">
         <h1 className="text-3xl font-bold">Privacy</h1>
-        <p className="text-sm leading-6">
-          Draft — this privacy information is incomplete.
-        </p>
+        <p className="text-sm leading-6">{draftNotice}</p>
         <section aria-labelledby="appearance-heading" className="space-y-fs-md">
           <h2 id="appearance-heading" className="text-2xl font-bold">
             Appearance preferences

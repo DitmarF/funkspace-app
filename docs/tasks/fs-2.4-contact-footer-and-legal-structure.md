@@ -16,7 +16,7 @@ Provide an honest no-JavaScript email fallback, compact shared footer and readab
 - [x] Legal routes load directly with headings, supplied material and explicit incomplete-content notices.
 - [x] No fake Send/success, inactive fields, reserved empty viewport, API, provider adapter, tracking or speculative consent controls.
 - [x] Email URI/text, direct loads/refresh, cross-page navigation, reflow and fresh no-JavaScript use have passing evidence.
-- [ ] Dimi supplies and approves missing operator/privacy facts and final legal wording. **Deferred from bounded task closure; still a release blocker. Placeholders do not satisfy legal completeness or the full static checkpoint.**
+- [ ] Dimi supplies and approves missing operator/privacy facts and final legal wording. **Deferred from bounded task closure; still a release blocker. Authorized readable drafts pass route usability but do not satisfy legal completeness. Dimi explicitly accepted the bounded EPIC 2 static checkpoint after integrated review; see [closure and P3 clarification](fs-2.6-semantics-metadata-and-static-routes.md#integrated-codex-review-and-dimi-completion--2026-09-20).**
 
 ## Context and repository evidence
 
@@ -54,7 +54,7 @@ Preserve root layout, ThemeService/providers/bootstrap, control/logo APIs/geomet
 
 | Gap                                                                                                            | Owner                                                               | Latest needed / effect                                                                                                      |
 | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Actual operator legal name, postal address and other applicable supplied legal material                        | Dimi supplies/verifies; Sites incorporates                          | FS-2.4 legal acceptance, before publication; full static checkpoint remains incomplete                                      |
+| Actual operator legal name, postal address and other applicable supplied legal material                        | Dimi supplies/verifies; Sites incorporates                          | Final legal acceptance before publication; bounded EPIC 2 checkpoint accepted in FS-2.6                                     |
 | Current deployed host/configuration, logging categories, access/recipients, processing locations and retention | Dimi supplies approved evidence; Codex verifies; Sites incorporates | Current FS-2.4 privacy baseline before publication, rechecked at FS-5.5/rollout; dated Vercel records are not current proof |
 | Existing mailbox correspondence purpose/access/processing and retention/deletion facts                         | Dimi                                                                | FS-2.4 public email/privacy acceptance; address is known, account operation/delivery is not verified                        |
 | Final legal wording                                                                                            | Dimi; Sites prepares supplied content                               | Before legal acceptance and publication; bounded structure accepted below, legal completeness remains unapproved            |
@@ -68,7 +68,7 @@ Bootstrap freshness before any generation; tokens → common types → workspace
 
 ## Completion record
 
-Contact/footer and development legal structure are implemented and complete by Dimi's explicit decision below. Required legal/operator facts and their approval remain missing. Task closure does not approve public release, legal completeness or the full static checkpoint.
+Contact/footer and development legal structure are implemented and complete by Dimi's explicit decision below. Required legal/operator facts and their approval remain missing. Task closure does not approve public release or legal completeness. The later FS-2.6 completion decision accepts the bounded EPIC 2 static checkpoint with these named release blockers.
 
 ### Actual validation
 
@@ -94,7 +94,7 @@ The email `href` and actionability checks are not delivery evidence. Current leg
 - **Exact base:** `6203e89607b9b58a0592502ed1b35ffb4f853dca`; the validated pre-closure candidate is preserved in the task patch. The Git commit containing this completion record is the final candidate on the authorized branch. Commit/push are now explicitly authorized; deployment is not.
 - **Artifact root:** `/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/fs-2.4`. `candidate.patch` includes modifications and new files; `manifest.json` records SHA-256 values and patch replay verification. `handoff.md` includes final results, technical fact-sheet attribution and acceptance limits. Other sessions must receive that artifact or exact diff; synchronization is not assumed.
 - **Contract changes:** Approved route labels/hrefs unchanged. `/#contact` now contains the actual supplied email; `/impressum` is reachable with email and authorized missing-operator notices; `/privacy` contains verified storage/font facts and explicit missing-privacy notices. Compact footer exposes Contact/Impressum/Privacy everywhere; overlay shares the same legal links. No backend contract exists or changes.
-- **Technical verdict:** Bounded implementation checks pass and Dimi has accepted task completion; evidence is ready for integrated FS-2.6 review. Incomplete for legal-content acceptance, the full static checkpoint and publication. Remaining input/owners/deadlines are the gap register above; provider-specific FS-5.5 work does not replace current legal fact requirements.
+- **Technical verdict:** Bounded implementation checks pass and Dimi has accepted task completion. The subsequent integrated FS-2.6 review passed, followed by explicit EPIC 2 closure. Required routes are usable with authorized drafts; legal-content acceptance and publication remain blocked. Remaining input/owners/deadlines are the gap register above; provider-specific FS-5.5 work does not replace current legal fact requirements.
 - **Precise acceptance still needed from Dimi:** supply and approve actual operator, hosting and mailbox-processing facts and final legal wording before publication. Bounded structure acceptance is recorded below separately from approval of complete legal content. No independent Codex site-gate review, legal certification or FS-G1 acceptance is claimed.
 
 ## Dimi completion and commit/push authorization — 2026-09-20
