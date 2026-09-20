@@ -3,6 +3,8 @@ import { screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import Home from "@/app/page";
 import PrivacyPage from "@/app/privacy/page";
+import AboutPage from "@/app/about/page";
+import { aboutContent } from "@/data/aboutContent";
 import { ServiceProvider } from "@/application/providers/ServiceProvider";
 import { portfolioDestinations as destinations } from "@/data/portfolioDestinations";
 
@@ -12,6 +14,7 @@ describe("server-rendered portfolio documents", () => {
   for (const [name, Page] of [
     ["Home", Home],
     ["Privacy", PrivacyPage],
+    ["About", AboutPage],
   ] as const) {
     it(`${name} supplies one shell and only readable native destinations before hydration`, () => {
       document.body.innerHTML = renderToStaticMarkup(
@@ -45,7 +48,11 @@ describe("server-rendered portfolio documents", () => {
           .getByRole("link", { name: destinations.home.label })
           .querySelector("svg"),
       ).not.toBeNull();
-      for (const destination of [destinations.start, destinations.about]) {
+      for (const destination of [
+        destinations.start,
+        destinations.about,
+        destinations.contact,
+      ]) {
         expect(
           within(screen.getByRole("navigation", { name: "Primary" })).getByRole(
             "link",
@@ -58,12 +65,8 @@ describe("server-rendered portfolio documents", () => {
           name: destinations.privacy.label,
         }),
       ).toHaveAttribute("href", destinations.privacy.href);
-      expect(screen.getAllByRole("link")).toHaveLength(5);
-      for (const destination of [
-        destinations.contact,
-        destinations.aboutPage,
-        destinations.impressum,
-      ]) {
+      expect(screen.getAllByRole("link")).toHaveLength(name === "Home" ? 7 : 6);
+      for (const destination of [destinations.impressum]) {
         expect(
           document.querySelector(`a[href="${destination.href}"]`),
         ).toBeNull();
@@ -91,9 +94,7 @@ describe("server-rendered portfolio documents", () => {
         destinations[section.id as "start" | "about" | "contact"].href,
       ).toBe(`/#${section.id}`);
     }
-    expect(
-      screen.getByText("FunkSpace is a design-system-first web experience."),
-    ).toBeVisible();
+    expect(screen.getByText(aboutContent.preview)).toBeVisible();
     expect(
       screen.getByText("A public contact address is not available yet."),
     ).toBeVisible();

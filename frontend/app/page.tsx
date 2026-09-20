@@ -1,4 +1,5 @@
 import Start from "@/components/sections/Start";
+import AboutPreview from "@/components/sections/AboutPreview";
 import PortfolioShell from "@/components/Layouts/PortfolioShell";
 
 export default function Home() {
@@ -6,19 +7,7 @@ export default function Home() {
     <PortfolioShell>
       <div className="space-y-fs-2xl">
         <Start />
-        <section
-          id="about"
-          tabIndex={-1}
-          aria-labelledby="about-heading"
-          className="space-y-fs-md"
-        >
-          <h2 id="about-heading" className="text-2xl font-bold">
-            About
-          </h2>
-          <p className="text-base leading-7">
-            FunkSpace is a design-system-first web experience.
-          </p>
-        </section>
+        <AboutPreview />
         <section
           id="contact"
           tabIndex={-1}

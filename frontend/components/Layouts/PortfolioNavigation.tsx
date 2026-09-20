@@ -19,19 +19,21 @@ export default function PortfolioNavigation() {
   const links = (
     <nav aria-label="Primary">
       <ul className="flex flex-wrap gap-fs-md">
-        {[destinations.start, destinations.about].map((destination) => (
-          <li key={destination.href}>
-            <ButtonLink
-              href={destination.href}
-              onClick={() => {
-                // Release the dialog's scroll lock before the native anchor action.
-                flushSync(() => setOpen(false));
-              }}
-            >
-              {destination.label}
-            </ButtonLink>
-          </li>
-        ))}
+        {[destinations.start, destinations.about, destinations.contact].map(
+          (destination) => (
+            <li key={destination.href}>
+              <ButtonLink
+                href={destination.href}
+                onClick={() => {
+                  // Release the dialog's scroll lock before the native anchor action.
+                  flushSync(() => setOpen(false));
+                }}
+              >
+                {destination.label}
+              </ButtonLink>
+            </li>
+          ),
+        )}
       </ul>
     </nav>
   );

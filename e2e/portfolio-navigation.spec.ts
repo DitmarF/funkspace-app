@@ -6,7 +6,7 @@ for (const javaScriptEnabled of [true, false]) {
   test.describe(`portfolio navigation, JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
     test.use({ javaScriptEnabled });
 
-    for (const route of ["/", "/privacy"]) {
+    for (const route of ["/", "/about", "/privacy"]) {
       test(`${route} has unique landmarks, a working skip link and no unfinished links`, async ({
         page,
       }) => {
@@ -27,11 +27,7 @@ for (const javaScriptEnabled of [true, false]) {
           .locator("[id]")
           .evaluateAll((nodes) => nodes.map((node) => node.id));
         expect(new Set(ids).size).toBe(ids.length);
-        for (const destination of [
-          destinations.contact,
-          destinations.aboutPage,
-          destinations.impressum,
-        ]) {
+        for (const destination of [destinations.impressum]) {
           await expect(
             page.locator(`a[href="${destination.href}"]`),
           ).toHaveCount(0);
@@ -52,7 +48,11 @@ for (const javaScriptEnabled of [true, false]) {
       page,
     }) => {
       await page.goto("/privacy");
-      for (const destination of [destinations.start, destinations.about]) {
+      for (const destination of [
+        destinations.start,
+        destinations.about,
+        destinations.contact,
+      ]) {
         if (javaScriptEnabled) await openSettings(page);
         const link = page
           .getByRole("navigation", { name: "Primary" })
