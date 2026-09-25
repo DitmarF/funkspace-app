@@ -17,7 +17,7 @@ describe("server-rendered portfolio documents", () => {
     ["Home", Home],
     ["Privacy", PrivacyPage],
     ["About", AboutPage],
-    ["Impressum", ImpressumPage],
+    ["Legal notice", ImpressumPage],
   ] as const) {
     it(`${name} supplies one shell and only readable native destinations before hydration`, () => {
       document.body.innerHTML = renderToStaticMarkup(
@@ -52,8 +52,8 @@ describe("server-rendered portfolio documents", () => {
           .querySelector("svg"),
       ).not.toBeNull();
       for (const destination of [
-        destinations.start,
-        destinations.about,
+        { label: "Home", href: destinations.home.href },
+        { label: "About", href: destinations.aboutPage.href },
         destinations.contact,
       ]) {
         expect(
@@ -69,7 +69,7 @@ describe("server-rendered portfolio documents", () => {
         }),
       ).toHaveAttribute("href", destinations.privacy.href);
       expect(screen.getAllByRole("link")).toHaveLength(
-        name === "Home" ? 10 : name === "About" ? 8 : 9,
+        name === "Home" ? 12 : name === "About" ? 10 : 11,
       );
       for (const destination of [
         destinations.contact,

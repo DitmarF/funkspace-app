@@ -23,8 +23,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${workSans.variable} ${spaceGrotesk.variable}`}
     >
-      <body className="antialiased">
+      <head>
         <ThemeBootstrapScript />
+      </head>
+      <body className="antialiased">
         <ServiceProvider>{children}</ServiceProvider>
       </body>
     </html>

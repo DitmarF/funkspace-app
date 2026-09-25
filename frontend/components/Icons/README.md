@@ -1,6 +1,6 @@
 # FunkSpace icons
 
-Eight existing Figma families, displayed at 24, 36 and 48 CSS pixels.
+Twenty-four Figma families, displayed at 24, 36 and 48 CSS pixels.
 The gallery is **Icons / Library / Gallery** in Storybook. Playground exposes
 name and size controls; Accent demonstrates inherited semantic color.
 
@@ -92,6 +92,83 @@ Trusted exports contain no scripts, event handlers, external references,
 embedded raster images or metadata. Clip paths are retained.
 
 ## Adding an existing or newly approved icon
+
+### FS-3.1 category additions (2026-09-23)
+
+Exact exports from [001 — FunkSpace UI Library](https://www.figma.com/design/o39DgxXnQ0jogb2ez6WKfq/001---FunkSpace-UI-Library?node-id=6-2), retrieved through Figma design context on the three size frames.
+
+| Family     | 24 node | 36 node | 48 node |
+| ---------- | ------- | ------- | ------- |
+| navigation | 200:19  | 200:11  | 200:4   |
+| chat-bot   | 200:28  | 200:27  | 200:26  |
+| a11y       | 200:38  | 200:37  | 200:36  |
+| languages  | 200:55  | 200:54  | 200:53  |
+
+All twelve original SVG exports are retained under `public/svg/icons/`.
+`categoryIconViewBoxes` preserves the actual exported frames, including the
+non-square chat-bot and stroke-inclusive languages frames. Inline artwork
+adapts only paint, JSX attribute names and per-instance IDs. No path is redrawn.
+The existing gallery automatically includes these families at all three sizes.
+Chat-bot and Languages are disabled navigation categories, not implemented features.
+Asset inspection found only SVG/groups/paths; no scripts, event handlers, external
+references or raster content. Product acceptance remains pending with Dimi.
+
+### FS-3.1 small-arrow additions (2026-09-24)
+
+Retrieved from the same UI Library Icons page through design context for
+the 24/36/48 frames (`72:145`, `72:58`, `8:96`). Each family is available
+in the existing Gallery and Playground size/name controls.
+
+| Family            | 24 node | 36 node | 48 node |
+| ----------------- | ------- | ------- | ------- |
+| arrow-down-small  | 207:34  | 207:30  | 207:26  |
+| arrow-up-small    | 207:35  | 207:31  | 207:27  |
+| arrow-right-small | 207:36  | 207:32  | 207:28  |
+| arrow-left-small  | 207:37  | 207:33  | 207:29  |
+
+The twelve raw exports are `public/svg/icons/{family}-{size}.svg`, with
+original bytes, paint and IDs. Figma names down/24 `arrow-down-samll-24`;
+the code spelling is normalized. All viewBoxes are square at their named size.
+The inline paths preserve the exact per-size geometry and use currentColor;
+unused source group/path IDs are omitted. No scripts, handlers, external
+references or raster images were present. Existing large-arrow families remain.
+
+Navigation uses right-small closed and down-small open, displaying the 24-unit
+artwork at the accepted 16px beside 24px type icons. Native disclosure behavior
+and theme/hover inheritance remain unchanged. Dimi owns design acceptance.
+
+### Navigation destination additions (2026-09-25)
+
+Retrieved from the same UI Library Icons page using design context for the
+24/36/48 frames (`72:145`, `72:58`, `8:96`). These eight families add 24 raw
+SVG exports and appear automatically in Gallery and Playground.
+
+| Code family    | Figma family   | 24 node | 36 node | 48 node |
+| -------------- | -------------- | ------- | ------- | ------- |
+| home           | home           | 210:95  | 210:94  | 210:93  |
+| about          | about          | 210:108 | 210:107 | 210:106 |
+| contact        | contact        | 210:118 | 210:116 | 210:117 |
+| animations     | animations     | 210:134 | 210:133 | 210:132 |
+| games          | games          | 210:146 | 210:145 | 210:144 |
+| privacy        | privacy        | 210:159 | 210:158 | 210:157 |
+| privacy-policy | privacy-police | 210:172 | 210:171 | 210:170 |
+| legal-notice   | legal-notice   | 210:185 | 210:184 | 210:183 |
+
+Figma's `privacy-police` spelling is normalized to `privacy-policy` in code.
+Each original export is `public/svg/icons/{code-family}-{size}.svg`; raw bytes
+retain all IDs and paint. `categoryIconViewBoxes` retains the exact non-square
+export frames, including Contact/48's fractional bounds. The existing square
+Icon display slot preserves aspect ratio rather than stretching these drawings.
+Inline groups/paths retain exact geometry; only black paint becomes currentColor
+and unused source IDs are omitted. No scripts, handlers, external references,
+clips or raster content were present. No runtime parser or dependency was added.
+
+Navigation uses the matching 24-size family for Home, About, Contact, Animations,
+Games, Privacy, Privacy policy and Legal notice. Disabled animation/game entries
+reuse their category icon pending item-specific artwork. Small disclosure arrows
+are unchanged. Dimi owns final visual/device acceptance.
+
+### Import procedure
 
 1. Export the real Figma component for each supported size; do not assume the
    24-unit drawing is a scaled 48-unit drawing. Record its node and actual name.

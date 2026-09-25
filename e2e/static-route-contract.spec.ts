@@ -20,9 +20,9 @@ const pages = [
   },
   {
     route: "/impressum",
-    title: "Impressum | FunkSpace",
+    title: "Legal notice | FunkSpace",
     description: "Draft — operator details are incomplete.",
-    heading: "Impressum",
+    heading: "Legal notice",
   },
   {
     route: "/privacy",
@@ -221,7 +221,7 @@ for (const javaScriptEnabled of [true, false]) {
           "mailto:diamondfunk13@gmail.com",
         );
         await mail.click({ trial: true });
-        for (const legal of ["Impressum", "Privacy"]) {
+        for (const legal of ["Legal notice", "Privacy"]) {
           await page
             .getByRole("navigation", { name: "Footer" })
             .getByRole("link", { name: legal, exact: true })

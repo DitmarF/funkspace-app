@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { openSettings } from "./helpers/foundation";
+import { openSettings, openAppearance } from "./helpers/foundation";
 
 async function expectArtworkAlignment(page: Page) {
   const visibleRight = await page
@@ -69,7 +69,7 @@ for (const viewport of [
         name: "Navigation and settings",
       });
       await expect(
-        dialog.getByRole("heading", { name: "Navigation and settings" }),
+        dialog.getByRole("button", { name: "Close", exact: true }),
       ).toBeFocused();
       await expect(trigger).toHaveAttribute("aria-expanded", "true");
       expect(await dialog.evaluate((node) => node.matches(":modal"))).toBe(
@@ -90,6 +90,7 @@ for (const viewport of [
           ),
         ).toBe(true);
       }
+      await openAppearance(page);
       await dialog.getByRole("button", { name: "Dark", exact: true }).click();
       await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
       const axe = await new AxeBuilder({ page }).analyze();
@@ -107,13 +108,16 @@ for (const viewport of [
       await dialog.getByRole("button", { name: "Close", exact: true }).click();
       await expect(trigger).toBeFocused();
       await openSettings(page);
-      const about = dialog.getByRole("link", { name: "About", exact: true });
-      await expect(about).toHaveAttribute("href", "/#about");
-      await about.click();
-      await expect(page).toHaveURL("/#about");
+      const contact = dialog.getByRole("link", {
+        name: "Contact",
+        exact: true,
+      });
+      await expect(contact).toHaveAttribute("href", "/#contact");
+      await contact.click();
+      await expect(page).toHaveURL("/#contact");
       await expect(dialog).toHaveCount(0);
-      await expect(page.locator("#about")).toBeInViewport();
-      await expect(page.locator("#about")).toBeFocused();
+      await expect(page.locator("#contact")).toBeInViewport();
+      await expect(page.locator("#contact")).toBeFocused();
       await expect(page.locator("body")).not.toHaveCSS("position", "fixed");
       const legal = page
         .getByRole("contentinfo")
@@ -121,7 +125,7 @@ for (const viewport of [
       await legal.scrollIntoViewIfNeeded();
       await legal.click();
       await expect(page).toHaveURL("/privacy");
-      await openSettings(page);
+      await openAppearance(page);
       await expect(
         page
           .getByRole("dialog")
@@ -133,7 +137,7 @@ for (const viewport of [
       await page.goto("/");
       await page.addStyleTag({ content: "html { font-size: 200%; }" });
       await expectArtworkAlignment(page);
-      await openSettings(page);
+      await openAppearance(page);
       const dialog = page.getByRole("dialog");
       await expect(
         dialog.getByRole("button", { name: "High Contrast" }),
@@ -148,7 +152,7 @@ for (const viewport of [
           () => document.documentElement.scrollWidth <= innerWidth,
         ),
       ).toBe(true);
-      await dialog.getByRole("button", { name: "Close" }).click();
+      await dialog.getByRole("button", { name: "Close", exact: true }).click();
       await expect(dialog).toHaveCount(0);
     });
   });

@@ -5,7 +5,7 @@ import {
   settleStyles,
   themes,
   transitionPairs,
-  openSettings,
+  openAppearance,
   closeSettings,
 } from "./helpers/foundation";
 
@@ -16,7 +16,7 @@ test.describe("A11y — Home", () => {
     }) => {
       await page.emulateMedia({ colorScheme: "light" });
       await page.goto("/");
-      await openSettings(page);
+      await openAppearance(page);
       // Storage normalization is best effort; the resolved UI establishes
       // readiness even when browser storage cannot be written.
       await expect(
@@ -35,8 +35,11 @@ test.describe("A11y — Home", () => {
 
       await page.mouse.move(0, 0);
       await assertAccessible();
-      await openSettings(page);
-      const unselected = page.locator('button[aria-pressed="false"]').first();
+      await openAppearance(page);
+      const unselected = page
+        .getByRole("group", { name: "Appearance" })
+        .locator('button[aria-pressed="false"]')
+        .first();
       await unselected.hover();
       for (const sample of await transitionPairs(unselected)) {
         expect(sample.ratio, JSON.stringify(sample)).toBeGreaterThanOrEqual(
@@ -49,12 +52,20 @@ test.describe("A11y — Home", () => {
       await page.mouse.move(0, 0);
       await page.mouse.up();
       await page.keyboard.press("Tab");
-      await page.locator('button[aria-pressed="true"]').focus();
-      await expect(page.locator('button[aria-pressed="true"]')).toBeFocused();
-      await expect(page.locator('button[aria-pressed="true"]')).toHaveCSS(
-        "outline-style",
-        "solid",
-      );
+      await page
+        .getByRole("group", { name: "Appearance" })
+        .locator('button[aria-pressed="true"]')
+        .focus();
+      await expect(
+        page
+          .getByRole("group", { name: "Appearance" })
+          .locator('button[aria-pressed="true"]'),
+      ).toBeFocused();
+      await expect(
+        page
+          .getByRole("group", { name: "Appearance" })
+          .locator('button[aria-pressed="true"]'),
+      ).toHaveCSS("outline-style", "solid");
       await assertAccessible();
       await closeSettings(page);
     });

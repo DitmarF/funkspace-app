@@ -25,7 +25,7 @@ for (const javaScriptEnabled of [true, false]) {
             page.getByRole("article").getByText(/Draft —/),
           ).toBeVisible();
           await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-            route === "/privacy" ? "Privacy" : "Impressum",
+            route === "/privacy" ? "Privacy" : "Legal notice",
           );
           await expect(
             page.getByRole("heading", { level: 2 }).first(),
@@ -61,7 +61,7 @@ for (const javaScriptEnabled of [true, false]) {
         await page.goBack();
         await expect(page).toHaveURL(route);
         for (const [label, href] of [
-          ["Impressum", "/impressum"],
+          ["Legal notice", "/impressum"],
           ["Privacy", "/privacy"],
         ]) {
           await page

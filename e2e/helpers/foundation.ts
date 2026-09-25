@@ -68,9 +68,21 @@ export async function closeSettings(page: Page) {
   await expect(dialog).not.toBeVisible();
 }
 
-export async function selectTheme(page: Page, theme: FoundationTheme) {
+export async function openAppearance(page: Page) {
   await openSettings(page);
-  await expect(page.locator('button[aria-pressed="true"]')).toBeVisible();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Accessibility", exact: true })
+    .click();
+}
+
+export async function selectTheme(page: Page, theme: FoundationTheme) {
+  await openAppearance(page);
+  await expect(
+    page
+      .getByRole("group", { name: "Appearance" })
+      .locator('button[aria-pressed="true"]'),
+  ).toBeVisible();
   const choice = page.getByRole("button", { name: labels[theme], exact: true });
   await choice.click();
   await expect(choice).toHaveAttribute("aria-pressed", "true");

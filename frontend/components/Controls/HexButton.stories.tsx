@@ -3,8 +3,7 @@ import { useState } from "react";
 import Button from "./Button";
 import HexButton, { type HexButtonSize } from "./HexButton";
 
-// Gallery samples use the native accessible-name prop without a visible label.
-// The production control's default Menu label remains unchanged.
+// Icon-only is the production default; explicit captions remain opt-in fixtures.
 const iconOnly = {
   children: "",
   "aria-label": "Menu",
@@ -16,8 +15,19 @@ const meta = {
   tags: ["autodocs"],
   args: { ...iconOnly, variant: "primary" },
   argTypes: {
-    icon: { control: "select", options: ["settings-burger", "close"] },
+    icon: {
+      control: "select",
+      options: [
+        "settings-burger",
+        "close",
+        "navigation",
+        "a11y",
+        "chat-bot",
+        "languages",
+      ],
+    },
     size: { control: "select", options: ["small", "medium", "large"] },
+    iconSize: { control: "select", options: [24, 36, 48] },
     variant: {
       control: "select",
       options: ["primary", "secondary", "outlined", "accent-outlined"],
@@ -27,7 +37,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "48/72/96px Figma artwork with matching 24/36/48px icons. Gallery samples omit visible text and retain an accessible Menu name. The default production control still includes its visible label. Hover and momentary press use the Standard treatments. Use keyboard Tab to inspect the unclipped focus ring.",
+          "48/72/96px Figma artwork with matching 24/36/48px icons. Controls are icon-only by default with an accessible name; no extra text field or caption is required. Explicit captions are optional. Hover and momentary press use the Standard treatments. Use keyboard Tab to inspect the unclipped focus ring.",
       },
     },
   },
@@ -36,6 +46,19 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Menu: Story = {};
+
+export const SelectedNavigation: Story = {
+  args: {
+    icon: "navigation",
+    iconSize: 48,
+    "aria-label": "Navigation",
+    "aria-pressed": true,
+  },
+};
+
+export const UnavailableChatBot: Story = {
+  args: { icon: "chat-bot", "aria-label": "Chat-bot", disabled: true },
+};
 
 export const Close: Story = {
   args: {

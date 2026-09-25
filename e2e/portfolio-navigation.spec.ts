@@ -50,13 +50,13 @@ for (const javaScriptEnabled of [true, false]) {
       });
     }
 
-    test("secondary-page links return to the homepage sections and native Back restores Privacy", async ({
+    test("secondary-page links reach Home, the About page and Contact, and native Back restores Privacy", async ({
       page,
     }) => {
       await page.goto("/privacy");
       for (const destination of [
-        destinations.start,
-        destinations.about,
+        { label: "Home", href: destinations.home.href },
+        { label: "About", href: destinations.aboutPage.href },
         destinations.contact,
       ]) {
         if (javaScriptEnabled) await openSettings(page);
@@ -66,8 +66,17 @@ for (const javaScriptEnabled of [true, false]) {
         await expect(link).toHaveAttribute("href", destination.href);
         await link.click();
         await expect(page).toHaveURL(destination.href);
-        await expect(page.locator(destination.href.slice(1))).toBeInViewport();
-        await expect(page.locator("main section")).toHaveCount(3);
+        if (destination.href.includes("#"))
+          await expect(
+            page.locator(destination.href.slice(1)),
+          ).toBeInViewport();
+        else
+          await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+            destination.href === "/about" ? "About FunkSpace" : "FunkSpace",
+          );
+        await expect(page.locator("main section")).toHaveCount(
+          destination.href === "/about" ? 0 : 3,
+        );
         await page.goBack();
         await expect(page).toHaveURL("/privacy");
       }

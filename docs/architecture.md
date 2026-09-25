@@ -193,13 +193,14 @@ compiles it into the tracked `frontend/generated/theme-bootstrap.ts`; normal
 TypeScript imports do not run startup effects. No service factory, runtime manager
 or new Presentation-to-Infrastructure import pattern is introduced.
 
-The existing inline `theme-script` / `beforeInteractive` delivery applies appearance
-once before provider hydration. Storage read/media access failures fall back;
-normalization writes happen independently after application. This timing does not
-guarantee application before first paint on every device/network: the installed
-Next App Router executes its inline queue after bootstrap chunks arrive. See the
-[task evidence](tasks/maintenance-theme-bootstrap.md) and
-[Next 15 Script contract](https://nextjs.org/docs/15/app/api-reference/components/script#beforeinteractive).
+The native inline `theme-script` executes once in the root HTML head, before the
+parser reaches visible body content, without waiting for Next bootstrap chunks.
+Storage read/media access failures fall back; normalization writes happen
+independently after application. The generated payload and ownership are unchanged.
+Dimi approved this bounded delivery correction on 2026-09-24; see the
+[first-paint task evidence](tasks/maintenance-theme-first-paint.md). The earlier
+[maintenance record](tasks/maintenance-theme-bootstrap.md) preserves historical
+measurements of the superseded `beforeInteractive` queue and its light flash.
 After hydration, `ThemeService` is
 the sole runtime authority: it validates and persists selections, updates the
 document theme, responds to system preference changes, and owns listener

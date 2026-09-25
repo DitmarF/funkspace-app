@@ -82,6 +82,7 @@ If a requested change conflicts with these boundaries, stop and propose the smal
 - Consume semantic design and motion tokens through Tailwind/CSS variables in the frontend and generated TypeScript constants in non-CSS runtimes. Change sources in `tokens/`, run `pnpm build:tokens`, and never hand-edit `styles/tokens.css` or `common/generated/`.
 - Do not hardcode colors, spacing, durations, or easing when a project token exists.
 - Use semantic HTML, a logical heading order, visible labels, visible focus states, and keyboard-operable controls. Add ARIA only when native semantics are insufficient.
+- HexButton is icon-only by default: no extra visible caption or text field is required (Dimi, 2026-09-24). Preserve a meaningful accessible name, the full native hit target and visible focus. The navigation trigger has no rectangular surface background; its hex artwork supplies the visual treatment. This supersedes earlier mandatory visible Menu guidance.
 - Support dark/high-contrast themes where relevant and always honor `prefers-reduced-motion` with a complete static or simplified experience.
 - Prevent layout shift. For motion, prefer transform and opacity, reserve layout space, and avoid repeated layout reads or writes.
 - Keep client bundles small; split heavy, optional browser code and avoid dependencies that duplicate existing capabilities.

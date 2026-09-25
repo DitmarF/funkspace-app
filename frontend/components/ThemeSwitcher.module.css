@@ -1,0 +1,25 @@
+.choices {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--fs-space-md);
+  min-width: 0;
+}
+
+.choices button[aria-pressed="true"] {
+  --control-foreground: var(--fs-color-content-inverse);
+  --control-background: var(--fs-color-content-primary);
+  --control-border: var(--control-foreground);
+}
+
+/* Retain the theme chooser's established text-contrast contract on hover. */
+.choices button[aria-pressed="false"]:hover:not(:disabled) {
+  --control-foreground: var(--fs-color-action-hover);
+}
+
+@media (min-width: 48rem) {
+  .choices {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

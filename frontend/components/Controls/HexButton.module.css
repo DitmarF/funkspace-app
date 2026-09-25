@@ -88,6 +88,13 @@
   cursor: not-allowed;
 }
 
+/* Category selection is persistent; pointer :active remains momentary. */
+.control[aria-pressed="true"] .artwork {
+  --control-foreground: var(--fs-color-action-primary);
+  --control-background: var(--fs-color-content-inverse);
+  --control-border: var(--control-foreground);
+}
+
 @media (forced-colors: active) {
   .control {
     border-color: ButtonText;

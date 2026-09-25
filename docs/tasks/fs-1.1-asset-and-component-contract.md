@@ -1,5 +1,7 @@
 # Task FS-1.1 — Asset and component contract
 
+**Current HexButton amendment — 2026-09-24:** Dimi explicitly removed the mandatory visible Menu caption during FS-3.1. Icon-only hex controls require an accessible name, not an extra visible text field. Preserve native targets, focus and accepted artwork. This supersedes earlier caption requirements in this record; historical quotations and approvals remain evidence of their original stage. See [FS-3.1](fs-3.1-navigation-settings-overlay.md).
+
 **Subsequent Standard revision (2026-09-15):** Dimi's FS-1.3 review expands the
 accepted Standard contract to all four Figma treatments and 48/72/96px sizes,
 including paired decorative icon slots. Dimi also approved Figma's 3:1

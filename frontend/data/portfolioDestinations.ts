@@ -11,6 +11,6 @@ export const portfolioDestinations = {
   about: { label: "About", href: "/#about" },
   contact: { label: "Contact", href: "/#contact" },
   aboutPage: { label: "More about FunkSpace", href: "/about" },
-  impressum: { label: "Impressum", href: "/impressum" },
+  impressum: { label: "Legal notice", href: "/impressum" },
   privacy: { label: "Privacy", href: "/privacy" },
 } as const satisfies Record<string, Destination>;

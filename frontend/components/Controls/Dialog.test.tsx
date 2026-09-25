@@ -19,6 +19,29 @@ beforeEach(() => {
 });
 
 describe("Dialog presentation and binding", () => {
+  it("retains an accessible title and initially focuses Close when the visible title is omitted", () => {
+    render(
+      <Dialog
+        title="Navigation and settings"
+        hideTitle
+        open
+        fallbackFocusRef={createRef()}
+        onCloseRequest={vi.fn()}
+      >
+        <p>Navigation</p>
+      </Dialog>,
+    );
+    const dialog = screen.getByRole("dialog", { hidden: true });
+    expect(dialog).toHaveAttribute(
+      "aria-labelledby",
+      screen.getByText("Navigation and settings").id,
+    );
+    const options = bind.mock.calls[0][1] as DialogBindingOptions<HTMLElement>;
+    expect(options.initialFocus()).toBe(
+      screen.getByRole("button", { name: "Close", hidden: true }),
+    );
+  });
+
   it("associates unique visible titles and only short supplied descriptions", () => {
     const fallbackFocusRef = createRef<HTMLHeadingElement>();
     const props = { open: false, onCloseRequest: vi.fn(), fallbackFocusRef };

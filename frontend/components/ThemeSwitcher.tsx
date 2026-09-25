@@ -3,8 +3,14 @@
 import { useEffect, useState } from "react";
 import { useServices } from "@/application/providers/ServiceProvider";
 import { THEME_METADATA, type Theme } from "@/domain/theme/Theme";
+import Button from "./Controls/Button";
+import styles from "./ThemeSwitcher.module.css";
 
-export default function ThemeSwitcher() {
+export default function ThemeSwitcher({
+  presentation = "default",
+}: {
+  presentation?: "default" | "outlined";
+}) {
   const { themeService } = useServices();
 
   // Do not assume an initial theme for button highlight to avoid visual flip.
@@ -20,6 +26,22 @@ export default function ThemeSwitcher() {
   const selectTheme = (theme: Theme) => {
     themeService.setTheme(theme);
   };
+
+  if (presentation === "outlined")
+    return (
+      <div className={styles.choices}>
+        {THEME_METADATA.map((theme) => (
+          <Button
+            key={theme.value}
+            variant="outlined"
+            aria-pressed={currentTheme === theme.value}
+            onClick={() => selectTheme(theme.value)}
+          >
+            {theme.label}
+          </Button>
+        ))}
+      </div>
+    );
 
   return (
     <div className="flex gap-fs-xs flex-wrap justify-center">

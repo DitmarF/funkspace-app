@@ -157,7 +157,7 @@ for (const viewport of viewports) {
           await page.keyboard.press("End");
           const footer = page.getByRole("navigation", { name: "Footer" });
           await expect(footer).toBeInViewport();
-          for (const name of ["Contact", "Impressum", "Privacy"])
+          for (const name of ["Contact", "Legal notice", "Privacy"])
             await footer
               .getByRole("link", { name, exact: true })
               .click({ trial: true });

@@ -6,7 +6,7 @@ import { contactEmail, contactHref } from "@/data/contactContent";
 const draftNotice = "Draft — operator details are incomplete.";
 
 export const metadata: Metadata = {
-  title: "Impressum | FunkSpace",
+  title: "Legal notice | FunkSpace",
   description: draftNotice,
 };
 
@@ -14,7 +14,7 @@ export default function ImpressumPage() {
   return (
     <PortfolioShell>
       <article className="max-w-prose space-y-fs-lg break-words">
-        <h1 className="text-3xl font-bold">Impressum</h1>
+        <h1 className="text-3xl font-bold">Legal notice</h1>
         <p className="text-sm leading-6">{draftNotice}</p>
         <section aria-labelledby="operator-heading" className="space-y-fs-md">
           <h2 id="operator-heading" className="text-2xl font-bold">

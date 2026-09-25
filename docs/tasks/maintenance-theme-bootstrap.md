@@ -1,5 +1,13 @@
 # Maintenance — Typed inline theme bootstrap
 
+> Current delivery amendment, 2026-09-24: Dimi explicitly requested “apply the fix”
+> after the separate first-paint proposal. The [bounded correction](maintenance-theme-first-paint.md)
+> replaces the previously frozen Next queue with a native inline head script.
+> This supersedes only the delivery freeze and current R1 implementation status;
+> historical measurements and acceptance below remain historical evidence.
+> Independent review and real-device acceptance of the new correction remain pending.
+> R2 runtime persistence consistency remains deferred to FS-3.3.
+
 ## Task metadata
 
 - **Status:** Complete — accepted by Dimi on 2026-09-15 after reporting all tests PASS. Browser/version-specific manual evidence was not supplied; see the acceptance record below.

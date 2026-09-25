@@ -10,6 +10,7 @@ import {
   type IconName,
   type IconSize,
 } from "./iconArtwork";
+import { categoryIconViewBoxes } from "./categoryIconViewBoxes";
 
 export { iconNames, type IconName, type IconSize } from "./iconArtwork";
 
@@ -37,13 +38,19 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(
     const prefix = useId();
     const artwork: (prefix: string) => ReactNode = iconArtwork[name][size];
     const viewBoxSize = name === "close" ? closeViewBoxSize[size] : size;
+    const viewBox =
+      name in categoryIconViewBoxes
+        ? categoryIconViewBoxes[name as keyof typeof categoryIconViewBoxes][
+            size
+          ]
+        : `0 0 ${viewBoxSize} ${viewBoxSize}`;
     return (
       <svg
         {...props}
         ref={ref}
         width={size}
         height={size}
-        viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
+        viewBox={viewBox}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         focusable="false"

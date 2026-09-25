@@ -1,0 +1,100 @@
+.tree {
+  min-width: 0;
+  width: 100%;
+  max-width: 36rem;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.branch > .list {
+  /* Center the 2px line under the 16px arrow; retain the child-row indent. */
+  margin-inline-start: 7px;
+  padding-inline-start: calc(min(var(--fs-space-md), 16px) - 8px);
+  border-inline-start: 2px solid var(--fs-color-border-subtle);
+}
+
+.row {
+  --fs-icon-background: var(--fs-color-surface-background);
+  display: grid;
+  /* Keep decorative slots compact when text grows beside the fixed rail. */
+  grid-template-columns: 16px 24px minmax(0, 1fr);
+  align-items: center;
+  gap: min(var(--fs-space-xs), 8px);
+  min-height: var(--fs-space-2xl);
+  padding: var(--fs-space-xs) 0;
+  color: var(--fs-color-content-primary);
+  background: transparent;
+  font-family: var(--font-work-sans, var(--fs-font-family-display));
+  font-size: var(--fs-font-size-md);
+  font-weight: var(--fs-font-weight-semibold);
+  line-height: var(--fs-line-height-normal);
+  text-decoration: none;
+  cursor: pointer;
+  list-style: none;
+}
+
+.row::-webkit-details-marker {
+  display: none;
+}
+.row::marker {
+  content: "";
+}
+.row:hover:not([aria-disabled="true"]) {
+  color: var(--fs-color-action-hover);
+}
+.row:focus-visible {
+  outline: 2px solid var(--fs-color-border-focus);
+  outline-offset: 2px;
+}
+.row[aria-disabled="true"] {
+  cursor: default;
+  font-weight: var(--fs-font-weight-regular);
+}
+.arrow {
+  grid-column: 1;
+  width: 16px;
+  height: 16px;
+}
+.arrow > svg {
+  width: 100%;
+  height: 100%;
+}
+.expandedArrow,
+.branch[open] > summary > .arrow > .collapsedArrow {
+  display: none;
+}
+.branch[open] > summary > .arrow > .expandedArrow {
+  display: block;
+}
+.icon {
+  grid-column: 2;
+  width: 24px;
+  height: 24px;
+}
+.label {
+  grid-column: 3;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.pendingLabel {
+  display: block;
+  font-size: var(--fs-font-size-sm);
+  font-weight: var(--fs-font-weight-regular);
+}
+
+@media (forced-colors: active) {
+  .row {
+    color: LinkText;
+  }
+  .row[aria-disabled="true"] {
+    color: GrayText;
+  }
+  .row:focus-visible {
+    outline-color: Highlight;
+  }
+}

@@ -1,9 +1,21 @@
 .shell {
+  --navigation-artwork-size: calc(var(--fs-space-2xl) * 1.5);
+  --navigation-control-size: calc(var(--navigation-artwork-size) + 4px);
+  --navigation-block-gutter: var(--fs-space-md);
   --shell-gutter: var(--fs-space-md);
   --shell-safe-left: env(safe-area-inset-left, 0px);
   --shell-safe-right: env(safe-area-inset-right, 0px);
   --shell-safe-top: env(safe-area-inset-top, 0px);
   --shell-safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* Shared by the launcher and the overlay's centered Close control. */
+  --navigation-inline-end: max(
+    calc(
+      max(0px, (100% - 80rem) / 2) +
+        max(var(--shell-gutter), var(--shell-safe-right)) -
+        (2px + var(--navigation-artwork-size) / 72 * 4.8232)
+    ),
+    var(--shell-safe-right)
+  );
   position: relative;
   display: flex;
   flex-direction: column;
@@ -48,7 +60,7 @@
    applies only while a portfolio shell is present, never to a future play page. */
 :global(html):has(.shell) {
   scroll-padding-bottom: calc(
-    var(--fs-space-2xl) * 2 + env(safe-area-inset-bottom, 0px)
+    var(--fs-space-2xl) * 3 + env(safe-area-inset-bottom, 0px)
   );
 }
 
@@ -76,19 +88,23 @@
 .launcher {
   /* Medium artwork: 72-unit viewBox, right path edge 66.1768, stroke 2.
      Include the native button's 2px border without changing its hit target. */
-  --artwork-right-inset: calc(2px + var(--fs-space-2xl) * 1.5 / 72 * 4.8232);
   position: fixed;
   z-index: 20;
   /* Match Container's centered wide (80rem) shell and responsive gutters. */
-  right: max(
-    calc(
-      max(0px, (100% - 80rem) / 2) +
-        max(var(--shell-gutter), var(--shell-safe-right)) -
-        var(--artwork-right-inset)
-    ),
-    var(--shell-safe-right)
-  );
-  bottom: max(var(--fs-space-md), var(--shell-safe-bottom));
+  right: var(--navigation-inline-end);
+  bottom: max(var(--navigation-block-gutter), var(--shell-safe-bottom));
+}
+
+.launcher > button {
+  --hex-size: var(--navigation-artwork-size);
+}
+
+/* Decorative artwork need not double with text when vertical room is scarce. */
+@media (max-height: 36rem) {
+  .shell {
+    --navigation-artwork-size: min(calc(var(--fs-space-2xl) * 1.5), 72px);
+    --navigation-block-gutter: min(var(--fs-space-md), 16px);
+  }
 }
 
 @media (min-width: 48rem) {

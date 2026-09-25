@@ -1,9 +1,48 @@
 import { createRef } from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Icon } from "./Icon";
+import { Icon, iconNames } from "./Icon";
+import { readFileSync } from "node:fs";
 
 describe("Icon", () => {
+  for (const name of iconNames) {
+    for (const size of [24, 36, 48] as const) {
+      it(`preserves the exported ${name}-${size} geometry and unique IDs`, () => {
+        const raw = readFileSync(
+          `frontend/public/svg/icons/${name}-${size}.svg`,
+          "utf8",
+        );
+        const source = new DOMParser().parseFromString(
+          raw,
+          "image/svg+xml",
+        ).documentElement;
+        const { container } = render(
+          <>
+            <Icon name={name} size={size} label="First" />
+            <Icon name={name} size={size} label="Second" />
+          </>,
+        );
+        const icon = screen.getByRole("img", { name: "First" });
+        expect(icon.getAttribute("viewBox")).toBe(
+          source.getAttribute("viewBox"),
+        );
+        expect(
+          [...icon.querySelectorAll("path")].map((path) =>
+            path.getAttribute("d"),
+          ),
+        ).toEqual(
+          [...source.querySelectorAll("path")].map((path) =>
+            path.getAttribute("d"),
+          ),
+        );
+        const ids = [...container.querySelectorAll("[id]")].map(
+          (node) => node.id,
+        );
+        expect(new Set(ids).size).toBe(ids.length);
+        expect(icon.innerHTML).not.toContain("#1A1A1A");
+      });
+    }
+  }
   it.each([
     [24, 26],
     [36, 40],

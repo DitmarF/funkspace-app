@@ -25,7 +25,7 @@ describe("HexButton native contract", () => {
     await user.keyboard("{Enter}");
     expect(click).toHaveBeenCalledOnce();
   });
-  it("has one visible Menu name and inert decorative artwork", () => {
+  it("has an accessible Menu name without a visible caption and inert decorative artwork", () => {
     const ref = createRef<HTMLButtonElement>();
     render(
       <HexButton
@@ -37,6 +37,7 @@ describe("HexButton native contract", () => {
       />,
     );
     const button = screen.getByRole("button", { name: "Menu" });
+    expect(button.textContent).toBe("");
     expect(ref.current).toBe(button);
     expect(button).toHaveAttribute("type", "button");
     expect(button).toHaveClass("consumer");
@@ -49,6 +50,16 @@ describe("HexButton native contract", () => {
     );
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
     expect(screen.getAllByRole("button")).toHaveLength(1);
+  });
+
+  it.each([
+    ["navigation", "Navigation"],
+    ["a11y", "Accessibility"],
+    ["chat-bot", "Chat-bot"],
+    ["languages", "Languages"],
+  ] as const)("names icon-only %s controls without a caption", (icon, name) => {
+    render(<HexButton icon={icon} />);
+    expect(screen.getByRole("button", { name }).textContent).toBe("");
   });
 
   it.each(["{Enter}", " "])("activates once with %s", async (key) => {

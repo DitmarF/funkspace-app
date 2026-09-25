@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, type ComponentPropsWithoutRef } from "react";
-import { Icon } from "../Icons/Icon";
+import { Icon, type IconName, type IconSize } from "../Icons/Icon";
 import {
   controlAppearanceClassName,
   type ControlVariant,
@@ -33,22 +33,33 @@ export type HexButtonSize = keyof typeof artworkBySize;
 
 export type HexButtonProps = Omit<
   ComponentPropsWithoutRef<"button">,
-  "children" | "dangerouslySetInnerHTML" | "aria-pressed"
+  "children" | "dangerouslySetInnerHTML"
 > & {
-  /** Visible name, or an empty string with a caller-supplied aria-label. */
+  /** Optional caption. Icon-only controls retain an accessible name. */
   children?: string;
-  icon?: "settings-burger" | "close";
+  icon?: Extract<
+    IconName,
+    | "settings-burger"
+    | "close"
+    | "navigation"
+    | "a11y"
+    | "chat-bot"
+    | "languages"
+  >;
   variant?: ControlVariant;
   size?: HexButtonSize;
+  /** Optional artwork size at the nominal button size; scales with the hexagon. */
+  iconSize?: IconSize;
 };
 
 const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
   (
     {
       icon = "settings-burger",
-      children = icon === "close" ? "" : "Menu",
+      children = "",
       variant = "primary",
       size = "medium",
+      iconSize,
       type = "button",
       className = "",
       ...props
@@ -56,8 +67,23 @@ const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
     ref,
   ) => {
     const artwork = artworkBySize[size];
+    const iconDimension = iconSize
+      ? `${(iconSize / artwork.dimension) * 100}%`
+      : undefined;
     return (
       <button
+        aria-label={
+          children
+            ? undefined
+            : {
+                "settings-burger": "Menu",
+                close: "Close",
+                navigation: "Navigation",
+                a11y: "Accessibility",
+                "chat-bot": "Chat-bot",
+                languages: "Languages",
+              }[icon]
+        }
         {...props}
         ref={ref}
         type={type}
@@ -76,7 +102,16 @@ const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
             {/* Size-specific Figma exports; only paint is bound to shared roles. */}
             <path d={artwork.path} strokeWidth={artwork.stroke} />
           </svg>
-          <Icon className={styles.icon} name={icon} size={artwork.icon} />
+          <Icon
+            className={styles.icon}
+            name={icon}
+            size={iconSize ?? artwork.icon}
+            style={
+              iconDimension
+                ? { width: iconDimension, height: iconDimension }
+                : undefined
+            }
+          />
         </span>
         {children && <span className={styles.label}>{children}</span>}
       </button>

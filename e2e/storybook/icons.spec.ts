@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { readFileSync } from "node:fs";
 import { renderedPair, settleStyles, themes } from "../helpers/foundation";
 
 for (const theme of themes) {
@@ -17,7 +18,7 @@ for (const theme of themes) {
       `/iframe.html?id=icons-library--gallery&viewMode=story&globals=theme:${global}`,
     );
     const root = page.locator("#storybook-root");
-    await expect(root.locator("svg")).toHaveCount(24);
+    await expect(root.locator("svg")).toHaveCount(72);
     await expect
       .poll(
         async () =>
@@ -27,18 +28,19 @@ for (const theme of themes) {
     await settleStyles(page);
     for (const size of [24, 36, 48]) {
       const section = page.getByRole("region", { name: `${size}px icons` });
-      await expect(section.getByRole("listitem")).toHaveCount(8);
+      await expect(section.getByRole("listitem")).toHaveCount(24);
       for (const item of await section.getByRole("listitem").all()) {
         expect((await renderedPair(item)).ratio).toBeGreaterThanOrEqual(4.5);
         const svg = item.locator("svg");
         await expect(svg).toHaveAttribute("aria-hidden", "true");
-        const sourceSize =
-          (await item.innerText()).trim() === "close"
-            ? ({ 24: 26, 36: 40, 48: 48 } as const)[size as 24 | 36 | 48]
-            : size;
+        const name = (await item.innerText()).trim().replaceAll(" ", "-");
+        const source = readFileSync(
+          `frontend/public/svg/icons/${name}-${size}.svg`,
+          "utf8",
+        );
         await expect(svg).toHaveAttribute(
           "viewBox",
-          `0 0 ${sourceSize} ${sourceSize}`,
+          source.match(/viewBox="([^"]+)"/)![1],
         );
         const box = await svg.boundingBox();
         expect(box!.width).toBe(size);
