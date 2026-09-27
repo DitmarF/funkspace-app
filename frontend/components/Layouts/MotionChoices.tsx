@@ -1,28 +1,32 @@
 import Button from "../Controls/Button";
 import styles from "./PortfolioNavigation.module.css";
+import {
+  MOTION_CHOICES,
+  type MotionPreference,
+} from "@/domain/motion/MotionPolicy";
 
-/** Presentation contract only. FS-3.4 owns the future live policy and storage. */
-export type MotionChoice = "system" | "reduced" | "off";
+/** Controlled presentation; the shared service owns live preference and storage. */
+export type MotionChoice = MotionPreference;
 export interface MotionChoicesProps {
   value: MotionChoice;
   onChange(value: MotionChoice): void;
+  disabled?: boolean;
 }
 
-export default function MotionChoices({ value, onChange }: MotionChoicesProps) {
+export default function MotionChoices({
+  value,
+  onChange,
+  disabled = false,
+}: MotionChoicesProps) {
   return (
     <fieldset className={styles.group}>
       <legend>Motion</legend>
       <div className={styles.choices}>
-        {(
-          [
-            ["system", "Follow system"],
-            ["reduced", "Reduced"],
-            ["off", "Off"],
-          ] as const
-        ).map(([choice, label]) => (
+        {MOTION_CHOICES.map(({ value: choice, label }) => (
           <Button
             key={choice}
             variant="outlined"
+            disabled={disabled}
             aria-pressed={value === choice}
             onClick={() => onChange(choice)}
           >

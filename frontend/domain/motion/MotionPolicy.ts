@@ -1,15 +1,21 @@
 import type { SystemMotion } from "../ports/MotionEnvironmentPort";
 
-export type MotionPreference = "system" | "reduced" | "off";
+export type MotionPreference = "system" | "on" | "reduced" | "off";
 export const MOTION_PREFERENCE_KEY = "funkspace.motion.preference.v1";
 export const MOTION_CHOICES = Object.freeze([
   Object.freeze({ value: "system", label: "Follow system" }),
+  Object.freeze({ value: "on", label: "On" }),
   Object.freeze({ value: "reduced", label: "Reduced" }),
   Object.freeze({ value: "off", label: "Off" }),
 ] as const);
 
 export function isMotionPreference(value: unknown): value is MotionPreference {
-  return value === "system" || value === "reduced" || value === "off";
+  return (
+    value === "system" ||
+    value === "on" ||
+    value === "reduced" ||
+    value === "off"
+  );
 }
 
 export type MotionSnapshot = Readonly<{
@@ -20,6 +26,8 @@ export type MotionSnapshot = Readonly<{
 }>;
 
 export type ConsumerMotionInputs = Readonly<{
+  /** Opt-in only for an implemented reduced alternative; default consumers stay static. */
+  supportsReducedMotion?: boolean;
   featureAvailable: boolean;
   optedIn: boolean;
   visible: boolean;
@@ -61,12 +69,20 @@ export function resolveMotionPermission(
   if (snapshot.status === "disposed") blockers.push("policy-disposed");
   if (!consumer.featureAvailable) blockers.push("feature-unavailable");
   if (!consumer.optedIn) blockers.push("opted-out");
-  if (snapshot.preference === "reduced") blockers.push("preference-reduced");
+  const reducedAlternative =
+    snapshot.preference === "reduced" &&
+    consumer.supportsReducedMotion === true;
+  if (snapshot.preference === "reduced" && !reducedAlternative)
+    blockers.push("preference-reduced");
   if (snapshot.preference === "off") blockers.push("preference-off");
-  if (snapshot.systemMotion === "reduce") blockers.push("system-reduce");
-  if (snapshot.systemMotion === "unknown") blockers.push("system-unknown");
-  if (snapshot.systemMotion === "unavailable")
-    blockers.push("system-unavailable");
+  // Explicit On overrides only the device preference, never other gates.
+  if (snapshot.preference !== "on") {
+    if (snapshot.systemMotion === "reduce" && !reducedAlternative)
+      blockers.push("system-reduce");
+    if (snapshot.systemMotion === "unknown") blockers.push("system-unknown");
+    if (snapshot.systemMotion === "unavailable")
+      blockers.push("system-unavailable");
+  }
   const hardDenied = blockers.length > 0;
   if (!snapshot.documentVisible) blockers.push("document-hidden");
   if (!consumer.visible) blockers.push("consumer-hidden");

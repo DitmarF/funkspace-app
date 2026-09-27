@@ -175,7 +175,7 @@ for (const viewport of [
       ).toBeVisible();
       await expect(
         dialog.getByRole("group", { name: "Motion", exact: true }),
-      ).toHaveCount(0);
+      ).toBeVisible();
       await page.mouse.move(0, 0);
       await page.screenshot({ path: info.outputPath("accessibility.png") });
       for (const [theme, label] of [

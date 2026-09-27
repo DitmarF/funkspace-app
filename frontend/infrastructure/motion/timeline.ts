@@ -31,7 +31,12 @@ export class AnimationTimeline implements AnimationRuntime {
   private lastFrameTime: number = 0;
   private elementCache: Map<string, SVGElement | null> = new Map();
 
-  constructor(root: SVGSVGElement, manifest: AnimationManifest) {
+  constructor(
+    root: SVGSVGElement,
+    manifest: AnimationManifest,
+    private onComplete?: () => void,
+    private onError?: (error: unknown) => void,
+  ) {
     this.root = root;
     this.timeline = createTimeline(manifest.steps);
   }
@@ -126,7 +131,13 @@ export class AnimationTimeline implements AnimationRuntime {
     const delta = now - this.lastFrameTime;
     this.lastFrameTime = now;
 
-    this.update(delta);
+    try {
+      this.update(delta);
+    } catch (error) {
+      this.pause();
+      if (this.onError) this.onError(error);
+      else throw error;
+    }
 
     if (this.isPlaying) {
       this.rafId = requestAnimationFrame(this.tick);
@@ -152,7 +163,10 @@ export class AnimationTimeline implements AnimationRuntime {
 
     this.render();
 
-    if (advancement.completed) this.pause();
+    if (advancement.completed) {
+      this.pause();
+      this.onComplete?.();
+    }
   }
 
   /**
@@ -170,7 +184,10 @@ export class AnimationTimeline implements AnimationRuntime {
   private applyValue(target: string, property: string, value: number): void {
     // Get or cache element
     if (!this.elementCache.has(target)) {
-      const element = this.root.querySelector(target) as SVGElement | null;
+      const element =
+        target === ":scope"
+          ? this.root
+          : this.root.querySelector<SVGElement>(target);
       this.elementCache.set(target, element);
     }
 

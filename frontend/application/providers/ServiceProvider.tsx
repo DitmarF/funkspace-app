@@ -17,14 +17,29 @@ import type { ThemeService } from "../theme/ThemeService";
 import type { ScrollService } from "../scroll/ScrollService";
 import type { AnimationService } from "../animations/AnimationService";
 import type { DialogBindingFactory } from "@/domain/ports/DialogBindingPort";
+import type { HomeIntroBinding } from "@/domain/ports/HomeIntroPort";
 
 import type { PortfolioNavigationHandoffPort } from "@/domain/ports/PortfolioNavigationHandoffPort";
 import type {
   MotionPolicyConsumer,
   MotionPolicyService,
 } from "../motion/MotionPolicyService";
+import type {
+  LogoMotionOptions,
+  LogoPlaybackHistory,
+  LogoMotionHandle,
+} from "../animations/LogoMotionController";
 
 export interface ServiceContextValue {
+  bindHomeIntro(
+    root: HTMLElement,
+    cancelIntroduction?: () => void,
+  ): HomeIntroBinding;
+  bindLogoMotion(
+    root: SVGSVGElement,
+    options: LogoMotionOptions,
+    history: LogoPlaybackHistory,
+  ): LogoMotionHandle;
   readonly motionPolicy: MotionPolicyConsumer;
   readonly decorativeMotionAvailable: boolean;
   navigationHandoff: PortfolioNavigationHandoffPort<HTMLElement>;
@@ -43,12 +58,17 @@ const ServiceContext = createContext<ServiceContextValue | null>(null);
 
 export interface ServiceProviderProps {
   children: ReactNode;
+  /** Controlled composition for stories/tests; application roots use the default. */
+  serviceFactory?: () => OwnedServices;
 }
 
-export function ServiceProvider({ children }: ServiceProviderProps) {
+export function ServiceProvider({
+  children,
+  serviceFactory = createServices,
+}: ServiceProviderProps) {
   // Create services on the client side to avoid serialization issues
   // during SSR/prerendering
-  const services = useMemo(() => createServices(), []);
+  const services = useMemo(() => serviceFactory(), [serviceFactory]);
 
   useEffect(() => {
     let releaseMotion = () => {};

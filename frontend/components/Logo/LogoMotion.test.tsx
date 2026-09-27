@@ -1,532 +1,1054 @@
-/**
- * Component tests for LogoMotion
- * Tests animation behavior, reduced motion, and feature flag handling
- */
-
-/// <reference types="@testing-library/jest-dom" />
-
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import { createRef } from "react";
-import { LogoMotion } from "./LogoMotion";
-import type { LogoMotionRef } from "./LogoMotion";
+import { act, fireEvent, render, screen } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
+import { createRef, StrictMode, useEffect } from "react";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { LogoMotion, type LogoMotionRef } from "./LogoMotion";
+import MotionSettings from "../Layouts/MotionSettings";
+import { ServiceProvider } from "@/application/providers/ServiceProvider";
+import { createServices } from "@/infrastructure/services/createServices";
+import { MOTION_PREFERENCE_KEY } from "@/domain/motion/MotionPolicy";
 import { AnimationTimeline } from "@/infrastructure/motion/timeline";
-import type { ThemeService } from "@/application/theme/ThemeService";
-import type { ScrollService } from "@/application/scroll/ScrollService";
+import { createTimeline } from "@funkspace/common/motion";
 
-// Type for the mock timeline instance
-type MockTimeline = {
-  play: ReturnType<typeof vi.fn>;
-  pause: ReturnType<typeof vi.fn>;
-  reverse: ReturnType<typeof vi.fn>;
-  seek: ReturnType<typeof vi.fn>;
-  setSpeed: ReturnType<typeof vi.fn>;
-  destroy: ReturnType<typeof vi.fn>;
-  duration: number;
-  time: number;
-};
-
-// Mock SVG utilities to avoid needing full SVG DOM support in jsdom
-vi.mock("@/infrastructure/motion/svg", () => ({
-  getPathLength: vi.fn(() => 100), // Return a mock path length
-  applyStrokeDrawInit: vi.fn(() => 100), // Return mock length
-  setStrokeDashoffset: vi.fn(),
-  applyNumericStyle: vi.fn(),
-}));
-
-// Mock AnimationOrchestrator to return a simple manifest
-const mockManifest = {
-  steps: [
-    {
-      target: "#logo-path-1",
-      property: "strokeDashoffset" as const,
-      from: 100,
-      to: 0,
-      duration: 800,
-      easing: "emph" as const,
-      delay: 0,
-    },
-    {
-      target: "#logo-path-1",
-      property: "fillOpacity" as const,
-      from: 0,
-      to: 1,
-      duration: 200,
-      delay: 100,
-    },
-  ],
-};
-
-vi.mock("@/application/animations/AnimationOrchestrator", () => ({
-  AnimationOrchestratorImpl: vi.fn().mockImplementation(function () {
-    return { buildLogoManifest: vi.fn(() => mockManifest) };
-  }),
-}));
-
-// Mock the AnimationTimeline to avoid needing actual SVG elements in tests
-vi.mock("@/infrastructure/motion/timeline", () => ({
-  AnimationTimeline: vi.fn().mockImplementation(function () {
-    return {
-      play: vi.fn(),
-      pause: vi.fn(),
-      reverse: vi.fn(),
-      seek: vi.fn(),
-      setSpeed: vi.fn(),
-      destroy: vi.fn(),
-      get duration() {
-        return 1880;
-      },
-      get time() {
-        return 0;
-      },
-    };
-  }),
-}));
-
-// Mock useReducedMotion hook
-const mockUseReducedMotion = vi.fn(() => false);
-vi.mock("@/hooks/useReducedMotion", () => ({
-  useReducedMotion: () => mockUseReducedMotion(),
-}));
-
-// Mock ServiceProvider
-const mockAnimationOrchestrator = {
-  buildLogoManifest: vi.fn(() => mockManifest),
-};
-
-const mockAnimationService = {
-  getOrchestrator: vi.fn(() => mockAnimationOrchestrator),
-};
-
-vi.mock("@/application/providers/ServiceProvider", () => ({
-  ServiceProvider: ({ children }: { children: React.ReactNode }) => children,
-  useServices: () => ({
-    animationService: mockAnimationService,
-    themeService: {} as Partial<ThemeService>,
-    scrollService: {} as Partial<ScrollService>,
-  }),
-}));
-
-describe("LogoMotion", () => {
-  const originalEnv = process.env;
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    // Reset env
-    process.env = { ...originalEnv };
-    // Reset AnimationTimeline mock call count
-    vi.mocked(AnimationTimeline).mockClear();
-    // Reset useReducedMotion to return false by default
-    mockUseReducedMotion.mockReturnValue(false);
-  });
-
-  afterEach(() => {
-    process.env = originalEnv;
-  });
-
-  describe("rendering", () => {
-    it.each(["empty", "error"])(
-      "restores the whole static logo when manifest construction returns %s",
-      (failure) => {
-        const warning = vi
-          .spyOn(console, "warn")
-          .mockImplementation(() => undefined);
-        mockAnimationOrchestrator.buildLogoManifest.mockImplementationOnce(
-          () => {
-            if (failure === "error") throw new Error("Test manifest failure");
-            return { steps: [] };
-          },
-        );
-        try {
-          render(<LogoMotion enabled />);
-          for (const element of screen
-            .getByRole("img")
-            .querySelectorAll<SVGElement>("path, polygon, circle")) {
-            expect(element.style.opacity).toBe("1");
-          }
-          expect(AnimationTimeline).not.toHaveBeenCalled();
-        } finally {
-          warning.mockRestore();
-        }
-      },
+it.each(["on", "reduced", "system"] as const)(
+  "%s cancelled automatic introduction survives Strict Mode and permits explicit playback",
+  (preference) => {
+    localStorage.setItem(MOTION_PREFERENCE_KEY, preference);
+    const services = createServices({ decorativeMotionAvailable: true });
+    const bind = vi.spyOn(services, "bindLogoMotion");
+    const factory = () => services;
+    const ref = createRef<LogoMotionRef>();
+    function Page({ autoPlay = true }: { autoPlay?: boolean }) {
+      useEffect(() => ref.current!.cancelIntroduction(), []);
+      return <LogoMotion ref={ref} autoPlay={autoPlay} />;
+    }
+    const tree = (autoPlay: boolean) => (
+      <StrictMode>
+        <ServiceProvider serviceFactory={factory}>
+          <Page autoPlay={autoPlay} />
+        </ServiceProvider>
+      </StrictMode>
     );
+    const view = render(tree(true));
+    visible();
+    advance(100);
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    view.rerender(tree(false));
+    view.rerender(tree(true));
+    visible(false);
+    visible(true);
+    act(() => services.themeService.setTheme("dark"));
+    advance(10000);
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    expect(services.motionPolicy.getSnapshot().preference).toBe(preference);
+    act(() => ref.current!.play());
+    expect(frames.size).toBe(1);
+    advance(100);
+    act(() => ref.current!.cancelIntroduction());
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    act(() => {
+      ref.current!.pause();
+      ref.current!.seek(0);
+      ref.current!.cancelIntroduction();
+      services.motionPolicy.setPreference("off");
+      services.motionPolicy.setPreference(preference);
+    });
+    visible(false);
+    visible(true);
+    complete(screen.getByRole("img"));
+    expect(bind.mock.calls.at(-1)![2].paused).toBe(true);
+    expect(frames.size).toBe(0);
+    act(() => {
+      // A changed variant may need preparation after Pause. Completed work
+      // still requires an explicit seek before replay, as in the public API.
+      ref.current!.play();
+      ref.current!.seek(0);
+      ref.current!.play();
+    });
+    expect(frames.size).toBe(1);
+    view.unmount();
+    expect(frames.size).toBe(0);
+    expect(observers.size).toBe(0);
+    // The retirement belongs to this mount, not the shared policy/provider.
+    const next = render(
+      <ServiceProvider
+        serviceFactory={() =>
+          createServices({ decorativeMotionAvailable: true })
+        }
+      >
+        <LogoMotion />
+      </ServiceProvider>,
+    );
+    visible();
+    expect(frames.size).toBe(1);
+    next.unmount();
+  },
+);
 
-    it("restores all dots and letters when an initialized animation is disabled", () => {
-      const { rerender } = render(<LogoMotion enabled autoPlay={false} />);
-      const svg = screen.getByRole("img");
-      const dots = [...svg.querySelectorAll("circle")];
-      expect(dots).toHaveLength(9);
-      expect(dots.every((dot) => dot.style.opacity === "0")).toBe(true);
-      rerender(<LogoMotion enabled={false} autoPlay={false} />);
-      expect(dots.every((dot) => dot.style.opacity === "1")).toBe(true);
-      for (const path of svg.querySelectorAll<SVGElement>("path, polygon")) {
-        expect(path.style.fillOpacity).toBe("1");
-        expect(path.style.strokeDashoffset).toBe("0");
+it.each([false, true])(
+  "Reduced fades complete artwork for exactly the normal duration (device reduction=%s)",
+  (deviceReduce) => {
+    reduce = deviceReduce;
+    localStorage.setItem(MOTION_PREFERENCE_KEY, "reduced");
+    const services = createServices({ decorativeMotionAvailable: true });
+    const build = vi.spyOn(
+      services.animationService.getOrchestrator(),
+      "buildLogoManifest",
+    );
+    const view = render(
+      <StrictMode>
+        <ServiceProvider serviceFactory={() => services}>
+          <LogoMotion aria-label="Animated" />
+          <LogoMotion enabled={false} aria-label="Static" />
+        </ServiceProvider>
+      </StrictMode>,
+    );
+    const svg = screen.getByRole("img", {
+      name: "Animated",
+    }) as unknown as SVGSVGElement;
+    complete(svg);
+    visible();
+    const duration = createTimeline(
+      build.mock.results.at(-1)!.value.steps,
+    ).duration;
+    expect(duration).toBeGreaterThan(0);
+    expect(svg.style.opacity).toBe("0");
+    expect(frames.size).toBe(1);
+    advance(duration / 2);
+    expect(Number(svg.style.opacity)).toBeCloseTo(0.5);
+    for (const part of svg.querySelectorAll<SVGElement>("[data-logo-part]")) {
+      expect(part.style.opacity).toBe("1");
+      expect(part.style.fillOpacity).toBe("1");
+      expect(part.style.strokeDasharray).toBe("none");
+      expect(part.style.strokeDashoffset).toBe("0");
+    }
+    complete(screen.getByRole("img", { name: "Static" }));
+    advance(duration / 2);
+    complete(svg);
+    expect(frames.size).toBe(0);
+    visible(false);
+    visible(true);
+    act(() => {
+      services.themeService.setTheme("dark");
+      services.motionPolicy.setPreference("on");
+    });
+    expect(frames.size).toBe(0);
+    view.unmount();
+    expect(observers.size).toBe(0);
+  },
+);
+
+it("Reduced retains the cursor on suspension, preserves Pause and permits explicit reverse playback", () => {
+  localStorage.setItem(MOTION_PREFERENCE_KEY, "reduced");
+  const services = createServices({ decorativeMotionAvailable: true });
+  const ref = createRef<LogoMotionRef>();
+  const view = render(
+    <ServiceProvider serviceFactory={() => services}>
+      <LogoMotion ref={ref} />
+    </ServiceProvider>,
+  );
+  const svg = screen.getByRole("img") as unknown as SVGSVGElement;
+  visible();
+  advance(300);
+  const opacity = Number(svg.style.opacity);
+  expect(opacity).toBeGreaterThan(0);
+  expect(opacity).toBeLessThan(1);
+  visible(false);
+  complete(svg);
+  expect(frames.size).toBe(0);
+  visible(true);
+  expect(Number(svg.style.opacity)).toBeCloseTo(opacity);
+  act(() => ref.current!.pause());
+  complete(svg);
+  visible(false);
+  visible(true);
+  act(() => services.themeService.setTheme("dark"));
+  expect(frames.size).toBe(0);
+  act(() => {
+    ref.current!.seek(99999);
+    ref.current!.reverse();
+  });
+  expect(frames.size).toBe(0);
+  act(() => ref.current!.play());
+  advance(300);
+  expect(Number(svg.style.opacity)).toBeGreaterThan(0);
+  expect(Number(svg.style.opacity)).toBeLessThan(1);
+  advance(10000);
+  complete(svg);
+  expect(frames.size).toBe(0);
+  act(() => {
+    ref.current!.reverse();
+    ref.current!.play();
+  });
+  advance(300);
+  expect(Number(svg.style.opacity)).toBeLessThan(1);
+  act(() => services.motionPolicy.setPreference("off"));
+  complete(svg);
+  act(() => {
+    ref.current!.seek(0);
+    ref.current!.reverse();
+    ref.current!.play();
+  });
+  complete(svg);
+  expect(frames.size).toBe(0);
+  act(() => services.motionPolicy.setPreference("reduced"));
+  complete(svg);
+  expect(frames.size).toBe(0);
+  view.unmount();
+  expect(observers.size).toBe(0);
+});
+
+it.each([
+  "pending",
+  "flag",
+  "unavailable",
+  "prepare-failure",
+  "frame-failure",
+] as const)(
+  "Reduced retains complete static artwork with %s",
+  (restriction) => {
+    localStorage.setItem(MOTION_PREFERENCE_KEY, "reduced");
+    if (restriction === "unavailable") vi.stubGlobal("matchMedia", undefined);
+    const services = createServices({
+      decorativeMotionAvailable: restriction !== "flag",
+    });
+    if (restriction === "pending")
+      services.motionPolicy.initialize = () => () => {};
+    if (restriction === "prepare-failure")
+      vi.spyOn(
+        services.animationService.getOrchestrator(),
+        "buildLogoManifest",
+      ).mockImplementation(() => {
+        throw Error("unavailable");
+      });
+    const ref = createRef<LogoMotionRef>();
+    const view = render(
+      <ServiceProvider serviceFactory={() => services}>
+        <LogoMotion ref={ref} />
+      </ServiceProvider>,
+    );
+    const svg = screen.getByRole("img");
+    complete(svg);
+    visible();
+    if (restriction === "frame-failure") {
+      vi.spyOn(AnimationTimeline.prototype, "update").mockImplementationOnce(
+        () => {
+          throw Error("failed frame");
+        },
+      );
+      advance(100);
+    }
+    act(() => {
+      ref.current!.play();
+      ref.current!.seek(100);
+      ref.current!.reverse();
+    });
+    complete(svg);
+    expect(frames.size).toBe(0);
+    view.unmount();
+    expect(observers.size).toBe(0);
+  },
+);
+
+it("Reduced may be selected before preparation without clearing Pause or duplicating the runtime", () => {
+  const services = createServices({ decorativeMotionAvailable: true });
+  const ref = createRef<LogoMotionRef>();
+  const view = render(
+    <ServiceProvider serviceFactory={() => services}>
+      <LogoMotion ref={ref} autoPlay={false} />
+    </ServiceProvider>,
+  );
+  visible();
+  act(() => {
+    ref.current!.pause();
+    services.motionPolicy.setPreference("reduced");
+  });
+  complete(screen.getByRole("img"));
+  expect(frames.size).toBe(0);
+  act(() => ref.current!.play());
+  advance(300);
+  expect(
+    Number((screen.getByRole("img") as unknown as SVGElement).style.opacity),
+  ).toBeLessThan(1);
+  expect(frames.size).toBe(1);
+  const callbacks = [...frames.values()];
+  const oldObservers = [...observers];
+  view.unmount();
+  act(() => {
+    callbacks.forEach((callback) => callback(now + 100));
+    oldObservers.forEach((observer) =>
+      observer.callback([
+        {
+          target: observer.target,
+          isIntersecting: true,
+          intersectionRatio: 1,
+        } as IntersectionObserverEntry,
+      ]),
+    );
+  });
+  expect(frames.size).toBe(0);
+  expect(observers.size).toBe(0);
+});
+
+let now = 0;
+let nextFrame = 0;
+let frames: Map<number, FrameRequestCallback>;
+let observers: Set<{
+  target?: Element;
+  callback: (entries: IntersectionObserverEntry[]) => void;
+}>;
+let media: Set<() => void>;
+let reduce = false;
+
+it.each(["on", "reduced"] as const)(
+  "%s reports actual completion for the homepage without frame notifications",
+  (preference) => {
+    localStorage.setItem(MOTION_PREFERENCE_KEY, preference);
+    const services = createServices({ decorativeMotionAvailable: true });
+    const callback = vi.fn();
+    const view = render(
+      <ServiceProvider serviceFactory={() => services}>
+        <LogoMotion onPlaybackState={callback} />
+      </ServiceProvider>,
+    );
+    expect(callback).toHaveBeenLastCalledWith("pending");
+    visible();
+    expect(callback).toHaveBeenLastCalledWith("running");
+    const count = callback.mock.calls.length;
+    advance(200);
+    expect(callback).toHaveBeenCalledTimes(count);
+    advance(10000);
+    expect(callback).toHaveBeenLastCalledWith("completed");
+    act(() => services.motionPolicy.setPreference("off"));
+    expect(callback).toHaveBeenLastCalledWith("static");
+    view.unmount();
+    const end = callback.mock.calls.length;
+    advance(10000);
+    expect(callback).toHaveBeenCalledTimes(end);
+  },
+);
+
+it.each(["on", "reduced"] as const)(
+  "%s keeps an unstarted background introduction pending until activation",
+  (preference) => {
+    localStorage.setItem(MOTION_PREFERENCE_KEY, preference);
+    const visibility = vi.spyOn(document, "visibilityState", "get");
+    visibility.mockReturnValue("hidden");
+    const services = createServices({ decorativeMotionAvailable: true });
+    const callback = vi.fn();
+    const view = render(
+      <ServiceProvider serviceFactory={() => services}>
+        <LogoMotion onPlaybackState={callback} />
+      </ServiceProvider>,
+    );
+    visible();
+    expect(callback).toHaveBeenLastCalledWith("pending");
+    expect(frames.size).toBe(0);
+    visibility.mockReturnValue("visible");
+    act(() => document.dispatchEvent(new Event("visibilitychange")));
+    expect(callback).toHaveBeenLastCalledWith("running");
+    advance(10000);
+    expect(callback).toHaveBeenLastCalledWith("completed");
+    view.unmount();
+  },
+);
+
+beforeEach(() => {
+  localStorage.clear();
+  now = 0;
+  nextFrame = 0;
+  reduce = false;
+  frames = new Map();
+  observers = new Set();
+  media = new Set();
+  vi.spyOn(performance, "now").mockImplementation(() => now);
+  vi.stubGlobal(
+    "requestAnimationFrame",
+    vi.fn((callback: FrameRequestCallback) => {
+      frames.set(++nextFrame, callback);
+      return nextFrame;
+    }),
+  );
+  vi.stubGlobal(
+    "cancelAnimationFrame",
+    vi.fn((id: number) => frames.delete(id)),
+  );
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    get matches() {
+      return query.includes("reduced-motion") && reduce;
+    },
+    addEventListener: (_: string, callback: () => void) => {
+      if (query.includes("reduced-motion")) media.add(callback);
+    },
+    removeEventListener: (_: string, callback: () => void) => {
+      media.delete(callback);
+    },
+  }));
+  vi.stubGlobal(
+    "IntersectionObserver",
+    class {
+      target?: Element;
+      constructor(
+        public callback: (entries: IntersectionObserverEntry[]) => void,
+      ) {
+        observers.add(this);
       }
-      const timeline = vi.mocked(AnimationTimeline).mock.results[0]
-        .value as MockTimeline;
-      expect(timeline.destroy).toHaveBeenCalledOnce();
-    });
-
-    it("should render the SVG logo", () => {
-      render(<LogoMotion enabled={true} />);
-      const svg = screen.getByRole("img", { name: /funkspace logo/i });
-      expect(svg).toBeInTheDocument();
-      expect(svg.tagName).toBe("svg");
-    });
-
-    it("should render with custom aria-label", () => {
-      render(<LogoMotion enabled={true} aria-label="Custom label" />);
-      // The component passes aria-label to FunkSpaceLogoInline
-      // Check that the SVG is rendered (it should have the default or custom label)
-      const svg = screen.getByRole("img");
-      expect(svg).toBeInTheDocument();
-      // The aria-label should be passed through, but jsdom might not support custom labels in getByRole
-      // So we verify the SVG exists and has the role="img"
-      expect(svg).toHaveAttribute("role", "img");
-    });
-
-    it("should fall back to a fully visible logo when animations are disabled", () => {
-      render(<LogoMotion enabled={false} />);
-      const svg = screen.getByRole("img");
-      const path = svg.querySelector(
-        '[data-logo-part="logo-path-1"]',
-      ) as SVGPathElement | null;
-
-      expect(path).not.toBeNull();
-      expect(path?.style.strokeDashoffset).toBe("0");
-      expect(path?.style.fillOpacity).toBe("1");
-    });
-
-    it("should initialize fill opacity to 0 when animation is active", async () => {
-      render(<LogoMotion enabled={true} autoPlay={false} />);
-      const svg = screen.getByRole("img");
-
-      await waitFor(() => {
-        expect(AnimationTimeline).toHaveBeenCalled();
-      });
-
-      // logoMark (path 1) is NOT animated - should remain visible
-      const logoMark = svg.querySelector(
-        '[data-logo-part="logo-path-1"]',
-      ) as SVGPathElement | null;
-      expect(logoMark).not.toBeNull();
-      expect(logoMark?.style.opacity).toBe("1");
-      expect(logoMark?.style.fillOpacity).toBe("1");
-
-      // Letter paths should be initialized for animation (fillOpacity 0)
-      const letterPath = svg.querySelector(
-        '[data-logo-part="logo-path-7"]',
-      ) as SVGPathElement | null; // F
-      expect(letterPath).not.toBeNull();
-      expect(letterPath?.style.opacity).toBe("1");
-      expect(letterPath?.style.fillOpacity).toBe("0");
-    });
-
-    it("should initialize logoMark for animation", async () => {
-      render(<LogoMotion enabled={true} autoPlay={false} />);
-
-      await waitFor(() => {
-        expect(mockAnimationOrchestrator.buildLogoManifest).toHaveBeenCalled();
-      });
-
-      // buildLogoManifest is called with SVG element
-      const calls = vi.mocked(mockAnimationOrchestrator.buildLogoManifest).mock
-        .calls;
-      expect(calls.length).toBeGreaterThan(0);
-      const firstCall = calls[0];
-      expect(firstCall).toBeDefined();
-      expect(firstCall?.length).toBeGreaterThan(0);
-      const svgElement = (firstCall as unknown[])[0] as SVGSVGElement;
-      expect(svgElement).toBeInstanceOf(SVGSVGElement);
-
-      // Verify logoMark elements exist
-      const svg = screen.getByRole("img");
-      const logoMark = svg.querySelector(
-        '[data-logo-part="logo-path-1"]',
-      ) as SVGPathElement | null;
-      expect(logoMark).not.toBeNull();
-
-      // Circles should start hidden (opacity 0) - they'll be shown during animation
-      const circle1 = svg.querySelector(
-        '[data-logo-part="lmd-dot-1"]',
-      ) as SVGCircleElement | null;
-      expect(circle1).not.toBeNull();
-      // Note: In test environment, setStaticState runs first, so we verify
-      // that the manifest includes logoMark animation steps
-      // Use the mock manifest that was returned by the orchestrator
-      const manifest = mockManifest;
-      const logoMarkSteps = manifest.steps.filter(
-        (step) =>
-          step.target === "#logo-path-1" || step.target.startsWith("#lmd-dot-"),
-      );
-      expect(logoMarkSteps.length).toBeGreaterThan(0);
-    });
-  });
-
-  describe("feature flag", () => {
-    it("should not animate when feature flag is disabled", async () => {
-      render(<LogoMotion enabled={false} />);
-
-      await waitFor(() => {
-        // Timeline should not be created when disabled
-        expect(AnimationTimeline).not.toHaveBeenCalled();
-      });
-    });
-
-    it("should not animate when NEXT_PUBLIC_ANIMATIONS_ENABLED is not set", async () => {
-      delete process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED;
-      render(<LogoMotion />);
-
-      await waitFor(() => {
-        // Timeline should not be created
-        expect(AnimationTimeline).not.toHaveBeenCalled();
-      });
-    });
-
-    it("should animate when feature flag is enabled", async () => {
-      render(<LogoMotion enabled={true} />);
-
-      await waitFor(() => {
-        // Timeline should be created
-        expect(AnimationTimeline).toHaveBeenCalled();
-      });
-    });
-
-    it("should use env var when enabled prop is undefined", async () => {
-      process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED = "true";
-      render(<LogoMotion />);
-
-      await waitFor(() => {
-        // Timeline should be created
-        expect(AnimationTimeline).toHaveBeenCalled();
-      });
-    });
-  });
-
-  describe("reduced motion", () => {
-    it("should not animate when reduced motion is preferred", async () => {
-      mockUseReducedMotion.mockReturnValue(true);
-
-      render(<LogoMotion enabled={true} />);
-
-      await waitFor(() => {
-        // Timeline should not be created when reduced motion is preferred
-        expect(AnimationTimeline).not.toHaveBeenCalled();
-      });
-    });
-
-    it("should render static final state when reduced motion is preferred", async () => {
-      mockUseReducedMotion.mockReturnValue(true);
-
-      render(<LogoMotion enabled={true} />);
-      const svg = screen.getByRole("img");
-
-      // Wait for SVG to be initialized
-      await waitFor(() => {
-        expect(svg).toBeInTheDocument();
-      });
-
-      // SVG should still render (just without animation)
-      expect(svg).toBeInTheDocument();
-    });
-  });
-
-  describe("autoPlay", () => {
-    it("should auto-play when autoPlay is true", async () => {
-      const mockTimeline: MockTimeline = {
-        play: vi.fn(),
-        pause: vi.fn(),
-        reverse: vi.fn(),
-        seek: vi.fn(),
-        setSpeed: vi.fn(),
-        destroy: vi.fn(),
-        duration: 1880,
-        time: 0,
-      };
-
-      vi.mocked(AnimationTimeline).mockImplementation(function () {
-        return mockTimeline as unknown as InstanceType<
-          typeof AnimationTimeline
-        >;
-      });
-
-      render(<LogoMotion enabled={true} autoPlay={true} />);
-
-      // Wait for SVG to render first
-      await waitFor(() => {
-        expect(screen.getByRole("img")).toBeInTheDocument();
-      });
-
-      // Then wait for timeline to be created
-      await waitFor(
-        () => {
-          expect(AnimationTimeline).toHaveBeenCalled();
-        },
-        { timeout: 1000 },
-      );
-
-      // Then check that play was called
-      expect(mockTimeline.play).toHaveBeenCalled();
-    });
-
-    it("should not auto-play when autoPlay is false", async () => {
-      const mockTimeline: MockTimeline = {
-        play: vi.fn(),
-        pause: vi.fn(),
-        reverse: vi.fn(),
-        seek: vi.fn(),
-        setSpeed: vi.fn(),
-        destroy: vi.fn(),
-        duration: 1880,
-        time: 0,
-      };
-
-      vi.mocked(AnimationTimeline).mockImplementation(function () {
-        return mockTimeline as unknown as InstanceType<
-          typeof AnimationTimeline
-        >;
-      });
-
-      render(<LogoMotion enabled={true} autoPlay={false} />);
-
-      // Wait for SVG to render first
-      await waitFor(() => {
-        expect(screen.getByRole("img")).toBeInTheDocument();
-      });
-
-      // Then wait for timeline to be created
-      await waitFor(
-        () => {
-          expect(AnimationTimeline).toHaveBeenCalled();
-        },
-        { timeout: 1000 },
-      );
-
-      // play should not be called
-      expect(mockTimeline.play).not.toHaveBeenCalled();
-    });
-
-    it("should clamp startAtMs to the timeline duration", async () => {
-      const mockTimeline: MockTimeline = {
-        play: vi.fn(),
-        pause: vi.fn(),
-        reverse: vi.fn(),
-        seek: vi.fn(),
-        setSpeed: vi.fn(),
-        destroy: vi.fn(),
-        duration: 1880,
-        time: 0,
-      };
-
-      vi.mocked(AnimationTimeline).mockImplementation(function () {
-        return mockTimeline as unknown as InstanceType<
-          typeof AnimationTimeline
-        >;
-      });
-
-      render(<LogoMotion enabled={true} autoPlay={false} startAtMs={99999} />);
-
-      await waitFor(() => {
-        expect(AnimationTimeline).toHaveBeenCalled();
-      });
-
-      expect(mockTimeline.seek).toHaveBeenCalledWith(1880);
-    });
-  });
-
-  describe("ref methods", () => {
-    it("should expose play, pause, reverse, seek, and setSpeed via ref", async () => {
-      const mockTimeline: MockTimeline = {
-        play: vi.fn(),
-        pause: vi.fn(),
-        reverse: vi.fn(),
-        seek: vi.fn(),
-        setSpeed: vi.fn(),
-        destroy: vi.fn(),
-        duration: 1880,
-        time: 0,
-      };
-
-      vi.mocked(AnimationTimeline).mockImplementation(function () {
-        return mockTimeline as unknown as InstanceType<
-          typeof AnimationTimeline
-        >;
-      });
-
-      const ref = createRef<LogoMotionRef>();
-      render(<LogoMotion ref={ref} enabled={true} autoPlay={false} />);
-
-      // Wait for SVG to render and timeline to be created
-      await waitFor(() => {
-        expect(screen.getByRole("img")).toBeInTheDocument();
-      });
-
-      await waitFor(
-        () => {
-          expect(AnimationTimeline).toHaveBeenCalled();
-          expect(ref.current).not.toBeNull();
-        },
-        { timeout: 1000 },
-      );
-
-      if (ref.current) {
-        ref.current.play();
-        expect(mockTimeline.play).toHaveBeenCalled();
-
-        ref.current.pause();
-        expect(mockTimeline.pause).toHaveBeenCalled();
-
-        ref.current.reverse();
-        expect(mockTimeline.reverse).toHaveBeenCalled();
-
-        ref.current.seek(500);
-        expect(mockTimeline.seek).toHaveBeenCalledWith(500);
-
-        ref.current.setSpeed(2);
-        expect(mockTimeline.setSpeed).toHaveBeenCalledWith(2);
+      observe(target: Element) {
+        this.target = target;
       }
-    });
-  });
-
-  describe("cleanup", () => {
-    it("should cleanup timeline on unmount", async () => {
-      const mockTimeline: MockTimeline = {
-        play: vi.fn(),
-        pause: vi.fn(),
-        reverse: vi.fn(),
-        seek: vi.fn(),
-        setSpeed: vi.fn(),
-        destroy: vi.fn(),
-        duration: 1880,
-        time: 0,
-      };
-
-      vi.mocked(AnimationTimeline).mockImplementation(function () {
-        return mockTimeline as unknown as InstanceType<
-          typeof AnimationTimeline
-        >;
-      });
-
-      const { unmount } = render(<LogoMotion enabled={true} />);
-
-      // Wait for SVG to render first
-      await waitFor(() => {
-        expect(screen.getByRole("img")).toBeInTheDocument();
-      });
-
-      // Then wait for timeline to be created
-      await waitFor(
-        () => {
-          expect(AnimationTimeline).toHaveBeenCalled();
-        },
-        { timeout: 1000 },
-      );
-
-      unmount();
-
-      expect(mockTimeline.pause).toHaveBeenCalled();
-      expect(mockTimeline.destroy).toHaveBeenCalled();
-    });
+      disconnect() {
+        observers.delete(this);
+      }
+    },
+  );
+  vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible");
+  Object.defineProperty(SVGElement.prototype, "getTotalLength", {
+    configurable: true,
+    value: () => 100,
   });
 });
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+  delete (SVGElement.prototype as unknown as { getTotalLength?: unknown })
+    .getTotalLength;
+});
+
+function visible(value = true) {
+  act(() =>
+    observers.forEach((observer) =>
+      observer.callback([
+        {
+          target: observer.target,
+          isIntersecting: value,
+          intersectionRatio: value ? 1 : 0,
+        } as IntersectionObserverEntry,
+      ]),
+    ),
+  );
+}
+function advance(ms: number) {
+  act(() => {
+    now += ms;
+    const callbacks = [...frames.values()];
+    frames.clear();
+    callbacks.forEach((callback) => callback(now));
+  });
+}
+function complete(svg: Element) {
+  expect(
+    (svg as SVGElement).style.opacity === "" ||
+      (svg as SVGElement).style.opacity === "1",
+  ).toBe(true);
+  expect(svg.querySelectorAll("[data-logo-part]")).toHaveLength(19);
+  for (const part of svg.querySelectorAll<SVGElement>("[data-logo-part]")) {
+    expect(part.style.opacity === "" || part.style.opacity === "1").toBe(true);
+    expect(
+      part.style.fillOpacity === "" || part.style.fillOpacity === "1",
+    ).toBe(true);
+    expect(
+      part.style.strokeDashoffset === "" || part.style.strokeDashoffset === "0",
+    ).toBe(true);
+  }
+}
+
+it("Reduced preserves reverse direction across an unprepared Off transition", () => {
+  localStorage.setItem(MOTION_PREFERENCE_KEY, "reduced");
+  const services = createServices({ decorativeMotionAvailable: true });
+  const ref = createRef<LogoMotionRef>();
+  const view = render(
+    <ServiceProvider serviceFactory={() => services}>
+      <LogoMotion ref={ref} autoPlay={false} />
+    </ServiceProvider>,
+  );
+  visible();
+  act(() => {
+    ref.current!.seek(99999);
+    ref.current!.reverse();
+    ref.current!.play();
+  });
+  advance(200);
+  act(() => {
+    ref.current!.pause();
+    services.motionPolicy.setPreference("off");
+    services.motionPolicy.setPreference("reduced");
+  });
+  complete(screen.getByRole("img"));
+  expect(frames.size).toBe(0);
+  act(() => ref.current!.play()); // Explicit resume prepares, but does not replay consumed work.
+  expect(frames.size).toBe(0);
+  act(() => {
+    ref.current!.seek(99999);
+    ref.current!.play();
+  });
+  advance(200);
+  const opacity = Number(
+    (screen.getByRole("img") as unknown as SVGElement).style.opacity,
+  );
+  expect(opacity).toBeGreaterThan(0);
+  expect(opacity).toBeLessThan(1);
+  expect(frames.size).toBe(1);
+  view.unmount();
+  expect(frames.size).toBe(0);
+});
+
+it.each(["pending", "off", "os", "flag", "unavailable"] as const)(
+  "L1: %s stays complete and imperative calls cannot bypass it",
+  (restriction) => {
+    if (restriction === "off")
+      localStorage.setItem(MOTION_PREFERENCE_KEY, restriction);
+    reduce = restriction === "os";
+    if (restriction === "unavailable") vi.stubGlobal("matchMedia", undefined);
+    const services = createServices({
+      decorativeMotionAvailable: restriction !== "flag",
+    });
+    if (restriction === "pending")
+      services.motionPolicy.initialize = () => () => {};
+    const ref = createRef<LogoMotionRef>();
+    const view = render(
+      <ServiceProvider serviceFactory={() => services}>
+        <LogoMotion ref={ref} enabled />
+      </ServiceProvider>,
+    );
+    visible();
+    act(() => {
+      ref.current!.play();
+      ref.current!.reverse();
+      ref.current!.seek(100);
+      ref.current!.setSpeed(2);
+    });
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    expect(ref.current!.isReady()).toBe(false);
+    view.unmount();
+    expect(observers.size).toBe(0);
+  },
+);
+
+it("L1: SSR and delayed initialization/visibility are complete before any drawing", () => {
+  const services = createServices({ decorativeMotionAvailable: true });
+  const factory = () => services;
+  const markup = renderToString(
+    <ServiceProvider serviceFactory={factory}>
+      <LogoMotion />
+    </ServiceProvider>,
+  );
+  expect(markup).not.toContain("stroke-dashoffset");
+  expect(observers.size).toBe(0);
+  expect(frames.size).toBe(0);
+  const initialize = services.motionPolicy.initialize.bind(
+    services.motionPolicy,
+  );
+  services.motionPolicy.initialize = () => () => {};
+  const view = render(
+    <ServiceProvider serviceFactory={factory}>
+      <LogoMotion />
+    </ServiceProvider>,
+  );
+  visible();
+  complete(screen.getByRole("img"));
+  expect(frames.size).toBe(0);
+  let release = () => {};
+  act(() => {
+    release = initialize();
+  });
+  expect(frames.size).toBe(1);
+  view.unmount();
+  release();
+  expect(frames.size).toBe(0);
+});
+
+it.each(["off", "reduced"] as const)(
+  "L1/L3: live %s mid-draw restores every part and consumes introduction",
+  (preference) => {
+    const services = createServices({ decorativeMotionAvailable: true });
+    const ref = createRef<LogoMotionRef>();
+    const view = render(
+      <ServiceProvider serviceFactory={() => services}>
+        <LogoMotion ref={ref} />
+        <MotionSettings />
+      </ServiceProvider>,
+    );
+    visible();
+    advance(300);
+    expect(frames.size).toBe(1);
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: preference === "off" ? "Off" : "Reduced",
+      }),
+    );
+    if (preference === "off")
+      act(() => {
+        ref.current!.play();
+        ref.current!.reverse();
+        ref.current!.seek(100);
+      });
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    fireEvent.click(screen.getByRole("button", { name: "Follow system" }));
+    visible();
+    expect(frames.size).toBe(0);
+    complete(screen.getByRole("img"));
+    act(() => ref.current!.play());
+    expect(frames.size).toBe(0);
+    act(() => {
+      ref.current!.seek(0);
+      ref.current!.play();
+    });
+    expect(frames.size).toBe(1);
+    view.unmount();
+    expect(frames.size).toBe(0);
+  },
+);
+
+it("L2/L3: Pause survives visibility, preferences, theme and autoplay updates; explicit resume works before readiness", () => {
+  const services = createServices({ decorativeMotionAvailable: true });
+  const factory = () => services;
+  const ref = createRef<LogoMotionRef>();
+  const view = render(
+    <ServiceProvider serviceFactory={factory}>
+      <LogoMotion ref={ref} autoPlay={false} />
+    </ServiceProvider>,
+  );
+  act(() => ref.current!.pause());
+  visible();
+  expect(ref.current!.isReady()).toBe(false);
+  act(() => ref.current!.play());
+  advance(200);
+  expect(ref.current!.isReady()).toBe(true);
+  act(() => ref.current!.pause());
+  expect(frames.size).toBe(0);
+  visible(false);
+  visible(true);
+  act(() => {
+    services.themeService.setTheme("dark");
+    services.motionPolicy.setPreference("off");
+    services.motionPolicy.setPreference("system");
+  });
+  view.rerender(
+    <ServiceProvider serviceFactory={factory}>
+      <LogoMotion ref={ref} autoPlay />
+    </ServiceProvider>,
+  );
+  expect(frames.size).toBe(0);
+  act(() => ref.current!.seek(100)); // Scrub is permitted while paused, without resuming.
+  expect(frames.size).toBe(0);
+  act(() => {
+    ref.current!.reverse();
+    ref.current!.setSpeed(2);
+  });
+  expect(frames.size).toBe(0);
+  act(() => ref.current!.play());
+  expect(frames.size).toBe(1);
+  advance(1000);
+  expect(frames.size).toBe(0);
+  view.unmount();
+});
+
+it("L3: unfinished work resumes from its cursor; completed work never restarts on theme/menu-like rerenders or visibility", () => {
+  const services = createServices({ decorativeMotionAvailable: true });
+  const factory = () => services;
+  const view = render(
+    <ServiceProvider serviceFactory={factory}>
+      <LogoMotion />
+    </ServiceProvider>,
+  );
+  visible();
+  advance(300);
+  const svg = screen.getByRole("img");
+  const before = [...svg.querySelectorAll<SVGElement>("[data-logo-part]")].map(
+    (part) => part.style.cssText,
+  );
+  visible(); // Repeated visible observations cannot rewind.
+  expect(
+    [...svg.querySelectorAll<SVGElement>("[data-logo-part]")].map(
+      (part) => part.style.cssText,
+    ),
+  ).toEqual(before);
+  visible(false);
+  expect(frames.size).toBe(0);
+  complete(svg);
+  visible(true);
+  expect(
+    [...svg.querySelectorAll<SVGElement>("[data-logo-part]")].map(
+      (part) => part.style.cssText,
+    ),
+  ).toEqual(before);
+  advance(10000);
+  expect(frames.size).toBe(0);
+  complete(svg);
+  for (const theme of [
+    "default",
+    "dark",
+    "muted",
+    "dark-high-contrast",
+    "system",
+  ] as const)
+    act(() => services.themeService.setTheme(theme));
+  view.rerender(
+    <ServiceProvider serviceFactory={factory}>
+      <LogoMotion className="menu-render" />
+    </ServiceProvider>,
+  );
+  visible(false);
+  visible(true);
+  expect(frames.size).toBe(0);
+  complete(svg);
+  view.unmount();
+  expect(observers.size).toBe(0);
+});
+
+it("L1/L2: actual manifest failures restore geometry; multiple copies have unique ids and one runtime", () => {
+  const services = createServices({ decorativeMotionAvailable: true });
+  const view = render(
+    <StrictMode>
+      <ServiceProvider serviceFactory={() => services}>
+        <LogoMotion aria-label="Animated" />
+        <LogoMotion enabled={false} aria-label="Static" />
+      </ServiceProvider>
+    </StrictMode>,
+  );
+  visible();
+  expect(frames.size).toBe(1);
+  complete(screen.getByRole("img", { name: "Static" }));
+  const ids = [...view.container.querySelectorAll("[id]")].map(
+    (node) => node.id,
+  );
+  expect(new Set(ids).size).toBe(ids.length);
+  const queued = [...frames.values()];
+  const observerCallbacks = [...observers];
+  view.unmount();
+  expect(frames.size).toBe(0);
+  expect(observers.size).toBe(0);
+  act(() => {
+    queued.forEach((callback) => callback(now + 10));
+    observerCallbacks.forEach((observer) =>
+      observer.callback([
+        {
+          target: observer.target,
+          isIntersecting: true,
+          intersectionRatio: 1,
+        } as IntersectionObserverEntry,
+      ]),
+    );
+  });
+  expect(frames.size).toBe(0);
+});
+
+it.each(["empty", "throw"] as const)(
+  "L1: %s manifest is a complete static failure without retry",
+  (failure) => {
+    const services = createServices({ decorativeMotionAvailable: true });
+    const build = vi
+      .spyOn(services.animationService.getOrchestrator(), "buildLogoManifest")
+      .mockImplementation(() => {
+        if (failure === "throw") throw Error("failed");
+        return { steps: [] };
+      });
+    const view = render(
+      <ServiceProvider serviceFactory={() => services}>
+        <LogoMotion />
+      </ServiceProvider>,
+    );
+    visible();
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    visible();
+    act(() => services.motionPolicy.setPreference("off"));
+    act(() => services.motionPolicy.setPreference("system"));
+    expect(build).toHaveBeenCalledTimes(1);
+    view.unmount();
+  },
+);
+
+it.each(["reduced", "on"] as const)(
+  "live %s settings survive restrictions and denied writes/reopening",
+  (preference) => {
+    localStorage.setItem(MOTION_PREFERENCE_KEY, "system");
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw Error("denied");
+    });
+    const services = createServices({ decorativeMotionAvailable: false });
+    const factory = () => services;
+    const view = render(
+      <ServiceProvider serviceFactory={factory}>
+        <MotionSettings />
+      </ServiceProvider>,
+    );
+    const label = preference === "on" ? "On" : "Reduced";
+    fireEvent.click(screen.getByRole("button", { name: label }));
+    view.rerender(
+      <ServiceProvider serviceFactory={factory}>
+        <div />
+      </ServiceProvider>,
+    );
+    view.rerender(
+      <ServiceProvider serviceFactory={factory}>
+        <MotionSettings />
+      </ServiceProvider>,
+    );
+    expect(screen.getByRole("button", { name: label })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(services.motionPolicy.getSnapshot().preference).toBe(preference);
+    expect(localStorage.getItem(MOTION_PREFERENCE_KEY)).toBe("system");
+    view.unmount();
+  },
+);
+
+it.each(["reduce", "unavailable"] as const)(
+  "explicit On overrides device %s but preserves Pause and completed history",
+  (device) => {
+    reduce = device === "reduce";
+    if (device === "unavailable") vi.stubGlobal("matchMedia", undefined);
+    const services = createServices({ decorativeMotionAvailable: true });
+    const ref = createRef<LogoMotionRef>();
+    const view = render(
+      <ServiceProvider serviceFactory={() => services}>
+        <LogoMotion ref={ref} />
+        <MotionSettings />
+      </ServiceProvider>,
+    );
+    visible();
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    act(() => ref.current!.pause());
+    fireEvent.click(screen.getByRole("button", { name: "On" }));
+    expect(screen.getByRole("button", { name: "On" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "regardless of your device",
+    );
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    act(() => ref.current!.play());
+    expect(frames.size).toBe(1);
+    advance(300);
+    reduce = !reduce;
+    act(() => media.forEach((callback) => callback()));
+    expect(services.motionPolicy.getSnapshot().preference).toBe("on");
+    expect(frames.size).toBe(1);
+    advance(10000);
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    fireEvent.click(screen.getByRole("button", { name: "Off" }));
+    fireEvent.click(screen.getByRole("button", { name: "On" }));
+    expect(frames.size).toBe(0);
+    complete(screen.getByRole("img"));
+    view.unmount();
+    expect(observers.size).toBe(0);
+  },
+);
+
+it("stored On cannot bypass the feature gate through autoplay or public methods", () => {
+  localStorage.setItem(MOTION_PREFERENCE_KEY, "on");
+  reduce = true;
+  const services = createServices({ decorativeMotionAvailable: false });
+  const ref = createRef<LogoMotionRef>();
+  const view = render(
+    <ServiceProvider serviceFactory={() => services}>
+      <LogoMotion ref={ref} />
+      <MotionSettings />
+    </ServiceProvider>,
+  );
+  visible();
+  act(() => {
+    ref.current!.play();
+    ref.current!.seek(300);
+    ref.current!.reverse();
+  });
+  expect(screen.getByRole("button", { name: "On" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  expect(screen.getByRole("status")).toHaveTextContent("currently unavailable");
+  complete(screen.getByRole("img"));
+  expect(frames.size).toBe(0);
+  expect(ref.current!.isReady()).toBe(false);
+  view.unmount();
+});
+
+it("L1/L2: prepared autoplay=false stays complete; initial position waits for permitted play", () => {
+  const services = createServices({ decorativeMotionAvailable: true });
+  const ref = createRef<LogoMotionRef>();
+  const view = render(
+    <ServiceProvider serviceFactory={() => services}>
+      <LogoMotion ref={ref} autoPlay={false} startAtMs={99999} />
+    </ServiceProvider>,
+  );
+  visible();
+  expect(ref.current!.isReady()).toBe(true);
+  complete(screen.getByRole("img"));
+  expect(frames.size).toBe(0);
+  act(() => ref.current!.play());
+  complete(screen.getByRole("img"));
+  expect(frames.size).toBe(0);
+  act(() => {
+    ref.current!.seek(0);
+    ref.current!.play();
+  });
+  expect(frames.size).toBe(1);
+  view.unmount();
+});
+
+it("L1: a runtime frame error restores complete artwork and cancels scheduling", () => {
+  const services = createServices({ decorativeMotionAvailable: true });
+  const view = render(
+    <ServiceProvider serviceFactory={() => services}>
+      <LogoMotion />
+    </ServiceProvider>,
+  );
+  visible();
+  vi.spyOn(AnimationTimeline.prototype, "update").mockImplementationOnce(() => {
+    throw Error("frame failure");
+  });
+  advance(100);
+  complete(screen.getByRole("img"));
+  expect(frames.size).toBe(0);
+  expect(observers.size).toBe(0);
+  view.unmount();
+});
+
+it("L3: document suspension resumes unfinished work but an OS reduction consumes it without changing selected preference", () => {
+  const services = createServices({ decorativeMotionAvailable: true });
+  const view = render(
+    <ServiceProvider serviceFactory={() => services}>
+      <LogoMotion />
+      <MotionSettings />
+    </ServiceProvider>,
+  );
+  visible();
+  advance(100);
+  const visibility = vi.spyOn(document, "visibilityState", "get");
+  visibility.mockReturnValue("hidden");
+  act(() => document.dispatchEvent(new Event("visibilitychange")));
+  expect(frames.size).toBe(0);
+  complete(screen.getByRole("img"));
+  visibility.mockReturnValue("visible");
+  act(() => document.dispatchEvent(new Event("visibilitychange")));
+  expect(frames.size).toBe(1);
+  act(() => {
+    reduce = true;
+    media.forEach((callback) => callback());
+  });
+  expect(screen.getByRole("button", { name: "Follow system" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  complete(screen.getByRole("img"));
+  expect(frames.size).toBe(0);
+  act(() => {
+    reduce = false;
+    media.forEach((callback) => callback());
+  });
+  expect(frames.size).toBe(0);
+  view.unmount();
+});
+
+for (const direction of ["forward", "backward"] as const) {
+  it(`L2/L3: reversing at the ${direction} endpoint while running retains one active frame chain`, () => {
+    const services = createServices({ decorativeMotionAvailable: true });
+    const ref = createRef<LogoMotionRef>();
+    const view = render(
+      <ServiceProvider serviceFactory={() => services}>
+        <LogoMotion ref={ref} />
+      </ServiceProvider>,
+    );
+    visible();
+    advance(200);
+    act(() => {
+      if (direction === "backward") ref.current!.reverse();
+      ref.current!.seek(direction === "forward" ? 99999 : 0);
+      ref.current!.reverse();
+    });
+    expect(frames.size).toBe(1);
+    visible();
+    act(() => services.motionPolicy.setPreference("on"));
+    expect(frames.size).toBe(1);
+    advance(300);
+    expect(
+      [
+        ...screen
+          .getByRole("img")
+          .querySelectorAll<SVGElement>("[data-logo-part]"),
+      ].some((part) => part.style.fillOpacity !== "1"),
+    ).toBe(true);
+    advance(10000);
+    complete(screen.getByRole("img"));
+    expect(frames.size).toBe(0);
+    view.unmount();
+    expect(observers.size).toBe(0);
+  });
+  for (const arrival of ["seek", "playback"] as const) {
+    it.each([false, true])(
+      `L2/L3: reversing after ${direction} ${arrival} completion permits explicit playback without automatic replay (paused=%s)`,
+      (paused) => {
+        const services = createServices({ decorativeMotionAvailable: true });
+        const factory = () => services;
+        const ref = createRef<LogoMotionRef>();
+        const view = render(
+          <ServiceProvider serviceFactory={factory}>
+            <LogoMotion ref={ref} autoPlay={false} />
+          </ServiceProvider>,
+        );
+        visible();
+        expect(ref.current!.isReady()).toBe(true);
+        act(() => {
+          if (direction === "backward") {
+            ref.current!.reverse();
+            ref.current!.seek(99999);
+          }
+          if (arrival === "seek")
+            ref.current!.seek(direction === "forward" ? 99999 : 0);
+          else ref.current!.play();
+        });
+        if (arrival === "playback") advance(10000);
+        expect(frames.size).toBe(0);
+        act(() => {
+          if (paused) ref.current!.pause();
+          ref.current!.reverse();
+        });
+        expect(frames.size).toBe(0);
+        visible(false);
+        visible(true);
+        act(() => {
+          services.themeService.setTheme("dark");
+          services.motionPolicy.setPreference("on");
+        });
+        expect(frames.size).toBe(0);
+        if (paused) {
+          view.rerender(
+            <ServiceProvider serviceFactory={factory}>
+              <LogoMotion ref={ref} autoPlay />
+            </ServiceProvider>,
+          );
+          expect(frames.size).toBe(0); // Reverse never clears explicit Pause.
+        }
+        act(() => ref.current!.play());
+        expect(frames.size).toBe(1);
+        advance(300);
+        expect(
+          [
+            ...screen
+              .getByRole("img")
+              .querySelectorAll<SVGElement>("[data-logo-part]"),
+          ].some((part) => part.style.fillOpacity !== "1"),
+        ).toBe(true);
+        advance(10000);
+        expect(frames.size).toBe(0);
+        complete(screen.getByRole("img"));
+        visible(false);
+        visible(true);
+        expect(frames.size).toBe(0);
+        view.unmount();
+        expect(observers.size).toBe(0);
+      },
+    );
+  }
+}

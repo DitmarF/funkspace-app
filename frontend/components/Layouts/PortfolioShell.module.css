@@ -27,6 +27,42 @@
   padding-right: max(var(--shell-gutter), var(--shell-safe-right));
 }
 
+/* Only the parser's permitted homepage enhancement opts in. Static/Off,
+   no-JS, secondary pages and failed startup keep the native content visible. */
+.shell[data-home-intro="preparing"] [data-home-content],
+.shell[data-home-intro="waiting"] [data-home-content],
+.shell[data-home-intro="menu"] [data-home-content],
+.shell[data-home-intro="preparing"] [data-home-menu],
+.shell[data-home-intro="waiting"] [data-home-menu] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Keep the measured SVG in place for its visibility observer. The initial
+   mask lifts only once the logo has prepared its draw/fade frame, or fails open. */
+.shell[data-home-intro="preparing"] .identity {
+  opacity: 0;
+}
+
+.shell[data-home-intro="fading"] [data-home-content] {
+  animation: homeContentIn var(--fs-motion-duration-800)
+    var(--fs-motion-easing-ease-out) both;
+}
+
+.shell[data-home-intro="menu"] [data-home-menu] {
+  animation: homeContentIn var(--fs-motion-duration-400)
+    var(--fs-motion-easing-ease-out) both;
+}
+
+@keyframes homeContentIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .skipLink:focus {
   top: max(var(--fs-space-xs), var(--shell-safe-top));
   left: max(var(--fs-space-xs), var(--shell-safe-left));

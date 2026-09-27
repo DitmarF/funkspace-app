@@ -15,6 +15,12 @@ const handoff = vi.hoisted(() => ({
 }));
 vi.mock("@/application/providers/ServiceProvider", () => ({
   useServices: () => ({
+    motionPolicy: {
+      getSnapshot: () => motionSnapshot,
+      subscribe: () => () => {},
+      setPreference: vi.fn(),
+    },
+    decorativeMotionAvailable: false,
     navigationHandoff: handoff,
     bindDialog: (
       node: HTMLDialogElement,
@@ -35,6 +41,13 @@ vi.mock("@/application/providers/ServiceProvider", () => ({
     },
   }),
 }));
+
+const motionSnapshot = {
+  status: "ready",
+  preference: "system",
+  systemMotion: "no-preference",
+  documentVisible: true,
+} as const;
 
 describe("Portfolio navigation composition", () => {
   it("opens Navigation with native destinations, disabled future categories and an icon-only named trigger", async () => {
@@ -81,7 +94,7 @@ describe("Portfolio navigation composition", () => {
     expect(dialog.getAllByRole("link")).toHaveLength(5);
     await user.click(dialog.getByRole("button", { name: "Accessibility" }));
     expect(dialog.getByRole("group", { name: "Appearance" })).toBeVisible();
-    expect(dialog.queryByRole("group", { name: "Motion" })).toBeNull();
+    expect(dialog.getByRole("group", { name: "Motion" })).toBeVisible();
     expect(dialog.queryByRole("link")).toBeNull();
     await user.click(dialog.getByRole("button", { name: "Close" }));
     await user.click(menu);

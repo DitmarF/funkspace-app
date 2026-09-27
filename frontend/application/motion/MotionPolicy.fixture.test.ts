@@ -36,7 +36,7 @@ it("M1/M4/M5/M6: two real-API consumers retain independent Pause, visibility and
   scene.changeInputs({ visible: false });
   expect(scene.read().running).toBe(false);
   scene.changeInputs({ visible: true });
-  for (const preference of ["off", "reduced", "system"] as const) {
+  for (const preference of ["off", "reduced", "on", "system"] as const) {
     service.setPreference(preference);
     changeEnvironment({ systemMotion: "reduce", documentVisible: false });
     changeEnvironment({ systemMotion: "no-preference", documentVisible: true });

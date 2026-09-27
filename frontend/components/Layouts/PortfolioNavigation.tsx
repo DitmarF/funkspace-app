@@ -17,11 +17,12 @@ import HexButton from "../Controls/HexButton";
 import ThemeSwitcher from "../ThemeSwitcher";
 import PortfolioNavigationTree from "./PortfolioNavigationTree";
 import MotionChoices, { type MotionChoicesProps } from "./MotionChoices";
+import MotionSettings from "./MotionSettings";
 import styles from "./PortfolioShell.module.css";
 import panel from "./PortfolioNavigation.module.css";
 
 export interface PortfolioNavigationProps {
-  /** Story/test input only until FS-3.4/3.5 supplies the live policy. */
+  /** Optional controlled story/test fixture; production uses the shared authority. */
   motion?: MotionChoicesProps;
 }
 
@@ -62,11 +63,16 @@ export default function PortfolioNavigation({
   };
   useEffect(() => setReady(true), []);
 
-  if (!ready || failed) return <PortfolioNavigationTree />;
+  if (!ready || failed)
+    return (
+      <div data-home-content="">
+        <PortfolioNavigationTree />
+      </div>
+    );
 
   return (
     <>
-      <div className={`${styles.launcher} ${panel.trigger}`}>
+      <div data-home-menu="" className={`${styles.launcher} ${panel.trigger}`}>
         <HexButton
           ref={triggerRef}
           aria-label="Menu: navigation and settings"
@@ -135,7 +141,7 @@ export default function PortfolioNavigation({
                   <legend>Appearance</legend>
                   <ThemeSwitcher presentation="outlined" />
                 </fieldset>
-                {motion && <MotionChoices {...motion} />}
+                {motion ? <MotionChoices {...motion} /> : <MotionSettings />}
               </>
             )}
           </section>

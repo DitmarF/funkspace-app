@@ -7,6 +7,12 @@ import {
   useServices,
 } from "../application/providers/ServiceProvider";
 import type { Theme } from "../domain/theme/Theme";
+import { createServices } from "../infrastructure/services/createServices";
+
+const createMotionFixtureServices = () =>
+  createServices({ decorativeMotionAvailable: true });
+const createStaticFixtureServices = () =>
+  createServices({ decorativeMotionAvailable: false });
 
 import "../app/globals.css";
 import { workSans, spaceGrotesk } from "../app/fonts";
@@ -74,7 +80,14 @@ const preview: Preview = {
     (Story, context) =>
       createElement(
         ServiceProvider,
-        null,
+        {
+          serviceFactory:
+            context.parameters.decorativeMotionAvailable === true
+              ? createMotionFixtureServices
+              : context.parameters.decorativeMotionAvailable === false
+                ? createStaticFixtureServices
+                : undefined,
+        },
         createElement(StorybookTheme, {
           theme: storybookThemes[context.globals.theme] ?? "system",
           children: createElement(Story),

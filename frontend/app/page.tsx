@@ -5,7 +5,7 @@ import PortfolioShell from "@/components/Layouts/PortfolioShell";
 
 export default function Home() {
   return (
-    <PortfolioShell>
+    <PortfolioShell animateIdentity>
       <div className="space-y-fs-2xl">
         <Start />
         <AboutPreview />

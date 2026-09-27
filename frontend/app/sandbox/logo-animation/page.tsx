@@ -17,7 +17,7 @@ export default function LogoAnimationPage() {
           autoPlay={true}
           speed={1}
           pathCount={10}
-          enabled={true}
+          enabled={false}
           className="w-full max-w-2xl h-auto"
         />
       </div>

@@ -1,5 +1,17 @@
 # FS-3.4 — Proposed decorative-motion policy contract
 
+> Historical proposal: subsequent approval and implemented reviews are recorded
+> in [FS-3.4 implementation](fs-3.4-motion-policy-implementation.md). On 2026-09-27,
+> Dimi requested a fourth **On** choice and explicitly approved overriding the
+> device preference while retaining availability and local Pause. The bounded
+> [FS-3.5 amendment](fs-3.5-motion-settings-and-logo.md#explicit-on-amendment--2026-09-27)
+> supersedes the three-choice union and absolute OS restriction below.
+> Earlier review results apply to their recorded candidates, not this amendment.
+> Dimi subsequently requested a whole-logo Reduced fade. The
+> [Reduced-logo amendment](fs-3.5-motion-settings-and-logo.md#reduced-logo-fade-amendment--2026-09-27)
+> supersedes Reduced's unconditional static result only for consumers with an
+> implemented, explicit reduced alternative. Default consumers stay static.
+
 ## Status, authority and inspected base — 2026-09-27
 
 **Status: PROPOSED — documentation only.** Codex is the contract author. Sites

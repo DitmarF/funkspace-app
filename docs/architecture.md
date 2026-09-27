@@ -58,6 +58,49 @@ Strict Mode can restart it. No motion registry, global scheduler or game-clock
 dependency is introduced. See the [FS-3.4 record](tasks/fs-3.4-motion-policy-implementation.md)
 for approved semantics, implementation evidence and later consumer boundaries.
 
+FS-3.5 connects Motion settings and the existing logo to that same authority.
+The subsequent homepage sequence uses a per-shell `HomeIntroBinding` and an
+optional `LogoMotion.onPlaybackState` lifecycle callback; there is no global
+animation coordinator. A route-local parser script serializes the same pure
+policy resolver/validator for one-time startup eligibility. It reads the existing
+key without writing or becoming a live authority. Browser effects and the
+bounded fail-open timer belong to infrastructure; `HomeIntroScript` is the
+startup composition boundary. The live logo controller drives completion or
+static fallback. A fallback before playback starts retains a per-shell
+cancellation latch and delivers it to the current logo even after late hydration.
+`LogoMotionRef.cancelIntroduction()` retires automatic playback for that mount;
+it preserves local Pause, shared preference and explicit permitted playback.
+The logo's existing history retains this latch across Strict Mode setup. The
+binding owns one cancellation subscriber with identity-guarded cleanup; detached
+shell cleanup removes it. A new page mount has independent history. CSS uses the existing 400 ms token for the menu hex-button
+fade, then the 800 ms token for the remaining content. The existing binding advances on actual
+animation-end events. The launcher and footer links are separate targets within
+the same footer; no second navigation owner or modal is introduced.
+The shell preserves server-rendered children and native links; no-JS/blocked
+inline script keeps them visible. No theme-bootstrap source or pipeline changes.
+The Reduced-logo amendment adds an optional `supportsReducedMotion` capability
+to the pure resolver; existing consumers default to static under Reduced. The
+logo alone supplies the implemented whole-artwork fade. Its binding accepts
+`prepare("draw" | "fade")`, deriving fade duration from the existing manifest
+and reusing one timeline. The renderer's `:scope` target addresses the owned SVG
+root for uniform opacity; geometry and per-part drawing remain unchanged.
+`LogoMotion` retains React ownership and an instance-local playback history;
+the application `LogoMotionController` combines intent with the pure resolver.
+The browser-free `LogoMotionPort` separates it from `NativeLogoMotionBinding`,
+which owns that SVG's observer, style changes and existing timeline. Composition
+injects the existing orchestrator's manifest builder; no second manifest or
+scheduler is introduced. The provider exposes a per-instance binding factory,
+and each logo releases only its own resources. Only the homepage identity opts
+in. Complete artwork is the initial and denied/error result; permission never
+replays a completed introduction. See the [FS-3.5 handoff](tasks/fs-3.5-motion-settings-and-logo.md)
+for public-method compatibility and outstanding human acceptance.
+
+The approved FS-3.5 On amendment extends the same preference union/key with
+`on`. Only this explicit choice bypasses device-preference restrictions;
+Follow system remains conservative when the signal is unavailable. Policy
+readiness, availability, opt-in, visibility, runtime readiness and local Pause
+remain independent restrictions. No new preference authority is introduced.
+
 ### Dependency Direction
 
 The dependency rule states that **dependencies point inward**:

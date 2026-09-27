@@ -53,13 +53,15 @@ it("M1: construction/subscription is inert and initial snapshots are stable", ()
   expect(listener).toHaveBeenCalledTimes(1);
 });
 
-it.each([null, "bad", '"off"', "", "system", "reduced", "off"])(
+it.each([null, "bad", '"off"', "", "system", "on", "reduced", "off"])(
   "M3: validates storage %s and never normalizes by writing",
   (stored) => {
     const { service, storage } = setup(stored);
     service.initialize();
     expect(service.getSnapshot().preference).toBe(
-      stored === "off" || stored === "reduced" ? stored : "system",
+      stored === "off" || stored === "reduced" || stored === "on"
+        ? stored
+        : "system",
     );
     expect(service.getSnapshot().status).toBe("ready");
     expect(storage.getItem).toHaveBeenCalledExactlyOnceWith(
@@ -107,20 +109,23 @@ it("M3: denied reads/writes settle and retain live choice for all readers/reinit
   });
 });
 
-it("M3: early and reentrant choice beats stale initialization", () => {
-  const early = setup("off");
-  early.service.setPreference("reduced");
-  expect(early.service.getSnapshot().status).toBe("pending");
-  early.service.initialize();
-  expect(early.storage.getItem).not.toHaveBeenCalled();
-  const { service, storage } = setup("off");
-  storage.getItem.mockImplementation(() => {
-    service.setPreference("reduced");
-    return "off";
-  });
-  service.initialize();
-  expect(service.getSnapshot().preference).toBe("reduced");
-});
+it.each(["reduced", "on"] as const)(
+  "M3: early and reentrant %s beats stale initialization",
+  (preference) => {
+    const early = setup("off");
+    early.service.setPreference(preference);
+    expect(early.service.getSnapshot().status).toBe("pending");
+    early.service.initialize();
+    expect(early.storage.getItem).not.toHaveBeenCalled();
+    const { service, storage } = setup("off");
+    storage.getItem.mockImplementation(() => {
+      service.setPreference(preference);
+      return "off";
+    });
+    service.initialize();
+    expect(service.getSnapshot().preference).toBe(preference);
+  },
+);
 
 it("M3/M6: nested delivery never delivers older values after newer ones; final write wins", () => {
   const { service, storage } = setup();
@@ -283,29 +288,32 @@ it.each(["pending", "ready"])(
   },
 );
 
-it("M3: normal persistence is recovered by a fresh authority", () => {
-  let stored: string | null = null;
-  const storage = {
-    getItem: () => stored,
-    setItem: (_key: string, value: string) => {
-      stored = value;
-    },
-    removeItem: vi.fn(),
-  };
-  const environment: MotionEnvironmentPort = {
-    observe: () => ({
-      current: { systemMotion: "no-preference", documentVisible: true },
-      unsubscribe: vi.fn(),
-    }),
-  };
-  const first = new MotionPolicyServiceImpl(storage, environment);
-  first.initialize();
-  first.setPreference("reduced");
-  first.dispose();
-  const next = new MotionPolicyServiceImpl(storage, environment);
-  next.initialize();
-  expect(next.getSnapshot().preference).toBe("reduced");
-});
+it.each(["reduced", "on"] as const)(
+  "M3: %s persistence is recovered by a fresh authority",
+  (preference) => {
+    let stored: string | null = null;
+    const storage = {
+      getItem: () => stored,
+      setItem: (_key: string, value: string) => {
+        stored = value;
+      },
+      removeItem: vi.fn(),
+    };
+    const environment: MotionEnvironmentPort = {
+      observe: () => ({
+        current: { systemMotion: "no-preference", documentVisible: true },
+        unsubscribe: vi.fn(),
+      }),
+    };
+    const first = new MotionPolicyServiceImpl(storage, environment);
+    first.initialize();
+    first.setPreference(preference);
+    first.dispose();
+    const next = new MotionPolicyServiceImpl(storage, environment);
+    next.initialize();
+    expect(next.getSnapshot().preference).toBe(preference);
+  },
+);
 
 it.each(["off", "reduced", "unavailable", "release", "dispose"] as const)(
   "M4/M6: %s reaches both consumers despite earlier subscriber failures",
