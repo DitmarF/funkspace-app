@@ -44,6 +44,9 @@ jobs:
           cd frontend
           pnpm exec tsc --noEmit
 
+      - name: Typecheck (stories, E2E and Playwright configs)
+        run: pnpm typecheck:validation
+
       - name: Unit tests (Vitest)
         run: pnpm coverage
 

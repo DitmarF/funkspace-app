@@ -147,7 +147,10 @@ for (const viewport of viewports) {
           await expect(page.getByRole("main")).toBeFocused();
           // Walk the real tab sequence, including email/footer links; never activate mailto.
           const focusableCount = await page
-            .locator("main a, footer a, footer button")
+            // Closed dialog/disclosure descendants are not native tab stops.
+            .locator(
+              "main a:visible, footer a:visible, footer button:visible:not(:disabled)",
+            )
             .count();
           for (let index = 0; index < focusableCount; index++) {
             await page.keyboard.press("Tab");

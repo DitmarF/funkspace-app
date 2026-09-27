@@ -312,12 +312,16 @@ test("N1 hidden invoker falls back to main; N7 immediate reopen ignores old clos
   await page.goto("/");
   await openSettings(page);
   await menu(page).evaluate((node) => {
+    if (!(node instanceof HTMLButtonElement))
+      throw Error("Expected menu button");
     node.hidden = true;
   });
   await page.keyboard.press("Escape");
   await expect(page.locator("#main-content")).toBeFocused();
   await unlocked(page);
   await menu(page).evaluate((node) => {
+    if (!(node instanceof HTMLButtonElement))
+      throw Error("Expected menu button");
     node.hidden = false;
   });
   await openSettings(page);

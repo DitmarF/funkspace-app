@@ -73,6 +73,8 @@ export default function PortfolioShell({
               ref={identity}
               enabled={animateIdentity}
               autoPlay={animateIdentity}
+              // Homepage introduction: 1 s; shared logo timing stays unchanged.
+              speed={animateIdentity ? 1.5 : 1}
               onPlaybackState={animateIdentity ? logoState : undefined}
               className="block h-auto w-full"
             />

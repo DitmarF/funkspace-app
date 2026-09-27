@@ -268,6 +268,11 @@ for (const width of [320, 1280]) {
       await page.clock.pauseAt(new Date(Date.now() + 100));
       await page.emulateMedia({ reducedMotion: "no-preference" });
       await page.goto("/");
+      if (available)
+        await expect(page.locator("[data-home-intro]")).toHaveAttribute(
+          "data-home-intro",
+          "waiting",
+        );
       await page.keyboard.press("Escape"); // Interaction exits the homepage introduction.
       await appearance(page);
       if (available)
@@ -289,6 +294,11 @@ for (const width of [320, 1280]) {
       expect(await partialCount(page)).toBe(prior);
       await page.getByRole("button", { name: "Reduced", exact: true }).click();
       await page.reload();
+      if (available)
+        await expect(page.locator("[data-home-intro]")).toHaveAttribute(
+          "data-home-intro",
+          "waiting",
+        );
       await page.keyboard.press("Escape"); // The paused test clock cannot finish the reloaded introduction.
       await appearance(page);
       await expect(

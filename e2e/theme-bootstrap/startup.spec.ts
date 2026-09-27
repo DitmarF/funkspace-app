@@ -295,71 +295,86 @@ test("cold throttled load applies saved appearance before first paint", async ({
 });
 
 for (const width of [320, 1280]) {
-  test(`saved dark paints before framework scripts at ${width}px, including reload`, async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width, height: 720 });
-    await page.emulateMedia({ colorScheme: "light" });
-    await page.addInitScript(() => {
-      localStorage.setItem("theme", "dark");
-    });
-    for (const navigation of ["open", "reload"]) {
-      let release!: () => void;
-      const gate = new Promise<void>((resolve) => {
-        release = resolve;
-      });
-      let held = 0;
-      await page.route("**/_next/**/*.js*", async (route) => {
-        held++;
-        await gate;
-        await route.continue();
-      });
-      try {
-        // This response is untouched: theme execution cannot depend on test
-        // checkpoints, React hydration, or arrival of any framework script.
-        if (navigation === "open")
-          await page.goto("/", { waitUntil: "commit" });
-        else await page.reload({ waitUntil: "commit" });
+  for (const motion of ["off", "on"] as const) {
+    test(`saved dark paints before framework scripts at ${width}px, motion ${motion}, including reload`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 720 });
+      await page.emulateMedia({ colorScheme: "light" });
+      await page.addInitScript((preference) => {
+        localStorage.setItem("theme", "dark");
+        localStorage.setItem("funkspace.motion.preference.v1", preference);
+      }, motion);
+      for (const navigation of ["open", "reload"]) {
+        let release!: () => void;
+        const gate = new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        let held = 0;
+        await page.route("**/_next/**/*.js*", async (route) => {
+          held++;
+          await gate;
+          await route.continue();
+        });
+        try {
+          // This response is untouched: theme execution cannot depend on test
+          // checkpoints, React hydration, or arrival of any framework script.
+          if (navigation === "open")
+            await page.goto("/", { waitUntil: "commit" });
+          else await page.reload({ waitUntil: "commit" });
+          if (motion === "on" && process.env.FS35_AVAILABLE === "true") {
+            // Accepted FS-3.5 startup masks content until the logo is ready.
+            // Inspect its real pre-hydration paint without waiting out fallback.
+            await expect(page.locator("main h1")).toHaveText("FunkSpace");
+            await expect(page.locator("[data-home-intro]")).toHaveAttribute(
+              "data-home-intro",
+              "preparing",
+            );
+          } else
+            await expect(
+              page.getByRole("heading", { name: "FunkSpace", exact: true }),
+            ).toBeVisible();
+          await expect.poll(() => held).toBeGreaterThan(0);
+          const frames = await page.evaluate(async () => {
+            const samples: { theme: string | null; background: string }[] = [];
+            for (let frame = 0; frame < 12; frame++) {
+              await new Promise(requestAnimationFrame);
+              samples.push({
+                theme: document.documentElement.getAttribute("data-theme"),
+                background: getComputedStyle(document.body).backgroundColor,
+              });
+            }
+            return samples;
+          });
+          expect(frames.every((frame) => frame.theme === "dark")).toBe(true);
+          await test.info().attach(`${navigation}-before-runtime.json`, {
+            body: JSON.stringify({ held, frames }),
+            contentType: "application/json",
+          });
+          // Capture the current paint directly: screenshot font-readiness waits
+          // can depend on load, which these deliberately held scripts prevent.
+          const cdp = await page.context().newCDPSession(page);
+          const screenshot = await cdp.send("Page.captureScreenshot");
+          await cdp.detach();
+          await test.info().attach(`${navigation}-before-runtime.png`, {
+            body: Buffer.from(screenshot.data, "base64"),
+            contentType: "image/png",
+          });
+        } finally {
+          release();
+          await page.unrouteAll({ behavior: "wait" });
+        }
+        await openAppearance(page);
         await expect(
-          page.getByRole("heading", { name: "FunkSpace", exact: true }),
-        ).toBeVisible();
-        await expect.poll(() => held).toBeGreaterThan(0);
-        const frames = await page.evaluate(async () => {
-          const samples: { theme: string | null; background: string }[] = [];
-          for (let frame = 0; frame < 12; frame++) {
-            await new Promise(requestAnimationFrame);
-            samples.push({
-              theme: document.documentElement.getAttribute("data-theme"),
-              background: getComputedStyle(document.body).backgroundColor,
-            });
-          }
-          return samples;
-        });
-        expect(frames.every((frame) => frame.theme === "dark")).toBe(true);
-        await test.info().attach(`${navigation}-before-runtime.json`, {
-          body: JSON.stringify({ held, frames }),
-          contentType: "application/json",
-        });
-        // Capture the current paint directly: screenshot font-readiness waits
-        // can depend on load, which these deliberately held scripts prevent.
-        const cdp = await page.context().newCDPSession(page);
-        const screenshot = await cdp.send("Page.captureScreenshot");
-        await cdp.detach();
-        await test.info().attach(`${navigation}-before-runtime.png`, {
-          body: Buffer.from(screenshot.data, "base64"),
-          contentType: "image/png",
-        });
-      } finally {
-        release();
-        await page.unrouteAll({ behavior: "wait" });
+          page.getByRole("button", { name: "Dark", exact: true }),
+        ).toHaveAttribute("aria-pressed", "true");
+        await expect(page.locator("html")).toHaveAttribute(
+          "data-theme",
+          "dark",
+        );
       }
-      await openAppearance(page);
-      await expect(
-        page.getByRole("button", { name: "Dark", exact: true }),
-      ).toHaveAttribute("aria-pressed", "true");
-      await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-    }
-  });
+    });
+  }
 }
 
 test("no JavaScript retains default static content", async ({

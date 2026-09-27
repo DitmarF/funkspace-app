@@ -6,14 +6,20 @@
       "startServerReadyPattern": "Ready in",
       "numberOfRuns": 3,
       "settings": {
-        "preset": "desktop"
+        "preset": "desktop",
+        "throttlingMethod": "devtools",
+        "throttling": {
+          "requestLatencyMs": 150,
+          "downloadThroughputKbps": 9216,
+          "uploadThroughputKbps": 9216
+        }
       }
     },
     "assert": {
       "assertions": {
         "largest-contentful-paint": [
           "error",
-          { "maxNumericValue": 2500, "aggregationMethod": "p75" }
+          { "maxNumericValue": 5000, "aggregationMethod": "p75" }
         ],
         "cumulative-layout-shift": [
           "error",

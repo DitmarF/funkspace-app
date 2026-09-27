@@ -326,7 +326,9 @@ for (const width of [320, 1280]) {
             "waiting",
           );
           await page.screenshot({ path: info.outputPath("logo-first.png") });
-          await page.clock.runFor(900);
+          // The homepage's 1 s introduction must finish before 1.1 s;
+          // the shared logo's 1.5 s default must not delay this sequence.
+          await page.clock.runFor(300);
           await finishMenuFade(page, info.outputPath("menu-fade.png"));
           await expect(page.locator(shell)).toHaveAttribute(
             "data-home-intro",

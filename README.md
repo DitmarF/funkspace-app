@@ -75,6 +75,7 @@ pnpm lint           # Next.js lint + prettier --check
 pnpm test           # Vitest in CI mode
 pnpm test:watch     # Vitest watch mode
 pnpm coverage       # V8: 75% lines/functions/statements, 80% branches; configured exclusions apply
+pnpm typecheck:validation # frontend + stories + all E2E/fixtures + Playwright configs
 pnpm e2e            # Playwright end-to-end suite (Chromium only)
 ```
 
@@ -82,12 +83,21 @@ Vitest is configured to reuse the frontend React installation and loads
 `vitest.setup.ts` for Testing Library matchers. Coverage thresholds are enforced
 when coverage runs. CI enables coverage by default; `pnpm coverage` also enables it locally.
 
+The normal frontend type check excludes stories and root E2E files. CI also runs
+`pnpm typecheck:validation` using `frontend/tsconfig.validation.json`, which includes
+them without weakening strictness. Its extra module paths let root-level E2E
+fixtures resolve the frontend's Next.js dependency and the common package's public
+colors export; they do not change application or browser-test runtime resolution.
+
 ## Playwright browser downloads
 
 Browser installation is explicit; dependency installation no longer downloads browsers.
 CI and E2E use `PLAYWRIGHT_BROWSERS_PATH=0`, so they resolve the same project-local Chromium.
 Playwright is locked to the reviewed 1.55.1 release, which fixes the earlier
-downloader certificate-verification advisory. Browser installation and both
+downloader certificate-verification advisory. The root `playwright-core` devDependency
+explicitly supplies axe's peer at that same version; keep it aligned with
+`@playwright/test` when upgrading. This prevents pnpm from installing a newer peer
+whose `Page` type differs from the runner's. Browser installation and both
 Chromium suites passed in the dependency maintenance record:
 
 ```bash
@@ -106,8 +116,19 @@ skips lifecycle scripts deliberately. This is not proof that browser prerequisit
 are installed. Add `--offline` only when the pnpm store already contains the locked graph.
 
 Lighthouse commands set `NEXT_PUBLIC_ANIMATIONS_ENABLED` **during the build**:
-`pnpm lhci:off`, then `pnpm lhci:on`. Both measure `/`; the current home route has no
-animated logo, so these measurements do not establish an animation-on cost comparison.
+`pnpm lhci:off`, then `pnpm lhci:on`. Both measure `/` with the desktop preset
+and DevTools throttling, using observed paint timings rather than simulated
+dependency timings. This includes the homepage introduction's elapsed time and
+keeps capture running through its staged reveal. Network emulation explicitly
+uses 150 ms request latency and 9,216 Kbps download/upload, translating the
+desktop preset's 40 ms RTT / 10,240 Kbps with Lighthouse's 3.75 / 0.9 calibration
+factors; CPU remains 1×. Each variant retains three
+runs, the 5,000 ms LCP / 0.1 CLS p75 limits and the 0.9 performance-score warning.
+The LCP budget was explicitly increased by Dimi on 2026-09-27 to retain the
+accepted introduction; this changes acceptance criteria, not runtime speed.
+The enabled homepage uses a 1,000 ms identity-logo introduction, followed by
+the 400 ms menu and 800 ms content fades; the disabled build stays static.
+These are local lab measurements, not field p75 or physical-device acceptance.
 
 ## Deployment
 
