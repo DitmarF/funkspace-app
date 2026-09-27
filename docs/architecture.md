@@ -196,6 +196,15 @@ Tests should be colocated with source files (`*.test.tsx` next to source).
 - `components/ThemeSwitcher` delegates theme persistence and application to
   `ThemeService`; it owns only selection UI state.
 
+ThemeService seeds its selected theme from validated storage on first
+initialization, unless a user selection already exists. Later initialization,
+subscriptions, current-theme reads and OS-change decisions retain that live
+selection; denied writes cannot replace it with stale persisted data.
+`getStoredTheme()` remains a storage query, including its System fallback for
+missing/invalid/unreadable values. Cleanup releases listeners/subscribers but
+retains the choice for provider effect replay. A new service after a full reload
+reads storage again; persistence is not promised when storage is blocked.
+
 `app/layout.tsx` renders `application/providers/ThemeBootstrapScript.tsx`, a thin
 startup composition boundary alongside ServiceProvider. It imports only trusted
 generated script data, not an executing browser initializer. The maintained

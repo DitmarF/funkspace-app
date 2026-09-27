@@ -162,4 +162,101 @@ describe("ThemeServiceImpl", () => {
     service.setTheme("dark");
     expect(subscriber).toHaveBeenCalledTimes(1);
   });
+
+  it.each(["system", "muted"])(
+    "keeps the live choice when writes leave storage at %s",
+    (stale) => {
+      storedValues.set("theme", stale);
+      storage.setItem = vi.fn(); // LocalStorageAdapter swallows denied writes.
+      const service = new ThemeServiceImpl(storage, dom);
+      service.initialize();
+      const oldSubscriber = vi.fn();
+      const unsubscribe = service.subscribe(oldSubscriber);
+      service.setTheme("dark");
+      unsubscribe(); // Settings closes; another reader mounts when reopened.
+      const newSubscriber = vi.fn();
+      service.subscribe(newSubscriber);
+
+      expect.soft(newSubscriber).toHaveBeenLastCalledWith({
+        selectedTheme: "dark",
+        resolvedTheme: "dark",
+      });
+      expect.soft(service.getCurrentTheme()).toBe("dark");
+      expect.soft(service.getStoredTheme()).toBe(stale);
+      prefersDark = true;
+      systemChangeListener?.({ matches: true } as MediaQueryListEvent);
+      prefersDark = false;
+      systemChangeListener?.({ matches: false } as MediaQueryListEvent);
+      expect
+        .soft(document.documentElement)
+        .toHaveAttribute("data-theme", "dark");
+      expect.soft(newSubscriber).toHaveBeenLastCalledWith({
+        selectedTheme: "dark",
+        resolvedTheme: "dark",
+      });
+      service.initialize();
+      expect.soft(service.getCurrentTheme()).toBe("dark");
+      expect
+        .soft(document.documentElement)
+        .toHaveAttribute("data-theme", "dark");
+      expect(oldSubscriber).toHaveBeenCalledTimes(2);
+    },
+  );
+
+  it("preserves a choice made before initialization and across effect replay", () => {
+    storedValues.set("theme", "system");
+    storage.setItem = vi.fn();
+    const service = new ThemeServiceImpl(storage, dom);
+    service.setTheme("muted");
+    service.initialize();
+    service.destroy();
+    const subscriber = vi.fn();
+    service.subscribe(subscriber);
+    service.initialize();
+    expect(service.getCurrentTheme()).toBe("muted");
+    expect(subscriber).toHaveBeenLastCalledWith({
+      selectedTheme: "muted",
+      resolvedTheme: "muted",
+    });
+    expect(storage.getItem).not.toHaveBeenCalled();
+    expect(mediaQuery.addEventListener).toHaveBeenCalledTimes(2);
+    expect(mediaQuery.removeEventListener).toHaveBeenCalledTimes(1);
+    service.destroy();
+  });
+
+  it("follows System live even when storage retains an explicit theme", () => {
+    storedValues.set("theme", "muted");
+    storage.setItem = vi.fn();
+    const service = new ThemeServiceImpl(storage, dom);
+    service.initialize();
+    service.setTheme("system");
+    prefersDark = true;
+    systemChangeListener?.({ matches: true } as MediaQueryListEvent);
+    const subscriber = vi.fn();
+    service.subscribe(subscriber);
+    expect(subscriber).toHaveBeenLastCalledWith({
+      selectedTheme: "system",
+      resolvedTheme: "dark",
+    });
+    expect(service.getCurrentTheme()).toBe("dark");
+    expect(service.getStoredTheme()).toBe("muted");
+    prefersDark = false;
+    systemChangeListener?.({ matches: false } as MediaQueryListEvent);
+    expect(service.getCurrentTheme()).toBe("default");
+    expect(document.documentElement).not.toHaveAttribute("data-theme");
+  });
+
+  it("seeds once, preserves bootstrapped appearance and leaves storage queries explicit", () => {
+    storedValues.set("theme", "dark");
+    document.documentElement.setAttribute("data-theme", "dark");
+    const service = new ThemeServiceImpl(storage, dom);
+    service.initialize();
+    storedValues.set("theme", "muted");
+    service.initialize();
+    service.subscribe(vi.fn());
+    expect(service.getCurrentTheme()).toBe("dark");
+    expect(storage.getItem).toHaveBeenCalledTimes(1);
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    expect(service.getStoredTheme()).toBe("muted");
+  });
 });

@@ -41,12 +41,12 @@ export interface ThemeService {
   resolveTheme(theme: Theme): ResolvedTheme;
 
   /**
-   * Get the currently applied theme
+   * Get the live resolved theme (storage is used only before a live selection exists)
    */
   getCurrentTheme(): ResolvedTheme;
 
   /**
-   * Initialize theme from storage
+   * Initialize from storage once; later calls retain the live selection
    */
   initialize(): void;
 
@@ -66,6 +66,8 @@ export class ThemeServiceImpl implements ThemeService {
   private readonly storageKey = THEME_STORAGE_KEY;
   private readonly subscribers = new Set<ThemeSubscriber>();
   private unsubscribeSystemTheme: (() => void) | null = null;
+  // Seed lazily; persistence failure must not replace a live user selection.
+  private selectedTheme: Theme | null = null;
 
   constructor(
     private readonly storage: StoragePort,
@@ -78,6 +80,7 @@ export class ThemeServiceImpl implements ThemeService {
   }
 
   setTheme(theme: Theme): void {
+    this.selectedTheme = theme;
     this.storage.setItem(this.storageKey, theme);
     const resolvedTheme = this.applyTheme(theme);
     this.notifySubscribers(theme, resolvedTheme);
@@ -104,18 +107,19 @@ export class ThemeServiceImpl implements ThemeService {
   }
 
   getCurrentTheme(): ResolvedTheme {
-    const stored = this.getStoredTheme();
-    return this.resolveTheme(stored);
+    return this.resolveTheme(this.selectedTheme ?? this.getStoredTheme());
   }
 
   initialize(): void {
-    const storedValue = this.storage.getItem(this.storageKey);
-    const theme = isTheme(storedValue) ? storedValue : "system";
-
-    if (!isTheme(storedValue)) {
-      this.storage.setItem(this.storageKey, "system");
+    if (this.selectedTheme === null) {
+      const storedValue = this.storage.getItem(this.storageKey);
+      this.selectedTheme = isTheme(storedValue) ? storedValue : "system";
+      if (!isTheme(storedValue)) {
+        this.storage.setItem(this.storageKey, "system");
+      }
     }
 
+    const theme = this.selectedTheme;
     const resolvedTheme = this.applyTheme(theme);
     this.notifySubscribers(theme, resolvedTheme);
 
@@ -137,6 +141,7 @@ export class ThemeServiceImpl implements ThemeService {
     this.unsubscribeSystemTheme?.();
     this.unsubscribeSystemTheme = null;
     this.subscribers.clear();
+    // Preserve the live choice when the same provider replays its effects.
   }
 
   private listenForSystemThemeChanges(): () => void {
@@ -150,10 +155,9 @@ export class ThemeServiceImpl implements ThemeService {
     }
 
     const handleChange = () => {
-      const stored = this.getStoredTheme();
-      if (stored === "system") {
-        const resolvedTheme = this.applyTheme(stored);
-        this.notifySubscribers(stored, resolvedTheme);
+      if (this.selectedTheme === "system") {
+        const resolvedTheme = this.applyTheme("system");
+        this.notifySubscribers("system", resolvedTheme);
       }
     };
 
@@ -175,7 +179,7 @@ export class ThemeServiceImpl implements ThemeService {
   }
 
   private getThemeState(): ThemeState {
-    const selectedTheme = this.getStoredTheme();
+    const selectedTheme = this.selectedTheme ?? this.getStoredTheme();
     return {
       selectedTheme,
       resolvedTheme: this.resolveTheme(selectedTheme),
