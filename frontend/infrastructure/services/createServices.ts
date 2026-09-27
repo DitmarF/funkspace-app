@@ -10,7 +10,9 @@ import { AnimationOrchestratorImpl } from "@/application/animations/AnimationOrc
 import { LocalStorageAdapter } from "@/infrastructure/storage/LocalStorageAdapter";
 import { DOMAdapter } from "@/infrastructure/dom/DOMAdapter";
 import { AnimationAdapter } from "@/infrastructure/motion/AnimationAdapter";
-import type { ServiceContextValue } from "@/application/providers/ServiceProvider";
+import type { OwnedServices } from "@/application/providers/ServiceProvider";
+import { MotionPolicyServiceImpl } from "@/application/motion/MotionPolicyService";
+import { BrowserMotionEnvironment } from "@/infrastructure/motion/BrowserMotionEnvironment";
 import { bindNativeDialog } from "@/infrastructure/dom/NativeDialogBinding";
 
 import { createPortfolioNavigationHandoff } from "@/infrastructure/dom/PortfolioNavigationHandoff";
@@ -18,7 +20,7 @@ import { createPortfolioNavigationHandoff } from "@/infrastructure/dom/Portfolio
 /**
  * Create all services with their dependencies
  */
-export function createServices(): ServiceContextValue {
+export function createServices(): OwnedServices {
   // Infrastructure adapters
   const storage = new LocalStorageAdapter();
   const dom = new DOMAdapter();
@@ -31,6 +33,12 @@ export function createServices(): ServiceContextValue {
   const animationService = new AnimationServiceImpl(animationOrchestrator);
 
   return {
+    motionPolicy: new MotionPolicyServiceImpl(
+      storage,
+      new BrowserMotionEnvironment(),
+    ),
+    decorativeMotionAvailable:
+      process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED === "true",
     themeService,
     scrollService,
     animationService,

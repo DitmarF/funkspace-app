@@ -43,6 +43,21 @@ common/
 
 ## Dependency Rules
 
+### Decorative-motion policy
+
+FS-3.4 adds a provider-owned `MotionPolicyService` beside animation orchestration.
+The pure domain resolver combines its immutable preference/environment snapshot
+with each consumer's independent availability, opt-in, visibility, Pause and
+runtime readiness. Permission never commands playback or resets local history.
+`BrowserMotionEnvironment` owns media/document listeners and attaches them only
+during provider lifecycle setup. The existing storage port persists one validated
+preference best-effort; live intent remains authoritative after failed writes.
+Consumers receive only snapshot/subscription/update methods and unsubscribe on
+unmount. Provider cleanup releases its activation without terminal disposal so
+Strict Mode can restart it. No motion registry, global scheduler or game-clock
+dependency is introduced. See the [FS-3.4 record](tasks/fs-3.4-motion-policy-implementation.md)
+for approved semantics, implementation evidence and later consumer boundaries.
+
 ### Dependency Direction
 
 The dependency rule states that **dependencies point inward**:
