@@ -213,3 +213,123 @@ describe("per-dialog native binding (platform fakes, not modality proof)", () =>
     expect(f.options.onCloseRequest).not.toHaveBeenCalled();
   });
 });
+
+it("suppresses every restoration path and releases overflow before acknowledging navigation", () => {
+  const f = fixture();
+  const returns = vi.fn(() => f.trigger);
+  const fallback = vi.fn(() => f.fallback);
+  const ack = vi.fn(() => {
+    expect(document.body.style.overflow).toBe("");
+    expect(document.documentElement.style.overflow).toBe("");
+    expect(window.scrollTo).not.toHaveBeenCalled();
+  });
+  const binding = bindNativeDialog(f.dialog, {
+    ...f.options,
+    returnFocus: returns,
+    fallbackFocus: fallback,
+    scrollLock: "document-overflow",
+    closeDisposition: () => "navigation",
+    onReleased: ack,
+  });
+  binding.sync(true);
+  expect(document.body.style.position).toBe("");
+  expect(document.body.style.top).toBe("");
+  binding.sync(false);
+  binding.destroy();
+  f.flush();
+  expect(returns).not.toHaveBeenCalled();
+  expect(fallback).not.toHaveBeenCalled();
+  expect(ack).toHaveBeenCalledExactlyOnceWith("navigation");
+});
+it("reads late disposition and explicit teardown override, leaving newer locks intact", () => {
+  const f = fixture();
+  let mode: "dismiss" | "navigation" = "dismiss";
+  const binding = bindNativeDialog(f.dialog, {
+    ...f.options,
+    closeDisposition: () => mode,
+    scrollLock: "document-overflow",
+  });
+  binding.sync(true);
+  mode = "navigation";
+  binding.sync(false);
+  expect(window.scrollTo).not.toHaveBeenCalled();
+  mode = "dismiss";
+  binding.sync(true);
+  binding.destroy("navigation");
+  expect(window.scrollTo).not.toHaveBeenCalled();
+  const next = bindNativeDialog(f.dialog, {
+    ...f.options,
+    scrollLock: "document-overflow",
+  });
+  next.sync(true);
+  binding.destroy();
+  f.flush();
+  expect(f.dialog.open).toBe(true);
+  expect(document.body.style.overflow).toBe("hidden");
+  next.destroy();
+});
+it.each(["hidden", "disabled", "inert"])(
+  "dismissal skips a %s invoker and uses the logical fallback",
+  (state) => {
+    const f = fixture();
+    const binding = bindNativeDialog(f.dialog, {
+      ...f.options,
+      returnFocus: () => f.trigger,
+      scrollLock: "document-overflow",
+    });
+    binding.sync(true);
+    f.trigger.setAttribute(state, "");
+    binding.sync(false);
+    expect(document.activeElement).toBe(f.fallback);
+    binding.destroy();
+  },
+);
+it("failed overflow opening rolls back without a successful release acknowledgment", () => {
+  const f = fixture();
+  const ack = vi.fn();
+  f.show.mockImplementation(() => {
+    throw Error("blocked");
+  });
+  const binding = bindNativeDialog(f.dialog, {
+    ...f.options,
+    scrollLock: "document-overflow",
+    closeDisposition: () => "navigation",
+    onReleased: ack,
+  });
+  expect(() => binding.sync(true)).toThrow("blocked");
+  expect(document.body.style.overflow).toBe("");
+  expect(window.scrollTo).toHaveBeenCalledOnce();
+  binding.destroy();
+  expect(ack).not.toHaveBeenCalled();
+});
+
+it("owns responsive anchor offsets per overflow cycle and removes resize work before release", () => {
+  const f = fixture();
+  const y = vi.spyOn(window, "scrollY", "get").mockReturnValue(300);
+  const add = vi.spyOn(window, "addEventListener");
+  const remove = vi.spyOn(window, "removeEventListener");
+  const style = document.documentElement.style;
+  style.setProperty("--dialog-page-scroll-y", "7px");
+  const binding = bindNativeDialog(f.dialog, {
+    ...f.options,
+    scrollLock: "document-overflow",
+  });
+  for (let index = 0; index < 10; index++) {
+    binding.sync(true);
+    y.mockReturnValue(index * 20);
+    window.dispatchEvent(new Event("resize"));
+    expect(style.getPropertyValue("--dialog-page-scroll-y")).toBe(
+      `${index * 20}px`,
+    );
+    binding.sync(false);
+    expect(style.getPropertyValue("--dialog-page-scroll-y")).toBe("7px");
+    window.dispatchEvent(new Event("resize"));
+    expect(style.getPropertyValue("--dialog-page-scroll-y")).toBe("7px");
+  }
+  binding.destroy();
+  const added = add.mock.calls.filter(([name]) => name === "resize");
+  expect(added).toHaveLength(10);
+  expect(remove.mock.calls.filter(([name]) => name === "resize")).toEqual(
+    added,
+  );
+});

@@ -18,7 +18,10 @@ import type { ScrollService } from "../scroll/ScrollService";
 import type { AnimationService } from "../animations/AnimationService";
 import type { DialogBindingFactory } from "@/domain/ports/DialogBindingPort";
 
+import type { PortfolioNavigationHandoffPort } from "@/domain/ports/PortfolioNavigationHandoffPort";
+
 export interface ServiceContextValue {
+  navigationHandoff: PortfolioNavigationHandoffPort<HTMLElement>;
   themeService: ThemeService;
   scrollService: ScrollService;
   animationService: AnimationService;
@@ -38,7 +41,10 @@ export function ServiceProvider({ children }: ServiceProviderProps) {
 
   useEffect(() => {
     services.themeService.initialize();
-    return () => services.themeService.destroy();
+    return () => {
+      services.navigationHandoff.cancel();
+      services.themeService.destroy();
+    };
   }, [services]);
 
   return (

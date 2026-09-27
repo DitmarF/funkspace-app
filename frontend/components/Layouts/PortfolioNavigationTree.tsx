@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { portfolioDestinations } from "../../data/portfolioDestinations";
+import {
+  portfolioDestinations,
+  type PortfolioDestinationKey,
+} from "../../data/portfolioDestinations";
 import {
   portfolioNavigation,
   type PortfolioNavigationItem,
@@ -9,7 +12,7 @@ import styles from "./PortfolioNavigationTree.module.css";
 
 interface Props {
   items?: readonly PortfolioNavigationItem[];
-  onNavigate?: (href: string) => void;
+  onNavigate?: (destination: PortfolioDestinationKey) => void;
 }
 
 function RowContent({ item }: { item: PortfolioNavigationItem }) {
@@ -60,9 +63,7 @@ function Rows({
               className={styles.row}
               href={portfolioDestinations[item.destination].href}
               prefetch={false}
-              onNavigate={() =>
-                onNavigate?.(portfolioDestinations[item.destination].href)
-              }
+              onNavigate={() => onNavigate?.(item.destination)}
             >
               <RowContent item={item} />
             </Link>

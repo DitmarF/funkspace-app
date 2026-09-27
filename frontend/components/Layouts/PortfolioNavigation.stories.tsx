@@ -19,7 +19,9 @@ function Fixture({ motion = false }: { motion?: boolean }) {
   const [value, onChange] = useState<MotionChoice>("system");
   return (
     <div className={shell.shell}>
-      <h1>Navigation preview</h1>
+      <main id="main-content" tabIndex={-1}>
+        <h1>Navigation preview</h1>
+      </main>
       {motion && (
         <p>
           Motion fixture only: choices are local to this story, are not saved,

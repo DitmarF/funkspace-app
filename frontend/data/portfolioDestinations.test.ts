@@ -4,13 +4,21 @@ import { portfolioDestinations } from "./portfolioDestinations";
 describe("portfolio destination contract", () => {
   it("keeps the approved section/page distinction and root-prefixed anchors", () => {
     expect(portfolioDestinations).toEqual({
-      home: { label: "FunkSpace", href: "/" },
-      start: { label: "Start", href: "/#start" },
-      about: { label: "About", href: "/#about" },
-      contact: { label: "Contact", href: "/#contact" },
-      aboutPage: { label: "More about FunkSpace", href: "/about" },
-      impressum: { label: "Legal notice", href: "/impressum" },
-      privacy: { label: "Privacy", href: "/privacy" },
+      home: { focusId: "main-content", label: "FunkSpace", href: "/" },
+      start: { focusId: "start", label: "Start", href: "/#start" },
+      about: { focusId: "about", label: "About", href: "/#about" },
+      contact: { focusId: "contact", label: "Contact", href: "/#contact" },
+      aboutPage: {
+        focusId: "main-content",
+        label: "More about FunkSpace",
+        href: "/about",
+      },
+      impressum: {
+        focusId: "main-content",
+        label: "Legal notice",
+        href: "/impressum",
+      },
+      privacy: { focusId: "main-content", label: "Privacy", href: "/privacy" },
     });
     const hrefs = Object.values(portfolioDestinations).map(({ href }) => href);
     expect(new Set(hrefs).size).toBe(hrefs.length);

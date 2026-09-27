@@ -3,7 +3,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "e2e", // keeps unit vs e2e separate
-  testIgnore: ["wave-survivor/**", "theme-bootstrap/**", "storybook/**"], // separate server configurations
+  testIgnore: [
+    "wave-survivor/**",
+    "theme-bootstrap/**",
+    "storybook/**",
+    "fixtures/**",
+  ], // separate server configurations
   timeout: 30_000,
   expect: { timeout: 5_000 },
 

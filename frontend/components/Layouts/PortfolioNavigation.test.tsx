@@ -4,8 +4,18 @@ import { describe, expect, it, vi } from "vitest";
 import PortfolioNavigation from "./PortfolioNavigation";
 import MotionChoices from "./MotionChoices";
 
+const handoff = vi.hoisted(() => ({
+  fallbackTarget: () => null,
+  arrived: vi.fn(),
+  observeDeparture: () => () => {},
+  cancelPreferred: vi.fn(),
+  cancel: vi.fn(),
+  released: vi.fn(),
+  begin: vi.fn(),
+}));
 vi.mock("@/application/providers/ServiceProvider", () => ({
   useServices: () => ({
+    navigationHandoff: handoff,
     bindDialog: (
       node: HTMLDialogElement,
       options: { onCloseRequest(reason: string): void },

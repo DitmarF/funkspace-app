@@ -165,6 +165,18 @@ imported or constrained in Domain. ThemeService/bootstrap and game boundaries
 remain unchanged. The [FS-1.6 record](tasks/fs-1.6-shared-dialog-primitive.md)
 contains the reviewed consumer contract, lifecycle policy and browser evidence.
 
+The FS-3.2 navigation consumer opts into `navigation` cleanup and the existing
+binding's `document-overflow` strategy. Other consumers retain fixed-body locking
+and dismissal restoration. Navigation suppresses all custom return targets and
+saved-scroll replay; explicit release acknowledgment runs after owned cleanup.
+A single `PortfolioNavigationHandoffPort` receipt in the existing provider bridges
+outgoing/incoming portfolio owners. It retains Next/native routing and history,
+resolves actual committed fragments, and schedules only bounded focus correction.
+It is neither another modal manager nor an every-route focus framework. Root
+cleanup cancels work; each owner removes its own browser listeners. See the
+[FS-3.2 record](tasks/fs-3.2-navigation-lifecycle.md) for the measured changed-hash
+ordering refinement, approved contract and validation limits.
+
 ## Testing Strategy
 
 - **Unit Tests**: Test domain logic and application services in isolation

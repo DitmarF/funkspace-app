@@ -111,7 +111,7 @@ test("modified link activation opens a new tab without dismissing the current ov
   try {
     await expect(popup).toHaveURL("/about");
     await expect(page.getByRole("dialog")).toBeVisible();
-    await expect(page.locator("body")).toHaveCSS("position", "fixed");
+    await expect(page.locator("body")).toHaveCSS("overflow", "hidden");
   } finally {
     await popup.close();
   }

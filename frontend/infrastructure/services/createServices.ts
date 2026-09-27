@@ -13,6 +13,8 @@ import { AnimationAdapter } from "@/infrastructure/motion/AnimationAdapter";
 import type { ServiceContextValue } from "@/application/providers/ServiceProvider";
 import { bindNativeDialog } from "@/infrastructure/dom/NativeDialogBinding";
 
+import { createPortfolioNavigationHandoff } from "@/infrastructure/dom/PortfolioNavigationHandoff";
+
 /**
  * Create all services with their dependencies
  */
@@ -33,5 +35,6 @@ export function createServices(): ServiceContextValue {
     scrollService,
     animationService,
     bindDialog: bindNativeDialog,
+    navigationHandoff: createPortfolioNavigationHandoff(),
   };
 }

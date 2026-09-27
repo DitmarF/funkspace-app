@@ -217,15 +217,24 @@
      trigger opened after a partial document scroll, without DOM effects. */
   @supports (top: anchor(--portfolio-menu top)) {
     .overlay > :first-child {
+      /* Use explicit coordinates without the implicit anchor scroll shift. */
+      position-anchor: auto;
       top: calc(
-        anchor(--portfolio-menu center) - var(--navigation-close-space) / 2
+        max(
+            var(--shell-safe-top),
+            anchor(--portfolio-menu top) - var(--dialog-page-scroll-y, 0px)
+          ) +
+          (var(--navigation-control-size) - var(--navigation-close-space)) / 2
       );
     }
 
     .overlay .rail {
-      top: anchor(--portfolio-menu top);
+      top: max(
+        var(--shell-safe-top),
+        anchor(--portfolio-menu top) - var(--dialog-page-scroll-y, 0px)
+      );
       right: anchor(--portfolio-menu right);
-      position-anchor: --portfolio-menu;
+      position-anchor: auto;
     }
   }
 

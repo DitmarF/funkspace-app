@@ -1,8 +1,17 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { flushSync } from "react-dom";
-import { usePathname } from "next/navigation";
+import { useServices } from "@/application/providers/ServiceProvider";
+import type { DialogCloseDisposition } from "@/domain/ports/DialogBindingPort";
+import { portfolioDestinations } from "@/data/portfolioDestinations";
 import Dialog from "../Controls/Dialog";
 import HexButton from "../Controls/HexButton";
 import ThemeSwitcher from "../ThemeSwitcher";
@@ -25,10 +34,35 @@ export default function PortfolioNavigation({
   const [category, setCategory] = useState<"navigation" | "a11y">("navigation");
   const detailId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const pathname = usePathname();
+  const { navigationHandoff } = useServices();
+  const disposition = useRef<DialogCloseDisposition>("dismiss");
+  const ticket = useRef<number | null>(null);
+  const [failed, setFailed] = useState(false);
+  // Resolve at use time: a route change may replace the old main before cleanup.
+  const fallback = useMemo(
+    () => ({
+      get current() {
+        return navigationHandoff.fallbackTarget();
+      },
+    }),
+    [navigationHandoff],
+  );
+  useLayoutEffect(() => {
+    const main = navigationHandoff.fallbackTarget();
+    if (main) navigationHandoff.arrived(main);
+    return navigationHandoff.observeDeparture(() => {
+      disposition.current = "navigation";
+      flushSync(() => setOpen(false));
+    });
+  }, [navigationHandoff]);
+  const dismiss = () => {
+    navigationHandoff.cancelPreferred();
+    disposition.current = "dismiss";
+    setOpen(false);
+  };
   useEffect(() => setReady(true), []);
 
-  if (!ready) return <PortfolioNavigationTree />;
+  if (!ready || failed) return <PortfolioNavigationTree />;
 
   return (
     <>
@@ -39,95 +73,116 @@ export default function PortfolioNavigation({
           aria-haspopup="dialog"
           aria-expanded={open}
           onClick={() => {
+            navigationHandoff.cancelPreferred();
+            ticket.current = null;
+            disposition.current = "dismiss";
             setCategory("navigation");
             setOpen(true);
           }}
         />
       </div>
-      {open && (
-        <Dialog
-          open={open}
-          title="Navigation and settings"
-          hideTitle
-          presentation="fullscreen"
-          className={panel.overlay}
-          onCloseRequest={() => setOpen(false)}
-          returnFocusRef={triggerRef}
-          fallbackFocusRef={triggerRef}
-        >
-          <div className={panel.layout}>
-            <section
-              id={detailId}
-              aria-labelledby={`${detailId}-title`}
-              className={panel.details}
-            >
-              <h3 id={`${detailId}-title`}>
-                {category === "navigation" ? "Navigation" : "Accessibility"}
-              </h3>
-              {category === "navigation" ? (
-                <PortfolioNavigationTree
-                  onNavigate={(href) => {
-                    // Same-page links need an unlocked document before scrolling.
-                    // Cross-page links keep the overlay until the old shell unmounts.
-                    if (href.split("#")[0] === pathname)
-                      flushSync(() => setOpen(false));
-                  }}
-                />
-              ) : (
-                <>
-                  <fieldset className={panel.group}>
-                    <legend>Appearance</legend>
-                    <ThemeSwitcher presentation="outlined" />
-                  </fieldset>
-                  {motion && <MotionChoices {...motion} />}
-                </>
-              )}
-            </section>
-          </div>
-          <div className={`${styles.launcher} ${panel.rail}`}>
-            <div
-              className={panel.categories}
-              role="group"
-              aria-label="Settings categories"
-            >
-              <HexButton
-                icon="navigation"
-                iconSize={48}
-                aria-label="Navigation"
-                title="Navigation"
-                aria-pressed={category === "navigation"}
-                aria-controls={detailId}
-                onClick={() => setCategory("navigation")}
+      <Dialog
+        open={open}
+        title="Navigation and settings"
+        hideTitle
+        presentation="fullscreen"
+        className={panel.overlay}
+        onCloseRequest={dismiss}
+        closeDispositionRef={disposition}
+        unmountDisposition="navigation"
+        scrollLock="document-overflow"
+        onReleased={() => {
+          const id = ticket.current;
+          ticket.current = null;
+          if (id !== null) navigationHandoff.released(id);
+        }}
+        onOpenError={(error) => {
+          navigationHandoff.cancel();
+          setOpen(false);
+          setFailed(true);
+          console.error(
+            "[PortfolioNavigation] Dialog unavailable; ordinary links restored",
+            error,
+          );
+        }}
+        returnFocusRef={triggerRef}
+        fallbackFocusRef={fallback}
+      >
+        <div className={panel.layout}>
+          <section
+            id={detailId}
+            aria-labelledby={`${detailId}-title`}
+            className={panel.details}
+          >
+            <h3 id={`${detailId}-title`}>
+              {category === "navigation" ? "Navigation" : "Accessibility"}
+            </h3>
+            {category === "navigation" ? (
+              <PortfolioNavigationTree
+                onNavigate={(key) => {
+                  const next = navigationHandoff.begin(
+                    portfolioDestinations[key],
+                  );
+                  ticket.current = next.id;
+                  disposition.current = "navigation";
+                  if (next.kind === "same-document")
+                    flushSync(() => setOpen(false));
+                }}
               />
-              <HexButton
-                icon="languages"
-                aria-label="Languages"
-                title="Languages"
-                disabled
-              />
-              <HexButton
-                icon="a11y"
-                aria-label="Accessibility"
-                title="Accessibility"
-                aria-pressed={category === "a11y"}
-                aria-controls={detailId}
-                onClick={() => setCategory("a11y")}
-              />
-              <HexButton
-                icon="chat-bot"
-                aria-label="Chat-bot"
-                title="Chat-bot"
-                disabled
-              />
-            </div>
+            ) : (
+              <>
+                <fieldset className={panel.group}>
+                  <legend>Appearance</legend>
+                  <ThemeSwitcher presentation="outlined" />
+                </fieldset>
+                {motion && <MotionChoices {...motion} />}
+              </>
+            )}
+          </section>
+        </div>
+        <div className={`${styles.launcher} ${panel.rail}`}>
+          <div
+            className={panel.categories}
+            role="group"
+            aria-label="Settings categories"
+          >
             <HexButton
-              variant="accent-outlined"
-              aria-label="Menu: close navigation and settings"
-              onClick={() => setOpen(false)}
+              icon="navigation"
+              iconSize={48}
+              aria-label="Navigation"
+              title="Navigation"
+              aria-pressed={category === "navigation"}
+              aria-controls={detailId}
+              onClick={() => setCategory("navigation")}
+            />
+            <HexButton
+              icon="languages"
+              aria-label="Languages"
+              title="Languages"
+              disabled
+            />
+            <HexButton
+              icon="a11y"
+              aria-label="Accessibility"
+              title="Accessibility"
+              aria-pressed={category === "a11y"}
+              aria-controls={detailId}
+              onClick={() => setCategory("a11y")}
+            />
+            <HexButton
+              icon="chat-bot"
+              aria-label="Chat-bot"
+              title="Chat-bot"
+              disabled
             />
           </div>
-        </Dialog>
-      )}
+          <HexButton
+            variant="accent-outlined"
+            aria-label="Menu: close navigation and settings"
+            onClick={dismiss}
+          />
+        </div>
+      </Dialog>
     </>
   );
 }

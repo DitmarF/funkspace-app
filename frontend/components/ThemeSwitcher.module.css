@@ -6,7 +6,8 @@
   min-width: 0;
 }
 
-.choices button[aria-pressed="true"] {
+.choices button[aria-pressed="true"],
+.choices button[aria-pressed="true"]:hover:not(:disabled) {
   --control-foreground: var(--fs-color-content-inverse);
   --control-background: var(--fs-color-content-primary);
   --control-border: var(--control-foreground);

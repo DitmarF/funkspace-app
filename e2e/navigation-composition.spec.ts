@@ -267,10 +267,16 @@ test("trigger alignment survives a scrolled header and a resize across breakpoin
   expect(await close.boundingBox()).toEqual(before);
   await expectCloseAlignment(page);
   await page.setViewportSize({ width: 320, height: 568 });
-  expect(await close.boundingBox()).toEqual(await trigger.boundingBox());
+  // Anchor positioning is recomputed after the viewport resize layout.
+  await expect(async () => {
+    expect(await close.boundingBox()).toEqual(await trigger.boundingBox());
+  }).toPass({ timeout: 2000 });
   await expectCloseAlignment(page);
   await page.setViewportSize({ width: 768, height: 1024 });
-  expect(await close.boundingBox()).toEqual(await trigger.boundingBox());
+  // Anchor positioning is recomputed after the viewport resize layout.
+  await expect(async () => {
+    expect(await close.boundingBox()).toEqual(await trigger.boundingBox());
+  }).toPass({ timeout: 2000 });
   await expectCloseAlignment(page);
   await close.click();
   await expect(trigger).toBeFocused();
