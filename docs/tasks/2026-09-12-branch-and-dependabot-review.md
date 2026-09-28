@@ -1,5 +1,9 @@
 # Repository maintenance — Branch and Dependabot review, 2026-09-12
 
+Follow-up: [2026-09-28 dependency remediation](2026-09-28-dependency-security.md)
+records the patched local graph and fresh validation. Its default-branch
+integration remains separate; the historical results below are preserved.
+
 ## Task metadata
 
 - **Status:** Complete. The [authorized integration continuation](#authorized-integration-continuation) and [execution result](#completed-integration-and-cleanup) supersede the historical retention decisions: fixes integrated, resulting revision validated, both feature branches synchronized, and all Dependabot branches removed. Owned residual advisories remain visible.
