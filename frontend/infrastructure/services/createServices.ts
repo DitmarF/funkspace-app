@@ -17,6 +17,8 @@ import { bindNativeLogoMotion } from "@/infrastructure/motion/NativeLogoMotionBi
 import { bindHomeIntro } from "@/infrastructure/motion/HomeIntroBinding";
 import { LogoMotionController } from "@/application/animations/LogoMotionController";
 import { bindNativeDialog } from "@/infrastructure/dom/NativeDialogBinding";
+import { ParticleSceneController } from "@/application/animations/ParticleSceneController";
+import { bindParticleScene } from "@/infrastructure/particles/ParticleSceneBinding";
 
 import { createPortfolioNavigationHandoff } from "@/infrastructure/dom/PortfolioNavigationHandoff";
 
@@ -46,6 +48,16 @@ export function createServices(fixture?: {
     process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED === "true";
 
   return {
+    bindParticleScene: (target, options) => {
+      const controller = new ParticleSceneController(
+        motionPolicy,
+        decorativeMotionAvailable,
+        () => bindParticleScene(target, themeService),
+        options,
+      );
+      controller.initialize();
+      return controller;
+    },
     bindHomeIntro,
     motionPolicy,
     decorativeMotionAvailable,

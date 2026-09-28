@@ -1,0 +1,32 @@
+.fixture {
+  padding: var(--fs-space-lg);
+  color: var(--fs-color-content-primary);
+  background: var(--fs-color-surface-background);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fs-space-xs);
+}
+
+.surface {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--fs-color-surface-background);
+}
+
+.compact {
+  max-width: 320px;
+}
+
+.still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: var(--fs-color-content-primary);
+}
