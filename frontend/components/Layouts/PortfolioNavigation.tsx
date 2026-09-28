@@ -35,6 +35,7 @@ export default function PortfolioNavigation({
   const [category, setCategory] = useState<"navigation" | "a11y">("navigation");
   const detailId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const disclosureRef = useRef<HTMLDetailsElement>(null);
   const { navigationHandoff } = useServices();
   const disposition = useRef<DialogCloseDisposition>("dismiss");
   const ticket = useRef<number | null>(null);
@@ -61,11 +62,20 @@ export default function PortfolioNavigation({
     disposition.current = "dismiss";
     setOpen(false);
   };
-  useEffect(() => setReady(true), []);
+  useEffect(() => {
+    const disclosure = disclosureRef.current;
+    if (!disclosure) return;
+    return navigationHandoff.whenFallbackIdle(disclosure, () => {
+      // Commit in the same idle notification, before another input can focus
+      // or reopen the native disclosure between the check and replacement.
+      flushSync(() => setReady(true));
+    });
+  }, [navigationHandoff]);
 
   if (!ready || failed)
     return (
       <details
+        ref={disclosureRef}
         className={`${styles.launcher} ${panel.fallback}`}
         data-home-menu=""
         open={failed}

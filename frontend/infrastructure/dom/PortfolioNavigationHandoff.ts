@@ -191,6 +191,37 @@ export function createPortfolioNavigationHandoff(
       const node = main();
       return usable(node) ? node : null;
     },
+    whenFallbackIdle(disclosure, notify) {
+      let disposed = false;
+      let queued = false;
+      const stop = () => {
+        disposed = true;
+        disclosure.removeEventListener("toggle", check);
+        disclosure.removeEventListener("focusout", check);
+      };
+      const check = () => {
+        if (disposed || queued) return;
+        queued = true;
+        // Focusout fires before the new active element is established. Recheck
+        // actual state at the microtask boundary, including a rapid reopen.
+        queueMicrotask(() => {
+          queued = false;
+          if (
+            disposed ||
+            !disclosure.isConnected ||
+            disclosure.hasAttribute("open") ||
+            disclosure.contains(disclosure.ownerDocument.activeElement)
+          )
+            return;
+          stop();
+          notify();
+        });
+      };
+      disclosure.addEventListener("toggle", check);
+      disclosure.addEventListener("focusout", check);
+      check();
+      return stop;
+    },
     observeDeparture(notify) {
       const doc = getDocument();
       const win = doc?.defaultView;

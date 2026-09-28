@@ -65,6 +65,8 @@ Dimi requested documentation updates, then commit and push of the completed navi
 
 ## Dimi's visual check
 
+**Review follow-up:** P2 Finding 1 identified that the initial readiness effect discarded an actively used native disclosure. The [hydration continuity correction](maintenance-navigation-hydration-continuity.md) records the actual-app reproduction, bounded deferral and focus/next-Tab evidence. The earlier pixel tests above did not establish interaction continuity; their results must not be interpreted as such.
+
 1. Open the overlay at phone and desktop widths: Menu → Navigation should have the same gap as each following pair of category controls.
 2. Resize through tablet, ordinary desktop and ultrawide: Close should remain immediately left of the heading, with the tree aligned beneath the heading. On mobile, Close should retain its position above the rail.
 3. Reload About, Privacy and Legal notice: no tree, Navigation caption or browser triangle should flash; the hex trigger should retain its position/artwork through hydration. With JavaScript disabled, use that same hex disclosure to open and close its ordinary links.

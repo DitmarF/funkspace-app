@@ -6,6 +6,15 @@ import MotionChoices from "./MotionChoices";
 
 const handoff = vi.hoisted(() => ({
   fallbackTarget: () => null,
+  whenFallbackIdle: (_node: HTMLElement, notify: () => void) => {
+    let active = true;
+    queueMicrotask(() => {
+      if (active) notify();
+    });
+    return () => {
+      active = false;
+    };
+  },
   arrived: vi.fn(),
   observeDeparture: () => () => {},
   cancelPreferred: vi.fn(),
@@ -53,7 +62,7 @@ describe("Portfolio navigation composition", () => {
   it("opens Navigation with native destinations, disabled future categories and an icon-only named trigger", async () => {
     const user = userEvent.setup();
     render(<PortfolioNavigation />);
-    const menu = screen.getByRole("button", {
+    const menu = await screen.findByRole("button", {
       name: "Menu: navigation and settings",
     });
     expect(menu.textContent).toBe("");

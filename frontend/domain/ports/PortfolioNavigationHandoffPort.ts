@@ -14,6 +14,9 @@ export interface PortfolioNavigationHandoffPort<TFocus> {
   cancelPreferred(id?: number): void;
   cancel(id?: number): void;
   fallbackTarget(): TFocus | null;
+  /** Notify once, asynchronously, when the native disclosure is closed and
+   * focus has left it. Cleanup cancels listeners and queued notification. */
+  whenFallbackIdle(disclosure: TFocus, notify: () => void): () => void;
   observeDeparture(
     notify: (cause: "history" | "fragment" | "document") => void,
   ): () => void;
