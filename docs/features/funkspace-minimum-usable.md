@@ -2,7 +2,7 @@
 
 ## Plan metadata
 
-- **Status:** Authoritative feature plan — EPICs 1–3 and FS-G1 are complete; Dimi closed EPIC 3 on 2026-09-27. The [closure and final re-review](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) and [EPIC 4 API handoff](../tasks/fs-3.6-integrated-validation.md#epic-4-implementation-handoff) are the current continuation entry points. EPIC 4 specification has started: [FS-4.1 is accepted and complete](../tasks/fs-4.1-scene-contract.md#dimi-acceptance-and-fs-41-completion--2026-09-28); FS-4.2 and runtime implementation remain not started. Content/legal/public-release limitations remain separate. Subsequent navigation maintenance is tracked below and does not reopen historical gate decisions.
+- **Status:** Authoritative feature plan — EPICs 1–3 and FS-G1 are complete; Dimi closed EPIC 3 on 2026-09-27. The [closure and final re-review](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) and [EPIC 4 API handoff](../tasks/fs-3.6-integrated-validation.md#epic-4-implementation-handoff) are the current continuation entry points. EPIC 4 specification has started: [FS-4.1 is accepted and complete](../tasks/fs-4.1-scene-contract.md#dimi-acceptance-and-fs-41-completion--2026-09-28); [FS-4.2 pure rules are implemented for review](../tasks/fs-4.2-particle-rules.md); Canvas/runtime integration remains not started. Content/legal/public-release limitations remain separate. Subsequent navigation maintenance is tracked below and does not reopen historical gate decisions.
 - **Owner/current writer:** Codex; product owner/final acceptance: Dimi. Sites supplies read-only counterpart review and later owns its assigned implementation tasks.
 - **Related epic/task:** Portfolio EPICs 0–6; publication task [FS-0.4](../tasks/fs-0.4-authoritative-feature-plan.md).
 - **Decision entry point:** [Authoritative decision register](#pending-decisions-and-latest-needed-points); [FS-0.5 technical rationale and answer provenance](../tasks/fs-0.5-product-and-technical-decisions.md). Dimi leads/approves FS-0.5; Codex is its designated documentation writer.
@@ -74,7 +74,7 @@ The shared decorative preference and production logo/settings consumption are co
 
 ### Delivery sequence
 
-Use the epic order and gates below. EPIC 3/FS-G1 is complete; EPIC 4 has an accepted FS-4.1 contract; FS-4.2 is the next task, subject to its own authorization and prerequisites. Preserve dated task-stage statuses as historical evidence: later completion decisions supersede their earlier pending wording. Do not repeat completed EPIC 3 work or skip unresolved content, asset, architecture or acceptance inputs for later tasks.
+Use the epic order and gates below. EPIC 3/FS-G1 is complete; EPIC 4 has an accepted FS-4.1 contract; FS-4.2's pure-rules candidate is awaiting its renderer checkpoint and Dimi's still feedback; FS-4.3 is not started or authorized by that work. Preserve dated task-stage statuses as historical evidence: later completion decisions supersede their earlier pending wording. Do not repeat completed EPIC 3 work or skip unresolved content, asset, architecture or acceptance inputs for later tasks.
 
 ### Rollout and rollback
 
@@ -765,7 +765,7 @@ this EPIC-level status and FS-3.6's closure supersede them. EPIC 4 is not starte
 
 ### EPIC 4 — Signature Canvas scene, replaceable SVG aperture, and customization
 
-**Current status — 2026-09-28:** FS-4.1 specification COMPLETE following Codex R2 technical PASS and Dimi’s acceptance of all product proposals. [Accepted contract and evidence](../tasks/fs-4.1-scene-contract.md). FS-4.2–FS-4.8 remain not started; no runtime implementation or final visual/performance acceptance is implied.
+**Current status — 2026-09-28:** FS-4.1 specification COMPLETE following Codex R2 technical PASS and Dimi’s acceptance of all product proposals. [Accepted contract and evidence](../tasks/fs-4.1-scene-contract.md). [FS-4.2 pure rules](../tasks/fs-4.2-particle-rules.md) are implemented for review; FS-4.3–FS-4.8 remain not started. No Canvas runtime or final visual/performance acceptance is implied.
 
 **Accepted amendment:** Replace the large Start logo with **Aperture**, a calm seeded particle field visible through a fixed SPACE cutout; retain header identity and intro/navigation. Homepage presents the scene, Pause/Resume and “Explore Aperture” linking to the approved future `/animations/aperture`. That page owns temporary count/speed/size/Reset settings and a Customize dialog using the existing shared Dialog. Coordinate only the navigation/customization pair in that shell. Initial SPACE and second original SVG exports remain outstanding. The contract supplies approved limits and the pre-scene baseline; no new performance success is claimed.
 
@@ -795,7 +795,7 @@ this EPIC-level status and FS-3.6's closure supersede them. EPIC 4 is not starte
 
 #### FS-4.2 — Implement pure particle state and update rules
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-09-28:** Pure-rules implementation candidate ready for Codex review; 64 focused domain tests, frontend/pure types and targeted lint passed. [Contracts, still fixture and exact evidence](../tasks/fs-4.2-particle-rules.md). Dimi's still feedback and the renderer checkpoint remain pending; FS-4.2 is not marked complete and no moving-scene acceptance is claimed.
 
 **Lead:** Sites
 
