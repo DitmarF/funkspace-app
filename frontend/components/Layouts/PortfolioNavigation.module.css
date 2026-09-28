@@ -5,6 +5,9 @@
 .overlay {
   --navigation-close-artwork-size: var(--fs-space-2xl);
   --navigation-rail-padding: min(var(--fs-space-xs), 8px);
+  --navigation-rail-offset: calc(
+    var(--fs-space-sm) - var(--navigation-rail-padding)
+  );
   --navigation-close-space: calc(
     var(--navigation-close-artwork-size) + 4px + 2 * var(--dialog-gutter)
   );
@@ -148,14 +151,14 @@
 
 .categories {
   position: absolute;
-  bottom: 100%;
+  bottom: calc(100% + var(--navigation-rail-offset));
   left: calc(-1 * var(--navigation-rail-padding));
   width: calc(100% + 2 * var(--navigation-rail-padding));
   max-height: calc(
     100dvh - var(--navigation-close-space) - var(--navigation-close-top) -
       var(--navigation-control-size) -
       max(var(--navigation-block-gutter), var(--shell-safe-bottom)) -
-      var(--navigation-rail-padding)
+      var(--navigation-rail-padding) - var(--navigation-rail-offset)
   );
   display: flex;
   flex-direction: column-reverse;
@@ -175,6 +178,35 @@
   --hex-size: var(--navigation-artwork-size);
 }
 
+/* The native disclosure and enhanced Menu share artwork and coordinates.
+   There is no interim text/marker to flash while application JS loads. */
+.fallback > summary {
+  --hex-size: var(--navigation-artwork-size);
+  list-style: none;
+}
+
+.fallback > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Only an explicitly opened native fallback shows its ordinary links. Keep
+   them reachable next to the trigger even when the footer is below the fold. */
+.fallback > nav {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--fs-space-sm));
+  width: min(24rem, calc(100vw - 2 * var(--shell-gutter)));
+  max-height: calc(
+    100dvh - var(--navigation-control-size) -
+      max(var(--navigation-block-gutter), var(--shell-safe-bottom)) -
+      max(var(--shell-gutter), var(--shell-safe-top)) - var(--fs-space-sm)
+  );
+  overflow: auto;
+  padding: var(--fs-space-xs);
+  background: var(--fs-color-surface-background);
+  border: 1px solid var(--fs-color-content-primary);
+}
+
 @media (max-height: 36rem) {
   .overlay {
     --navigation-close-artwork-size: min(var(--fs-space-2xl), 48px);
@@ -182,7 +214,29 @@
 }
 
 @media (min-width: 48rem) {
+  .fallback > nav {
+    top: calc(100% + var(--fs-space-sm));
+    bottom: auto;
+    max-height: calc(
+      100dvh - max(var(--fs-space-xl), var(--shell-safe-top)) -
+        var(--navigation-control-size) - var(--fs-space-sm) -
+        max(var(--shell-gutter), var(--shell-safe-bottom))
+    );
+  }
+
   .overlay {
+    /* Reserve Close beside the entire details column, including at tablet
+       widths; both move with the centered shell on ultrawide screens. */
+    --navigation-content-start: max(
+      calc(
+        max(0px, (100vw - 80rem) / 2) +
+          max(var(--shell-gutter), var(--shell-safe-left))
+      ),
+      calc(
+        var(--shell-safe-left) + var(--navigation-close-space) +
+          var(--fs-space-sm)
+      )
+    );
     --navigation-close-top: calc(
       max(var(--fs-space-xl), var(--shell-safe-top)) +
         (var(--navigation-control-size) - var(--navigation-close-space)) / 2
@@ -196,26 +250,20 @@
 
   .overlay > :first-child {
     right: auto;
-    left: var(--shell-safe-left);
-  }
-
-  .details h3 {
-    padding-inline-start: max(
-      0px,
-      calc(
-        var(--shell-safe-left) + var(--navigation-close-space) +
-          var(--fs-space-sm) - var(--navigation-content-start)
-      )
+    left: calc(
+      var(--navigation-content-start) - var(--navigation-close-space) -
+        var(--fs-space-sm)
     );
   }
 
   .categories {
-    top: 100%;
+    top: calc(100% + var(--navigation-rail-offset));
     bottom: auto;
     flex-direction: column;
     max-height: calc(
       100dvh - var(--navigation-control-size) -
-        max(var(--fs-space-xl), var(--shell-safe-top)) - var(--fs-space-md)
+        max(var(--fs-space-xl), var(--shell-safe-top)) - var(--fs-space-md) -
+        var(--navigation-rail-offset)
     );
   }
 

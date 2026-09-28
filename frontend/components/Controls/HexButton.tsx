@@ -52,6 +52,64 @@ export type HexButtonProps = Omit<
   iconSize?: IconSize;
 };
 
+function controlClassName(
+  size: HexButtonSize,
+  variant: ControlVariant,
+  caption = "",
+  className = "",
+) {
+  return `${styles.control} ${styles[size]} ${caption ? "" : styles.iconOnly} ${controlAppearanceClassName(variant)} ${className}`.trim();
+}
+
+function HexArtwork({
+  icon = "settings-burger",
+  size = "medium",
+  iconSize,
+}: Pick<HexButtonProps, "icon" | "size" | "iconSize">) {
+  const artwork = artworkBySize[size];
+  const iconDimension = iconSize
+    ? `${(iconSize / artwork.dimension) * 100}%`
+    : undefined;
+  return (
+    <span className={styles.artwork} aria-hidden="true" inert>
+      <svg
+        className={styles.shape}
+        width={artwork.dimension}
+        height={artwork.dimension}
+        viewBox={`0 0 ${artwork.dimension} ${artwork.dimension}`}
+        fill="none"
+        focusable="false"
+        aria-hidden="true"
+      >
+        {/* Size-specific Figma exports; only paint is bound to shared roles. */}
+        <path d={artwork.path} strokeWidth={artwork.stroke} />
+      </svg>
+      <Icon
+        className={styles.icon}
+        name={icon}
+        size={iconSize ?? artwork.icon}
+        style={
+          iconDimension
+            ? { width: iconDimension, height: iconDimension }
+            : undefined
+        }
+      />
+    </span>
+  );
+}
+
+/** Native navigation disclosure with the same artwork/target as Menu. */
+export function HexNavigationSummary() {
+  return (
+    <summary
+      aria-label="Navigation"
+      className={controlClassName("medium", "primary")}
+    >
+      <HexArtwork />
+    </summary>
+  );
+}
+
 const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
   (
     {
@@ -66,10 +124,6 @@ const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
     },
     ref,
   ) => {
-    const artwork = artworkBySize[size];
-    const iconDimension = iconSize
-      ? `${(iconSize / artwork.dimension) * 100}%`
-      : undefined;
     return (
       <button
         aria-label={
@@ -87,32 +141,9 @@ const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
         {...props}
         ref={ref}
         type={type}
-        className={`${styles.control} ${styles[size]} ${children ? "" : styles.iconOnly} ${controlAppearanceClassName(variant)} ${className}`.trim()}
+        className={controlClassName(size, variant, children, className)}
       >
-        <span className={styles.artwork} aria-hidden="true" inert>
-          <svg
-            className={styles.shape}
-            width={artwork.dimension}
-            height={artwork.dimension}
-            viewBox={`0 0 ${artwork.dimension} ${artwork.dimension}`}
-            fill="none"
-            focusable="false"
-            aria-hidden="true"
-          >
-            {/* Size-specific Figma exports; only paint is bound to shared roles. */}
-            <path d={artwork.path} strokeWidth={artwork.stroke} />
-          </svg>
-          <Icon
-            className={styles.icon}
-            name={icon}
-            size={iconSize ?? artwork.icon}
-            style={
-              iconDimension
-                ? { width: iconDimension, height: iconDimension }
-                : undefined
-            }
-          />
-        </span>
+        <HexArtwork icon={icon} size={size} iconSize={iconSize} />
         {children && <span className={styles.label}>{children}</span>}
       </button>
     );

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { openFallbackNavigation } from "./helpers/foundation";
 
 const available = process.env.FS35_AVAILABLE === "true";
 const shell = "[data-home-intro]";
@@ -491,6 +492,7 @@ test("failed hydration opens content after a bounded deadline", async ({
   await page.clock.runFor(5100);
   await expect(page.locator('header a[href="/"]')).toHaveCSS("opacity", "1");
   await expect(page.locator("main")).toHaveCSS("opacity", "1");
+  await openFallbackNavigation(page);
   await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
 });
 
@@ -504,6 +506,7 @@ test("no JavaScript retains static content and ordinary navigation", async ({
     await page.goto(baseURL!);
     await expect(page.locator("main")).toHaveCSS("opacity", "1");
     await expect(page.locator('header a[href="/"]')).toHaveCSS("opacity", "1");
+    await openFallbackNavigation(page);
     await page
       .getByRole("navigation", { name: "Primary" })
       .getByRole("link", { name: "About", exact: true })

@@ -60,7 +60,7 @@ for (const viewport of [
       if (viewport.width < 768) {
         expect(closeBox.y).toBeLessThan(24);
         expect(closeBox.x).toBeGreaterThan(viewport.width / 2);
-      } else expect(closeBox.x).toBeLessThan(24);
+      }
       await expectCloseAlignment(page);
       if (viewport.width < 768) {
         const rightGap = viewport.width - closeBox.x - closeBox.width;
@@ -94,9 +94,15 @@ for (const viewport of [
       const tree = (await dialog
         .getByRole("navigation", { name: "Primary" })
         .boundingBox())!;
-      expect(Math.abs(tree.x - (viewport.width - artworkRight))).toBeLessThan(
-        0.5,
-      );
+      if (viewport.width < 768)
+        expect(Math.abs(tree.x - (viewport.width - artworkRight))).toBeLessThan(
+          0.5,
+        );
+      else {
+        expect(Math.abs(tree.x - heading.x)).toBeLessThan(0.5);
+        expect(tree.x).toBeGreaterThan(closeBox.x + closeBox.width);
+        expect(tree.x - closeBox.x - closeBox.width).toBeLessThanOrEqual(32);
+      }
       await page.mouse.move(0, 0);
       await page.screenshot({
         path: info.outputPath("navigation-initial.png"),

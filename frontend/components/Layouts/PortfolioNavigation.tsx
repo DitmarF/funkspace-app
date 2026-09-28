@@ -13,7 +13,7 @@ import { useServices } from "@/application/providers/ServiceProvider";
 import type { DialogCloseDisposition } from "@/domain/ports/DialogBindingPort";
 import { portfolioDestinations } from "@/data/portfolioDestinations";
 import Dialog from "../Controls/Dialog";
-import HexButton from "../Controls/HexButton";
+import HexButton, { HexNavigationSummary } from "../Controls/HexButton";
 import ThemeSwitcher from "../ThemeSwitcher";
 import PortfolioNavigationTree from "./PortfolioNavigationTree";
 import MotionChoices, { type MotionChoicesProps } from "./MotionChoices";
@@ -65,9 +65,16 @@ export default function PortfolioNavigation({
 
   if (!ready || failed)
     return (
-      <div data-home-content="">
+      <details
+        className={`${styles.launcher} ${panel.fallback}`}
+        data-home-menu=""
+        open={failed}
+        // The native open attribute can change through user input before hydration.
+        suppressHydrationWarning
+      >
+        <HexNavigationSummary />
         <PortfolioNavigationTree />
-      </div>
+      </details>
     );
 
   return (

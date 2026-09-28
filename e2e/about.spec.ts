@@ -2,7 +2,12 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { aboutContent } from "../frontend/data/aboutContent";
 import { contactEmail } from "../frontend/data/contactContent";
-import { openSettings, selectTheme, themes } from "./helpers/foundation";
+import {
+  openSettings,
+  openFallbackNavigation,
+  selectTheme,
+  themes,
+} from "./helpers/foundation";
 
 for (const javaScriptEnabled of [true, false]) {
   test.describe(`About, JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
@@ -47,6 +52,7 @@ for (const javaScriptEnabled of [true, false]) {
         "About FunkSpace",
       );
       if (javaScriptEnabled) await openSettings(page);
+      else await openFallbackNavigation(page);
       const contact = page
         .getByRole("navigation", { name: "Primary" })
         .getByRole("link", { name: "Contact", exact: true });

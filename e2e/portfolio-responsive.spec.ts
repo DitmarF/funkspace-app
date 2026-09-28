@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { themes } from "./helpers/foundation";
+import { themes, openFallbackNavigation } from "./helpers/foundation";
 
 test.describe.configure({ mode: "parallel" });
 
@@ -221,6 +221,7 @@ test.describe("fresh no-JavaScript reading and long-content fixtures", () => {
         await page.evaluate(() =>
           document.documentElement.style.setProperty("font-size", "200%"),
         );
+        await openFallbackNavigation(page);
         await expect(
           page.getByRole("navigation", { name: "Primary" }),
         ).toBeVisible();
@@ -244,6 +245,15 @@ test.describe("fresh no-JavaScript reading and long-content fixtures", () => {
               `${"long-address".repeat(12)}@example.invalid`;
         });
         await expectDocumentFlow(page);
+        // The native fallback now opens beside the persistent hex trigger.
+        // Exercise its close action before following links behind that disclosure.
+        const fallback = page.locator('footer details[class*="fallback"]');
+        await fallback.locator(":scope > summary").focus();
+        await page.keyboard.press("Enter");
+        await expect(fallback).not.toHaveAttribute("open");
+        await expect(
+          page.getByRole("navigation", { name: "Primary" }),
+        ).toBeHidden();
         const privacy = page
           .getByRole("navigation", { name: "Footer" })
           .getByRole("link", { name: "Privacy", exact: true });

@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { openSettings, openAppearance } from "./helpers/foundation";
+import {
+  openSettings,
+  openAppearance,
+  openFallbackNavigation,
+} from "./helpers/foundation";
 
 for (const width of [320, 1280]) {
   test(`branch lines center under down arrows at ${width}px and enlarged text`, async ({
@@ -129,6 +133,7 @@ test("native groups and legal destinations work without JavaScript", async ({
   try {
     const page = await context.newPage();
     await page.goto("/");
+    await openFallbackNavigation(page);
     const nav = page.getByRole("navigation", { name: "Primary" });
     const privacy = nav.locator("summary").filter({ hasText: "Privacy" });
     await expect(privacy.locator("svg").nth(0)).toBeVisible();
@@ -138,6 +143,7 @@ test("native groups and legal destinations work without JavaScript", async ({
     await expect(privacy.locator("svg").nth(1)).toBeVisible();
     await nav.getByRole("link", { name: "Privacy policy" }).click();
     await expect(page).toHaveURL("/privacy");
+    await openFallbackNavigation(page);
     await nav.getByText("Privacy", { exact: true }).click();
     await nav.getByRole("link", { name: "Legal notice" }).click();
     await expect(page).toHaveURL("/impressum");

@@ -62,6 +62,13 @@ export async function openSettings(page: Page) {
   await expect(dialog).toBeVisible();
 }
 
+export async function openFallbackNavigation(page: Page) {
+  const fallback = page.locator("footer details").first();
+  if (!(await fallback.evaluate((node) => node.hasAttribute("open"))))
+    await fallback.locator(":scope > summary").click();
+  await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
+}
+
 export async function closeSettings(page: Page) {
   const dialog = page.getByRole("dialog", { name: "Navigation and settings" });
   await dialog.getByRole("button", { name: "Close", exact: true }).click();

@@ -25,6 +25,15 @@ describe("server-rendered portfolio documents", () => {
           <Page />
         </ServiceProvider>,
       );
+      const fallback = document.querySelector("footer details")!;
+      expect(fallback).not.toHaveAttribute("open");
+      const summary = fallback.querySelector("summary")!;
+      expect(summary).toHaveAccessibleName("Navigation");
+      expect(summary.textContent).toBe("");
+      expect(summary.querySelector("svg")).not.toBeNull();
+      expect(summary.querySelector("button, a")).toBeNull();
+      // Native disclosure remains operable without any application JavaScript.
+      fallback.setAttribute("open", "");
       expect(screen.getAllByRole("banner")).toHaveLength(1);
       expect(screen.getAllByRole("main")).toHaveLength(1);
       expect(screen.getAllByRole("contentinfo")).toHaveLength(1);
