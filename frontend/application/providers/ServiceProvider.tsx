@@ -38,6 +38,7 @@ export interface ServiceContextValue {
   bindHomeIntro(
     root: HTMLElement,
     cancelIntroduction?: () => void,
+    onContentReady?: (ready: boolean) => void,
   ): HomeIntroBinding;
   bindLogoMotion(
     root: SVGSVGElement,

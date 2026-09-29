@@ -183,7 +183,7 @@ test("all denied motion choices retain an independent static representation", as
   page,
 }) => {
   await setup(page);
-  for (const choice of ["Off", "Reduced", "Follow system"]) {
+  for (const choice of ["Off", "Follow system"]) {
     await page.getByRole("button", { name: choice, exact: true }).click();
     await page
       .getByRole("button", { name: "Start scene", exact: true })

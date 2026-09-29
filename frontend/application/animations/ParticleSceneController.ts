@@ -56,7 +56,8 @@ export class ParticleSceneController implements ParticleSceneHandle {
     return resolveMotionPermission(this.policy.getSnapshot(), {
       featureAvailable: this.available,
       optedIn: this.options.optedIn === true,
-      supportsReducedMotion: false,
+      // Explicit Reduced supports a single still draw, never continuous playback.
+      supportsReducedMotion: true,
       runtime,
       locallyPaused,
       visible:
@@ -124,7 +125,7 @@ export class ParticleSceneController implements ParticleSceneHandle {
     if (this.runtime) {
       const runtime = this.runtime;
       runtime.setVisible(this.permission("ready", false).mayRun);
-      if (this.permission().mayRun) runtime.resume();
+      if (this.permission().mayRun && !this.reducedMotion()) runtime.resume();
       else runtime.pause();
     } else if (this.binding && this.permission().mayPrepare) {
       this.prepare();
@@ -182,13 +183,27 @@ export class ParticleSceneController implements ParticleSceneHandle {
       );
   }
 
+  private reducedMotion() {
+    return this.policy.getSnapshot().preference === "reduced";
+  }
+
   getSnapshot = (): ParticleSceneSnapshot =>
     Object.freeze({
       status: this.status,
       config: this.state.config,
       locallyPaused: this.localPause,
+      reducedMotion: this.reducedMotion(),
+      paletteUnavailable:
+        this.surface.width > 0 &&
+        this.surface.height > 0 &&
+        this.surface.palette === null,
       frameReady: this.frameReady && this.permission("ready", false).mayRun,
-      presentation: this.permission().presentation,
+      presentation:
+        this.reducedMotion() &&
+        this.permission().presentation === "motion-permitted"
+          ? "hold-frame"
+          : this.permission().presentation,
+      blockers: this.permission().blockers,
     });
   getStill = () => getParticleStill(this.state);
   subscribe(listener: (snapshot: ParticleSceneSnapshot) => void) {

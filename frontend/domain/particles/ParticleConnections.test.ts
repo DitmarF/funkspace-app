@@ -148,9 +148,12 @@ describe("complete density-adjusted proximity connections", () => {
     expect(createParticleConnectionSampler()(points, bounds).count).toBe(0);
   });
   it("reduces the radius for a dense patch instead of returning an order-biased prefix", () => {
-    const points = Array.from({ length: 120 }, (_, i) => ({
-      x: (i % 10) * 4,
-      y: Math.floor(i / 10) * 4,
+    // Ensure the patch can actually exceed the authored output capacity.
+    const length = Math.ceil(Math.sqrt(2 * rules.maxLines)) + 2;
+    const columns = Math.ceil(Math.sqrt(length));
+    const points = Array.from({ length }, (_, i) => ({
+      x: (i % columns) * 4,
+      y: Math.floor(i / columns) * 4,
     }));
     const result = sampledPairs(points);
     expect(result.limited).toBe(true);

@@ -5,25 +5,9 @@
   line-height: var(--fs-line-height-tight);
 }
 
-.scene {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 343 / 503;
-  padding: var(--fs-space-lg);
-  border: 1px solid var(--fs-color-border-subtle);
-  background: var(--fs-color-surface-background);
-  pointer-events: none;
-}
-
 .introduction {
   max-width: 42rem;
   margin-top: var(--fs-space-lg);
   font-size: var(--fs-font-size-md);
   line-height: var(--fs-line-height-normal);
-}
-
-@media (min-width: 48rem) {
-  .scene {
-    aspect-ratio: 3 / 2;
-  }
 }

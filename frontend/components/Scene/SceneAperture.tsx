@@ -11,6 +11,8 @@ import styles from "./SceneAperture.module.css";
 
 interface Props {
   selection?: SceneApertureSelection;
+  /** Complete silhouette until the consumer has a valid live/held frame. */
+  showStatic?: boolean;
   onReady?(ready: boolean): void;
 }
 const circleHref =
@@ -23,11 +25,12 @@ type LoadedAsset = { selection: SceneApertureSelection; href: string };
 /** Full rectangular cover. Only the nested opening is contained/centered. */
 export default function SceneAperture({
   selection = "circle",
+  showStatic = false,
   onReady,
 }: Props) {
   const { apertureAssets } = useServices();
   const maskId = `fs-aperture-${useId().replace(/:/g, "")}`;
-  const [supported, setSupported] = useState(false);
+  const [supported, setSupported] = useState<boolean>();
   const [asset, setAsset] = useState<LoadedAsset>();
   const [loaded, setLoaded] = useState<LoadedAsset>();
   const [failed, setFailed] = useState<LoadedAsset>();
@@ -45,17 +48,20 @@ export default function SceneAperture({
     };
   }, [apertureAssets, selection]);
   useEffect(() => {
-    onReady?.(supported);
+    // Pending probing is not a failed mask: startup consumers must be able to
+    // distinguish waiting from a settled static fallback.
+    if (supported !== undefined) onReady?.(supported);
   }, [onReady, supported]);
   const href = asset?.selection === selection ? asset.href : undefined;
   const useAsset = Boolean(href && loaded === asset && failed !== asset);
+  const solid = showStatic || !supported;
   return (
     <svg
       className={styles.cover}
       aria-hidden="true"
       focusable="false"
       data-scene-aperture
-      data-mask-ready={supported}
+      data-mask-ready={supported === true}
       data-aperture={useAsset ? selection : "circle"}
     >
       <defs>
@@ -100,9 +106,9 @@ export default function SceneAperture({
         width="100%"
         height="100%"
         className={styles.paint}
-        mask={supported ? `url(#${maskId})` : undefined}
+        mask={solid ? undefined : `url(#${maskId})`}
       />
-      {!supported && (
+      {solid && (
         <svg
           x="10%"
           y="10%"

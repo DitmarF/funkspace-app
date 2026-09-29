@@ -180,7 +180,8 @@ for (const preference of ["on", "reduced"] as const) {
             "waiting",
           );
           await expect(second.locator("main")).toHaveCSS("opacity", "0");
-          await second.clock.runFor(1700);
+          // The accepted homepage logo lasts 1 s; inspect the following 400 ms menu fade.
+          await second.clock.runFor(1100);
           await finishMenuFade(second);
           await expect(second.locator(shell)).toHaveAttribute(
             "data-home-intro",

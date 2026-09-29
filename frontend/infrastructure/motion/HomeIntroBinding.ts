@@ -132,15 +132,37 @@ export function homeIntroBootstrapScript(available: boolean): string {
 export function bindHomeIntro(
   element: HTMLElement,
   cancelIntroduction?: () => void,
+  onContentReady?: (ready: boolean) => void,
 ): HomeIntroBinding {
   const root = element as IntroRoot;
   let active = true;
+  let lastReady: boolean | undefined;
+  const reportReady = () => {
+    if (!active) return;
+    const ready =
+      !root.dataset.homeIntro || root.dataset.homeIntro === "visible";
+    if (ready !== lastReady) {
+      lastReady = ready;
+      onContentReady?.(ready);
+    }
+  };
+  // Observe the existing parser fail-open as well as the normal reveal. No new clock.
+  const observer =
+    onContentReady && typeof MutationObserver !== "undefined"
+      ? new MutationObserver(reportReady)
+      : undefined;
+  observer?.observe(root, {
+    attributes: true,
+    attributeFilter: ["data-home-intro"],
+  });
+  reportReady();
   const stopObservingCancellation = cancelIntroduction
     ? root.__fsHomeIntro?.onCancelled(cancelIntroduction)
     : undefined;
   const reveal = () => {
     root.__fsHomeIntro?.reveal();
     root.dataset.homeIntro = "visible";
+    reportReady();
   };
   const ended = (event: AnimationEvent) => {
     const target = event.target as HTMLElement;
@@ -176,6 +198,7 @@ export function bindHomeIntro(
     release() {
       if (!active) return;
       active = false;
+      observer?.disconnect();
       stopObservingCancellation?.();
       root.removeEventListener("animationend", ended);
       // Strict Mode setup/cleanup before playback must not consume the parser

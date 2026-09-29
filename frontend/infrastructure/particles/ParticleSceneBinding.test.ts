@@ -92,9 +92,36 @@ function fixture() {
   };
 }
 afterEach(() => {
+  vi.useRealTimers();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   document.body.replaceChildren();
+});
+it("times out a stalled import, ignores late completion and releases its deadline", async () => {
+  vi.useFakeTimers();
+  const f = fixture();
+  let finish!: (value: typeof import("./CanvasParticleScene")) => void;
+  const binding = bindParticleScene(
+    f.host,
+    f.theme,
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const pending = binding.prepare(createParticleScene(null), () => true, {
+    frameReady: vi.fn(),
+    failed: vi.fn(),
+  });
+  const rejected = expect(pending).rejects.toThrow("timed out");
+  await vi.advanceTimersByTimeAsync(5000);
+  await rejected;
+  const createCanvasParticleScene = vi.fn();
+  finish({ createCanvasParticleScene });
+  await Promise.resolve();
+  expect(createCanvasParticleScene).not.toHaveBeenCalled();
+  expect(vi.getTimerCount()).toBe(0);
+  binding.destroy();
 });
 it("observes geometry, theme, DPR and intersection before any Canvas load", () => {
   const f = fixture();
@@ -125,6 +152,32 @@ it("observes geometry, theme, DPR and intersection before any Canvas load", () =
   expect(f.disconnectIntersection).toHaveBeenCalledTimes(1);
   expect(f.unsubscribe).toHaveBeenCalledTimes(1);
   expect(f.queries[1].removeEventListener).toHaveBeenCalledTimes(1);
+});
+it("caches immutable palette values and denies invalid or context-dependent colors", () => {
+  const f = fixture();
+  const binding = bindParticleScene(f.host, f.theme);
+  const palette = binding.getSnapshot().palette;
+  expect(Object.isFrozen(palette)).toBe(true);
+  f.visible(true);
+  expect(binding.getSnapshot().palette).toBe(palette);
+  for (const color of [
+    "",
+    "var(--missing)",
+    "not-a-color",
+    "currentColor",
+    "inherit",
+  ]) {
+    f.host.style.setProperty("--fs-color-content-primary", color);
+    f.themeChange();
+    expect(binding.getSnapshot().palette).toBeNull();
+  }
+  f.host.style.setProperty("--fs-color-content-primary", "red");
+  f.themeChange();
+  expect(binding.getSnapshot().palette).toEqual({
+    background: "white",
+    particle: "red",
+  });
+  binding.destroy();
 });
 it("does not construct after cancellation or destroy during lazy loading", async () => {
   const f = fixture();

@@ -15,6 +15,21 @@ beforeEach(() => {
   fake.load.mockReset().mockReturnValue(vi.fn());
 });
 describe("aperture composition", () => {
+  it("does not report a pending mask probe as a settled failure", () => {
+    let result!: (ready: boolean) => void;
+    fake.checkMask.mockImplementation((callback) => {
+      result = callback;
+      return vi.fn();
+    });
+    const ready = vi.fn();
+    const view = render(<SceneAperture selection="web" onReady={ready} />);
+    expect(ready).not.toHaveBeenCalled();
+    expect(
+      view.container.querySelector("[data-aperture-fallback] path"),
+    ).toBeInTheDocument();
+    act(() => result(false));
+    expect(ready).toHaveBeenCalledExactlyOnceWith(false);
+  });
   it("renders outlined WEB independently of masking and asset loading", () => {
     const html = renderToString(<SceneAperture selection="web" />);
     const wrapper = document.createElement("div");
@@ -28,6 +43,29 @@ describe("aperture composition", () => {
     const ready = vi.fn();
     render(<SceneAperture onReady={ready} />);
     expect(ready).toHaveBeenLastCalledWith(true);
+  });
+  it("reports mask readiness while holding solid WEB, then exposes the existing mask", () => {
+    const ready = vi.fn();
+    const view = render(
+      <SceneAperture selection="web" showStatic onReady={ready} />,
+    );
+    expect(ready).toHaveBeenLastCalledWith(true);
+    expect(
+      view.container.querySelector("[data-aperture-fallback] path"),
+    ).toBeInTheDocument();
+    expect(view.container.querySelector("svg > rect")).not.toHaveAttribute(
+      "mask",
+    );
+    const id = view.container.querySelector("mask")!.id;
+    view.rerender(
+      <SceneAperture selection="web" showStatic={false} onReady={ready} />,
+    );
+    expect(view.container.querySelector("[data-aperture-fallback]")).toBeNull();
+    expect(view.container.querySelector("svg > rect")).toHaveAttribute(
+      "mask",
+      `url(#${id})`,
+    );
+    expect(fake.checkMask).toHaveBeenCalledTimes(1);
   });
   it("failed selected-image decoding retains the built-in circle", () => {
     fake.load.mockImplementation((_asset, result) => {

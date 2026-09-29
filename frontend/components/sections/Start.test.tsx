@@ -12,7 +12,7 @@ describe("portfolio Start", () => {
     vi.restoreAllMocks();
   });
 
-  it("server-renders HTML copy and complete decorative branding", () => {
+  it("server-renders HTML copy and complete decorative WEB artwork", () => {
     const container = document.createElement("div");
     container.innerHTML = renderToString(
       <ServiceProvider>
@@ -21,20 +21,28 @@ describe("portfolio Start", () => {
     );
     expect(container.querySelectorAll("h1")).toHaveLength(1);
     expect(container.querySelector("h1")?.textContent).toBe("FunkSpace");
-    expect(container.querySelector("p")?.textContent).toBe(
+    expect(
+      container.querySelector("[data-start-introduction]")?.textContent,
+    ).toBe(
       "FunkSpace is a design-system-first web experience built as a PNPM workspace.",
     );
-    const logo = container.querySelector("[data-funkspace-logo]")!;
-    expect(logo.querySelectorAll("path, polygon")).toHaveLength(10);
-    expect(logo.querySelectorAll("circle")).toHaveLength(9);
+    const logo = container.querySelector("[data-aperture-fallback]")!;
+    expect(logo.querySelectorAll("path, polygon")).toHaveLength(1);
+    expect(logo.querySelectorAll("circle")).toHaveLength(0);
     expect(logo.closest('[aria-hidden="true"]')).not.toBeNull();
     expect(
       container.querySelector("h1")?.closest('[aria-hidden="true"]'),
     ).toBeNull();
     expect(container.querySelector("canvas")).toBeNull();
+    expect(
+      container.querySelectorAll(
+        "[data-start-scene] line, [data-start-scene] circle",
+      ),
+    ).toHaveLength(0);
+    expect(container.querySelector("[data-particle-static]")).toBeNull();
   });
 
-  it("never requests animation even with the feature flag on", () => {
+  it("does not animate the retired large logo; unavailable observation retains artwork", () => {
     vi.stubEnv("NEXT_PUBLIC_ANIMATIONS_ENABLED", "true");
     vi.stubGlobal(
       "matchMedia",
@@ -62,9 +70,7 @@ describe("portfolio Start", () => {
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
     expect(buildManifest).not.toHaveBeenCalled();
     expect(
-      screen.queryByRole("button", {
-        name: /next|previous|up|down|play|pause/i,
-      }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: "Pause animation" }),
+    ).toBeDisabled();
   });
 });

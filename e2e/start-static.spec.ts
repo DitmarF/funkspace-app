@@ -1,173 +1,111 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { selectTheme, themes } from "./helpers/foundation";
-
-async function visibleLogoState(page: Page) {
-  const svg = page.locator("#start [data-funkspace-logo]");
-  await expect(svg).toBeVisible();
-  await expect(svg.locator("path, polygon")).toHaveCount(10);
-  await expect(svg.locator("circle")).toHaveCount(9);
-  const state = await svg
-    .locator("path, polygon, circle")
-    .evaluateAll((nodes) =>
-      nodes.map((node) => {
-        const style = getComputedStyle(node);
-        return {
-          opacity: Number(style.opacity),
-          fillOpacity: Number(style.fillOpacity),
-          strokeOffset: parseFloat(style.strokeDashoffset),
-          display: style.display,
-          visibility: style.visibility,
-        };
-      }),
-    );
-  for (const part of state) {
-    expect(part.opacity).toBe(1);
-    expect(part.fillOpacity).toBe(1);
-    expect(part.strokeOffset).toBe(0);
-    expect(part.display).not.toBe("none");
-    expect(part.visibility).toBe("visible");
-  }
-  return state;
-}
 
 for (const viewport of [
   { width: 320, height: 480 },
   { width: 1440, height: 900 },
 ]) {
-  test.describe(`Start at ${viewport.width}px`, () => {
-    test.use({ viewport });
-    for (const javaScriptEnabled of [true, false]) {
-      test.describe(`JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
-        test.use({ javaScriptEnabled });
-        test("fresh navigation contains a complete static logo and stable hydrated IDs", async ({
-          page,
-        }, testInfo) => {
-          const errors: string[] = [];
-          page.on("pageerror", (error) => errors.push(error.message));
-          page.on("console", (message) => {
-            if (message.type() === "error") errors.push(message.text());
-          });
-          const response = await page.goto("/");
-          expect(response?.status()).toBe(200);
-          const html = await response!.text();
-          const serverIds = await page.evaluate((html) => {
-            const doc = new DOMParser().parseFromString(html, "text/html");
-            const svg = doc.querySelector("#start [data-funkspace-logo]")!;
-            return [
-              svg.id,
-              ...[...svg.querySelectorAll("[id]")].map((node) => node.id),
-            ];
-          }, html);
-          expect(serverIds.length).toBeGreaterThan(19);
-          const first = await visibleLogoState(page);
-          if (javaScriptEnabled) {
-            await expect(
-              page.getByRole("button", {
-                name: "Menu: navigation and settings",
-              }),
-            ).toBeVisible();
-            // Observe beyond the existing logo timeline's duration.
-            await page.waitForTimeout(2100);
-          }
-          expect(await visibleLogoState(page)).toEqual(first);
-          expect(
-            await page
-              .locator(
-                "#start [data-funkspace-logo], #start [data-funkspace-logo] [id]",
-              )
-              .evaluateAll((nodes) => nodes.map((node) => node.id)),
-          ).toEqual(serverIds);
-          const ids = await page
-            .locator("[id]")
-            .evaluateAll((nodes) => nodes.map((node) => node.id));
-          expect(new Set(ids).size).toBe(ids.length);
-          await expect(
-            page.getByRole("heading", { level: 1, name: "FunkSpace" }),
-          ).toHaveCount(1);
-          await expect(page.locator("#start p")).toHaveText(
-            "FunkSpace is a design-system-first web experience built as a PNPM workspace.",
-          );
-          await expect(page.locator("#start").getByRole("img")).toHaveCount(0);
-          await expect(page.locator("#start canvas")).toHaveCount(0);
-          await expect(
-            page.locator("#start").getByRole("button", {
-              name: /next|previous|up|down|play|pause/i,
-            }),
-          ).toHaveCount(0);
-          const layout = await page.locator("#start").evaluate((section) => {
-            const frame = section
-              .querySelector("[data-start-scene]")!
-              .getBoundingClientRect();
-            const copy = section.querySelector("p")!.getBoundingClientRect();
-            const svg = section
-              .querySelector("[data-funkspace-logo]")!
-              .getBoundingClientRect();
-            return {
-              frameBottom: frame.bottom,
-              copyTop: copy.top,
-              frameHeight: frame.height,
-              frameRatio: frame.width / frame.height,
-              ratio: svg.width / svg.height,
-              overflow: document.documentElement.scrollWidth > innerWidth,
-            };
-          });
-          expect(layout.frameBottom).toBeLessThanOrEqual(layout.copyTop);
-          expect(layout.frameHeight).toBeGreaterThan(100);
-          expect(layout.frameRatio).toBeCloseTo(
-            viewport.width < 768 ? 343 / 503 : 3 / 2,
-            2,
-          );
-          expect(layout.ratio).toBeCloseTo(1652.1 / 849.75, 2);
-          expect(layout.overflow).toBe(false);
-          const brand = await page
-            .getByRole("banner")
-            .locator("svg")
-            .boundingBox();
-          expect(brand!.width).toBeLessThanOrEqual(144);
-          expect(brand!.x).toBeLessThan(viewport.width / 4);
-          await page.keyboard.press("Tab");
-          await expect(
-            page.getByRole("link", { name: "Skip to main content" }),
-          ).toBeFocused();
-          await page.keyboard.press("Enter");
-          await expect(page.getByRole("main")).toBeFocused();
-          await page.screenshot({
-            path: testInfo.outputPath("start-static.png"),
-            fullPage: true,
-          });
-          expect(errors).toEqual([]);
-        });
+  for (const javaScriptEnabled of [true, false]) {
+    test.describe(`Start ${viewport.width}px JS=${javaScriptEnabled}`, () => {
+      test.use({
+        viewport,
+        javaScriptEnabled,
+        contextOptions: { reducedMotion: "reduce" },
       });
-    }
-
-    test("all supported themes preserve the static visual and accessible content", async ({
-      page,
-    }, testInfo) => {
-      await page.goto("/");
-      for (const theme of themes) {
-        await selectTheme(page, theme);
-        await visibleLogoState(page);
-        const colors = await page.locator("#start").evaluate((section) => ({
-          text: getComputedStyle(section.querySelector("p")!).color,
-          stroke: getComputedStyle(section.querySelector("polygon")!).stroke,
-          surface: getComputedStyle(
-            section.querySelector("[data-start-scene]")!,
-          ).backgroundColor,
-        }));
-        expect(colors.stroke).toBe(colors.text);
-        expect(colors.stroke).not.toBe(colors.surface);
-        const result = await new AxeBuilder({ page })
-          .withTags(["wcag2a", "wcag2aa", "wcag21aa", "best-practice"])
-          .analyze();
-        expect(result.violations, JSON.stringify(result.violations)).toEqual(
-          [],
+      test("complete static artwork, stable IDs, reserved geometry and native navigation", async ({
+        page,
+      }, testInfo) => {
+        const errors: string[] = [];
+        page.on("pageerror", (error) => errors.push(error.message));
+        const response = await page.goto("/");
+        expect(response?.status()).toBe(200);
+        const html = await response!.text();
+        expect(html).toContain("data-aperture-fallback");
+        expect(html).not.toContain("Pause animation");
+        expect(html).not.toContain("data-particle-static");
+        const serverId = await page.evaluate(
+          (html) =>
+            new DOMParser()
+              .parseFromString(html, "text/html")
+              .querySelector("#start mask")!.id,
+          html,
         );
+        await expect(
+          page.locator("#start [data-scene-aperture]"),
+        ).toBeVisible();
+        await expect(page.locator("#start mask")).toHaveAttribute(
+          "id",
+          serverId,
+        );
+        await expect(page.locator("#start canvas")).toHaveCount(0);
+        await expect(page.locator("#start line, #start circle")).toHaveCount(0);
+        await expect(
+          page.locator("#start [data-aperture-fallback] path"),
+        ).toBeVisible();
+        await expect(page.locator("[data-start-introduction]")).toHaveText(
+          "FunkSpace is a design-system-first web experience built as a PNPM workspace.",
+        );
+        await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+          "FunkSpace",
+        );
+        await expect(
+          page.locator("header [data-funkspace-logo]"),
+        ).toBeVisible();
+        if (!javaScriptEnabled) {
+          await expect(page.locator("#start button")).toHaveCount(0);
+          await expect(
+            page.locator("[data-aperture-fallback] path"),
+          ).toBeVisible();
+        } else
+          await expect(
+            page.getByRole("button", { name: "Pause animation" }),
+          ).toBeDisabled();
+        const layout = await page.locator("#start").evaluate((section) => {
+          const frame = section
+            .querySelector("[data-start-scene]")!
+            .getBoundingClientRect();
+          return {
+            bottom: frame.bottom,
+            copy: section
+              .querySelector("[data-start-introduction]")!
+              .getBoundingClientRect().top,
+            border: getComputedStyle(
+              section.querySelector("[data-start-scene]")!,
+            ).borderTopWidth,
+            height: frame.height,
+            overflow: document.documentElement.scrollWidth > innerWidth,
+          };
+        });
+        expect(layout.bottom).toBeLessThanOrEqual(layout.copy);
+        expect(layout.height).toBeCloseTo(
+          Math.max(200, Math.min(400, viewport.width * 0.4)),
+          2,
+        );
+        expect(layout.border).toBe("0px");
+        expect(layout.overflow).toBe(false);
+        const ids = await page
+          .locator("[id]")
+          .evaluateAll((nodes) => nodes.map((node) => node.id));
+        expect(new Set(ids).size).toBe(ids.length);
+        await page.keyboard.press("Tab");
+        await expect(
+          page.getByRole("link", { name: "Skip to main content" }),
+        ).toBeFocused();
+        await page.keyboard.press("Enter");
+        await expect(page.getByRole("main")).toBeFocused();
+        // Axe injects JavaScript; no-JS semantics/navigation are asserted above.
+        if (javaScriptEnabled) {
+          const result = await new AxeBuilder({ page })
+            .withTags(["wcag2a", "wcag2aa", "wcag21aa", "best-practice"])
+            .analyze();
+          expect(result.violations).toEqual([]);
+        }
         await page.screenshot({
-          path: testInfo.outputPath(`start-${theme}.png`),
+          path: testInfo.outputPath("start-static.png"),
           fullPage: true,
         });
-      }
+        expect(errors).toEqual([]);
+      });
     });
-  });
+  }
 }

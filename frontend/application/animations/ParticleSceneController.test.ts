@@ -98,9 +98,29 @@ function fixture(available = true) {
     change,
     policyListeners,
     surfaceListeners,
+    surface: (patch: Partial<ParticleSurface>) => {
+      surface = { ...surface, ...patch };
+      surfaceListeners.forEach((cb) => cb(surface));
+    },
   };
 }
 describe("particle permission orchestration", () => {
+  it("distinguishes palette rejection from unmeasured or hidden geometry without granting preparation", async () => {
+    const f = fixture();
+    expect(f.controller.getSnapshot().paletteUnavailable).toBe(false);
+    f.surface({ width: 0, height: 0, palette: null });
+    expect(f.controller.getSnapshot().paletteUnavailable).toBe(false);
+    f.surface({ width: 640, height: 360, visible: true });
+    await flush();
+    expect(f.controller.getSnapshot().paletteUnavailable).toBe(true);
+    expect(f.binding.prepare).not.toHaveBeenCalled();
+    expect(f.controller.getSnapshot().frameReady).toBe(false);
+    f.surface({ palette: { background: "white", particle: "black" } });
+    await flush();
+    expect(f.controller.getSnapshot().paletteUnavailable).toBe(false);
+    expect(f.binding.prepare).toHaveBeenCalledTimes(1);
+    f.controller.destroy();
+  });
   it("observes before loading and starts only when actually visible", async () => {
     const f = fixture();
     await flush();
@@ -127,7 +147,7 @@ describe("particle permission orchestration", () => {
       f.visibility(false);
       expect(f.controller.getSnapshot().status).toBe("unprepared");
       expect(f.attempts[0].current()).toBe(false);
-      f.controller.configure({ count: 80 });
+      f.controller.configure({ count: 84 });
       f.visibility(true);
       await flush();
       expect(f.attempts).toHaveLength(2);
@@ -141,7 +161,7 @@ describe("particle permission orchestration", () => {
       f.attempts[1].resolve(current);
       await flush();
       expect(f.controller.getSnapshot().status).toBe("ready");
-      expect(f.controller.getSnapshot().config.count).toBe(80);
+      expect(f.controller.getSnapshot().config.count).toBe(84);
       f.controller.destroy();
     },
   );
@@ -177,7 +197,7 @@ describe("particle permission orchestration", () => {
     expect(f.controller.getSnapshot().status).toBe("failed");
     f.controller.destroy();
   });
-  it.each(["system", "reduced", "off"] as const)(
+  it.each(["system", "off"] as const)(
     "%s stays static with device reduction and never loads",
     async (preference) => {
       const f = fixture();
@@ -189,6 +209,36 @@ describe("particle permission orchestration", () => {
       f.controller.destroy();
     },
   );
+  it("Reduced prepares a visible still, never resumes, and preserves local Pause", async () => {
+    const f = fixture();
+    f.change({ preference: "reduced" });
+    f.visibility(true);
+    await flush();
+    const runtime = f.runtime();
+    f.attempts[0].resolve(runtime);
+    await flush();
+    expect(runtime.setVisible).toHaveBeenLastCalledWith(true);
+    expect(runtime.pause).toHaveBeenCalled();
+    expect(runtime.resume).not.toHaveBeenCalled();
+    expect(f.controller.getSnapshot()).toMatchObject({
+      reducedMotion: true,
+      locallyPaused: false,
+      presentation: "hold-frame",
+    });
+    f.controller.resume();
+    expect(runtime.resume).not.toHaveBeenCalled();
+    f.controller.pause();
+    f.change({ preference: "on" });
+    expect(runtime.resume).not.toHaveBeenCalled();
+    f.controller.resume();
+    expect(runtime.resume).toHaveBeenCalledTimes(1);
+    f.change({ preference: "reduced" });
+    expect(f.attempts).toHaveLength(1);
+    expect(runtime.reset).not.toHaveBeenCalled();
+    f.change({ documentVisible: false });
+    expect(runtime.setVisible).toHaveBeenLastCalledWith(false);
+    f.controller.destroy();
+  });
   it("feature denial, pending policy, intro, cover and occlusion deny preparation", async () => {
     const off = fixture(false);
     off.visibility(true);

@@ -1,6 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { ScenePresentationContext } from "./ScenePresentationContext";
 import { useServices } from "@/application/providers/ServiceProvider";
 import { HomeIntroScript } from "@/application/providers/HomeIntroScript";
 import type { HomeIntroBinding } from "@/domain/ports/HomeIntroPort";
@@ -21,6 +29,12 @@ export default function PortfolioShell({
   animateIdentity?: boolean;
 }) {
   const root = useRef<HTMLDivElement>(null);
+  const [introReady, setIntroReady] = useState(!animateIdentity);
+  const [occluded, setOccluded] = useState(false);
+  const presentation = useMemo(
+    () => ({ introReady, occluded }),
+    [introReady, occluded],
+  );
   const intro = useRef<HomeIntroBinding | null>(null);
   const identity = useRef<LogoMotionRef>(null);
   const state = useRef<LogoPlaybackState>("pending");
@@ -31,8 +45,10 @@ export default function PortfolioShell({
   }, []);
   useEffect(() => {
     if (!animateIdentity || !root.current) return;
-    const binding = bindHomeIntro(root.current, () =>
-      identity.current?.cancelIntroduction(),
+    const binding = bindHomeIntro(
+      root.current,
+      () => identity.current?.cancelIntroduction(),
+      setIntroReady,
     );
     intro.current = binding;
     binding.logoState(state.current);
@@ -90,7 +106,9 @@ export default function PortfolioShell({
         padding="none"
         className={`${styles.frame} ${styles.main}`}
       >
-        {children}
+        <ScenePresentationContext.Provider value={presentation}>
+          {children}
+        </ScenePresentationContext.Provider>
       </Container>
       <Container
         as="footer"
@@ -98,7 +116,7 @@ export default function PortfolioShell({
         padding="none"
         className={`${styles.frame} ${styles.footer}`}
       >
-        <PortfolioNavigation />
+        <PortfolioNavigation onOcclusionChange={setOccluded} />
         <nav aria-label="Footer" data-home-content="">
           <ul className={styles.links}>
             <li>

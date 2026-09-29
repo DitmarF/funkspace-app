@@ -88,6 +88,7 @@ If a requested change conflicts with these boundaries, stop and propose the smal
 - Dimi's homepage-sequence amendment permits a bounded pre-paint content hide only for eligible full-document homepage introductions: logo completion starts the menu hex-button fade, then the rest of the content fades in. Off, unavailable motion, no-JS, section/history navigation and failed startup retain accessible static content. Interaction exits the reveal; never make content depend indefinitely on animation or replay it on settings changes.
 - Prevent layout shift. For motion, prefer transform and opacity, reserve layout space, and avoid repeated layout reads or writes.
 - Keep client bundles small; split heavy, optional browser code and avoid dependencies that duplicate existing capabilities.
+- Do not render particle fields or their connection graphs as large SVG/DOM constructs on production pages, including SSR, hidden trees, loading/error fallbacks and future customization previews. Use the bounded Canvas adapter for permitted particle rendering; retain its frozen frame when eligible and ready, and use lightweight independent artwork such as solid WEB when preparation is denied or unavailable. Never initialize denied Canvas just to make a fallback. Simple SVG logos, silhouettes and aperture masks remain appropriate. See [particle rendering and fallback cost](docs/architecture.md#particle-rendering-and-fallback-cost) for the diagnostic-fixture boundary and regression checks.
 - Validate and sanitize untrusted input at system boundaries. Never expose secrets in client code, logs, fixtures, or documentation.
 
 ## Development workflow
@@ -150,7 +151,7 @@ Before handing off code, run at minimum type checking, linting, and the affected
 - Treat the experience as a feature with explicit rules, controls, lifecycle, accessibility fallback, performance budget, and test plan.
 - Keep rules, scoring, state transitions, collision/math, and seeded randomness in pure Domain modules. Inject clocks, randomness, persistence, audio, input, and renderers through ports/adapters so tests stay deterministic.
 - Keep the animation/game loop out of React render. Start it only when needed; pause it when hidden or inactive; cancel animation frames, observers, listeners, audio, and timers on teardown.
-- Use SVG first for accessible, themeable DOM-driven graphics. Move heavy 2D scenes, particles, or large object counts to Canvas only after measurement. Use WebGL for justified 3D or scale requirements, behind a renderer boundary.
+- Use SVG for small accessible, themeable graphics; use the existing bounded Canvas boundary for particle fields and dense connection graphs, following the production fallback rule above. Measure HTML/DOM and startup/interaction costs instead of assuming a static SVG is cheap. Use WebGL for justified 3D or scale requirements, behind a renderer boundary.
 - Reuse motion tokens and typed manifests/configuration. Give interactive targets stable identifiers and validate manifest/config input before playback.
 - Provide equivalent keyboard, pointer, and touch controls where applicable; preserve focus and reading order; never trap scrolling or focus.
 - Reduced motion must disable or simplify nonessential movement without removing content, instructions, controls, or completion paths.

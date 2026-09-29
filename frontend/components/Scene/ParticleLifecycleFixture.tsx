@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PARTICLE_SETTINGS } from "@/domain/particles/ParticleSettings";
 import SceneAperture from "./SceneAperture";
 import type { SceneApertureSelection } from "@/data/sceneApertures";
 import ThemeSwitcher from "../ThemeSwitcher";
 import { FunkSpaceLogoInline } from "../Logo/FunkSpaceLogoInline";
-import { createParticleConnectionSampler } from "@/domain/particles/ParticleConnections";
+import ParticleStill from "./ParticleStill";
 import { useServices } from "@/application/providers/ServiceProvider";
 import {
   createParticleScene,
@@ -49,12 +49,6 @@ export default function ParticleLifecycleFixture({
   );
   const [snapshot, setSnapshot] = useState<ParticleSceneSnapshot>();
   const [still, setStill] = useState(fallback);
-  const connections = useMemo(() => {
-    const sample = createParticleConnectionSampler(
-      (index) => still.particles[index].radius,
-    )(still.particles, still.bounds);
-    return sample.links.slice(0, sample.count);
-  }, [still]);
   const [preference, setPreference] = useState<MotionPreference>("system");
   useEffect(
     () =>
@@ -201,33 +195,11 @@ export default function ParticleLifecycleFixture({
         >
           {/* Fractional positions fill every aspect ratio; radii stay in CSS px.
               This also works before observation, after destroy and on failure. */}
-          <svg
+          <ParticleStill
+            still={still}
+            hidden={Boolean(showCanvas)}
             className={styles.still}
-            style={{ visibility: showCanvas ? "hidden" : "visible" }}
-            aria-hidden="true"
-            data-particle-static
-          >
-            {connections.map((link) => (
-              <line
-                key={`${link.from}:${link.to}`}
-                x1={`${(still.particles[link.from].x / (still.bounds?.width ?? 640)) * 100}%`}
-                y1={`${(still.particles[link.from].y / (still.bounds?.height ?? 360)) * 100}%`}
-                x2={`${(still.particles[link.to].x / (still.bounds?.width ?? 640)) * 100}%`}
-                y2={`${(still.particles[link.to].y / (still.bounds?.height ?? 360)) * 100}%`}
-                stroke="currentColor"
-                strokeWidth={link.width}
-                opacity={link.opacity}
-              />
-            ))}
-            {still.particles.map((particle) => (
-              <circle
-                key={particle.id}
-                cx={`${(particle.x / (still.bounds?.width ?? 640)) * 100}%`}
-                cy={`${(particle.y / (still.bounds?.height ?? 360)) * 100}%`}
-                r={particle.radius}
-              />
-            ))}
-          </svg>
+          />
         </div>
         {aperture && (
           <SceneAperture selection={selection} onReady={coverChanged} />

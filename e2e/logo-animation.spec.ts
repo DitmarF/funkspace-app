@@ -119,14 +119,14 @@ for (const width of [320, 1280]) {
       expect((await samples()).every((s) => s.partsComplete)).toBe(true);
       if (!available)
         expect((await samples()).every((s) => s.opacity === 1)).toBe(true);
-      expect(
-        await isComplete(page, "[data-start-scene] [data-funkspace-logo]"),
-      ).toBe(true);
+      await expect(
+        page.locator("[data-start-scene] [data-scene-aperture]"),
+      ).toBeVisible();
       await appearance(page);
       await expect(
         page.getByRole("button", { name: "Reduced", exact: true }),
       ).toHaveAttribute("aria-pressed", "true");
-      await expect(page.getByRole("status")).toHaveText(
+      await expect(page.getByRole("dialog").getByRole("status")).toHaveText(
         available
           ? "The logo uses a gentle fade-in. Decorative scenes stay still."
           : "Animation is currently unavailable.",
@@ -162,7 +162,7 @@ for (const width of [320, 1280]) {
       await expect(
         page.getByRole("button", { name: "On", exact: true }),
       ).toHaveAttribute("aria-pressed", "true");
-      await expect(page.getByRole("status")).toHaveText(
+      await expect(page.getByRole("dialog").getByRole("status")).toHaveText(
         available
           ? "Animation is on, regardless of your device’s reduced-motion setting."
           : "Animation is currently unavailable.",
@@ -215,9 +215,9 @@ for (const width of [320, 1280]) {
           }),
         ).toHaveAttribute("aria-pressed", "true");
         expect(await isComplete(page)).toBe(true);
-        expect(
-          await isComplete(page, "[data-start-scene] [data-funkspace-logo]"),
-        ).toBe(true);
+        await expect(
+          page.locator("[data-start-scene] [data-scene-aperture]"),
+        ).toBeVisible();
         expect(await partialCount(page)).toBe(0);
       });
     }
@@ -231,9 +231,9 @@ for (const width of [320, 1280]) {
       if (available)
         await expect.poll(() => partialCount(page)).toBeGreaterThan(0);
       await expect.poll(() => isComplete(page)).toBe(true);
-      expect(
-        await isComplete(page, "[data-start-scene] [data-funkspace-logo]"),
-      ).toBe(true);
+      await expect(
+        page.locator("[data-start-scene] [data-scene-aperture]"),
+      ).toBeVisible();
       if (!available) expect(await partialCount(page)).toBe(0);
       const prior = await partialCount(page);
       await appearance(page);
@@ -368,6 +368,7 @@ test("live Motion controls and explanation remain reachable on a short screen wi
   await off.click();
   await expect(off).toBeInViewport();
   const status = page
+    .getByRole("dialog")
     .getByRole("status")
     .filter({ hasText: "Decorative animation is off." });
   await status.scrollIntoViewIfNeeded();

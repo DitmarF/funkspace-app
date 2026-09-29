@@ -1,6 +1,7 @@
 import type { ThemeService } from "@/application/theme/ThemeService";
 import type {
   ParticleSceneBinding,
+  ParticlePalette,
   ParticleSurface,
 } from "@/domain/ports/ParticleScenePort";
 
@@ -15,6 +16,8 @@ export function bindParticleScene(
   let active = true;
   let intersecting = false;
   let observedBounds: Pick<DOMRectReadOnly, "width" | "height"> | undefined;
+  let cachedPalette: ParticlePalette | null = null;
+  const colorProbe = host.ownerDocument.createElement("span").style;
   let snapshot: ParticleSurface = {
     width: 0,
     height: 0,
@@ -24,6 +27,7 @@ export function bindParticleScene(
   };
   const listeners = new Set<(value: ParticleSurface) => void>();
   const releases: (() => void)[] = [];
+  const preparations = new Set<() => void>();
   let releaseResolution = () => {};
   const publish = () => {
     if (active) for (const listener of listeners) listener(snapshot);
@@ -54,17 +58,32 @@ export function bindParticleScene(
     const particle = style
       .getPropertyValue("--fs-color-content-primary")
       .trim();
-    const valid = (color: string) =>
-      color !== "" &&
-      !color.includes("var(") &&
-      (win.CSS?.supports?.("color", color) ?? true);
+    const valid = (color: string) => {
+      if (
+        !color ||
+        /var\(|currentcolor|^(inherit|initial|unset|revert|revert-layer)$/i.test(
+          color,
+        )
+      )
+        return false;
+      colorProbe.color = "";
+      colorProbe.color = color;
+      return (
+        colorProbe.color !== "" && (win.CSS?.supports?.("color", color) ?? true)
+      );
+    };
+    if (!valid(background) || !valid(particle)) cachedPalette = null;
+    else if (
+      cachedPalette?.background !== background ||
+      cachedPalette.particle !== particle
+    )
+      cachedPalette = Object.freeze({ background, particle });
     snapshot = {
       width,
       height,
       dpr: win.devicePixelRatio,
       visible: host.isConnected && intersecting,
-      palette:
-        valid(background) && valid(particle) ? { background, particle } : null,
+      palette: cachedPalette,
     };
     publish();
   };
@@ -87,7 +106,11 @@ export function bindParticleScene(
     listeners.clear();
     let first: unknown;
     let failed = false;
-    for (const release of [() => releaseResolution(), ...releases.splice(0)]) {
+    for (const release of [
+      ...preparations,
+      () => releaseResolution(),
+      ...releases.splice(0),
+    ]) {
       try {
         release();
       } catch (error) {
@@ -143,7 +166,25 @@ export function bindParticleScene(
     },
     async prepare(state, current, events) {
       if (!active || !current()) throw new Error("Scene preparation canceled");
-      const module = await load();
+      // Match the aperture capability probe's bounded startup fallback. This is
+      // a failure deadline, never a reveal delay or an automatic retry clock.
+      let timeout: number | undefined;
+      let cancel = () => {};
+      const stopped = new Promise<never>((_resolve, reject) => {
+        cancel = () => reject(new Error("Scene preparation canceled"));
+        timeout = win.setTimeout(
+          () => reject(new Error("Scene preparation timed out")),
+          5000,
+        );
+      });
+      preparations.add(cancel);
+      let module: Awaited<ReturnType<typeof load>>;
+      try {
+        module = await Promise.race([load(), stopped]);
+      } finally {
+        win.clearTimeout(timeout);
+        preparations.delete(cancel);
+      }
       if (!active || !current() || !snapshot.palette)
         throw new Error("Scene preparation canceled");
       const runtime = module.createCanvasParticleScene(

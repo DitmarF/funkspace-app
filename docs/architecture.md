@@ -78,6 +78,19 @@ animation-end events. The launcher and footer links are separate targets within
 the same footer; no second navigation owner or modal is introduced.
 The shell preserves server-rendered children and native links; no-JS/blocked
 inline script keeps them visible. No theme-bootstrap source or pipeline changes.
+FS-4.5 adds an optional content-readiness callback to that same intro binding.
+It observes the existing root state (including parser fail-open), without a new
+timer. A per-shell presentation context forwards actual reveal readiness and
+navigation occlusion to Start's service-created particle controller. Dialog
+release clears occlusion; Dialog still owns focus and scroll behavior. The
+controller consumes the provider's motion policy/resolver and exposes its
+blockers for accessible local Pause/Resume explanations. No consumer initializes
+or disposes shared services. Start reuses the trusted aperture's solid WEB
+silhouette when Canvas preparation is denied or fails; a ready locally paused
+Canvas retains its frame. The pure-data particle SVG preview remains fixture-only.
+The infrastructure binding caches validated, immutable semantic palette values;
+theme events recolor the existing runtime without changing particles or intent.
+See the [FS-4.5 record](tasks/fs-4.5-scene-policy-and-themes.md).
 The Reduced-logo amendment adds an optional `supportsReducedMotion` capability
 to the pure resolver; existing consumers default to static under Reduced. The
 logo alone supplies the implemented whole-artwork fade. Its binding accepts
@@ -244,10 +257,70 @@ port: browser infrastructure validates repository exports, loads the exact
 validated bytes, and performs a bounded mask pixel probe. Cancellable operations
 own no scene clock, persistent settings or shared-service lifecycle. The existing
 particle controller receives only `coverReady`; geometry and asset selection
-never enter particle state or Canvas drawing. Mask-independent outlined Work Sans SPACE covers failed masking for that selection;
+never enter particle state or Canvas drawing. The existing mask-independent Work Sans Black WEB silhouette covers failed masking for that selection;
 the circle remains the load fallback and other diagnostic selections' static art.
 Dimi authorized repository-authored SVGs; Illustrator delivery is no longer required. See [FS-4.4](tasks/fs-4.4-svg-aperture.md) for the
 strict export profile, replacement proof and outstanding browser/asset acceptance.
+
+Under Dimi's [R15 amendment](tasks/fs-4.1-scene-contract.md#r15--lightweight-homepage-fallback--2026-09-29),
+Start also selects that solid WEB silhouette during SSR/no-JS, pending, denied
+or failed runtime states. The aperture's `showStatic` presentation input never
+changes its mask-capability readiness report, preventing preparation deadlock.
+Only a valid permitted live/locally paused Canvas frame exposes the aperture.
+Start imports no particle SVG preview; the pure-data `ParticleStill` remains
+available to the diagnostic fixture. R15 itself changed no controller, permission or frame owner.
+
+Under [R16](tasks/fs-4.1-scene-contract.md#r16--reduced-still-canvas-and-web-readiness-reveal--2026-09-29),
+the particle controller declares the existing resolver’s reduced capability for
+an explicit Reduced **still**: prepare once, keep the runtime paused, and allow
+only visible dirty redraws. It exposes Reduced separately from local Pause;
+shared policy/resolver and the Canvas frame owner stay unchanged. Start reveals
+the WEB scene once after a valid frame, retaining observable reserved geometry
+and the original intro/navigation handoff. The infrastructure binding bounds
+optional module loading to 5 s, clears its deadline on settlement/destroy and
+ignores late completion; timeout is a failure fallback, never a reveal clock.
+The controller also exposes `paletteUnavailable` when measured positive geometry
+has no validated palette. Start settles to independent solid WEB for this case,
+while the existing resolver gate still denies Canvas preparation. Unmeasured or
+temporarily hidden geometry alone does not settle the initial reveal. Valid
+palette recovery uses the existing binding observation and never replays the fade.
+
+### Particle rendering and fallback cost
+
+Dimi's 2026-09-29 rule prohibits large SVG/DOM particle and connection constructs
+on production pages. This includes server HTML, hidden or memoized trees,
+loading/error/static fallbacks and future customization previews. Hiding nodes
+does not remove transfer, parsing, hydration or reconciliation cost. Combining
+thousands of particles/segments into one oversized SVG path is not a substitute
+for keeping the representation lightweight.
+
+Use the bounded Canvas adapter for permitted particle rendering. An eligible,
+ready scene can keep its frozen Canvas; explicit Reduced uses the approved
+paused Canvas alternative. Denied/unavailable preparation, no-JS and failures
+use independent, lightweight artwork such as the solid WEB silhouette. Never
+prepare a denied Canvas solely to obtain fallback pixels. Keep small SVG logos,
+icons, silhouettes and the trusted aperture cover/mask: this rule concerns dense
+simulation geometry, not SVG as a format.
+
+The existing `ParticleStill` diagnostic representation remains confined to the
+particle sandbox. Do not import it into Start, shared shell code or production
+customization UI, or preload its graph data with a public page. This documented
+fixture boundary does not approve it as a production fallback or require a new
+preview renderer in the current task.
+
+Reviewers must inspect production HTML size, SVG/DOM node counts, initial bundle
+imports and interaction/reveal behavior when scene representations change.
+Retain Start's server/browser regressions excluding particle circles, connection
+lines and `data-particle-static` while proving complete no-JS/error artwork.
+Check aggregate path/data size too; a low node count alone is insufficient.
+Use repeatable production measurements and the existing performance criteria;
+do not add an arbitrary budget or call a frozen scene free of cost.
+
+The [FS-4.5 solid-fallback measurement](tasks/fs-4.5-scene-policy-and-themes.md#solid-web-homepage-fallback--2026-09-29)
+recorded uncompressed homepage HTML shrinking from 1,957,350 to 63,248 bytes
+after removing 9,570 connection lines and 600 particle circles. That historical
+600-particle comparison motivates the rule; it is not a fresh measurement of
+the current tuning, compressed transfer, or sustained device performance.
 
 ## Testing Strategy
 

@@ -1,0 +1,42 @@
+.scene {
+  position: relative;
+  overflow: hidden;
+  height: clamp(200px, 40vw, 400px);
+  background: var(--fs-color-surface-background);
+  color: var(--fs-color-content-primary);
+  pointer-events: none;
+}
+.runtime {
+  position: absolute;
+  inset: 0;
+}
+/* Parser-owned intro hides eligible SSR content before hydration. No-JS and
+   fail-open markup remain visible; only this decorative scene waits for a draw. */
+:global([data-home-intro]:not([data-home-intro="visible"]))
+  .scene[data-scene-reveal="pending"],
+.scene[data-scene-reveal="waiting"] {
+  opacity: 0;
+}
+.scene[data-scene-reveal="fade"] {
+  animation: sceneReadyIn var(--fs-motion-duration-400)
+    var(--fs-motion-easing-ease-out) both;
+}
+@keyframes sceneReadyIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.controls {
+  display: grid;
+  gap: var(--fs-space-md);
+  margin-top: var(--fs-space-md);
+}
+.action {
+  min-height: var(--fs-space-3xl);
+}
+.controls p {
+  min-height: 3lh;
+}

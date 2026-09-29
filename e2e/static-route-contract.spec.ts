@@ -142,12 +142,14 @@ for (const javaScriptEnabled of [true, false]) {
         await expectVisibleBrand(page);
         await expectSemanticsAndSkip(page);
         if (entry.route === "/") {
-          await expect(page.locator("#start p")).toHaveText(startIntroduction);
+          await expect(page.locator("[data-start-introduction]")).toHaveText(
+            startIntroduction,
+          );
           await expect(page.locator("#about p[lang=la]")).toHaveText(
             aboutContent.preview,
           );
           await expect(
-            page.locator("#start [data-funkspace-logo]"),
+            page.locator("#start [data-scene-aperture]"),
           ).toBeVisible();
         } else if (entry.route === "/about") {
           await expect(page.locator("article p[lang=la]")).toHaveText([

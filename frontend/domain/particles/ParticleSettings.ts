@@ -48,8 +48,8 @@ export const PARTICLE_SETTINGS: ParticleSettings = Object.freeze({
   // Future controls consume these same defaults, clamps and steps.
   controls: Object.freeze({
     count: Object.freeze({ default: 200, min: 20, max: 200, step: 2 }),
-    speed: Object.freeze({ default: 0.5, min: 0.05, max: 1, step: 0.05 }),
-    size: Object.freeze({ default: 3, min: 1, max: 6, step: 0.5 }),
+    speed: Object.freeze({ default: 0.4, min: 0.2, max: 0.6, step: 0.1 }),
+    size: Object.freeze({ default: 1, min: 0.5, max: 2, step: 0.1 }),
   }),
   particles: Object.freeze({
     seed: 0x46533431,
@@ -64,7 +64,7 @@ export const PARTICLE_SETTINGS: ParticleSettings = Object.freeze({
     densityTargetLines: 1000, // Formula input, not a promised output line count.
     densityTargetPerParticle: 0.5,
     lineBudgetPerParticle: 24, // × count.max = buffer/output ceiling.
-    widthCssPx: 1.2,
+    widthCssPx: 0.4,
     opacity: 1,
     referenceRadiusCssPx: 2,
     sizeScale: Object.freeze([0.8, 1.5] as const),

@@ -24,11 +24,13 @@ import panel from "./PortfolioNavigation.module.css";
 export interface PortfolioNavigationProps {
   /** Optional controlled story/test fixture; production uses the shared authority. */
   motion?: MotionChoicesProps;
+  onOcclusionChange?: (occluded: boolean) => void;
 }
 
 /** Progressively enhance ordinary footer links with the shared modal. */
 export default function PortfolioNavigation({
   motion,
+  onOcclusionChange,
 }: PortfolioNavigationProps) {
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
@@ -100,6 +102,7 @@ export default function PortfolioNavigation({
             ticket.current = null;
             disposition.current = "dismiss";
             setCategory("navigation");
+            onOcclusionChange?.(true);
             setOpen(true);
           }}
         />
@@ -115,11 +118,13 @@ export default function PortfolioNavigation({
         unmountDisposition="navigation"
         scrollLock="document-overflow"
         onReleased={() => {
+          onOcclusionChange?.(false);
           const id = ticket.current;
           ticket.current = null;
           if (id !== null) navigationHandoff.released(id);
         }}
         onOpenError={(error) => {
+          onOcclusionChange?.(false);
           navigationHandoff.cancel();
           setOpen(false);
           setFailed(true);

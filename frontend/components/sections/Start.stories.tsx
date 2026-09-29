@@ -17,4 +17,9 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Static: Story = {};
+export const Static: Story = {
+  parameters: { decorativeMotionAvailable: false },
+};
+export const Motion: Story = {
+  parameters: { decorativeMotionAvailable: true },
+};

@@ -66,8 +66,13 @@ export type ParticleSceneSnapshot = Readonly<{
   status: ConsumerMotionInputs["runtime"];
   config: ParticleConfig;
   locallyPaused: boolean;
+  /** Explicit Reduced renders a still without changing the user's local Pause. */
+  reducedMotion: boolean;
+  /** Measured geometry has no valid palette; independent artwork can be shown. */
+  paletteUnavailable: boolean;
   frameReady: boolean;
   presentation: MotionPermission["presentation"];
+  blockers: MotionPermission["blockers"];
 }>;
 
 export interface ParticleSceneHandle {

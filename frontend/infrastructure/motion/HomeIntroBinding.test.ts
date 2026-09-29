@@ -34,6 +34,42 @@ function start(available = true) {
   new Function(homeIntroBootstrapScript(available))();
 }
 
+it("reports actual content visibility, parser fail-open and terminal unsubscribe", async () => {
+  start();
+  const changed = vi.fn();
+  const binding = bindHomeIntro(root, undefined, changed);
+  expect(changed).toHaveBeenLastCalledWith(false);
+  binding.logoState("running");
+  binding.logoState("completed");
+  await Promise.resolve();
+  expect(changed).toHaveBeenCalledTimes(1);
+  window.dispatchEvent(new Event("pointerdown"));
+  await Promise.resolve();
+  expect(changed).toHaveBeenLastCalledWith(true);
+  binding.release();
+  root.dataset.homeIntro = "preparing";
+  await Promise.resolve();
+  expect(changed).toHaveBeenCalledTimes(2);
+});
+
+it("waits through fading until the existing content animation ends", () => {
+  start();
+  const changed = vi.fn();
+  const binding = bindHomeIntro(root, undefined, changed);
+  binding.logoState("running");
+  binding.logoState("completed");
+  root
+    .querySelector("[data-home-menu]")!
+    .dispatchEvent(new Event("animationend", { bubbles: true }));
+  expect(root.dataset.homeIntro).toBe("fading");
+  expect(changed).toHaveBeenLastCalledWith(false);
+  root
+    .querySelector("[data-home-content]")!
+    .dispatchEvent(new Event("animationend", { bubbles: true }));
+  expect(changed).toHaveBeenLastCalledWith(true);
+  binding.release();
+});
+
 it.each(["deadline", "interaction"])(
   "%s cancellation survives late binding and Strict Mode subscription replacement",
   (reason) => {
