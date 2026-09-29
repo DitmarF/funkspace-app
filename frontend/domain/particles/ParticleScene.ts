@@ -1,10 +1,17 @@
 import { clamp } from "@funkspace/common/motion";
 
-export type ParticleConfig = Readonly<{
-  count: number;
-  speed: number;
-  size: number;
-}>;
+import {
+  PARTICLE_SETTINGS,
+  DEFAULT_PARTICLE_CONFIG,
+  DEFAULT_PARTICLE_SEED,
+  type ParticleConfig,
+} from "./ParticleSettings";
+export {
+  DEFAULT_PARTICLE_CONFIG,
+  DEFAULT_PARTICLE_SEED,
+  MAX_PARTICLE_COUNT,
+  type ParticleConfig,
+} from "./ParticleSettings";
 
 /** Simulation dimensions and positions are CSS pixels, never backing pixels. */
 export type ParticleBounds = Readonly<{ width: number; height: number }>;
@@ -46,13 +53,6 @@ export type ParticleStill = Readonly<{
   }>[];
 }>;
 
-export const DEFAULT_PARTICLE_SEED = 0x46533431;
-export const DEFAULT_PARTICLE_CONFIG: ParticleConfig = Object.freeze({
-  count: 120,
-  speed: 1,
-  size: 1,
-});
-
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -75,15 +75,24 @@ function normalize(
   return Number(clamp(minimum + rounded * step, minimum, maximum).toFixed(2));
 }
 
+function normalizeSetting(
+  value: unknown,
+  previous: number,
+  key: keyof ParticleConfig,
+): number {
+  const { min, max, step } = PARTICLE_SETTINGS.controls[key];
+  return normalize(value, previous, min, max, step);
+}
+
 function effectiveConfig(
   input: unknown,
   previous: ParticleConfig,
 ): ParticleConfig {
   if (!isRecord(input)) return previous;
   return Object.freeze({
-    count: normalize(input.count, previous.count, 40, 240, 10),
-    speed: normalize(input.speed, previous.speed, 0.25, 2, 0.05),
-    size: normalize(input.size, previous.size, 0.75, 2, 0.05),
+    count: normalizeSetting(input.count, previous.count, "count"),
+    speed: normalizeSetting(input.speed, previous.speed, "speed"),
+    size: normalizeSetting(input.size, previous.size, "size"),
   });
 }
 
@@ -132,8 +141,10 @@ function createParticle(
   const x = wrap(sample() * bounds.width, bounds.width);
   const y = wrap(sample() * bounds.height, bounds.height);
   const direction = sample() * 2 * Math.PI;
-  const speed = 8 + sample() * 16;
-  const baseRadius = 1 + sample() * 2;
+  const [minSpeed, maxSpeed] = PARTICLE_SETTINGS.particles.speedCssPxPerSecond;
+  const speed = minSpeed + sample() * (maxSpeed - minSpeed);
+  const [minRadius, maxRadius] = PARTICLE_SETTINGS.particles.radiusCssPx;
+  const baseRadius = minRadius + sample() * (maxRadius - minRadius);
   return {
     id,
     x,
@@ -213,13 +224,17 @@ export function resizeParticleScene(
   return true;
 }
 
-/** Apply 0–50 ms; excess is dropped. The eventual adapter supplies zero on resume. */
+/** Apply the configured bounded delta; excess is dropped. The eventual adapter supplies zero on resume. */
 export function advanceParticles(
   state: ParticleSceneState,
   deltaMilliseconds: unknown,
 ): number {
   if (state.suspended || !state.bounds || !finite(deltaMilliseconds)) return 0;
-  const elapsed = clamp(deltaMilliseconds, 0, 50);
+  const elapsed = clamp(
+    deltaMilliseconds,
+    0,
+    PARTICLE_SETTINGS.simulation.maxDeltaMs,
+  );
   if (elapsed === 0) return 0;
   const seconds = (elapsed / 1000) * state.config.speed;
   for (const particle of state.particles) {

@@ -1,8 +1,11 @@
+import { PARTICLE_SETTINGS as settings } from "@/domain/particles/ParticleSettings";
+import { createParticleConnectionSampler } from "@/domain/particles/ParticleConnections";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createCanvasParticleScene } from "./CanvasParticleScene";
 import {
   createParticleScene,
   getParticleStill,
+  configureParticles,
 } from "@/domain/particles/ParticleScene";
 
 function fixture() {
@@ -74,6 +77,30 @@ afterEach(() => {
 });
 
 describe("Canvas particle ownership", () => {
+  it("draws the same size-dependent links as the independent still after a size change", () => {
+    const f = fixture();
+    configureParticles(f.state, { size: 2 });
+    const strokes: { width: number; opacity: number }[] = [];
+    f.context.stroke.mockImplementation(() => {
+      strokes.push({
+        width: f.context.lineWidth,
+        opacity: f.context.globalAlpha,
+      });
+    });
+    f.runtime.setVisible(true);
+    f.tick(0);
+    const still = getParticleStill(f.state);
+    const sample = createParticleConnectionSampler(
+      (i) => still.particles[i].radius,
+    )(still.particles, still.bounds);
+    expect(strokes).toEqual(
+      sample.links
+        .slice(0, sample.count)
+        .map(({ width, opacity }) => ({ width, opacity })),
+    );
+    expect(strokes.length).toBeGreaterThan(0);
+    f.runtime.destroy();
+  });
   it("draws proximity lines before opaque particles in the same frame", () => {
     const f = fixture();
     f.runtime.setVisible(true);
@@ -84,7 +111,12 @@ describe("Canvas particle ownership", () => {
     );
     expect(f.context.globalAlpha).toBe(1);
     expect(f.context.strokeStyle).toBe(f.palette.particle);
-    expect(f.context.lineWidth).toBe(1);
+    expect(f.context.lineWidth).toBeGreaterThanOrEqual(
+      settings.connections.widthCssPx * settings.connections.sizeScale[0],
+    );
+    expect(f.context.lineWidth).toBeLessThanOrEqual(
+      settings.connections.widthCssPx * settings.connections.sizeScale[1],
+    );
     expect(f.pending.size).toBe(0);
     f.runtime.destroy();
   });

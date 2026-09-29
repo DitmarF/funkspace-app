@@ -235,6 +235,20 @@ cleanup cancels work; each owner removes its own browser listeners. See the
 [FS-3.2 record](tasks/fs-3.2-navigation-lifecycle.md) for the measured changed-hash
 ordering refinement, approved contract and validation limits.
 
+### Trusted scene aperture
+
+FS-4.4 keeps the SVG cover in Presentation. Its full-rectangle luminance mask
+uses independently fitted native SVG images, with stable React instance IDs.
+The existing composition root supplies the small, stateless `ApertureAssets`
+port: browser infrastructure validates repository exports, loads the exact
+validated bytes, and performs a bounded mask pixel probe. Cancellable operations
+own no scene clock, persistent settings or shared-service lifecycle. The existing
+particle controller receives only `coverReady`; geometry and asset selection
+never enter particle state or Canvas drawing. Mask-independent outlined Work Sans SPACE covers failed masking for that selection;
+the circle remains the load fallback and other diagnostic selections' static art.
+Dimi authorized repository-authored SVGs; Illustrator delivery is no longer required. See [FS-4.4](tasks/fs-4.4-svg-aperture.md) for the
+strict export profile, replacement proof and outstanding browser/asset acceptance.
+
 ## Testing Strategy
 
 - **Unit Tests**: Test domain logic and application services in isolation

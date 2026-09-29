@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --workspace-root build:theme-bootstrap && pnpm --filter @funkspace/wave-survivor build && next dev -p 3000",
-    "build": "pnpm --workspace-root build:theme-bootstrap && pnpm --filter @funkspace/wave-survivor build && next build",
+    "build": "pnpm --workspace-root check:scene-apertures && pnpm --workspace-root build:theme-bootstrap && pnpm --filter @funkspace/wave-survivor build && next build",
     "start": "next start",
     "lint": "next lint",
     "build:tokens": "pnpm --workspace-root build:tokens",
     "storybook": "pnpm -F frontend build:tokens && storybook dev -p 6006",
-    "storybook:build": "pnpm -F frontend build:tokens && storybook build"
+    "storybook:build": "pnpm --workspace-root check:scene-apertures && pnpm -F frontend build:tokens && storybook build"
   },
   "dependencies": {
     "@funkspace/common": "workspace:*",

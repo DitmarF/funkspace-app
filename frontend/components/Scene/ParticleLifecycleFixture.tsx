@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  createParticleConnectionSampler,
-  PARTICLE_CONNECTIONS,
-} from "@/domain/particles/ParticleConnections";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { PARTICLE_SETTINGS } from "@/domain/particles/ParticleSettings";
+import SceneAperture from "./SceneAperture";
+import type { SceneApertureSelection } from "@/data/sceneApertures";
+import ThemeSwitcher from "../ThemeSwitcher";
+import { FunkSpaceLogoInline } from "../Logo/FunkSpaceLogoInline";
+import { createParticleConnectionSampler } from "@/domain/particles/ParticleConnections";
 import { useServices } from "@/application/providers/ServiceProvider";
 import {
   createParticleScene,
+  DEFAULT_PARTICLE_CONFIG,
   getParticleStill,
+  MAX_PARTICLE_COUNT,
 } from "@/domain/particles/ParticleScene";
 import type {
   ParticleSceneHandle,
@@ -24,16 +28,31 @@ const fallback = getParticleStill(
 );
 
 /** Diagnostic only. No automatic mount, homepage integration or product aperture. */
-export default function ParticleLifecycleFixture() {
+export default function ParticleLifecycleFixture({
+  aperture = false,
+}: {
+  aperture?: boolean;
+}) {
   const services = useServices();
   const host = useRef<HTMLDivElement>(null);
   const handle = useRef<ParticleSceneHandle | undefined>(undefined);
   const [mounted, setMounted] = useState(false);
-  const [compact, setCompact] = useState(false);
+  const [fixtureSize, setFixtureSize] = useState<
+    "standard" | "compact" | "large"
+  >("standard");
+  const [short, setShort] = useState(false);
+  const [selection, setSelection] = useState<SceneApertureSelection>("web");
+  const [coverReady, setCoverReady] = useState(!aperture);
+  const coverChanged = useCallback(
+    (ready: boolean) => setCoverReady(ready),
+    [],
+  );
   const [snapshot, setSnapshot] = useState<ParticleSceneSnapshot>();
   const [still, setStill] = useState(fallback);
   const connections = useMemo(() => {
-    const sample = createParticleConnectionSampler()(still.particles);
+    const sample = createParticleConnectionSampler(
+      (index) => still.particles[index].radius,
+    )(still.particles, still.bounds);
     return sample.links.slice(0, sample.count);
   }, [still]);
   const [preference, setPreference] = useState<MotionPreference>("system");
@@ -48,7 +67,11 @@ export default function ParticleLifecycleFixture() {
     if (!mounted || !host.current) return;
     const scene = services.bindParticleScene(host.current, {
       optedIn: true,
-      presentation: { introReady: true, coverReady: true, occluded: false },
+      presentation: {
+        introReady: true,
+        coverReady: !aperture,
+        occluded: false,
+      },
     });
     handle.current = scene;
     const release = scene.subscribe((value) => {
@@ -61,23 +84,54 @@ export default function ParticleLifecycleFixture() {
       release();
       scene.destroy();
     };
-  }, [services, mounted]);
+  }, [services, mounted, aperture]);
+  useEffect(() => {
+    handle.current?.setPresentation({
+      introReady: true,
+      coverReady,
+      occluded: false,
+    });
+  }, [coverReady, mounted]);
   const showCanvas =
     mounted &&
     snapshot?.frameReady &&
     snapshot.presentation !== "complete-static";
   return (
     <main className={styles.fixture}>
-      <h1>Particle lifecycle fixture</h1>
+      <h1>
+        {aperture
+          ? "Aperture replacement fixture"
+          : "Particle lifecycle fixture"}
+      </h1>
       <p>
-        Unmasked diagnostic for FS-4.3. Start explicitly; motion choices and the
-        build availability flag still apply. This is not the homepage animation.
+        {aperture
+          ? "FS-4.4 Work Sans WEB and repository-authored diamond diagnostic."
+          : "Unmasked diagnostic for FS-4.3."}{" "}
+        Start explicitly; motion choices and the build availability flag still
+        apply. This is not the homepage animation.
       </p>
+      {aperture && <ThemeSwitcher presentation="outlined" />}
       <MotionChoices
         value={preference}
         onChange={(value) => services.motionPolicy.setPreference(value)}
       />
       <div className={styles.controls}>
+        {aperture && (
+          <>
+            <Button
+              onClick={() =>
+                setSelection((value) =>
+                  value === "web" ? "technical-diamond" : "web",
+                )
+              }
+            >
+              Replace aperture
+            </Button>
+            <Button onClick={() => setShort((value) => !value)}>
+              Toggle short frame
+            </Button>
+          </>
+        )}
         <Button onClick={() => setMounted((value) => !value)}>
           {mounted ? "Destroy scene" : "Start scene"}
         </Button>
@@ -94,14 +148,36 @@ export default function ParticleLifecycleFixture() {
         <Button disabled={!mounted} onClick={() => handle.current?.reset()}>
           Reset seeded state
         </Button>
-        <Button onClick={() => setCompact((value) => !value)}>
+        <Button
+          onClick={() =>
+            setFixtureSize((value) =>
+              value === "standard"
+                ? "compact"
+                : value === "compact"
+                  ? "large"
+                  : "standard",
+            )
+          }
+        >
           Resize fixture
         </Button>
         <Button
           disabled={!mounted}
           onClick={() =>
             handle.current?.configure({
-              count: snapshot?.config.count === 120 ? 240 : 120,
+              count:
+                snapshot?.config.count === DEFAULT_PARTICLE_CONFIG.count
+                  ? DEFAULT_PARTICLE_CONFIG.count === MAX_PARTICLE_COUNT
+                    ? Math.max(
+                        PARTICLE_SETTINGS.controls.count.min,
+                        Math.floor(
+                          MAX_PARTICLE_COUNT /
+                            2 /
+                            PARTICLE_SETTINGS.controls.count.step,
+                        ) * PARTICLE_SETTINGS.controls.count.step,
+                      )
+                    : MAX_PARTICLE_COUNT
+                  : DEFAULT_PARTICLE_CONFIG.count,
             })
           }
         >
@@ -110,42 +186,73 @@ export default function ParticleLifecycleFixture() {
       </div>
       <p role="status">
         {mounted ? (snapshot?.status ?? "unprepared") : "unmounted"} ·{" "}
-        {snapshot?.config.count ?? 120} particles
+        {snapshot?.config.count ?? DEFAULT_PARTICLE_CONFIG.count} particles ·{" "}
+        {fixtureSize} frame
       </p>
       <div
-        ref={host}
-        className={`${styles.surface} ${compact ? styles.compact : ""}`}
+        className={`${styles.surface} ${fixtureSize === "compact" ? styles.compact : fixtureSize === "large" ? styles.large : ""} ${short ? styles.short : ""}`}
         data-particle-fixture
+        data-fixture-size={fixtureSize}
       >
-        <svg
-          className={styles.still}
-          style={{ visibility: showCanvas ? "hidden" : "visible" }}
-          viewBox={`0 0 ${still.bounds?.width ?? 640} ${still.bounds?.height ?? 360}`}
-          aria-hidden="true"
-          data-particle-static
+        <div
+          ref={host}
+          className={styles.runtime}
+          style={{ opacity: coverReady ? 1 : 0 }}
         >
-          {connections.map((link) => (
-            <line
-              key={`${link.from}:${link.to}`}
-              x1={still.particles[link.from].x}
-              y1={still.particles[link.from].y}
-              x2={still.particles[link.to].x}
-              y2={still.particles[link.to].y}
-              stroke="currentColor"
-              strokeWidth={PARTICLE_CONNECTIONS.width}
-              opacity={link.opacity}
-            />
-          ))}
-          {still.particles.map((particle) => (
-            <circle
-              key={particle.id}
-              cx={particle.x}
-              cy={particle.y}
-              r={particle.radius}
-            />
-          ))}
-        </svg>
+          {/* Fractional positions fill every aspect ratio; radii stay in CSS px.
+              This also works before observation, after destroy and on failure. */}
+          <svg
+            className={styles.still}
+            style={{ visibility: showCanvas ? "hidden" : "visible" }}
+            aria-hidden="true"
+            data-particle-static
+          >
+            {connections.map((link) => (
+              <line
+                key={`${link.from}:${link.to}`}
+                x1={`${(still.particles[link.from].x / (still.bounds?.width ?? 640)) * 100}%`}
+                y1={`${(still.particles[link.from].y / (still.bounds?.height ?? 360)) * 100}%`}
+                x2={`${(still.particles[link.to].x / (still.bounds?.width ?? 640)) * 100}%`}
+                y2={`${(still.particles[link.to].y / (still.bounds?.height ?? 360)) * 100}%`}
+                stroke="currentColor"
+                strokeWidth={link.width}
+                opacity={link.opacity}
+              />
+            ))}
+            {still.particles.map((particle) => (
+              <circle
+                key={particle.id}
+                cx={`${(particle.x / (still.bounds?.width ?? 640)) * 100}%`}
+                cy={`${(particle.y / (still.bounds?.height ?? 360)) * 100}%`}
+                r={particle.radius}
+              />
+            ))}
+          </svg>
+        </div>
+        {aperture && (
+          <SceneAperture selection={selection} onReady={coverChanged} />
+        )}
       </div>
+      {aperture && (
+        <div className={styles.gallery} data-aperture-gallery>
+          <FunkSpaceLogoInline className={styles.identity} />
+          {(["web", "circle", "technical-diamond"] as const).map((shape) => (
+            <div key={shape} className={styles.thumbnail}>
+              <svg className={styles.still} aria-hidden="true">
+                {fallback.particles.map((particle) => (
+                  <circle
+                    key={particle.id}
+                    cx={`${(particle.x / 640) * 100}%`}
+                    cy={`${(particle.y / 360) * 100}%`}
+                    r={particle.radius}
+                  />
+                ))}
+              </svg>
+              <SceneAperture selection={shape} />
+            </div>
+          ))}
+        </div>
+      )}
       <p>
         The static representation is independent of Canvas. Reset here resets
         the current seeded configuration and retains local Pause; product Reset

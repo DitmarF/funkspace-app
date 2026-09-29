@@ -1,3 +1,4 @@
+import { PARTICLE_SETTINGS } from "@/domain/particles/ParticleSettings";
 import {
   advanceParticles,
   resetParticles,
@@ -10,10 +11,7 @@ import type {
   ParticleRuntimeEvents,
   ParticleSceneRuntime,
 } from "@/domain/ports/ParticleScenePort";
-import {
-  createParticleConnectionSampler,
-  PARTICLE_CONNECTIONS,
-} from "@/domain/particles/ParticleConnections";
+import { createParticleConnectionSampler } from "@/domain/particles/ParticleConnections";
 
 /** Canvas and its single frame chain are owned by exactly this instance. */
 export function createCanvasParticleScene(
@@ -38,7 +36,9 @@ export function createCanvasParticleScene(
   let epoch = 0;
   let lastTime: number | undefined;
   let palette = initialPalette;
-  const sampleConnections = createParticleConnectionSampler();
+  const sampleConnections = createParticleConnectionSampler(
+    (index) => state.particles[index].baseRadius * state.config.size,
+  );
 
   const readiness = (next: boolean) => {
     if (ready === next) return;
@@ -100,13 +100,13 @@ export function createCanvasParticleScene(
     context.fillStyle = palette.background;
     context.globalAlpha = 1;
     context.fillRect(0, 0, state.bounds.width, state.bounds.height);
-    const connections = sampleConnections(state.particles);
+    const connections = sampleConnections(state.particles, state.bounds);
     context.strokeStyle = palette.particle;
-    context.lineWidth = PARTICLE_CONNECTIONS.width;
     for (let i = 0; i < connections.count; i++) {
       const link = connections.links[i];
       const from = state.particles[link.from],
         to = state.particles[link.to];
+      context.lineWidth = link.width;
       context.globalAlpha = link.opacity;
       context.beginPath();
       context.moveTo(from.x, from.y);
@@ -171,6 +171,7 @@ export function createCanvasParticleScene(
       fail(error);
     }
   };
+  const raster = PARTICLE_SETTINGS.raster;
   const geometry = (value: ParticleGeometry) => {
     const old = state.bounds;
     const oldScale = scale;
@@ -181,14 +182,18 @@ export function createCanvasParticleScene(
     scale = valid
       ? Math.min(
           dpr,
-          2,
-          4096 / value.width,
-          4096 / value.height,
-          Math.sqrt(4000000 / value.width) / Math.sqrt(value.height),
+          raster.maxDpr,
+          raster.maxDimensionPx / value.width,
+          raster.maxDimensionPx / value.height,
+          Math.sqrt(raster.maxPixels / value.width) / Math.sqrt(value.height),
         )
       : 0;
-    const width = valid ? Math.min(4096, Math.floor(value.width * scale)) : 0;
-    const height = valid ? Math.min(4096, Math.floor(value.height * scale)) : 0;
+    const width = valid
+      ? Math.min(raster.maxDimensionPx, Math.floor(value.width * scale))
+      : 0;
+    const height = valid
+      ? Math.min(raster.maxDimensionPx, Math.floor(value.height * scale))
+      : 0;
     validRaster = width > 0 && height > 0;
     if (!validRaster) {
       dirty = true;

@@ -19,6 +19,7 @@ import { LogoMotionController } from "@/application/animations/LogoMotionControl
 import { bindNativeDialog } from "@/infrastructure/dom/NativeDialogBinding";
 import { ParticleSceneController } from "@/application/animations/ParticleSceneController";
 import { bindParticleScene } from "@/infrastructure/particles/ParticleSceneBinding";
+import { apertureAssets } from "@/infrastructure/particles/ApertureAssets";
 
 import { createPortfolioNavigationHandoff } from "@/infrastructure/dom/PortfolioNavigationHandoff";
 
@@ -48,6 +49,7 @@ export function createServices(fixture?: {
     process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED === "true";
 
   return {
+    apertureAssets,
     bindParticleScene: (target, options) => {
       const controller = new ParticleSceneController(
         motionPolicy,

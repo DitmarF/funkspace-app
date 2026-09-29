@@ -38,7 +38,8 @@
     "lhci:build": "pnpm build",
     "lhci:off": "cross-env NEXT_PUBLIC_ANIMATIONS_ENABLED=false pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.off.json",
     "lhci:on": "cross-env NEXT_PUBLIC_ANIMATIONS_ENABLED=true pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.on.json",
-    "lhci:ci": "pnpm run lhci:off && pnpm run lhci:on"
+    "lhci:ci": "pnpm run lhci:off && pnpm run lhci:on",
+    "check:scene-apertures": "node --import tsx scripts/check-scene-apertures.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",

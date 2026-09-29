@@ -1,5 +1,9 @@
 # FS-4.3 — Canvas rendering and lifecycle adapter
 
+## Current renderer checkpoint — 2026-09-29
+
+The combined FS-4.2–FS-4.4 review and correction re-review are recorded in [FS-4.4 R2 closure](fs-4.4-svg-aperture.md#codex-r2-closure-and-authorized-delivery--2026-09-29). Codex returned PASS for F1–F3 against the exact candidate; all three findings are closed. [Current authoring settings](fs-4-particle-settings.md#current-tuning--2026-09-29-fs-44b-correction) supersede dated numeric amendments below. Earlier pending-review statements and measurements are historical. This does not confer Dimi visual acceptance, final device/performance acceptance or task/EPIC closure. The current instruction authorizes documentation reconciliation and commit/push of the reviewed candidate only.
+
 ## Documentation and commit/push authorization — 2026-09-28
 
 Dimi explicitly requested: **“update the documentation, then commit and push the changes.”** This authorizes this documentation amendment and the complete 19-file connected-particle FS-4.3 candidate on `feature/funkspace-minimum-usable`. It does not approve the provisional connection styling/density, confer independent renderer-review PASS or visual acceptance, close FS-4.3, start FS-4.4, or authorize deployment.

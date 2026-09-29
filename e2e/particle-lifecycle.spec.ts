@@ -1,5 +1,19 @@
+import {
+  DEFAULT_PARTICLE_CONFIG,
+  MAX_PARTICLE_COUNT,
+  PARTICLE_SETTINGS,
+} from "../frontend/domain/particles/ParticleSettings";
 import { expect, test, type Page } from "@playwright/test";
 
+const alternateCount =
+  DEFAULT_PARTICLE_CONFIG.count === MAX_PARTICLE_COUNT
+    ? Math.max(
+        PARTICLE_SETTINGS.controls.count.min,
+        Math.floor(
+          MAX_PARTICLE_COUNT / 2 / PARTICLE_SETTINGS.controls.count.step,
+        ) * PARTICLE_SETTINGS.controls.count.step,
+      )
+    : MAX_PARTICLE_COUNT;
 const available = process.env.FS35_AVAILABLE === "true";
 const route = "/sandbox/particles/lifecycle";
 const canvas = "canvas[data-particle-canvas]";
@@ -114,15 +128,32 @@ test("explicit start, local Pause, one still redraw, resize and remount", async 
   await expect(page.locator(canvas)).toBeVisible();
   await expect.poll(() => draws(page)).toBeGreaterThan(2);
   await page.getByRole("button", { name: "Pause scene", exact: true }).click();
+  await expect(page.getByRole("status")).toContainText(
+    `${DEFAULT_PARTICLE_CONFIG.count} particles`,
+  );
   const held = await draws(page);
   await page.waitForTimeout(150);
   expect(await draws(page)).toBe(held);
   await page
     .getByRole("button", { name: "Toggle particle count", exact: true })
     .click();
+  await expect(page.getByRole("status")).toContainText(
+    `${alternateCount} particles`,
+  );
+  await expect(page.locator(`${still} circle`)).toHaveCount(alternateCount);
   await expect.poll(() => draws(page)).toBe(held + 1);
   await page.waitForTimeout(100);
   expect(await draws(page)).toBe(held + 1);
+  await page
+    .getByRole("button", { name: "Toggle particle count", exact: true })
+    .click();
+  await expect(page.getByRole("status")).toContainText(
+    `${DEFAULT_PARTICLE_CONFIG.count} particles`,
+  );
+  await expect(page.locator(`${still} circle`)).toHaveCount(
+    DEFAULT_PARTICLE_CONFIG.count,
+  );
+  await expect.poll(() => draws(page)).toBe(held + 2);
   await page
     .getByRole("button", { name: "Resize fixture", exact: true })
     .click();
@@ -201,6 +232,9 @@ test("zero geometry recovers, offscreen suspends, context loss is terminal", asy
   });
   await expect(page.locator(canvas)).not.toBeVisible();
   await page.waitForTimeout(50);
+  await expect(page.getByRole("status")).toContainText(
+    `${DEFAULT_PARTICLE_CONFIG.count} particles`,
+  );
   const held = await draws(page);
   await page.waitForTimeout(100);
   expect(await draws(page)).toBe(held);
@@ -234,9 +268,63 @@ test("static fixture remains visible without JavaScript", async ({
     const page = await context.newPage();
     await page.goto(`${baseURL}${route}`);
     await expect(page.locator(still)).toBeVisible();
-    await expect(page.locator(`${still} circle`)).toHaveCount(120);
+    await expect(page.locator(`${still} circle`)).toHaveCount(
+      DEFAULT_PARTICLE_CONFIG.count,
+    );
     await expect(page.locator(canvas)).toHaveCount(0);
   } finally {
     await context.close();
+  }
+});
+
+test("resize cycles compact, large and standard without replacing the paused runtime", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await setup(page);
+  await page.getByRole("button", { name: "Start scene", exact: true }).click();
+  if (available) {
+    await expect(page.locator(canvas)).toBeVisible();
+    await page
+      .getByRole("button", { name: "Pause scene", exact: true })
+      .click();
+  }
+  const original = available
+    ? await page.locator(canvas).elementHandle()
+    : null;
+  for (const [size, width] of [
+    ["compact", 320],
+    ["large", 1280],
+    ["standard", 640],
+  ] as const) {
+    await page
+      .getByRole("button", { name: "Resize fixture", exact: true })
+      .click();
+    await expect(page.locator(host)).toHaveAttribute("data-fixture-size", size);
+    await expect
+      .poll(async () => (await page.locator(host).boundingBox())?.width)
+      .toBe(width);
+    await expect(page.getByRole("status")).toContainText(
+      `${DEFAULT_PARTICLE_CONFIG.count} particles`,
+    );
+    if (original) {
+      expect(
+        await original.evaluate(
+          (node) =>
+            node === document.querySelector("canvas[data-particle-canvas]"),
+        ),
+      ).toBe(true);
+      await expect(
+        page.getByRole("button", { name: "Resume scene", exact: true }),
+      ).toBeVisible();
+      const pixels = await page
+        .locator(canvas)
+        .evaluate(
+          (node) =>
+            (node as HTMLCanvasElement).width *
+            (node as HTMLCanvasElement).height,
+        );
+      expect(pixels).toBeLessThanOrEqual(4_000_000);
+    }
   }
 });

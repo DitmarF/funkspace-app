@@ -19,6 +19,7 @@ import type { AnimationService } from "../animations/AnimationService";
 import type { DialogBindingFactory } from "@/domain/ports/DialogBindingPort";
 import type { HomeIntroBinding } from "@/domain/ports/HomeIntroPort";
 import type { ParticleSceneFactory } from "@/domain/ports/ParticleScenePort";
+import type { ApertureAssets } from "@/domain/ports/ApertureAssetPort";
 
 import type { PortfolioNavigationHandoffPort } from "@/domain/ports/PortfolioNavigationHandoffPort";
 import type {
@@ -32,6 +33,7 @@ import type {
 } from "../animations/LogoMotionController";
 
 export interface ServiceContextValue {
+  apertureAssets: ApertureAssets;
   bindParticleScene: ParticleSceneFactory<HTMLElement>;
   bindHomeIntro(
     root: HTMLElement,

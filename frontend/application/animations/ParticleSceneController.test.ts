@@ -1,3 +1,4 @@
+import { DEFAULT_PARTICLE_CONFIG } from "@/domain/particles/ParticleSettings";
 import { describe, expect, it, vi } from "vitest";
 import { ParticleSceneController } from "./ParticleSceneController";
 import type { MotionSnapshot } from "@/domain/motion/MotionPolicy";
@@ -104,7 +105,9 @@ describe("particle permission orchestration", () => {
     const f = fixture();
     await flush();
     expect(f.attempts).toHaveLength(0);
-    expect(f.controller.getStill().particles).toHaveLength(120);
+    expect(f.controller.getStill().particles).toHaveLength(
+      DEFAULT_PARTICLE_CONFIG.count,
+    );
     f.visibility(true);
     await flush();
     expect(f.attempts).toHaveLength(1);

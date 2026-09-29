@@ -1,5 +1,23 @@
 # FS-4.2 — Pure particle state and update rules
 
+## Current renderer checkpoint — 2026-09-29
+
+The combined FS-4.2–FS-4.4 review and correction re-review are recorded in [FS-4.4 R2 closure](fs-4.4-svg-aperture.md#codex-r2-closure-and-authorized-delivery--2026-09-29). Codex returned PASS for F1–F3 against the exact candidate; all three findings are closed. [Current authoring settings](fs-4-particle-settings.md#current-tuning--2026-09-29-fs-44b-correction) supersede dated numeric amendments below. Earlier pending-review statements and measurements are historical. This does not confer Dimi visual acceptance, final device/performance acceptance or task/EPIC closure. The current instruction authorizes documentation reconciliation and commit/push of the reviewed candidate only.
+
+[FS-4.1 R10](fs-4.1-scene-contract.md#r10--every-nearby-pair-without-grid-grouping) restores seeded radii to 1–3 CSS px and replaces cell-prioritised degree quotas with a bounded complete proximity graph using scene bounds. Current code and FS-4.4 evidence supersede older amendments below.
+
+[FS-4.1 R9](fs-4.1-scene-contract.md#r9--connection-prominence-smaller-particles-and-large-fixture) narrows seeded radii to 0.8–1.6 CSS px while keeping count/speed, seeded positions and velocities unchanged. It also raises the derived connection cap to 2,400 and corrects dense-cell traversal within the existing visit budget. Older values below are historical; current evidence belongs to FS-4.4.
+
+Current settings are superseded by [FS-4.1 R8](fs-4.1-scene-contract.md#r8--denser-slower-particles-and-size-dependent-connections): 1,600 default, 3,200 maximum, 0.5× default speed. Seeded traits and update math are unchanged; connection styling is derived from effective endpoint radii. Older amendments below are historical.
+
+## Current count amendment — 2026-09-29
+
+[FS-4.1 R7](fs-4.1-scene-contract.md#r7--1000-default-and-2000-toggle) supersedes previous count settings: default 1,000, maximum 2,000, minimum 40 and step 10. The fixture toggles 1,000 ↔ 2,000. Low-level Reset retains current configuration. Current validation belongs to [FS-4.4](fs-4.4-svg-aperture.md#1000-default--2000-toggle-amendment--2026-09-29); older fixtures/results remain historical.
+
+## Count amendment — 2026-09-29
+
+Dimi requests 480 particles. [FS-4.1 R6](fs-4.1-scene-contract.md#r6--480-particles) changes the default and maximum to 480, retaining minimum 40 and step 10. The domain now exports one maximum reused by the connection sampler. Population growth preserves survivors; reset recreates all 480 deterministically. This supersedes historical 120/240 configuration values below; existing still fixtures and old validation remain historical. Current checks and exact diff are recorded in [FS-4.4](fs-4.4-svg-aperture.md#480-particle-amendment--2026-09-29).
+
 ## Task metadata
 
 - **Status:** Implementation candidate ready for Codex renderer checkpoint and Dimi's still feedback. Technical checks passed; no task completion or moving-scene acceptance claimed.

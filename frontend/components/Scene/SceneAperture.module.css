@@ -1,0 +1,14 @@
+.cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+.paint {
+  fill: var(--fs-color-surface-background);
+}
+.silhouette {
+  fill: var(--fs-color-content-primary);
+}

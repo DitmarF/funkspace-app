@@ -1,4 +1,8 @@
 // @vitest-environment node
+import {
+  PARTICLE_SETTINGS as settings,
+  MAX_PARTICLE_COUNT,
+} from "./ParticleSettings";
 import { describe, expect, it, vi } from "vitest";
 import {
   advanceParticles,
@@ -27,13 +31,15 @@ function expectBounded(state: ParticleSceneState) {
     expect(p.x).toBeLessThan(state.bounds!.width);
     expect(p.y).toBeLessThan(state.bounds!.height);
     expect(Math.hypot(p.velocityX, p.velocityY)).toBeGreaterThanOrEqual(
-      8 - 1e-12,
+      settings.particles.speedCssPxPerSecond[0] - 1e-12,
     );
     expect(Math.hypot(p.velocityX, p.velocityY)).toBeLessThanOrEqual(
-      24 + 1e-12,
+      settings.particles.speedCssPxPerSecond[1] + 1e-12,
     );
-    expect(p.baseRadius).toBeGreaterThanOrEqual(1);
-    expect(p.baseRadius).toBeLessThanOrEqual(3);
+    expect(p.baseRadius).toBeGreaterThanOrEqual(
+      settings.particles.radiusCssPx[0],
+    );
+    expect(p.baseRadius).toBeLessThanOrEqual(settings.particles.radiusCssPx[1]);
   }
 }
 
@@ -62,17 +68,24 @@ describe("particle initialization and effective configuration", () => {
     expect(state.config).toEqual({ count: 40, speed: 0.5, size: 1.5 });
     const defaults = createParticleScene(bounds);
     expect(defaults.seed).toBe(0x46533431);
-    expect(defaults.config).toEqual({ count: 120, speed: 1, size: 1 });
+    expect(defaults.config).toEqual(DEFAULT_PARTICLE_CONFIG);
     expectBounded(defaults);
   });
 
   it.each([0, 1, 0xffffffff, DEFAULT_PARTICLE_SEED])(
     "repeats seed %s and keeps bounded state",
     (seed) => {
-      const a = createParticleScene(bounds, { count: 240 }, seed);
-      expect(a).toEqual(createParticleScene(bounds, { count: 240 }, seed));
+      const a = createParticleScene(
+        bounds,
+        { count: MAX_PARTICLE_COUNT },
+        seed,
+      );
+      expect(a).toEqual(
+        createParticleScene(bounds, { count: MAX_PARTICLE_COUNT }, seed),
+      );
       expect(a.particles).not.toBe(
-        createParticleScene(bounds, { count: 240 }, seed).particles,
+        createParticleScene(bounds, { count: MAX_PARTICLE_COUNT }, seed)
+          .particles,
       );
       expectBounded(a);
     },
@@ -108,8 +121,8 @@ describe("particle initialization and effective configuration", () => {
       const state = createParticleScene(bounds);
       const previous = configureParticles(state, {
         count: 70,
-        speed: 1.5,
-        size: 0.8,
+        speed: 0.5,
+        size: 1.5,
       });
       expect(configureParticles(state, input)).toEqual(previous);
       expect(createParticleScene(bounds, input).config).toEqual(
@@ -123,12 +136,12 @@ describe("particle initialization and effective configuration", () => {
     (input) => {
       const state = createParticleScene(bounds, {
         count: 70,
-        speed: 1.5,
-        size: 0.8,
+        speed: 0.5,
+        size: 1.5,
       });
       expect(
         configureParticles(state, { count: input, speed: input, size: input }),
-      ).toEqual({ count: 70, speed: 1.5, size: 0.8 });
+      ).toEqual({ count: 70, speed: 0.5, size: 1.5 });
       expect(
         createParticleScene(bounds, { count: input, speed: input, size: input })
           .config,
@@ -140,11 +153,11 @@ describe("particle initialization and effective configuration", () => {
     const state = createParticleScene(bounds);
     const effective = configureParticles(state, {
       count: "80",
-      speed: 1.234,
+      speed: 0.734,
       size: null,
     });
     expect(effective).toBe(state.config);
-    expect(effective).toEqual({ count: 120, speed: 1.25, size: 1 });
+    expect(effective).toEqual({ ...DEFAULT_PARTICLE_CONFIG, speed: 0.75 });
     expect(Object.isFrozen(effective)).toBe(true);
   });
 
@@ -156,7 +169,11 @@ describe("particle initialization and effective configuration", () => {
         speed: -Number.MAX_VALUE,
         size: -Number.MAX_VALUE,
       }),
-    ).toEqual({ count: 40, speed: 0.25, size: 0.75 });
+    ).toEqual({
+      count: settings.controls.count.min,
+      speed: settings.controls.speed.min,
+      size: settings.controls.size.min,
+    });
     expectBounded(state);
     expect(
       configureParticles(state, {
@@ -164,16 +181,35 @@ describe("particle initialization and effective configuration", () => {
         speed: Number.MAX_VALUE,
         size: Number.MAX_VALUE,
       }),
-    ).toEqual({ count: 240, speed: 2, size: 2 });
+    ).toEqual({
+      count: MAX_PARTICLE_COUNT,
+      speed: settings.controls.speed.max,
+      size: settings.controls.size.max,
+    });
     expectBounded(state);
   });
 
   it("normalizes every approved step and midpoint upward, with neighbors on both sides", () => {
     const state = createParticleScene(bounds);
     for (const [key, minimum, maximum, step] of [
-      ["count", 40, 240, 10],
-      ["speed", 0.25, 2, 0.05],
-      ["size", 0.75, 2, 0.05],
+      [
+        "count",
+        settings.controls.count.min,
+        MAX_PARTICLE_COUNT,
+        settings.controls.count.step,
+      ],
+      [
+        "speed",
+        settings.controls.speed.min,
+        settings.controls.speed.max,
+        settings.controls.speed.step,
+      ],
+      [
+        "size",
+        settings.controls.size.min,
+        settings.controls.size.max,
+        settings.controls.size.step,
+      ],
     ] as const) {
       const n = Math.round((maximum - minimum) / step);
       for (let i = 0; i <= n; i++) {
@@ -195,10 +231,32 @@ describe("particle initialization and effective configuration", () => {
 });
 
 describe("movement, delta and independence", () => {
+  it("moves at half speed without changing seeded traits", () => {
+    const slow = createParticleScene(bounds, { speed: 0.5 });
+    const normal = createParticleScene(bounds, { speed: 1 });
+    for (const state of [slow, normal])
+      for (const particle of state.particles) {
+        particle.x = 100;
+        particle.y = 100;
+      }
+    advanceParticles(slow, 50);
+    advanceParticles(normal, 50);
+    slow.particles.forEach((particle, i) => {
+      expect(particle.x - 100).toBeCloseTo(
+        (normal.particles[i].x - 100) / 2,
+        10,
+      );
+      expect(particle.y - 100).toBeCloseTo(
+        (normal.particles[i].y - 100) / 2,
+        10,
+      );
+      expect(particle.velocityX).toBe(normal.particles[i].velocityX);
+    });
+  });
   it("advances using CSS px/s and wraps both signs into half-open bounds", () => {
     const state = createParticleScene(
       { width: 1, height: 2 },
-      { count: 40, speed: 2 },
+      { count: 40, speed: 1 },
     );
     state.particles[0] = {
       ...state.particles[0],
@@ -208,8 +266,8 @@ describe("movement, delta and independence", () => {
       velocityY: 19.2,
     };
     expect(advanceParticles(state, 50)).toBe(50);
-    expect(state.particles[0].x).toBeCloseTo(0.66, 12);
-    expect(state.particles[0].y).toBeCloseTo(1.82, 12);
+    expect(state.particles[0].x).toBeCloseTo(0.38, 12);
+    expect(state.particles[0].y).toBeCloseTo(0.86, 12);
     expectBounded(state);
   });
 
@@ -235,7 +293,7 @@ describe("movement, delta and independence", () => {
     });
     try {
       for (let i = 0; i < 100; i++) advanceParticles(state, 16);
-      configureParticles(state, { size: 2, speed: 2 });
+      configureParticles(state, { size: 2, speed: 1 });
       resizeParticleScene(state, { width: 700, height: 400 });
       getParticleStill(state);
       expect(state.particles).toBe(array);
@@ -272,9 +330,9 @@ describe("movement, delta and independence", () => {
   });
 
   it("speed affects displacement only; size affects radius only", () => {
-    const base = createParticleScene(bounds);
-    const sized = createParticleScene(bounds, { size: 2 });
-    const fast = createParticleScene(bounds, { speed: 2 });
+    const base = createParticleScene(bounds, { speed: 0.5, size: 1 });
+    const sized = createParticleScene(bounds, { speed: 0.5, size: 2 });
+    const fast = createParticleScene(bounds, { speed: 1, size: 1 });
     expect(base.particles).toEqual(sized.particles);
     expect(base.particles).toEqual(fast.particles);
     expect(getParticleStill(base).particles).toEqual(
@@ -306,6 +364,29 @@ describe("movement, delta and independence", () => {
 });
 
 describe("population, resizing, reset and static data", () => {
+  it("grows from half capacity to capacity without moving survivors and resets at the current count", () => {
+    const initialCount = Math.floor(MAX_PARTICLE_COUNT / 20) * 10;
+    const state = createParticleScene(bounds, { count: initialCount });
+    advanceParticles(state, 50);
+    const survivors = state.particles.slice();
+    const positions = structuredClone(survivors);
+    expect(configureParticles(state, { count: MAX_PARTICLE_COUNT }).count).toBe(
+      MAX_PARTICLE_COUNT,
+    );
+    expect(state.particles).toHaveLength(MAX_PARTICLE_COUNT);
+    survivors.forEach((particle, i) =>
+      expect(state.particles[i]).toBe(particle),
+    );
+    expect(state.particles.slice(0, initialCount)).toEqual(positions);
+    resetParticles(state);
+    expect(state).toEqual(
+      createParticleScene(bounds, { count: MAX_PARTICLE_COUNT }),
+    );
+    expectBounded(state);
+    configureParticles(state, DEFAULT_PARTICLE_CONFIG);
+    resetParticles(state);
+    expect(state).toEqual(createParticleScene(bounds));
+  });
   it("keeps survivor objects/traits/positions on shrink/grow; new slots initialize at current bounds", () => {
     const state = createParticleScene(bounds);
     advanceParticles(state, 50);
@@ -314,11 +395,13 @@ describe("population, resizing, reset and static data", () => {
     const before = structuredClone(survivors);
     const array = state.particles;
     configureParticles(state, { count: 40 });
-    configureParticles(state, { count: 240 });
+    configureParticles(state, { count: MAX_PARTICLE_COUNT });
     expect(state.particles).toBe(array);
     survivors.forEach((p, i) => expect(state.particles[i]).toBe(p));
     expect(state.particles.slice(0, 40)).toEqual(before);
-    const initial = createParticleScene(state.bounds, { count: 240 });
+    const initial = createParticleScene(state.bounds, {
+      count: MAX_PARTICLE_COUNT,
+    });
     expect(state.particles.slice(40)).toEqual(initial.particles.slice(40));
     expectBounded(state);
   });
@@ -394,7 +477,7 @@ describe("population, resizing, reset and static data", () => {
   it("reset restores the seeded composition at current configuration and bounds, retaining suspension", () => {
     const state = createParticleScene(bounds, undefined, 42);
     advanceParticles(state, 50);
-    configureParticles(state, { count: 80, speed: 1.75, size: 1.25 });
+    configureParticles(state, { count: 80, speed: 0.75, size: 1.5 });
     resizeParticleScene(state, { width: 320, height: 800 });
     const expected = createParticleScene(state.bounds, state.config, 42);
     resetParticles(state);
@@ -404,7 +487,7 @@ describe("population, resizing, reset and static data", () => {
     resetParticles(state);
     expect(state.suspended).toBe(true);
     expect(state.particles).toEqual(expected.particles);
-    expect(state.config).toEqual({ count: 80, speed: 1.75, size: 1.25 });
+    expect(state.config).toEqual({ count: 80, speed: 0.75, size: 1.5 });
     expect(advanceParticles(state, 50)).toBe(0);
     resetParticles(state);
     expect(state.particles).toEqual(expected.particles);
@@ -430,8 +513,8 @@ describe("population, resizing, reset and static data", () => {
     const a = createParticleScene(bounds);
     const b = createParticleScene(bounds);
     advanceParticles(a, 50);
-    configureParticles(a, { speed: 2 });
-    configureParticles(b, { speed: 2 });
+    configureParticles(a, { speed: 1 });
+    configureParticles(b, { speed: 1 });
     advanceParticles(b, 50);
     expect(a.particles).not.toEqual(b.particles);
   });
@@ -440,7 +523,7 @@ describe("population, resizing, reset and static data", () => {
     const state = createParticleScene(bounds);
     const still = getParticleStill(state);
     const before = structuredClone(still);
-    expect(still.particles).toHaveLength(120);
+    expect(still.particles).toHaveLength(DEFAULT_PARTICLE_CONFIG.count);
     expect(Object.isFrozen(still.particles[0])).toBe(true);
     expect(Object.isFrozen(still.particles)).toBe(true);
     expect(Object.keys(still.particles[0]).sort()).toEqual([
@@ -450,10 +533,10 @@ describe("population, resizing, reset and static data", () => {
       "y",
     ]);
     advanceParticles(state, 50);
-    configureParticles(state, { count: 240, size: 2 });
+    configureParticles(state, { count: MAX_PARTICLE_COUNT, size: 2 });
     resizeParticleScene(state, { width: 320, height: 600 });
     resetParticles(state);
     expect(still).toEqual(before);
-    expect(getParticleStill(state).particles).toHaveLength(240);
+    expect(getParticleStill(state).particles).toHaveLength(MAX_PARTICLE_COUNT);
   });
 });
