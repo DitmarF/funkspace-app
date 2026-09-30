@@ -13,8 +13,11 @@ async function fixture(
   theme: (typeof themes)[number] = "default",
   story = "full-document",
 ) {
+  // This visit's explicit AxeBuilder scans own accessibility analysis. Set the
+  // addon's supported manual global before the story renders, so its automatic
+  // afterEach scan cannot overlap them. Normal Storybook visits stay automatic.
   await page.goto(
-    `/iframe.html?id=controls-essentialset--${story}&viewMode=story&globals=theme:${globals[theme]}`,
+    `/iframe.html?id=controls-essentialset--${story}&viewMode=story&globals=theme:${globals[theme]};a11y.manual:!true`,
   );
   await expect(page.getByTestId("resolved-theme")).toHaveText(
     `Resolved theme: ${theme}`,
@@ -33,6 +36,37 @@ async function accessible(page: Page) {
       .violations,
   ).toEqual([]);
 }
+
+test("explicit accessibility scans still detect an unnamed button", async ({
+  page,
+}) => {
+  await fixture(page);
+  await page.locator("#storybook-root").evaluate((root) => {
+    const button = document.createElement("button");
+    button.id = "a11y-negative-control";
+    root.append(button);
+  });
+  try {
+    const result = await new AxeBuilder({ page })
+      .include("#storybook-root")
+      .analyze();
+    expect(result.violations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "button-name",
+          nodes: expect.arrayContaining([
+            expect.objectContaining({ target: ["#a11y-negative-control"] }),
+          ]),
+        }),
+      ]),
+    );
+  } finally {
+    await page
+      .locator("#a11y-negative-control")
+      .evaluate((node) => node.remove());
+  }
+  await accessible(page);
+});
 
 for (const theme of themes) {
   test(`${theme}: complete composition uses resolved themes, fonts and native interactions`, async ({
@@ -243,7 +277,10 @@ for (const viewport of [
     expect(
       await dialog.evaluate((node) => node.scrollWidth <= node.clientWidth),
     ).toBe(true);
-    const content = page.locator("dialog > div");
+    const content = dialog.locator(":scope > div").filter({
+      has: page.getByRole("button", { name: "Run local preview" }),
+    });
+    await expect(content).toHaveCount(1);
     expect(await content.evaluate((node) => node.clientHeight)).toBeGreaterThan(
       40,
     );

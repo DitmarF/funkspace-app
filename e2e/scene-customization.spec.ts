@@ -444,9 +444,17 @@ test("overlay transparency retains the paused Canvas, local settings and complet
       exact: true,
     })
     .click();
-  await expect(cover).toHaveCSS("opacity", "0");
-  await expect(canvas(page)).toBeVisible();
-  await expect(cover.locator("[data-aperture-fallback] path")).toHaveCount(0);
+  await expect(cover).toHaveCSS("opacity", available ? "0" : "1");
+  if (available) {
+    await expect(canvas(page)).toBeVisible();
+    expect(await original!.evaluate((node) => node.isConnected)).toBe(true);
+  } else {
+    await expect(canvas(page)).toHaveCount(0);
+    await expect(cover.locator("[data-aperture-fallback] path")).toBeVisible();
+  }
+  await expect(cover.locator("[data-aperture-fallback] path")).toHaveCount(
+    available ? 0 : 1,
+  );
   await stopped(page);
   await page.reload();
   await openCustomization(page);

@@ -331,14 +331,14 @@ for (const width of [320, 1280]) {
           if (motion === "on" && process.env.FS35_AVAILABLE === "true") {
             // Accepted FS-3.5 startup masks content until the logo is ready.
             // Inspect its real pre-hydration paint without waiting out fallback.
-            await expect(page.locator("main h1")).toHaveText("FunkSpace");
+            await expect(page.locator("main h1")).toHaveText("Aperture - 1");
             await expect(page.locator("[data-home-intro]")).toHaveAttribute(
               "data-home-intro",
               "preparing",
             );
           } else
             await expect(
-              page.getByRole("heading", { name: "FunkSpace", exact: true }),
+              page.getByRole("heading", { name: "Aperture - 1", exact: true }),
             ).toBeVisible();
           await expect.poll(() => held).toBeGreaterThan(0);
           const frames = await page.evaluate(async () => {
@@ -395,7 +395,7 @@ test("no JavaScript retains default static content", async ({
     const page = await context.newPage();
     await page.goto("/");
     await expect(
-      page.getByRole("heading", { name: "FunkSpace" }),
+      page.getByRole("heading", { name: "Aperture - 1", exact: true }),
     ).toBeVisible();
     await expect(page.locator("html")).not.toHaveAttribute("data-theme");
   } finally {

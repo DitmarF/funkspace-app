@@ -159,6 +159,14 @@ for (const preference of ["on", "reduced"] as const) {
             });
           });
         await second.goto("/");
+        // The fake JS clock does not own CSS animation timelines. Keep the
+        // actual menu/content tweens paused from creation while advancing the
+        // logo's JS clock. finishMenuFade inspects their real duration/opacity
+        // and explicitly finishes each step; no animationend event is faked.
+        await second.addStyleTag({
+          content:
+            "[data-home-menu], [data-home-content] { animation-play-state: paused !important; }",
+        });
         if (background) {
           await second.clock.runFor(6000);
           if (available)

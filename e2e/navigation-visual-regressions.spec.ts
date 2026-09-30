@@ -66,9 +66,6 @@ for (const route of ["/about", "/privacy", "/impressum"]) {
         (theme) => localStorage.setItem("theme", theme),
         width < 768 ? "default" : "dark",
       );
-      // Capture the browser's actual paint without waiting for document.fonts.ready:
-      // deferred application scripts are intentionally held before DOMContentLoaded.
-      const capture = await page.context().newCDPSession(page);
       for (const reload of [false, true]) {
         let release!: () => void;
         const held = new Promise<void>((resolve) => {
@@ -97,10 +94,17 @@ for (const route of ["/about", "/privacy", "/impressum"]) {
           ).toBe("none");
           const initialBox = (await summary.boundingBox())!;
           expect(initialBox.height).toBeGreaterThanOrEqual(44);
-          const initialArtwork = await capture.send("Page.captureScreenshot", {
-            format: "png",
-            clip: { ...initialBox, scale: 1 },
+          const viewport = () =>
+            page.evaluate(() => ({ width: innerWidth, height: innerHeight }));
+          expect(await viewport()).toEqual({ width, height: 720 });
+          // Use Playwright's screenshot queue/viewport ownership rather than a
+          // separate raw CDP session. Keep scripts held and compare the exact
+          // trigger pixels without allowing capture to resize the viewport.
+          const initialArtwork = await page.screenshot({
+            type: "png",
+            clip: initialBox,
           });
+          expect(await viewport()).toEqual({ width, height: 720 });
           await expect(
             tree.getByRole("link", {
               name: "About",
@@ -114,14 +118,16 @@ for (const route of ["/about", "/privacy", "/impressum"]) {
             exact: true,
           });
           await expect(menu).toBeVisible();
+          expect(await viewport()).toEqual({ width, height: 720 });
           expect(await menu.boundingBox()).toEqual(initialBox);
-          const enhancedArtwork = await capture.send("Page.captureScreenshot", {
-            format: "png",
-            clip: { ...initialBox, scale: 1 },
+          const enhancedArtwork = await page.screenshot({
+            type: "png",
+            clip: initialBox,
           });
-          expect(enhancedArtwork.data).toEqual(initialArtwork.data);
+          expect(await viewport()).toEqual({ width, height: 720 });
+          expect(enhancedArtwork).toEqual(initialArtwork);
           await info.attach(`identical-trigger-${reload ? "reload" : "load"}`, {
-            body: Buffer.from(initialArtwork.data, "base64"),
+            body: initialArtwork,
             contentType: "image/png",
           });
           await expect(
@@ -134,7 +140,6 @@ for (const route of ["/about", "/privacy", "/impressum"]) {
           await page.unrouteAll({ behavior: "wait" });
         }
       }
-      await capture.detach();
     });
   }
 }
