@@ -15,6 +15,27 @@ beforeEach(() => {
   fake.load.mockReset().mockReturnValue(vi.fn());
 });
 describe("aperture composition", () => {
+  it("makes only a ready cover transparent and retains its mask identity and static fallback", () => {
+    const view = render(<SceneAperture selection="web" />);
+    const mask = view.container.querySelector("mask");
+    view.rerender(<SceneAperture selection="web" transparent />);
+    expect(view.container.querySelector("[data-scene-aperture]")).toHaveStyle({
+      opacity: "0",
+    });
+    expect(view.container.querySelector("mask")).toBe(mask);
+    view.rerender(<SceneAperture selection="web" transparent showStatic />);
+    expect(view.container.querySelector("[data-scene-aperture]")).toHaveStyle({
+      opacity: "1",
+    });
+    expect(
+      view.container.querySelector("[data-aperture-fallback] path"),
+    ).toBeInTheDocument();
+    view.rerender(<SceneAperture selection="web" />);
+    expect(view.container.querySelector("mask")).toBe(mask);
+    expect(view.container.querySelector("[data-scene-aperture]")).toHaveStyle({
+      opacity: "1",
+    });
+  });
   it("does not report a pending mask probe as a settled failure", () => {
     let result!: (ready: boolean) => void;
     fake.checkMask.mockImplementation((callback) => {

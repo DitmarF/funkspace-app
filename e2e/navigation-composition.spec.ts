@@ -170,8 +170,8 @@ for (const viewport of [
         await dialog.getByText(group, { exact: true }).click();
       await expect(
         dialog.getByText("Coming soon", { exact: true }),
-      ).toHaveCount(4);
-      await expect(dialog.getByRole("link")).toHaveCount(5);
+      ).toHaveCount(3);
+      await expect(dialog.getByRole("link")).toHaveCount(6);
       await expect(dialog.getByRole("menu")).toHaveCount(0);
       await page.mouse.move(0, 0);
       await page.screenshot({ path: info.outputPath("navigation.png") });
@@ -185,15 +185,20 @@ for (const viewport of [
       await page.mouse.move(0, 0);
       await page.screenshot({ path: info.outputPath("accessibility.png") });
       for (const [theme, label] of [
-        ["default", "Default"],
+        ["default", "Light"],
         ["dark", "Dark"],
         ["muted", "Muted"],
         ["dark-high-contrast", "High Contrast"],
         ["system", "System"],
       ]) {
-        await dialog.getByRole("button", { name: label, exact: true }).click();
+        await dialog
+          .getByRole("group", { name: "Appearance", exact: true })
+          .getByRole("button", { name: label, exact: true })
+          .click();
         await expect(
-          dialog.getByRole("button", { name: label, exact: true }),
+          dialog
+            .getByRole("group", { name: "Appearance", exact: true })
+            .getByRole("button", { name: label, exact: true }),
         ).toHaveAttribute("aria-pressed", "true");
         if (
           themes.includes(theme as (typeof themes)[number]) &&
@@ -263,9 +268,10 @@ test("trigger alignment survives a scrolled header and a resize across breakpoin
     exact: true,
   });
   await expect(trigger).toBeVisible();
-  await page.evaluate(() => window.scrollTo(0, 20));
+  await page.evaluate(() => window.scrollTo({ top: 20, behavior: "instant" }));
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(20);
   const before = await trigger.boundingBox();
-  await trigger.click();
+  await openSettings(page, { preserveScroll: true });
   const close = page.getByRole("button", {
     name: "Menu: close navigation and settings",
     exact: true,
@@ -273,13 +279,13 @@ test("trigger alignment survives a scrolled header and a resize across breakpoin
   expect(await close.boundingBox()).toEqual(before);
   await expectCloseAlignment(page);
   await page.setViewportSize({ width: 320, height: 568 });
-  // Anchor positioning is recomputed after the viewport resize layout.
+  // Shared coordinates settle after viewport layout and the lock's resize event.
   await expect(async () => {
     expect(await close.boundingBox()).toEqual(await trigger.boundingBox());
   }).toPass({ timeout: 2000 });
   await expectCloseAlignment(page);
   await page.setViewportSize({ width: 768, height: 1024 });
-  // Anchor positioning is recomputed after the viewport resize layout.
+  // Shared coordinates settle after viewport layout and the lock's resize event.
   await expect(async () => {
     expect(await close.boundingBox()).toEqual(await trigger.boundingBox());
   }).toPass({ timeout: 2000 });

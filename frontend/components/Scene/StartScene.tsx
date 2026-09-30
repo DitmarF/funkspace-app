@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { useServices } from "@/application/providers/ServiceProvider";
+import { SceneStartupScript } from "@/application/providers/SceneStartupScript";
 import type { MotionBlocker } from "@/domain/motion/MotionPolicy";
 import type {
   ParticleSceneHandle,
@@ -11,6 +13,8 @@ import { useScenePresentation } from "../Layouts/ScenePresentationContext";
 import Button from "../Controls/Button";
 import SceneAperture from "./SceneAperture";
 import styles from "./StartScene.module.css";
+
+const SceneCustomization = dynamic(() => import("./SceneCustomization"));
 
 const reasons: Record<MotionBlocker, string> = {
   "policy-pending": "Loading motion preference. Artwork stays still.",
@@ -34,14 +38,19 @@ const reasons: Record<MotionBlocker, string> = {
 };
 
 /** Owns one scene handle; shared services and preferences remain provider-owned. */
-export default function StartScene() {
-  const { bindParticleScene } = useServices();
+export default function StartScene({
+  customizable = false,
+}: {
+  customizable?: boolean;
+}) {
+  const { bindParticleScene, decorativeMotionAvailable } = useServices();
   const { introReady, occluded } = useScenePresentation();
   const host = useRef<HTMLDivElement>(null);
   const handle = useRef<ParticleSceneHandle | undefined>(undefined);
   const [coverReady, setCoverReady] = useState<boolean>();
   const [snapshot, setSnapshot] = useState<ParticleSceneSnapshot>();
   const [reveal, setReveal] = useState<"fade" | "static">();
+  const [overlayTransparent, setOverlayTransparent] = useState(false);
   const statusId = useId();
   useEffect(() => {
     if (!host.current) return;
@@ -74,7 +83,11 @@ export default function StartScene() {
   const fallbackSettled = Boolean(
     snapshot &&
       !snapshot.blockers.includes("policy-pending") &&
-      (coverReady === false ||
+      // A covered details scene must have complete artwork if navigation fails
+      // before the first Canvas frame. It remains suspended; no retry or reveal
+      // replay is needed after the native fallback is dismissed.
+      ((customizable && introReady && occluded) ||
+        coverReady === false ||
         snapshot.paletteUnavailable ||
         snapshot.locallyPaused ||
         snapshot.blockers.some(
@@ -84,12 +97,17 @@ export default function StartScene() {
               "consumer-hidden",
               "document-hidden",
               "runtime-not-ready",
+              "preference-off",
             ].includes(value),
         )),
   );
   useLayoutEffect(() => {
     if (!reveal && (showCanvas || fallbackSettled))
-      setReveal(showCanvas && !snapshot?.reducedMotion ? "fade" : "static");
+      setReveal(
+        showCanvas && snapshot?.presentation === "motion-permitted"
+          ? "fade"
+          : "static",
+      );
     // A restriction also finishes an in-flight reveal immediately. Keeping the
     // static latch prevents On/visibility restoration from replaying that fade.
     else if (reveal === "fade" && snapshot?.presentation !== "motion-permitted")
@@ -123,9 +141,11 @@ export default function StartScene() {
       <div
         data-start-scene=""
         data-scene-reveal={reveal ?? (snapshot ? "waiting" : "pending")}
+        suppressHydrationWarning
         aria-hidden="true"
         className={styles.scene}
       >
+        <SceneStartupScript available={decorativeMotionAvailable} />
         <div
           ref={host}
           className={styles.runtime}
@@ -133,6 +153,7 @@ export default function StartScene() {
         />
         <SceneAperture
           selection="web"
+          transparent={overlayTransparent && showCanvas}
           showStatic={!showCanvas}
           onReady={setCoverReady}
         />
@@ -162,6 +183,15 @@ export default function StartScene() {
             ? " Your local Pause is retained."
             : ""}
         </p>
+        {customizable && snapshot && handle.current && (
+          <SceneCustomization
+            scene={handle.current}
+            snapshot={snapshot}
+            statusMessage={message}
+            overlayTransparent={overlayTransparent}
+            onOverlayTransparentChange={setOverlayTransparent}
+          />
+        )}
       </div>
     </>
   );

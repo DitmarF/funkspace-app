@@ -20,6 +20,7 @@ for (const width of [320, 1280]) {
       "Home",
       "About",
       "Animations",
+      "Aperture - 1",
       "Games",
       "Privacy",
       "Privacy policy",
@@ -85,7 +86,7 @@ test("disclosures support keyboard use, independent branches, themes and ready d
   await page.keyboard.press("Space");
   await expect(games.locator("..")).toHaveAttribute("open", "");
   await expect(animations.locator("..")).toHaveAttribute("open", "");
-  await expect(nav.locator('[aria-disabled="true"]')).toHaveCount(4);
+  await expect(nav.locator('[aria-disabled="true"]')).toHaveCount(3);
   await expect(nav.locator('[aria-disabled="true"] a')).toHaveCount(0);
   for (const row of await nav.locator('[aria-disabled="true"]').all())
     await expect(row.locator("svg")).toHaveCount(1);
@@ -94,9 +95,12 @@ test("disclosures support keyboard use, independent branches, themes and ready d
   await expect(games.locator("svg").nth(0)).toBeVisible();
   await expect(games.locator("svg").nth(1)).toBeHidden();
 
-  for (const label of ["Default", "Dark", "Muted", "High Contrast", "System"]) {
+  for (const label of ["Light", "Dark", "Muted", "High Contrast", "System"]) {
     await openAppearance(page);
-    await page.getByRole("button", { name: label, exact: true }).click();
+    await page
+      .getByRole("group", { name: "Appearance", exact: true })
+      .getByRole("button", { name: label, exact: true })
+      .click();
     await page.getByRole("button", { name: "Navigation", exact: true }).click();
     for (const summary of await nav.locator("summary").all())
       await summary.click();

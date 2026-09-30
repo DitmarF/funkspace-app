@@ -43,11 +43,7 @@ describe("authored particle settings safety", () => {
     expect(c.opacity).toBeLessThanOrEqual(1);
     expect(c.maxOpacity).toBeLessThanOrEqual(1);
     expect(c.retryDistanceMultiplier).toBeLessThan(1);
-    for (const n of [
-      c.maxPasses,
-      c.candidateVisitsPerParticle,
-      c.lineBudgetPerParticle,
-    ])
+    for (const n of [c.maxPasses, c.maxCandidateChecks, c.maxLines])
       expect(Number.isInteger(n)).toBe(true);
     expect(settings.simulation.maxDeltaMs).toBeGreaterThan(0);
     for (const n of Object.values(settings.raster))

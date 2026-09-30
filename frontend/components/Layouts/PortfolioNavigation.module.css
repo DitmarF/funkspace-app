@@ -237,8 +237,17 @@
           var(--fs-space-sm)
       )
     );
+    /* The desktop launcher has a known document offset. Convert it once to
+       viewport coordinates using the existing dialog-owned scroll snapshot. */
+    --navigation-rail-top: max(
+      var(--shell-safe-top),
+      calc(
+        max(var(--fs-space-xl), var(--shell-safe-top)) -
+          var(--dialog-page-scroll-y, 0px)
+      )
+    );
     --navigation-close-top: calc(
-      max(var(--fs-space-xl), var(--shell-safe-top)) +
+      var(--navigation-rail-top) +
         (var(--navigation-control-size) - var(--navigation-close-space)) / 2
     );
     /* Native focus scrolling must reveal the row below the fixed Close cover. */
@@ -249,6 +258,7 @@
   }
 
   .overlay > :first-child {
+    position-anchor: normal;
     right: auto;
     left: calc(
       var(--navigation-content-start) - var(--navigation-close-space) -
@@ -267,29 +277,8 @@
     );
   }
 
-  /* Shared coordinates remain the fallback. Anchoring also follows a header
-     trigger opened after a partial document scroll, without DOM effects. */
-  @supports (top: anchor(--portfolio-menu top)) {
-    .overlay > :first-child {
-      /* Use explicit coordinates without the implicit anchor scroll shift. */
-      position-anchor: auto;
-      top: calc(
-        max(
-            var(--shell-safe-top),
-            anchor(--portfolio-menu top) - var(--dialog-page-scroll-y, 0px)
-          ) +
-          (var(--navigation-control-size) - var(--navigation-close-space)) / 2
-      );
-    }
-
-    .overlay .rail {
-      top: max(
-        var(--shell-safe-top),
-        anchor(--portfolio-menu top) - var(--dialog-page-scroll-y, 0px)
-      );
-      right: anchor(--portfolio-menu right);
-      position-anchor: auto;
-    }
+  .overlay .rail {
+    top: var(--navigation-rail-top);
   }
 
   .choices {

@@ -7,6 +7,66 @@ import {
 } from "./MotionPolicy";
 
 describe("M1/M2: permission matrix", () => {
+  it("Off still preparation is opt-in, obeys every gate and never grants motion", () => {
+    for (const supportsOffStill of [false, true])
+      for (const status of ["pending", "ready", "disposed"] as const)
+        for (const systemMotion of [
+          "unknown",
+          "reduce",
+          "no-preference",
+          "unavailable",
+        ] as const)
+          for (const documentVisible of [false, true])
+            for (const featureAvailable of [false, true])
+              for (const optedIn of [false, true])
+                for (const visible of [false, true])
+                  for (const locallyPaused of [false, true])
+                    for (const runtime of [
+                      "unprepared",
+                      "preparing",
+                      "ready",
+                      "failed",
+                      "disposed",
+                    ] as const) {
+                      const permission = resolveMotionPermission(
+                        {
+                          status,
+                          preference: "off",
+                          systemMotion,
+                          documentVisible,
+                        },
+                        {
+                          supportsOffStill,
+                          featureAvailable,
+                          optedIn,
+                          visible,
+                          locallyPaused,
+                          runtime,
+                        },
+                      );
+                      const allowed =
+                        supportsOffStill &&
+                        status === "ready" &&
+                        featureAvailable &&
+                        optedIn &&
+                        (systemMotion === "reduce" ||
+                          systemMotion === "no-preference");
+                      expect(permission.mayRun).toBe(false);
+                      expect(permission.mayPrepare).toBe(
+                        allowed &&
+                          documentVisible &&
+                          visible &&
+                          !locallyPaused &&
+                          runtime === "unprepared",
+                      );
+                      expect(permission.presentation).toBe(
+                        allowed && runtime === "ready"
+                          ? "hold-frame"
+                          : "complete-static",
+                      );
+                      expect(permission.blockers).toContain("preference-off");
+                    }
+  });
   it("covers every independent input and preserves inputs (15,360 combinations)", () => {
     let combinations = 0;
     for (const supportsReducedMotion of [false, true])

@@ -4,12 +4,6 @@
   background: var(--fs-color-surface-background);
 }
 
-.controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--fs-space-xs);
-}
-
 .surface {
   position: relative;
   width: 100%;

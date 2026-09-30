@@ -4,11 +4,55 @@
 
 Dimi requests a typed, single authoring source for particle tuning, suitable for later customization controls. This is consolidation within the existing Domain boundary, not a new settings service, persistence authority or UI. Current local tuning is the baseline; no approval of its performance is inferred. Branch `feature/funkspace-minimum-usable`, HEAD `0eabf793240ec44e7352247c8160aa7f901de927`, plus the pre-existing uncommitted FS-4.4 candidate. Preserve WEB Black, theme/motion authorities and composition.
 
-## Current tuning — 2026-09-29, FS-4.4B correction
+## Current tuning — 2026-09-30, R18 customization
+
+Edit `frontend/domain/particles/ParticleSettings.ts` for authoring defaults and
+limits; the detail-page controls consume that same metadata. Effective runtime
+values come back from Domain normalization. Current defaults preserve count 200,
+speed 0.4×, size 1× and distance 6×. The new connection cap defaults to 100, so it
+does not restrict the ordinary default graph. Reload restores defaults.
+
+| Control key                       | Default | Range / step | Meaning                                                                                         |
+| --------------------------------- | ------- | ------------ | ----------------------------------------------------------------------------------------------- |
+| `controls.count`                  | 200     | 10–1000 / 1  | Particle count                                                                                  |
+| `controls.speed`                  | 0.4     | 0.1–2 / 0.1  | Multiplier on seeded 8–24 CSS px/s velocity                                                     |
+| `controls.size`                   | 1       | 0.1–4 / 0.1  | Multiplier on seeded 1–3 CSS px radii                                                           |
+| `controls.connectionsPerParticle` | 100     | 1–100 / 1    | Maximum degree at **both** endpoints, not a promise that every particle has this many neighbors |
+| `controls.connectionDistance`     | 6       | 1–10 / 0.1   | Multiplier on the density-derived distance                                                      |
+
+Connection engineering limits are now absolute: `connections.maxLines = 4800`
+and `connections.maxCandidateChecks = 38400`, across at most 16 passes. These
+retain the former 200-particle work/output ceilings even though count now permits 1000. `connections.distanceMultiplier` moved to `controls.connectionDistance`;
+the old per-capacity budget fields are replaced by those absolute limits.
+The requested distance is still the density formula below, initially limited by
+the radius whose uniform-density estimate fits 4800 pairs. Dense patches may
+require smaller-radius retries; exhausted work returns no partial prefix.
+The effective cutoff can therefore plateau/shorten at high settings. The UI
+explains this constraint rather than claiming a guaranteed line length.
+
+Within the bounded candidate graph, pairs are selected shortest-first when a
+degree cap is needed, with canonical spatial ties. Both endpoint degrees are
+checked. Selection is deterministic, crosses bucket boundaries and does not
+change particle positions/velocities/identities. If the cap is nonbinding, all
+pairs inside the effective cutoff remain connected. The latest explicit cap
+request supersedes the older no-degree-quota rule.
+
+Line width remains 0.4 CSS px before size scaling [0.8, 1.5], opacity 1 before
+distance fade, alpha ceiling 1. DPR 2, backing dimension 4096 px, backing area
+4000000 px and delta 50 ms stay unchanged. Size/speed are independent.
+
+Transparent WEB overlay is presentation state in `StartScene`, default Off. It
+conceals the cover only over a ready Canvas, keeping failure/denied static WEB
+complete. It never enters particle configuration or changes the runtime. User
+Reset restores all five controls, opaque WEB and the seeded composition while
+retaining Pause/theme/shared restrictions. Low-level reset still keeps the
+current configuration. See [FS-4.6 C4](fs-4.6-customization-overlay.md#c4--expanded-customization--2026-09-30).
+
+## Historical tuning — 2026-09-29, FS-4.4B correction
 
 This table records the local authoring values inspected for the renderer checkpoint, preserved during F1–F3 corrections. It supersedes the older consolidation table; it does not imply a new performance or visual approval. Defaults now yield 200 particles, radii 3–9 CSS px and speeds 4–12 CSS px/s. The fixture count toggle is 200 ↔ 100.
 
-## Design and tuning guide
+## Historical consolidation tuning guide — superseded by R18
 
 Edit `frontend/domain/particles/ParticleSettings.ts`, then reload the fixture. `ParticleSettings` describes the immutable authoring object `PARTICLE_SETTINGS`. Derived legacy exports remain compatible; do not edit defaults in consumers.
 

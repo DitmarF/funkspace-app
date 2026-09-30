@@ -52,12 +52,17 @@ export class ParticleSceneController implements ParticleSceneHandle {
     };
   }
 
-  private permission(runtime = this.status, locallyPaused = this.localPause) {
+  private permission(
+    runtime = this.status,
+    locallyPaused = this.localPause,
+    occluded = this.presentation.occluded,
+  ) {
     return resolveMotionPermission(this.policy.getSnapshot(), {
       featureAvailable: this.available,
       optedIn: this.options.optedIn === true,
       // Explicit Reduced supports a single still draw, never continuous playback.
       supportsReducedMotion: true,
+      supportsOffStill: true,
       runtime,
       locallyPaused,
       visible:
@@ -67,7 +72,7 @@ export class ParticleSceneController implements ParticleSceneHandle {
         this.surface.palette !== null &&
         this.presentation.introReady &&
         this.presentation.coverReady &&
-        !this.presentation.occluded,
+        !occluded,
     });
   }
 
@@ -117,14 +122,20 @@ export class ParticleSceneController implements ParticleSceneHandle {
 
   private reconcile() {
     if (this.status === "disposed") return;
-    // R2: a ready-copy probes permission during loading, never publishes readiness.
-    if (this.status === "preparing" && !this.permission("ready").mayRun) {
+    // Probe preparation eligibility without claiming a ready runtime or playback.
+    if (
+      this.status === "preparing" &&
+      !this.permission("unprepared").mayPrepare
+    ) {
       ++this.generation;
       this.status = "unprepared";
     }
     if (this.runtime) {
       const runtime = this.runtime;
-      runtime.setVisible(this.permission("ready", false).mayRun);
+      // Modal occlusion pauses playback but keeps a ready frame visible behind it.
+      runtime.setVisible(
+        this.permission("unprepared", false, false).mayPrepare,
+      );
       if (this.permission().mayRun && !this.reducedMotion()) runtime.resume();
       else runtime.pause();
     } else if (this.binding && this.permission().mayPrepare) {
@@ -140,7 +151,8 @@ export class ParticleSceneController implements ParticleSceneHandle {
       this.generation === generation &&
       this.status !== "disposed" &&
       this.status !== "failed";
-    const eligible = () => current() && this.permission("ready").mayRun;
+    const eligible = () =>
+      current() && this.permission("unprepared").mayPrepare;
     // Start in a microtask so synchronous cancellation also prevents loading.
     void Promise.resolve()
       .then(() => {
@@ -197,7 +209,12 @@ export class ParticleSceneController implements ParticleSceneHandle {
         this.surface.width > 0 &&
         this.surface.height > 0 &&
         this.surface.palette === null,
-      frameReady: this.frameReady && this.permission("ready", false).mayRun,
+      frameReady:
+        this.frameReady &&
+        this.surface.palette !== null &&
+        this.presentation.coverReady &&
+        this.permission("ready", false, false).presentation !==
+          "complete-static",
       presentation:
         this.reducedMotion() &&
         this.permission().presentation === "motion-permitted"

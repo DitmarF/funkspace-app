@@ -78,7 +78,7 @@ describe("server-rendered portfolio documents", () => {
         }),
       ).toHaveAttribute("href", destinations.privacy.href);
       expect(screen.getAllByRole("link")).toHaveLength(
-        name === "Home" ? 12 : name === "About" ? 10 : 11,
+        name === "Home" ? 14 : name === "About" ? 11 : 12,
       );
       for (const destination of [
         destinations.contact,

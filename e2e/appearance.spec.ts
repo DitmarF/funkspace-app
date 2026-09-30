@@ -34,7 +34,9 @@ for (const width of [320, 1280]) {
       >();
       for (const { value, label } of THEME_METADATA) {
         await openAppearance(page);
-        const button = page.getByRole("button", { name: label, exact: true });
+        const button = page
+          .getByRole("group", { name: "Appearance", exact: true })
+          .getByRole("button", { name: label, exact: true });
         await button.click();
         await expect(button).toHaveAttribute("aria-pressed", "true");
         await expect(
@@ -70,7 +72,9 @@ for (const width of [320, 1280]) {
         await page.reload();
         await openAppearance(page);
         await expect(
-          page.getByRole("button", { name: label, exact: true }),
+          page
+            .getByRole("group", { name: "Appearance", exact: true })
+            .getByRole("button", { name: label, exact: true }),
         ).toHaveAttribute("aria-pressed", "true");
         expect(await appearance(page)).toEqual(beforeReload);
         await page.emulateMedia({ colorScheme: "light" });
@@ -130,7 +134,10 @@ for (const width of [320, 1280]) {
           expect(await appearance(page)).toEqual(selected);
         }
         // Switching back to System must work even while stored Muted is stale.
-        await page.getByRole("button", { name: "System", exact: true }).click();
+        await page
+          .getByRole("group", { name: "Appearance", exact: true })
+          .getByRole("button", { name: "System", exact: true })
+          .click();
         await page.emulateMedia({ colorScheme: "dark" });
         await expect(page.locator("html")).toHaveAttribute(
           "data-theme",
@@ -143,7 +150,9 @@ for (const width of [320, 1280]) {
         await openAppearance(page);
         const fallback = fault === "write-muted" ? "Muted" : "System";
         await expect(
-          page.getByRole("button", { name: fallback, exact: true }),
+          page
+            .getByRole("group", { name: "Appearance", exact: true })
+            .getByRole("button", { name: fallback, exact: true }),
         ).toHaveAttribute("aria-pressed", "true");
         await expect
           .poll(() => page.locator("html").getAttribute("data-theme"))

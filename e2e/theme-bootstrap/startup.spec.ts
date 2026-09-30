@@ -160,7 +160,7 @@ for (const [stored, expected] of [
     );
     const label =
       stored === "default"
-        ? "Default"
+        ? "Light"
         : stored === "dark"
           ? "Dark"
           : stored === "muted"
@@ -170,7 +170,9 @@ for (const [stored, expected] of [
               : "System";
     await openAppearance(page);
     await expect(
-      page.getByRole("button", { name: label, exact: true }),
+      page
+        .getByRole("group", { name: "Appearance", exact: true })
+        .getByRole("button", { name: label, exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
     await test.info().attach("pre-provider.json", {
       body: JSON.stringify(early),
@@ -202,7 +204,9 @@ for (const fault of [
     );
     await openAppearance(page);
     await expect(
-      page.getByRole("button", { name: "System", exact: true }),
+      page
+        .getByRole("group", { name: "Appearance", exact: true })
+        .getByRole("button", { name: "System", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
     await page.getByRole("button", { name: "Muted", exact: true }).click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "muted");
@@ -239,7 +243,9 @@ test("reload, OS changes, controls and same-layout history navigation preserve a
   await page.goto("/");
   await openAppearance(page);
   await expect(
-    page.getByRole("button", { name: "System", exact: true }),
+    page
+      .getByRole("group", { name: "Appearance", exact: true })
+      .getByRole("button", { name: "System", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await page.emulateMedia({ colorScheme: "light" });
   await expect(page.locator("html")).not.toHaveAttribute("data-theme");

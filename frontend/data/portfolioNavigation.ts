@@ -45,9 +45,10 @@ export const portfolioNavigation = [
     children: [
       {
         id: "first-animation",
-        label: "First animation",
+        label: "Aperture - 1",
         icon: "animations",
-        kind: "pending",
+        kind: "link",
+        destination: "aperture",
       },
       {
         id: "second-animation",

@@ -14,12 +14,20 @@
    fail-open markup remain visible; only this decorative scene waits for a draw. */
 :global([data-home-intro]:not([data-home-intro="visible"]))
   .scene[data-scene-reveal="pending"],
+.scene[data-scene-startup="waiting"][data-scene-reveal="pending"],
 .scene[data-scene-reveal="waiting"] {
   opacity: 0;
 }
+/* Denied startup stays static; an expired parser deadline never hides/re-fades
+   already visible artwork when delayed application code eventually arrives. */
 .scene[data-scene-reveal="fade"] {
   animation: sceneReadyIn var(--fs-motion-duration-400)
     var(--fs-motion-easing-ease-out) both;
+}
+.scene[data-scene-startup="static"][data-scene-reveal="waiting"],
+.scene[data-scene-startup="expired"] {
+  opacity: 1;
+  animation: none;
 }
 @keyframes sceneReadyIn {
   from {
@@ -37,6 +45,6 @@
 .action {
   min-height: var(--fs-space-3xl);
 }
-.controls p {
+.controls > p {
   min-height: 3lh;
 }

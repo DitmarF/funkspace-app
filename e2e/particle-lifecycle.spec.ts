@@ -135,8 +135,8 @@ test("explicit start, local Pause, one still redraw, resize and remount", async 
   await page.waitForTimeout(150);
   expect(await draws(page)).toBe(held);
   await page
-    .getByRole("button", { name: "Toggle particle count", exact: true })
-    .click();
+    .getByRole("slider", { name: "Particle count", exact: true })
+    .fill(String(alternateCount));
   await expect(page.getByRole("status")).toContainText(
     `${alternateCount} particles`,
   );
@@ -145,8 +145,8 @@ test("explicit start, local Pause, one still redraw, resize and remount", async 
   await page.waitForTimeout(100);
   expect(await draws(page)).toBe(held + 1);
   await page
-    .getByRole("button", { name: "Toggle particle count", exact: true })
-    .click();
+    .getByRole("slider", { name: "Particle count", exact: true })
+    .fill(String(DEFAULT_PARTICLE_CONFIG.count));
   await expect(page.getByRole("status")).toContainText(
     `${DEFAULT_PARTICLE_CONFIG.count} particles`,
   );
@@ -155,8 +155,8 @@ test("explicit start, local Pause, one still redraw, resize and remount", async 
   );
   await expect.poll(() => draws(page)).toBe(held + 2);
   await page
-    .getByRole("button", { name: "Resize fixture", exact: true })
-    .click();
+    .getByRole("combobox", { name: "Frame width", exact: true })
+    .selectOption("compact");
   await expect(page.locator(canvas)).toBeVisible();
   expect(
     await page
@@ -183,8 +183,11 @@ test("all denied motion choices retain an independent static representation", as
   page,
 }) => {
   await setup(page);
-  for (const choice of ["Off", "Follow system"]) {
-    await page.getByRole("button", { name: choice, exact: true }).click();
+  for (const choice of ["System"]) {
+    await page
+      .getByRole("group", { name: "Motion", exact: true })
+      .getByRole("button", { name: choice, exact: true })
+      .click();
     await page
       .getByRole("button", { name: "Start scene", exact: true })
       .click();
@@ -298,8 +301,8 @@ test("resize cycles compact, large and standard without replacing the paused run
     ["standard", 640],
   ] as const) {
     await page
-      .getByRole("button", { name: "Resize fixture", exact: true })
-      .click();
+      .getByRole("combobox", { name: "Frame width", exact: true })
+      .selectOption(size);
     await expect(page.locator(host)).toHaveAttribute("data-fixture-size", size);
     await expect
       .poll(async () => (await page.locator(host).boundingBox())?.width)

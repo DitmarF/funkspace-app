@@ -75,7 +75,7 @@ function normalize(
   return Number(clamp(minimum + rounded * step, minimum, maximum).toFixed(2));
 }
 
-function normalizeSetting(
+export function normalizeParticleSetting(
   value: unknown,
   previous: number,
   key: keyof ParticleConfig,
@@ -90,9 +90,19 @@ function effectiveConfig(
 ): ParticleConfig {
   if (!isRecord(input)) return previous;
   return Object.freeze({
-    count: normalizeSetting(input.count, previous.count, "count"),
-    speed: normalizeSetting(input.speed, previous.speed, "speed"),
-    size: normalizeSetting(input.size, previous.size, "size"),
+    count: normalizeParticleSetting(input.count, previous.count, "count"),
+    speed: normalizeParticleSetting(input.speed, previous.speed, "speed"),
+    size: normalizeParticleSetting(input.size, previous.size, "size"),
+    connectionsPerParticle: normalizeParticleSetting(
+      input.connectionsPerParticle,
+      previous.connectionsPerParticle,
+      "connectionsPerParticle",
+    ),
+    connectionDistance: normalizeParticleSetting(
+      input.connectionDistance,
+      previous.connectionDistance,
+      "connectionDistance",
+    ),
   });
 }
 

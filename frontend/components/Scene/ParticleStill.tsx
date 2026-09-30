@@ -25,7 +25,7 @@ export default function ParticleStill({
   const artwork = useMemo(() => {
     const sample = createParticleConnectionSampler(
       (index) => still.particles[index].radius,
-    )(still.particles, still.bounds);
+    )(still.particles, still.bounds, still.config);
     // Retain the element tree as well as the graph: a visibility-only change
     // must not reconcile every line when a menu covers the running scene.
     return (

@@ -100,7 +100,11 @@ export function createCanvasParticleScene(
     context.fillStyle = palette.background;
     context.globalAlpha = 1;
     context.fillRect(0, 0, state.bounds.width, state.bounds.height);
-    const connections = sampleConnections(state.particles, state.bounds);
+    const connections = sampleConnections(
+      state.particles,
+      state.bounds,
+      state.config,
+    );
     context.strokeStyle = palette.particle;
     for (let i = 0; i < connections.count; i++) {
       const link = connections.links[i];

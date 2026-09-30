@@ -46,7 +46,7 @@ for (const viewport of [
           "FunkSpace is a design-system-first web experience built as a PNPM workspace.",
         );
         await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-          "FunkSpace",
+          "Aperture - 1",
         );
         await expect(
           page.locator("header [data-funkspace-logo]"),

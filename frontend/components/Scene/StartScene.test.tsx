@@ -126,7 +126,10 @@ it.each([
   ["reduced", "reduce", true],
   ["reduced", "unknown", false],
   ["reduced", "unavailable", false],
-  ["off", "no-preference", false],
+  ["off", "no-preference", true],
+  ["off", "reduce", true],
+  ["off", "unknown", false],
+  ["off", "unavailable", false],
 ] as const)(
   "actual Start consumer: %s / %s prepares=%s",
   async (preference, systemMotion, prepares) => {
@@ -221,7 +224,7 @@ it("failed preparation keeps complete static artwork and does not retry", async 
   expect(screen.getByRole("button")).toBeDisabled();
 });
 
-it.each(["on", "reduced"] as const)(
+it.each(["on", "reduced", "off"] as const)(
   "%s shows solid WEB for a rejected palette and recovers without replay or losing Pause",
   async (preference) => {
     snapshot = { ...snapshot, preference };
@@ -313,6 +316,24 @@ it("conceals the startup artwork until the first valid Canvas frame and reveals 
   );
 });
 
+it("details navigation startup does not settle the fallback before preparation", async () => {
+  // The same occlusion gate later represents a real modal/failure, but startup
+  // readiness must first be reached before it can latch complete artwork.
+  const view = render(
+    <ScenePresentationContext.Provider
+      value={{ introReady: false, occluded: true }}
+    >
+      <StartScene customizable />
+    </ScenePresentationContext.Provider>,
+  );
+  expect(view.container.querySelector("[data-start-scene]")).toHaveAttribute(
+    "data-scene-reveal",
+    "waiting",
+  );
+  expect(binding.prepare).not.toHaveBeenCalled();
+  view.unmount();
+});
+
 it("finishes an in-flight reveal under Reduced and does not replay when On returns", async () => {
   const view = render(<StartScene />);
   await waitFor(() =>
@@ -395,7 +416,7 @@ it("holds the ready frame and uses solid WEB under restrictions without requesti
   expect(reads).not.toHaveBeenCalled();
   expect(
     mounted.container.querySelectorAll("[data-aperture-fallback] path"),
-  ).toHaveLength(1);
+  ).toHaveLength(0);
   expect(
     mounted.container.querySelectorAll(
       "[data-start-scene] line, [data-start-scene] circle",

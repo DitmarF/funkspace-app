@@ -3,12 +3,16 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type ReactNode,
 } from "react";
 import { ScenePresentationContext } from "./ScenePresentationContext";
+import PortfolioOverlayScope, {
+  usePortfolioOverlays,
+} from "./PortfolioOverlayScope";
 import { useServices } from "@/application/providers/ServiceProvider";
 import { HomeIntroScript } from "@/application/providers/HomeIntroScript";
 import type { HomeIntroBinding } from "@/domain/ports/HomeIntroPort";
@@ -21,19 +25,40 @@ import PortfolioNavigation from "./PortfolioNavigation";
 import PortfolioLegalLinks from "./PortfolioLegalLinks";
 import styles from "./PortfolioShell.module.css";
 
-export default function PortfolioShell({
-  children,
-  animateIdentity = false,
-}: {
+type Props = {
   children: ReactNode;
   animateIdentity?: boolean;
-}) {
+  sceneCustomization?: boolean;
+};
+
+export default function PortfolioShell(props: Props) {
+  return props.sceneCustomization ? (
+    <PortfolioOverlayScope>
+      <ShellContent {...props} />
+    </PortfolioOverlayScope>
+  ) : (
+    <ShellContent {...props} />
+  );
+}
+
+function ShellContent({ children, animateIdentity = false }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const [introReady, setIntroReady] = useState(!animateIdentity);
-  const [occluded, setOccluded] = useState(false);
+  const [navigationOccluded, setOccluded] = useState(false);
+  const overlays = usePortfolioOverlays();
+  const [navigationStarted, setNavigationStarted] = useState(false);
+  useLayoutEffect(() => {
+    if (overlays?.navigationReady) setNavigationStarted(true);
+  }, [overlays?.navigationReady]);
+  const occluded = overlays
+    ? !overlays.navigationReady || overlays.owner !== "none"
+    : navigationOccluded;
   const presentation = useMemo(
-    () => ({ introReady, occluded }),
-    [introReady, occluded],
+    () => ({
+      introReady: introReady && (!overlays || navigationStarted),
+      occluded,
+    }),
+    [introReady, occluded, overlays, navigationStarted],
   );
   const intro = useRef<HomeIntroBinding | null>(null);
   const identity = useRef<LogoMotionRef>(null);

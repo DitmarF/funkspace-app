@@ -91,6 +91,18 @@ Canvas retains its frame. The pure-data particle SVG preview remains fixture-onl
 The infrastructure binding caches validated, immutable semantic palette values;
 theme events recolor the existing runtime without changing particles or intent.
 See the [FS-4.5 record](tasks/fs-4.5-scene-policy-and-themes.md).
+
+The homepage and Aperture details page also have a scene-local parser/CSR startup boundary,
+`SceneStartupScript`, composed from the infrastructure `SceneStartup` adapter.
+It serializes the existing pure motion resolver for a one-time eligibility read;
+it does not store preferences or schedule particle frames. Eligible pending WEB
+artwork is concealed with opacity while its rectangle stays measurable. Actual
+frame/static readiness releases the startup observer and deadline. A 5 s
+fail-open deadline retains visible solid artwork through late hydration without
+hiding or fading it again. No-JS, denied policy and unavailable startup retain
+static artwork. This does not sequence or delay the header/navigation. Details
+scene readiness distinguishes the initial navigation handover from later modal
+occlusion/failure so the startup gate cannot prematurely latch the fallback.
 The Reduced-logo amendment adds an optional `supportsReducedMotion` capability
 to the pure resolver; existing consumers default to static under Reduced. The
 logo alone supplies the implemented whole-artwork fade. Its binding accepts
@@ -267,6 +279,13 @@ Start also selects that solid WEB silhouette during SSR/no-JS, pending, denied
 or failed runtime states. The aperture's `showStatic` presentation input never
 changes its mask-capability readiness report, preventing preparation deadlock.
 Only a valid permitted live/locally paused Canvas frame exposes the aperture.
+Details customization may make this existing cover transparent over that ready
+frame, exposing the full field. This is local presentation state; neither mask
+visibility nor geometry enters the particle rules. Domain effective configuration
+now also includes maximum endpoint degree and a connection-distance multiplier.
+The pure sampler enforces both endpoint caps with shortest-pair selection within
+the existing absolute candidate/line budgets; changing those controls invalidates
+the same Canvas for a permitted redraw, without recreating or reseeding it.
 Start imports no particle SVG preview; the pure-data `ParticleStill` remains
 available to the diagnostic fixture. R15 itself changed no controller, permission or frame owner.
 
@@ -284,6 +303,29 @@ has no validated palette. Start settles to independent solid WEB for this case,
 while the existing resolver gate still denies Canvas preparation. Unmeasured or
 temporarily hidden geometry alone does not settle the initial reveal. Valid
 palette recovery uses the existing binding observation and never replays the fade.
+
+### Details-only particle customization
+
+R19 names the WEB scene **Aperture - 1** and adds its existing details route as
+the first Animations navigation link. Customization starts with Reset and the
+overlay switch, without a duplicate artwork preview. A ready Canvas stays visible
+behind the modal with continuous playback paused; edits may request coalesced
+still redraws. Modal occlusion blocks initial preparation and playback, but no
+longer replaces an already valid frame with solid WEB.
+
+The pure resolver's optional `supportsOffStill` capability defaults false. Only
+the particle controller/startup gate opts in: Off permits preparation of a still
+under all existing availability, readiness and environment guards and always
+returns `mayRun: false`. Its ready presentation is `hold-frame`. Other motion
+consumers retain their existing Off behavior. Reduced retains its current scene
+still behavior. This supersedes earlier Off/static-preview statements below;
+unavailable, failed and no-JS paths keep lightweight solid artwork.
+
+`/animations/aperture` reuses `StartScene` with a details-only customization module. The homepage adds a native More link and keeps Pause/Resume. Native labeled density/speed/size ranges read limits from `ParticleSettings` and render the controller's effective configuration. Input calls the existing handle; Reset configures defaults and invokes low-level seeded reset without changing Pause, theme or policy. Settings belong to that mounted scene, never storage, URL or shared services.
+
+Only the details shell enables `PortfolioOverlayScope`: the two concrete owners are navigation and customization. It retains a closing owner until shared Dialog release, keeps the latest queued request, and cancels it on departure/unmount. It delegates every lock/focus operation to existing Dialog/useDialog. Navigation tickets and native href/history behavior stay in the existing handoff. A shared departure disposition prevents either consumer restoring focus to a departed page. The active native navigation disclosure is preserved until idle; customization remains unavailable during that handover or failed navigation enhancement.
+
+The shell's existing scene-presentation signal treats either modal (and pending native handover) as environmental occlusion. It never changes local Pause. If navigation fails before Canvas is ready, the covered details consumer settles to complete independent WEB artwork instead of waiting indefinitely for a frame. Controls and explanations stay inside the dialog; the modal creates no particle graph or Canvas. The customization panel scrolls as a whole so its enlarged heading does not consume the usable area in short viewports. [FS-4.6 evidence and limitations](tasks/fs-4.6-customization-overlay.md).
 
 ### Particle rendering and fallback cost
 

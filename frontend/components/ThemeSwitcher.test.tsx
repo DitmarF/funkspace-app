@@ -35,7 +35,7 @@ describe("ThemeSwitcher", () => {
     render(<ThemeSwitcher />);
 
     expect(screen.getByRole("button", { name: "System" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Default" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Light" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Dark" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Muted" })).toBeVisible();
     expect(screen.getByRole("button", { name: "High Contrast" })).toBeVisible();

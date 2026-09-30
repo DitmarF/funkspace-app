@@ -93,7 +93,7 @@
   display: grid;
   gap: var(--fs-space-md);
   min-height: 0;
-  overflow: auto;
+  overflow: var(--dialog-content-overflow, auto);
   overscroll-behavior: contain;
   padding: var(--dialog-gutter);
   padding-inline-end: var(--dialog-content-end-space, var(--dialog-gutter));

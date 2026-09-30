@@ -17,6 +17,8 @@ export interface LogoMotionOptions {
   speed: number;
   startAtMs?: number;
   onPlaybackState?: (state: LogoPlaybackState) => void;
+  /** Read-only renderer observation. Consumers must not set per-frame React state. */
+  onPosition?: (timeMs: number, durationMs: number) => void;
 }
 
 /** Retained by one mounted component across effect replay; never persisted. */
@@ -71,6 +73,9 @@ export class LogoMotionController implements LogoMotionHandle {
     this.active = true;
     try {
       this.binding = this.factory({
+        position: (time, duration) => {
+          if (this.active) this.options.onPosition?.(time, duration);
+        },
         visibility: (visible) => {
           if (this.active) {
             this.visibilityKnown = true;

@@ -2,6 +2,7 @@
 import {
   PARTICLE_SETTINGS as settings,
   MAX_PARTICLE_COUNT,
+  DEFAULT_PARTICLE_CONFIG,
 } from "./ParticleSettings";
 import { describe, expect, it, vi } from "vitest";
 import {
@@ -34,8 +35,86 @@ const sampledPairs = (points: readonly Point[], geometry = bounds) => {
       .sort(),
   };
 };
-describe("complete density-adjusted proximity connections", () => {
-  it("connects every close pair, including across cells, with no degree quota", () => {
+describe("bounded density-adjusted proximity connections", () => {
+  it.each([1, 2, 5, 100])(
+    "caps both endpoint degrees at %s using nearest pairs without input-order bias",
+    (limit) => {
+      const points = createParticleScene(bounds, { count: 80 }).particles;
+      const config = { connectionsPerParticle: limit, connectionDistance: 6 };
+      const sample = createParticleConnectionSampler()(points, bounds, config);
+      const degrees = new Array(points.length).fill(0);
+      const original = sample.links
+        .slice(0, sample.count)
+        .map(({ from, to }) => {
+          degrees[from]++;
+          degrees[to]++;
+          return `${from}:${to}`;
+        })
+        .sort();
+      expect(sample.count).toBeGreaterThan(0);
+      expect(Math.max(...degrees)).toBeLessThanOrEqual(limit);
+      expect(new Set(original).size).toBe(original.length);
+      const reverse = createParticleConnectionSampler()(
+        [...points].reverse(),
+        bounds,
+        config,
+      );
+      const mapped = reverse.links
+        .slice(0, reverse.count)
+        .map((l) => `${points.length - 1 - l.to}:${points.length - 1 - l.from}`)
+        .sort();
+      expect(mapped).toEqual(original);
+    },
+  );
+  it("prefers the shortest available pair and independently scales the requested distance", () => {
+    const points = [
+      { x: 0, y: 0 },
+      { x: 4, y: 0 },
+      { x: 6, y: 0 },
+      { x: 10, y: 0 },
+    ];
+    const sample = createParticleConnectionSampler();
+    const result = sample(points, bounds, {
+      connectionsPerParticle: 1,
+      connectionDistance: 1,
+    });
+    expect(
+      result.links.slice(0, result.count).map(({ from, to }) => [from, to]),
+    ).toEqual([
+      [1, 2],
+      [0, 3],
+    ]);
+    const distance = result.distance;
+    expect(
+      sample(points, bounds, {
+        connectionsPerParticle: 1,
+        connectionDistance: 2,
+      }).distance,
+    ).toBeCloseTo(distance * 2);
+    expect(
+      sample(points, bounds, {
+        connectionsPerParticle: NaN,
+        connectionDistance: Infinity,
+      }).distance,
+    ).toBe(sample(points, bounds).distance);
+  });
+  it("supports 1,000 particles at all visitor extremes without increasing engineering budgets", () => {
+    expect(rules.maxLines).toBe(4800);
+    expect(rules.maxCandidateChecks).toBe(38400);
+    const points = createParticleScene(bounds, { count: 1000 }).particles;
+    for (const connectionsPerParticle of [1, 100]) {
+      for (const connectionDistance of [1, 10]) {
+        const result = createParticleConnectionSampler()(points, bounds, {
+          connectionsPerParticle,
+          connectionDistance,
+        });
+        expect(result.count).toBeGreaterThan(0);
+        expect(result.count).toBeLessThanOrEqual(4800);
+        expect(result.candidateChecks).toBeLessThanOrEqual(38400);
+      }
+    }
+  });
+  it("connects every close pair across cells when the degree cap is nonbinding", () => {
     const points = [
       { x: 39, y: 39 },
       { x: 41, y: 39 },
@@ -68,10 +147,14 @@ describe("complete density-adjusted proximity connections", () => {
     for (const count of [settings.controls.count.min, MAX_PARTICLE_COUNT]) {
       const state = createParticleScene(bounds, { count });
       const result = sampledPairs(state.particles);
-      expect(result.limited).toBe(false);
+      expect(result.limited).toBe(count === MAX_PARTICLE_COUNT);
       const expectedDistance = Math.min(
         rules.distance,
-        settings.connections.distanceMultiplier *
+        Math.sqrt(
+          (2 * rules.maxLines * bounds.width * bounds.height) /
+            (Math.PI * count * (count - 1)),
+        ),
+        settings.controls.connectionDistance.default *
           Math.sqrt(
             (2 *
               Math.min(
@@ -161,7 +244,7 @@ describe("complete density-adjusted proximity connections", () => {
     expect(result.count).toBeLessThanOrEqual(rules.maxLines);
     expect(result.pairs).toEqual(pairs(points, result.distance));
     expect(result.candidateChecks).toBeLessThanOrEqual(
-      rules.maxParticles * rules.candidatesPerParticle,
+      rules.maxCandidateChecks,
     );
   });
   it("bounds pathological work and clears partial output rather than starving a region", async () => {
@@ -170,9 +253,13 @@ describe("complete density-adjusted proximity connections", () => {
     vi.doMock("./ParticleSettings", () => ({
       PARTICLE_SETTINGS: {
         ...settings,
-        connections: { ...settings.connections, candidateVisitsPerParticle: 1 },
+        connections: {
+          ...settings.connections,
+          maxCandidateChecks: MAX_PARTICLE_COUNT,
+        },
       },
       MAX_PARTICLE_COUNT,
+      DEFAULT_PARTICLE_CONFIG,
     }));
     try {
       const { createParticleConnectionSampler: boundedSampler } = await import(

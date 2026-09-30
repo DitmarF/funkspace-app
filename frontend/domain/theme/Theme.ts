@@ -41,7 +41,7 @@ export interface ThemeMetadata {
  */
 export const THEME_METADATA: ThemeMetadata[] = [
   { value: "system", label: "System" },
-  { value: "default", label: "Default" },
+  { value: "default", label: "Light" },
   { value: "dark", label: "Dark" },
   { value: "muted", label: "Muted" },
   { value: "dark-high-contrast", label: "High Contrast" },

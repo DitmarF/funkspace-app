@@ -39,6 +39,8 @@ export interface LogoMotionProps
   enabled?: boolean;
   /** Lifecycle notification for the bounded homepage reveal; never a frame callback. */
   onPlaybackState?: (state: LogoPlaybackState) => void;
+  /** Optional imperative timeline display; do not use for per-frame React state. */
+  onPosition?: (timeMs: number, durationMs: number) => void;
 }
 
 export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
@@ -49,6 +51,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       startAtMs,
       enabled = true,
       onPlaybackState,
+      onPosition,
       className,
       "aria-label": ariaLabel,
     },
@@ -65,6 +68,15 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
     });
     const { bindLogoMotion } = useServices();
     const callback = useRef(onPlaybackState);
+    const positionCallback = useRef(onPosition);
+    useEffect(() => {
+      positionCallback.current = onPosition;
+    }, [onPosition]);
+    const notifyPosition = useCallback(
+      (time: number, duration: number) =>
+        positionCallback.current?.(time, duration),
+      [],
+    );
     useEffect(() => {
       callback.current = onPlaybackState;
     }, [onPlaybackState]);
@@ -78,6 +90,7 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
       startAtMs,
       enabled,
       onPlaybackState: notify,
+      onPosition: notifyPosition,
     });
     // Options are updated separately; theme/menu renders never recreate this binding.
     useEffect(() => {
@@ -100,9 +113,10 @@ export const LogoMotion = forwardRef<LogoMotionRef, LogoMotionProps>(
         startAtMs,
         enabled,
         onPlaybackState: notify,
+        onPosition: notifyPosition,
       };
       controller.current?.update(options.current);
-    }, [autoPlay, speed, startAtMs, enabled, notify]);
+    }, [autoPlay, speed, startAtMs, enabled, notify, notifyPosition]);
     useImperativeHandle(
       ref,
       () => ({

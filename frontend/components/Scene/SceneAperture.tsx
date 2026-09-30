@@ -13,6 +13,8 @@ interface Props {
   selection?: SceneApertureSelection;
   /** Complete silhouette until the consumer has a valid live/held frame. */
   showStatic?: boolean;
+  /** Presentation only. Failure/static artwork always remains complete. */
+  transparent?: boolean;
   onReady?(ready: boolean): void;
 }
 const circleHref =
@@ -26,6 +28,7 @@ type LoadedAsset = { selection: SceneApertureSelection; href: string };
 export default function SceneAperture({
   selection = "circle",
   showStatic = false,
+  transparent = false,
   onReady,
 }: Props) {
   const { apertureAssets } = useServices();
@@ -61,6 +64,8 @@ export default function SceneAperture({
       aria-hidden="true"
       focusable="false"
       data-scene-aperture
+      data-overlay-transparent={transparent && !solid}
+      style={{ opacity: transparent && !solid ? 0 : 1 }}
       data-mask-ready={supported === true}
       data-aperture={useAsset ? selection : "circle"}
     >

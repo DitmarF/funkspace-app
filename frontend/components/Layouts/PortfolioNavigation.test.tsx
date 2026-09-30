@@ -100,7 +100,7 @@ describe("Portfolio navigation composition", () => {
     for (const name of ["Chat-bot", "Languages"])
       expect(dialog.getByRole("button", { name })).toBeDisabled();
     expect(dialog.queryByRole("menu")).toBeNull();
-    expect(dialog.getAllByRole("link")).toHaveLength(5);
+    expect(dialog.getAllByRole("link")).toHaveLength(6);
     await user.click(dialog.getByRole("button", { name: "Accessibility" }));
     expect(dialog.getByRole("group", { name: "Appearance" })).toBeVisible();
     expect(dialog.getByRole("group", { name: "Motion" })).toBeVisible();
@@ -117,9 +117,10 @@ describe("Portfolio navigation composition", () => {
     const view = render(<MotionChoices value="system" onChange={onChange} />);
     fireEvent.click(screen.getByRole("button", { name: "Off" }));
     expect(onChange).toHaveBeenCalledExactlyOnceWith("off");
-    expect(
-      screen.getByRole("button", { name: "Follow system" }),
-    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "System" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
     view.rerender(<MotionChoices value="off" onChange={onChange} />);
     expect(screen.getByRole("button", { name: "Off" })).toHaveAttribute(
       "aria-pressed",

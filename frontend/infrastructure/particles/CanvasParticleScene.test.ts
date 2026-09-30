@@ -77,6 +77,30 @@ afterEach(() => {
 });
 
 describe("Canvas particle ownership", () => {
+  it("applies connection controls to the same paused Canvas with one still redraw", () => {
+    const f = fixture();
+    f.runtime.setVisible(true);
+    f.tick(0);
+    const before = structuredClone(f.state.particles);
+    const original = f.canvas;
+    f.context.stroke.mockClear();
+    configureParticles(f.state, {
+      connectionsPerParticle: 1,
+      connectionDistance: 2,
+    });
+    f.runtime.invalidate();
+    f.runtime.invalidate();
+    expect(f.pending.size).toBe(1);
+    f.tick(16);
+    expect(f.context.stroke.mock.calls.length).toBeGreaterThan(0);
+    expect(f.context.stroke.mock.calls.length).toBeLessThanOrEqual(
+      f.state.config.count / 2,
+    );
+    expect(f.state.particles).toEqual(before);
+    expect(f.host.querySelector("canvas")).toBe(original);
+    expect(f.pending.size).toBe(0);
+    f.runtime.destroy();
+  });
   it("draws the same size-dependent links as the independent still after a size change", () => {
     const f = fixture();
     configureParticles(f.state, { size: 2 });

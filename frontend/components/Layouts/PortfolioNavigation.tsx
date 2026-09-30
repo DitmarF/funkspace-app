@@ -18,6 +18,7 @@ import ThemeSwitcher from "../ThemeSwitcher";
 import PortfolioNavigationTree from "./PortfolioNavigationTree";
 import MotionChoices, { type MotionChoicesProps } from "./MotionChoices";
 import MotionSettings from "./MotionSettings";
+import { usePortfolioOverlays } from "./PortfolioOverlayScope";
 import styles from "./PortfolioShell.module.css";
 import panel from "./PortfolioNavigation.module.css";
 
@@ -33,15 +34,51 @@ export default function PortfolioNavigation({
   onOcclusionChange,
 }: PortfolioNavigationProps) {
   const [ready, setReady] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [localOpen, setLocalOpen] = useState(false);
+  const overlays = usePortfolioOverlays();
+  const open = overlays
+    ? overlays.owner === "navigation" && overlays.open
+    : localOpen;
+  const setOpen = (value: boolean) => {
+    if (!overlays) setLocalOpen(value);
+    else if (value) overlays.request("navigation");
+    else overlays.close("navigation");
+  };
   const [category, setCategory] = useState<"navigation" | "a11y">("navigation");
   const detailId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const disclosureRef = useRef<HTMLDetailsElement>(null);
   const { navigationHandoff } = useServices();
   const disposition = useRef<DialogCloseDisposition>("dismiss");
+  const departureDisposition = overlays?.closeDispositionRef;
+  const closeDisposition = useMemo(
+    () => ({
+      get current() {
+        return departureDisposition?.current === "navigation"
+          ? ("navigation" as const)
+          : disposition.current;
+      },
+    }),
+    [departureDisposition],
+  );
   const ticket = useRef<number | null>(null);
   const [failed, setFailed] = useState(false);
+  const closeCoordinated = overlays?.close;
+  const releaseCoordinated = overlays?.released;
+  const navigationReady = overlays?.setNavigationReady;
+  useLayoutEffect(() => {
+    navigationReady?.(ready && !failed);
+    // Also acknowledges a canceled opening which never acquired a native lock.
+    // Child Dialog's sync(false) has run before this parent layout effect.
+    if (!open) releaseCoordinated?.("navigation");
+  }, [
+    open,
+    ready,
+    failed,
+    navigationReady,
+    releaseCoordinated,
+    overlays?.owner,
+  ]);
   // Resolve at use time: a route change may replace the old main before cleanup.
   const fallback = useMemo(
     () => ({
@@ -54,11 +91,13 @@ export default function PortfolioNavigation({
   useLayoutEffect(() => {
     const main = navigationHandoff.fallbackTarget();
     if (main) navigationHandoff.arrived(main);
+    // The two-consumer scope invalidates both owners before either releases.
+    if (closeCoordinated) return;
     return navigationHandoff.observeDeparture(() => {
       disposition.current = "navigation";
-      flushSync(() => setOpen(false));
+      flushSync(() => setLocalOpen(false));
     });
-  }, [navigationHandoff]);
+  }, [navigationHandoff, closeCoordinated]);
   const dismiss = () => {
     navigationHandoff.cancelPreferred();
     disposition.current = "dismiss";
@@ -114,16 +153,18 @@ export default function PortfolioNavigation({
         presentation="fullscreen"
         className={panel.overlay}
         onCloseRequest={dismiss}
-        closeDispositionRef={disposition}
+        closeDispositionRef={closeDisposition}
         unmountDisposition="navigation"
         scrollLock="document-overflow"
         onReleased={() => {
+          releaseCoordinated?.("navigation");
           onOcclusionChange?.(false);
           const id = ticket.current;
           ticket.current = null;
           if (id !== null) navigationHandoff.released(id);
         }}
         onOpenError={(error) => {
+          navigationReady?.(false);
           onOcclusionChange?.(false);
           navigationHandoff.cancel();
           setOpen(false);

@@ -8,7 +8,7 @@ export const themes = [
 ] as const;
 export type FoundationTheme = (typeof themes)[number];
 const labels = {
-  default: "Default",
+  default: "Light",
   dark: "Dark",
   muted: "Muted",
   "dark-high-contrast": "High Contrast",
@@ -49,15 +49,24 @@ export async function transitionPairs(locator: Locator) {
   return samples;
 }
 
-export async function openSettings(page: Page) {
+export async function openSettings(
+  page: Page,
+  { preserveScroll = false }: { preserveScroll?: boolean } = {},
+) {
   const dialog = page.getByRole("dialog", { name: "Navigation and settings" });
   if (!(await dialog.isVisible())) {
-    await page
-      .getByRole("button", {
-        name: "Menu: navigation and settings",
-        exact: true,
-      })
-      .click();
+    const trigger = page.getByRole("button", {
+      name: "Menu: navigation and settings",
+      exact: true,
+    });
+    if (preserveScroll) {
+      // Locator.click() may scroll even a visible launcher before pointerdown.
+      // Scroll-restoration tests need real pointer input at its current position.
+      await expect(trigger).toBeInViewport({ ratio: 1 });
+      const box = await trigger.boundingBox();
+      if (!box) throw new Error("Navigation launcher has no visible bounds");
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    } else await trigger.click();
   }
   await expect(dialog).toBeVisible();
 }

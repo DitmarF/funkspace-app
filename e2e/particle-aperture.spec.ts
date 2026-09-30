@@ -40,10 +40,14 @@ test("static WEB fills short frames before Start, while denied and after destroy
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(route);
   await expect(page.locator(cover)).toHaveAttribute("data-aperture", "web");
-  await page.getByRole("button", { name: "Off", exact: true }).click();
-  await page.getByRole("button", { name: "Toggle short frame" }).click();
+  await page
+    .getByRole("group", { name: "Motion", exact: true })
+    .getByRole("button", { name: "System", exact: true })
+    .click();
+  await page.getByRole("checkbox", { name: "Short frame (4:1)" }).check();
   await expectCompleteStaticField(page);
   await expect(page.locator(canvas)).toHaveCount(0);
   await page.getByRole("button", { name: "Start scene", exact: true }).click();
@@ -52,9 +56,13 @@ test("static WEB fills short frames before Start, while denied and after destroy
   await page
     .getByRole("button", { name: "Destroy scene", exact: true })
     .click();
-  for (let i = 0; i < 3; i++) {
-    await page.getByRole("button", { name: "Resize fixture" }).click();
-    await page.getByRole("button", { name: "Toggle short frame" }).click();
+  for (const [i, size] of ["compact", "large", "standard"].entries()) {
+    await page
+      .getByRole("combobox", { name: "Frame width" })
+      .selectOption(size);
+    await page
+      .getByRole("checkbox", { name: "Short frame (4:1)" })
+      .setChecked(i % 2 !== 0);
     await expectCompleteStaticField(page);
     await expect(page.locator(canvas)).toHaveCount(0);
   }
@@ -71,7 +79,7 @@ test("failed runtime keeps the full static field across later aspect changes", a
     await page.locator(canvas).dispatchEvent("contextlost");
     await expect(page.getByRole("status")).toContainText("failed");
   }
-  await page.getByRole("button", { name: "Toggle short frame" }).click();
+  await page.getByRole("checkbox", { name: "Short frame (4:1)" }).check();
   await expectCompleteStaticField(page);
   await expect(page.locator(canvas)).toHaveCount(0);
 });
@@ -96,8 +104,11 @@ test("native embedding, stable IDs, theme/layout and non-intercepting decoration
     .locator("[id]")
     .evaluateAll((nodes) => nodes.map((node) => node.id));
   expect(new Set(ids).size).toBe(ids.length);
-  for (const theme of ["Default", "Dark", "Muted", "High Contrast", "System"]) {
-    await page.getByRole("button", { name: theme, exact: true }).click();
+  for (const theme of ["Light", "Dark", "Muted", "High Contrast", "System"]) {
+    await page
+      .getByRole("group", { name: "Theme", exact: true })
+      .getByRole("button", { name: theme, exact: true })
+      .click();
     for (const width of [320, 1280]) {
       await page.setViewportSize({ width, height: 720 });
       await expect(page.locator(cover)).toHaveCSS("pointer-events", "none");
@@ -105,7 +116,9 @@ test("native embedding, stable IDs, theme/layout and non-intercepting decoration
       expect(await page.locator(cover).boundingBox()).toEqual(frame);
     }
   }
-  await page.getByRole("button", { name: "Replace aperture" }).click();
+  await page
+    .getByRole("combobox", { name: "Aperture" })
+    .selectOption("technical-diamond");
   await expect(page.locator(cover)).toHaveAttribute(
     "data-aperture",
     "technical-diamond",
@@ -121,7 +134,9 @@ test("mounted replacement preserves the same Canvas and exact paused pixels", as
   await page.getByRole("button", { name: "Start scene", exact: true }).click();
   if (!available) {
     await expect(page.locator(canvas)).toHaveCount(0);
-    await page.getByRole("button", { name: "Replace aperture" }).click();
+    await page
+      .getByRole("combobox", { name: "Aperture" })
+      .selectOption("technical-diamond");
     await expect(page.locator(cover)).toHaveAttribute(
       "data-aperture",
       "technical-diamond",
@@ -135,7 +150,9 @@ test("mounted replacement preserves the same Canvas and exact paused pixels", as
     .locator(canvas)
     .evaluate((node) => (node as HTMLCanvasElement).toDataURL());
   for (let i = 0; i < 4; i++) {
-    await page.getByRole("button", { name: "Replace aperture" }).click();
+    await page
+      .getByRole("combobox", { name: "Aperture" })
+      .selectOption(i % 2 === 0 ? "technical-diamond" : "web");
     await expect(page.locator(cover)).toHaveAttribute(
       "data-aperture",
       i % 2 === 0 ? "technical-diamond" : "web",
@@ -181,7 +198,9 @@ for (const failure of ["missing", "malformed", "forbidden", "empty"]) {
       "data-mask-ready",
       "true",
     );
-    await page.getByRole("button", { name: "Replace aperture" }).click();
+    await page
+      .getByRole("combobox", { name: "Aperture" })
+      .selectOption("technical-diamond");
     await expect(page.locator(cover)).toHaveAttribute(
       "data-aperture",
       "circle",
@@ -210,9 +229,11 @@ test("delayed and stale responses do not replace the newer WEB selection", async
   );
   await page.goto(route);
   await expect(page.locator(cover)).toHaveAttribute("data-mask-ready", "true");
-  await page.getByRole("button", { name: "Replace aperture" }).click();
+  await page
+    .getByRole("combobox", { name: "Aperture" })
+    .selectOption("technical-diamond");
   await expect(page.locator(cover)).toHaveAttribute("data-aperture", "circle");
-  await page.getByRole("button", { name: "Replace aperture" }).click();
+  await page.getByRole("combobox", { name: "Aperture" }).selectOption("web");
   release();
   await expect(
     page.locator("[data-aperture-gallery] [data-aperture='technical-diamond']"),

@@ -36,6 +36,7 @@ export class AnimationTimeline implements AnimationRuntime {
     manifest: AnimationManifest,
     private onComplete?: () => void,
     private onError?: (error: unknown) => void,
+    private onPosition?: (timeMs: number, durationMs: number) => void,
   ) {
     this.root = root;
     this.timeline = createTimeline(manifest.steps);
@@ -176,6 +177,7 @@ export class AnimationTimeline implements AnimationRuntime {
     for (const sample of sampleTimeline(this.timeline, this.currentTime)) {
       this.applyValue(sample.tween.target, sample.tween.property, sample.value);
     }
+    this.onPosition?.(this.currentTime, this.duration);
   }
 
   /**

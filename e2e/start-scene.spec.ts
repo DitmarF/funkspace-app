@@ -11,7 +11,10 @@ async function preference(page: Page, choice: string) {
   await page
     .getByRole("button", { name: "Accessibility", exact: true })
     .click();
-  await page.getByRole("button", { name: choice, exact: true }).click();
+  await page
+    .getByRole("group", { name: "Motion", exact: true })
+    .getByRole("button", { name: choice, exact: true })
+    .click();
   await page
     .getByRole("button", {
       name: "Menu: close navigation and settings",
@@ -118,7 +121,7 @@ for (const choice of ["on", "reduced"]) {
   });
 }
 
-test("menu cycles keep a lightweight fallback and the same live Canvas", async ({
+test("menu cycles retain the same frozen Canvas without a particle fallback", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -143,7 +146,8 @@ test("menu cycles keep a lightweight fallback and the same live Canvas", async (
     await stopped(page);
     await expect(
       page.locator("#start [data-aperture-fallback] path"),
-    ).toHaveCount(1);
+    ).toHaveCount(0);
+    await expect(canvas(page)).toBeVisible();
     await expect(
       page.locator("#start line, #start circle, #start [data-particle-static]"),
     ).toHaveCount(0);
@@ -194,13 +198,15 @@ for (const choice of ["system", "on", "reduced", "off"]) {
       if (runs) {
         await expect(canvas(page)).toBeVisible();
         await expect.poll(() => frames(page)).toBeGreaterThan(2);
-      } else if (available && choice === "reduced") {
+      } else if (available && (choice === "reduced" || choice === "off")) {
         await expect(canvas(page)).toBeVisible();
         await expect.poll(() => frames(page)).toBe(1);
         await stopped(page);
         await expect(page.locator("#start button")).toBeDisabled();
         await expect(page.locator("#start [role=status]")).toContainText(
-          "Reduced motion is selected",
+          choice === "off"
+            ? "Decorative animation is off"
+            : "Reduced motion is selected",
         );
         await expect(page.locator("[data-aperture-fallback]")).toHaveCount(0);
         await expect(page.locator("[data-start-scene]")).toHaveAttribute(
@@ -289,57 +295,63 @@ for (const outcome of ["draw", "timeout"] as const) {
   });
 }
 
-test("Reduced keeps one still Canvas through recolor, resize, occlusion and On transitions", async ({
-  page,
-}, testInfo) => {
-  if (!available) return;
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.addInitScript(() =>
-    localStorage.setItem("funkspace.motion.preference.v1", "reduced"),
-  );
-  await instrument(page);
-  await page.goto("/");
-  await expect(canvas(page)).toBeVisible();
-  await stopped(page);
-  const owner = await canvas(page).elementHandle();
-  await page.setViewportSize({ width: 900, height: 740 });
-  await expect.poll(() => frames(page)).toBeGreaterThan(1);
-  await stopped(page);
-  await page
-    .getByRole("button", { name: "Menu: navigation and settings", exact: true })
-    .click();
-  await page
-    .getByRole("button", { name: "Accessibility", exact: true })
-    .click();
-  const before = await frames(page);
-  await page.getByRole("button", { name: "Dark", exact: true }).click();
-  await stopped(page);
-  expect(await frames(page)).toBe(before);
-  await page
-    .getByRole("button", {
-      name: "Menu: close navigation and settings",
-      exact: true,
-    })
-    .click();
-  await expect.poll(() => frames(page)).toBe(before + 1);
-  await stopped(page);
-  await page.screenshot({
-    path: testInfo.outputPath("reduced-still-canvas.png"),
+for (const stillPreference of ["reduced", "off"] as const) {
+  test(`${stillPreference} keeps one still Canvas through recolor, resize, occlusion and On transitions`, async ({
+    page,
+  }, testInfo) => {
+    if (!available) return;
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.addInitScript(
+      (value) => localStorage.setItem("funkspace.motion.preference.v1", value),
+      stillPreference,
+    );
+    await instrument(page);
+    await page.goto("/");
+    await expect(canvas(page)).toBeVisible();
+    await stopped(page);
+    const owner = await canvas(page).elementHandle();
+    await page.setViewportSize({ width: 900, height: 740 });
+    await expect.poll(() => frames(page)).toBeGreaterThan(1);
+    await stopped(page);
+    await page
+      .getByRole("button", {
+        name: "Menu: navigation and settings",
+        exact: true,
+      })
+      .click();
+    await page
+      .getByRole("button", { name: "Accessibility", exact: true })
+      .click();
+    const before = await frames(page);
+    await page.getByRole("button", { name: "Dark", exact: true }).click();
+    await stopped(page);
+    expect(await frames(page)).toBe(before + 1);
+    await page
+      .getByRole("button", {
+        name: "Menu: close navigation and settings",
+        exact: true,
+      })
+      .click();
+    await expect.poll(() => frames(page)).toBe(before + 1);
+    await stopped(page);
+    await page.screenshot({
+      path: testInfo.outputPath(`${stillPreference}-still-canvas.png`),
+    });
+    await preference(page, "On");
+    await expect.poll(() => frames(page)).toBeGreaterThan(before + 3);
+    await preference(page, stillPreference === "off" ? "Off" : "Reduced");
+    await stopped(page);
+    expect(
+      await owner!.evaluate(
+        (node) => node === document.querySelector("#start canvas"),
+      ),
+    ).toBe(true);
+    await expect(page.locator("[data-start-scene]")).toHaveAttribute(
+      "data-scene-reveal",
+      "static",
+    );
   });
-  await preference(page, "On");
-  await expect.poll(() => frames(page)).toBeGreaterThan(before + 3);
-  await preference(page, "Reduced");
-  await stopped(page);
-  expect(
-    await owner!.evaluate(
-      (node) => node === document.querySelector("#start canvas"),
-    ),
-  ).toBe(true);
-  await expect(page.locator("[data-start-scene]")).toHaveAttribute(
-    "data-scene-reveal",
-    "static",
-  );
-});
+}
 
 test("Pause, all themes, settings occlusion and policy transitions preserve the mounted scene", async ({
   page,
@@ -355,14 +367,14 @@ test("Pause, all themes, settings occlusion and policy transitions preserve the 
   await page.getByRole("button", { name: "Pause animation" }).click();
   await stopped(page);
   const scene = await canvas(page).elementHandle();
-  for (const choice of ["Off", "Reduced", "Follow system", "On"]) {
+  for (const choice of ["Off", "Reduced", "System", "On"]) {
     await preference(page, choice);
     await expect(
       page.getByRole("button", { name: "Resume animation" }),
     ).toBeVisible();
     await stopped(page);
   }
-  for (const theme of ["Dark", "Muted", "High Contrast", "Default"]) {
+  for (const theme of ["Dark", "Muted", "High Contrast", "Light"]) {
     const points = await page.evaluate(
       () =>
         (window as typeof window & { fs45: { points: number[][] } }).fs45
@@ -491,7 +503,7 @@ test("blocked storage and unavailable OS signals retain static System artwork", 
   await expect(page.locator("[data-aperture-fallback] path")).toBeVisible();
   await expect(canvas(page)).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "FunkSpace", exact: true }),
+    page.getByRole("heading", { name: "Aperture - 1", exact: true }),
   ).toBeVisible();
 });
 

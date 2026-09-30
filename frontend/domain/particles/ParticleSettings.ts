@@ -9,6 +9,8 @@ export type ParticleConfig = Readonly<{
   count: number;
   speed: number;
   size: number;
+  connectionsPerParticle: number;
+  connectionDistance: number;
 }>;
 type Range = readonly [min: number, max: number];
 
@@ -23,16 +25,15 @@ export interface ParticleSettings {
   }>;
   readonly connections: Readonly<{
     maxDistanceCssPx: number;
-    distanceMultiplier: number;
     densityTargetLines: number;
     densityTargetPerParticle: number;
-    lineBudgetPerParticle: number;
+    maxLines: number;
     widthCssPx: number;
     opacity: number;
     referenceRadiusCssPx: number;
     sizeScale: Range;
     maxOpacity: number;
-    candidateVisitsPerParticle: number;
+    maxCandidateChecks: number;
     maxPasses: number;
     retryDistanceMultiplier: number;
   }>;
@@ -45,11 +46,23 @@ export interface ParticleSettings {
 }
 
 export const PARTICLE_SETTINGS: ParticleSettings = Object.freeze({
-  // Future controls consume these same defaults, clamps and steps.
+  // Controls and direct callers share these defaults, clamps and steps.
   controls: Object.freeze({
-    count: Object.freeze({ default: 200, min: 20, max: 200, step: 2 }),
-    speed: Object.freeze({ default: 0.4, min: 0.2, max: 0.6, step: 0.1 }),
-    size: Object.freeze({ default: 1, min: 0.5, max: 2, step: 0.1 }),
+    count: Object.freeze({ default: 200, min: 10, max: 1000, step: 1 }),
+    speed: Object.freeze({ default: 0.4, min: 0.1, max: 2, step: 0.1 }),
+    size: Object.freeze({ default: 1, min: 0.1, max: 4, step: 0.1 }),
+    connectionsPerParticle: Object.freeze({
+      default: 100,
+      min: 1,
+      max: 100,
+      step: 1,
+    }),
+    connectionDistance: Object.freeze({
+      default: 6,
+      min: 1,
+      max: 10,
+      step: 0.1,
+    }),
   }),
   particles: Object.freeze({
     seed: 0x46533431,
@@ -60,17 +73,16 @@ export const PARTICLE_SETTINGS: ParticleSettings = Object.freeze({
   }),
   connections: Object.freeze({
     maxDistanceCssPx: 10000, // Ceiling; density normally gives a shorter distance.
-    distanceMultiplier: 6, // Scale the density-derived distance, before the ceiling.
     densityTargetLines: 1000, // Formula input, not a promised output line count.
     densityTargetPerParticle: 0.5,
-    lineBudgetPerParticle: 24, // × count.max = buffer/output ceiling.
+    maxLines: 4800, // Preserve the existing absolute output budget as density grows.
     widthCssPx: 0.4,
     opacity: 1,
     referenceRadiusCssPx: 2,
     sizeScale: Object.freeze([0.8, 1.5] as const),
     maxOpacity: 1,
-    // Work ceiling, NOT a degree quota: every nearby unordered pair is eligible.
-    candidateVisitsPerParticle: 192, // × count.max, shared across all retry passes.
+    // Engineering ceiling, separate from the visitor's per-particle degree cap.
+    maxCandidateChecks: 38400, // Shared across all retry passes; independent of count.
     maxPasses: 16,
     retryDistanceMultiplier: 0.5,
   }),
@@ -90,4 +102,7 @@ export const DEFAULT_PARTICLE_CONFIG: ParticleConfig = Object.freeze({
   count: PARTICLE_SETTINGS.controls.count.default,
   speed: PARTICLE_SETTINGS.controls.speed.default,
   size: PARTICLE_SETTINGS.controls.size.default,
+  connectionsPerParticle:
+    PARTICLE_SETTINGS.controls.connectionsPerParticle.default,
+  connectionDistance: PARTICLE_SETTINGS.controls.connectionDistance.default,
 });

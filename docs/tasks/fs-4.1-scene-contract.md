@@ -2,14 +2,81 @@
 
 ## Task metadata
 
-- **Contract revision:** R16, 2026-09-29; explicit Reduced uses a still Canvas and WEB reveals after its first valid frame. R15, 2026-09-29; homepage solid WEB fallback replaces the particle SVG while preserving ready local-Pause Canvas. R14, 2026-09-29; WEB uses Work Sans Black 900. R13, 2026-09-29; WEB replaces SPACE, retaining Work Sans Bold 700 and current particle tuning. R12, 2026-09-29; half-width amendment supersedes R11 thickness only. R11, 2026-09-29; doubled connection range/width supersedes R10 numeric limits below. R10, 2026-09-29; complete proximity graph amendment below supersedes R9 connection/radius tuning. R9, 2026-09-29; connection prominence / smaller particles / larger fixture amendment below supersedes R8 tuning. R8, 2026-09-29; density/speed/connection amendment below supersedes R7 settings. R7, 2026-09-29; 1,000 default / 2,000 toggle amendment below supersedes R6 count settings. R6, 2026-09-29; 480-particle amendment below supersedes the earlier count default/ceiling. R5, 2026-09-29: repository-authored Work Sans SPACE amendment below supersedes Illustrator-delivery prerequisites. R4, 2026-09-28: Dimi's proximity-connection amendment below supersedes only the earlier exclusion of links. Numeric connection styling and density remain provisional candidate values.
-- **Status:** R16 records Dimi’s explicit still-Canvas and WEB-only reveal request (navigation clarification received); independent implementation review and final visual acceptance remain separate. R15 records Dimi’s accepted solid-homepage-fallback amendment; implementation evidence belongs to FS-4.5. R3 specification completion and R2 technical PASS remain historical facts. R4 records the newly requested connection behavior; it does not claim approval of its provisional tuning, an independent implementation review or new performance results.
+**Current revision: R19 (2026-09-30)** — Dimi's scene identity, dialog and Off-still
+amendment below supersedes earlier preview/Off fallback behavior. R18 still owns
+the numeric controls and degree limits. The revision and
+status entries immediately below retain the historical record through R17.
+
+**Implementation checkpoint — 2026-09-30:** FS-4.6 C7 received Codex R2 technical
+PASS against R19; F1–F3 are closed. See the [review closure and remaining limits](fs-4.6-customization-overlay.md#codex-r2-closure-and-authorized-delivery--2026-09-30).
+This adds evidence, not a product-contract revision or final visual acceptance.
+
+- **Contract revision:** R17, 2026-09-29; details-only customization, homepage More link and lightweight thumbnail clarification below. R16, 2026-09-29; explicit Reduced uses a still Canvas and WEB reveals after its first valid frame. R15, 2026-09-29; homepage solid WEB fallback replaces the particle SVG while preserving ready local-Pause Canvas. R14, 2026-09-29; WEB uses Work Sans Black 900. R13, 2026-09-29; WEB replaces SPACE, retaining Work Sans Bold 700 and current particle tuning. R12, 2026-09-29; half-width amendment supersedes R11 thickness only. R11, 2026-09-29; doubled connection range/width supersedes R10 numeric limits below. R10, 2026-09-29; complete proximity graph amendment below supersedes R9 connection/radius tuning. R9, 2026-09-29; connection prominence / smaller particles / larger fixture amendment below supersedes R8 tuning. R8, 2026-09-29; density/speed/connection amendment below supersedes R7 settings. R7, 2026-09-29; 1,000 default / 2,000 toggle amendment below supersedes R6 count settings. R6, 2026-09-29; 480-particle amendment below supersedes the earlier count default/ceiling. R5, 2026-09-29: repository-authored Work Sans SPACE amendment below supersedes Illustrator-delivery prerequisites. R4, 2026-09-28: Dimi's proximity-connection amendment below supersedes only the earlier exclusion of links. Numeric connection styling and density remain provisional candidate values.
+- **Status:** R17 records Dimi’s details-only customization instruction; implementation review and visual acceptance remain separate. R16 records Dimi’s explicit still-Canvas and WEB-only reveal request (navigation clarification received); independent implementation review and final visual acceptance remain separate. R15 records Dimi’s accepted solid-homepage-fallback amendment; implementation evidence belongs to FS-4.5. R3 specification completion and R2 technical PASS remain historical facts. R4 records the newly requested connection behavior; it does not claim approval of its provisional tuning, an independent implementation review or new performance results.
 - **Owner/current writer:** Codex records Dimi's acceptance and reconciles the feature plan. Sites owns later implementation tasks when authorized. The separate read-only review phase in this same chat is not represented as a separately staffed reviewer.
 - **Product owner:** Dimi; exact acceptance and its limits are recorded below.
 - **Repository:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`.
 - **Inspected HEAD/base:** `1ab13095edb3cf0c9b38897ddcbb75a16d0ff498`; R1 started from a clean tree; R2 started with only the untracked R1 document. The historical reference happens to equal HEAD; no reset or remote fetch was performed.
 - **Scope authority:** [feature plan](../features/funkspace-minimum-usable.md), [EPIC 3 closure and API handoff](fs-3.6-integrated-validation.md), [workflow](../development/ai-workflow.md), [task template](../templates/task.md).
 - **Candidate identity:** Reviewed R2 was the base above plus this one added document; its exact hash is retained in the acceptance record. R3 also updated the feature plan and had no runtime diff. Exact R3 diff/hashes/checks remain in the acceptance packet. R4 implementation and fresh evidence belong to the FS-4.3 connection amendment.
+
+## R19 — Aperture - 1 and retained still frames — 2026-09-30
+
+Dimi explicitly requests the following changes, replacing the earlier R16/R17
+restrictions where they conflict:
+
+- Name the WEB animation **Aperture - 1** on the homepage, details page and first
+  Animations navigation entry. Preserve the existing `/animations/aperture` URL.
+- Remove the dialog's WEB artwork section. Reset animation and the transparent
+  WEB overlay switch come first, followed by explanations and the five controls.
+- Preserve the current paused Canvas behind the open customization dialog. This
+  remains one runtime/frame owner; opening the dialog suspends continuous motion
+  environmentally and never changes local Pause. Visible edits may redraw a still.
+- Explicit **Off**, like the existing Reduced scene behavior, may prepare a single
+  still Canvas. The shared resolver exposes an opt-in `supportsOffStill` capability;
+  Off always returns `mayRun: false`. The particle controller and its trusted
+  startup gate opt in. Other consumers, including the logo, keep their prior Off
+  behavior. Pending/disposed policy, unavailable feature, unready intro/cover,
+  invalid palette, hidden geometry/document, unknown/unavailable System and failed
+  runtime still prevent preparation. Failed/unavailable Canvas and no-JS retain
+  independent solid WEB. No automatic failure retry or second preview loop.
+- Visible appearance label **Light** retains the persisted `default` value;
+  motion label **System** retains the persisted `system` value. No storage migration.
+
+The attached 2026-09-30 13.06.38 screenshot was inspected for the old preview and
+background fallback. This is implementation authorization, not Dimi's final
+visual acceptance or a new performance result. See FS-4.6 C6 for exact evidence.
+
+## R18 — expanded customization — 2026-09-30
+
+Dimi explicitly requests density 10–1000, connections per particle 1–100,
+connection-distance multiplier 1–10, speed 0.1–2, size 0.1–4, and an on/off
+transparent WEB overlay. These bounds and controls are authorized by that
+request; implementation/visual acceptance remains separate.
+
+Interpret connections per particle as a maximum at both endpoints, selecting
+closest pairs first within the bounded spatial graph. This supersedes R10's
+unconditional no-degree-quota rule. Keep existing engineering limits absolute
+(4800 lines, 38400 candidate visits, 16 passes), independent of the expanded
+particle count. Effective distance may be reduced by those limits. Defaults
+remain count 200, speed 0.4×, size 1× and distance 6×; the new maximum degree
+defaults to 100. Count/degree steps are 1; multiplier steps are 0.1.
+
+Transparent overlay On exposes the full rectangular particle field of a ready
+Canvas; Off restores the WEB cutout. This presentation-only state retains
+runtime identity and leaves denied/failed static artwork complete. Values stay
+local and reset on reload. User Reset restores all five default values, opaque
+WEB and seeded particles without clearing Pause or motion/theme preferences.
+No extra homepage controls. [Current tuning](fs-4-particle-settings.md#current-tuning--2026-09-30-r18-customization)
+and [implementation evidence](fs-4.6-customization-overlay.md#c4--expanded-customization--2026-09-30).
+
+## R17 — details-only customization — 2026-09-29
+
+Dimi explicitly authorizes FS-4.6 and clarifies: no extra customization controls on the main WEB animation; add a **More** link to a separate detailed page. Preserve homepage Pause/Resume. The already accepted `/animations/aperture` route owns its own temporary scene settings and shared **Customize animation** Dialog (D11/D12); closing retains values, leaving/reloading restores defaults. No homepage-to-details settings transfer or persistence. Detailed educational copy remains Dimi's later input.
+
+Dimi's later repository rule against dense particle SVG/DOM constructs also covers customization previews. Reuse the lightweight solid WEB silhouette, explicitly labeled static artwork; it does not pretend to show particle edits. Suspend the covered scene environmentally, keep its runtime and local Pause, and show effective edits on returning to the scene. This reconciles D11's static-thumbnail choice with the newer rendering constraint; no second preview simulation or Canvas loop is introduced.
+
+Approval: the details-only placement and More link are Dimi's explicit instruction; reuse of Dialog and shell-local two-consumer coordination comes from accepted D11/D12. Implementation layout/labels and technical correctness await review and Dimi's feedback, not inferred visual acceptance. [FS-4.6 implementation and validation](fs-4.6-customization-overlay.md). FS-4.7, remote actions and EPIC closure are not authorized by this amendment.
 
 ## R16 — Reduced still Canvas and WEB readiness reveal — 2026-09-29
 

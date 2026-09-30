@@ -1,0 +1,89 @@
+/* Compact diagnostic controls only; product control sizes stay unchanged. */
+.panel {
+  display: grid;
+  gap: var(--fs-space-md);
+  min-width: 0;
+  width: 100%;
+  color: var(--fs-color-content-primary);
+}
+
+.panel button {
+  --standard-font-size: var(--fs-font-size-sm);
+  --standard-padding: var(--fs-space-sm);
+  --standard-font-weight: var(--fs-font-weight-semibold);
+}
+
+.panel h1 {
+  font-size: var(--fs-font-size-lg);
+}
+
+.panel fieldset > legend {
+  font-size: var(--fs-font-size-sm);
+  margin-bottom: var(--fs-space-sm);
+}
+
+/* Keep the shared Motion choices compact without changing navigation styles. */
+.panel fieldset:not(.group) > div {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--fs-space-sm);
+}
+
+.theme {
+  min-width: 0;
+}
+
+.group {
+  display: grid;
+  gap: var(--fs-space-sm);
+  min-width: 0;
+  margin: 0;
+  padding: var(--fs-space-md) 0 0;
+  border: 0;
+  border-top: 1px solid var(--fs-color-border-subtle);
+}
+
+.group legend {
+  padding: 0 var(--fs-space-xs) 0 0;
+  font-size: var(--fs-font-size-sm);
+  font-weight: var(--fs-font-weight-semibold);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fs-space-sm);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--fs-space-md);
+  max-width: 40rem;
+}
+
+.timeline {
+  display: grid;
+  gap: var(--fs-space-xs);
+  width: 100%;
+  max-width: 40rem;
+  font-size: var(--fs-font-size-sm);
+}
+
+.timeline input {
+  width: 100%;
+  min-height: var(--fs-space-xl);
+  margin: 0;
+  accent-color: var(--fs-color-content-primary);
+}
+
+.timeline input:focus-visible {
+  outline: 2px solid var(--fs-color-border-focus);
+  outline-offset: 2px;
+}
+
+.hint {
+  font-size: var(--fs-font-size-sm);
+  max-width: 65ch;
+}

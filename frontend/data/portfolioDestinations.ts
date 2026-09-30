@@ -8,6 +8,11 @@ type Destination = Readonly<{
 // record, not this contract.
 export const portfolioDestinations = {
   home: { focusId: "main-content", label: "FunkSpace", href: "/" },
+  aperture: {
+    focusId: "main-content",
+    label: "More about Aperture - 1",
+    href: "/animations/aperture",
+  },
   start: { focusId: "start", label: "Start", href: "/#start" },
   about: { focusId: "about", label: "About", href: "/#about" },
   contact: { focusId: "contact", label: "Contact", href: "/#contact" },

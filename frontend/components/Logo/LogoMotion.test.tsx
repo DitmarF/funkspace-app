@@ -10,6 +10,48 @@ import { MOTION_PREFERENCE_KEY } from "@/domain/motion/MotionPolicy";
 import { AnimationTimeline } from "@/infrastructure/motion/timeline";
 import { createTimeline } from "@funkspace/common/motion";
 
+it("reports the renderer position through one clock, including seek and terminal cleanup", () => {
+  localStorage.setItem(MOTION_PREFERENCE_KEY, "on");
+  const services = createServices({ decorativeMotionAvailable: true });
+  const factory = () => services;
+  const ref = createRef<LogoMotionRef>();
+  const first = vi.fn();
+  const latest = vi.fn();
+  const tree = (onPosition: (time: number, duration: number) => void) => (
+    <ServiceProvider serviceFactory={factory}>
+      <LogoMotion ref={ref} autoPlay={false} onPosition={onPosition} />
+    </ServiceProvider>
+  );
+  const view = render(tree(first));
+  visible();
+  expect(first.mock.lastCall?.[0]).toBe(0);
+  const duration = first.mock.lastCall![1];
+  expect(duration).toBeGreaterThan(0);
+  expect(frames.size).toBe(0);
+  act(() => ref.current!.play());
+  advance(100);
+  expect(first).toHaveBeenLastCalledWith(100, duration);
+  expect(frames.size).toBe(1);
+  view.rerender(tree(latest));
+  const previousCalls = first.mock.calls.length;
+  advance(100);
+  expect(first).toHaveBeenCalledTimes(previousCalls);
+  expect(latest).toHaveBeenLastCalledWith(200, duration);
+  act(() => {
+    ref.current!.pause();
+    ref.current!.seek(duration / 2);
+  });
+  expect(latest).toHaveBeenLastCalledWith(duration / 2, duration);
+  expect(frames.size).toBe(0);
+  act(() => ref.current!.play());
+  const stale = [...frames.values()];
+  view.unmount();
+  const calls = latest.mock.calls.length;
+  act(() => stale.forEach((callback) => callback(9999)));
+  expect(latest).toHaveBeenCalledTimes(calls);
+  expect(frames.size).toBe(0);
+});
+
 it.each(["on", "reduced", "system"] as const)(
   "%s cancelled automatic introduction survives Strict Mode and permits explicit playback",
   (preference) => {
@@ -588,7 +630,7 @@ it.each(["off", "reduced"] as const)(
       });
     complete(screen.getByRole("img"));
     expect(frames.size).toBe(0);
-    fireEvent.click(screen.getByRole("button", { name: "Follow system" }));
+    fireEvent.click(screen.getByRole("button", { name: "System" }));
     visible();
     expect(frames.size).toBe(0);
     complete(screen.getByRole("img"));
@@ -937,7 +979,7 @@ it("L3: document suspension resumes unfinished work but an OS reduction consumes
     reduce = true;
     media.forEach((callback) => callback());
   });
-  expect(screen.getByRole("button", { name: "Follow system" })).toHaveAttribute(
+  expect(screen.getByRole("button", { name: "System" })).toHaveAttribute(
     "aria-pressed",
     "true",
   );

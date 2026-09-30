@@ -1,0 +1,10 @@
+.dialog[open] {
+  /* Scroll the whole panel: an enlarged header must not consume short screens. */
+  display: block;
+  /* A nested auto scroller with overscroll containment traps wheel/touch input. */
+  --dialog-content-overflow: visible;
+}
+.range {
+  accent-color: var(--fs-color-content-primary);
+  cursor: pointer;
+}

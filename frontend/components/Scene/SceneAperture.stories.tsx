@@ -24,8 +24,9 @@ export const Replacement: Story = {
       ).toBeVisible(),
     );
     const canvas = canvasElement.querySelector("canvas[data-particle-canvas]");
-    await userEvent.click(
-      view.getByRole("button", { name: "Replace aperture" }),
+    await userEvent.selectOptions(
+      view.getByRole("combobox", { name: "Aperture" }),
+      "technical-diamond",
     );
     await waitFor(() =>
       expect(

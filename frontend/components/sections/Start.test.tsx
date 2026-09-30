@@ -20,7 +20,7 @@ describe("portfolio Start", () => {
       </ServiceProvider>,
     );
     expect(container.querySelectorAll("h1")).toHaveLength(1);
-    expect(container.querySelector("h1")?.textContent).toBe("FunkSpace");
+    expect(container.querySelector("h1")?.textContent).toBe("Aperture - 1");
     expect(
       container.querySelector("[data-start-introduction]")?.textContent,
     ).toBe(

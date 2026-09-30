@@ -209,10 +209,12 @@ for (const width of [320, 1280]) {
         await page.goto("/");
         await appearance(page);
         await expect(
-          page.getByRole("button", {
-            name: preference === "os-reduce" ? "Follow system" : "Off",
-            exact: true,
-          }),
+          page
+            .getByRole("group", { name: "Motion", exact: true })
+            .getByRole("button", {
+              name: preference === "os-reduce" ? "System" : "Off",
+              exact: true,
+            }),
         ).toHaveAttribute("aria-pressed", "true");
         expect(await isComplete(page)).toBe(true);
         await expect(
@@ -237,7 +239,7 @@ for (const width of [320, 1280]) {
       if (!available) expect(await partialCount(page)).toBe(0);
       const prior = await partialCount(page);
       await appearance(page);
-      for (const name of ["Dark", "Muted", "High Contrast", "Default"])
+      for (const name of ["Dark", "Muted", "High Contrast", "Light"])
         await page.getByRole("button", { name, exact: true }).click();
       await page.getByRole("button", { name: "Close", exact: true }).click();
       await page.evaluate(() => {
@@ -287,7 +289,8 @@ for (const width of [320, 1280]) {
       await page.screenshot({ path: info.outputPath("motion-settings.png") });
       const prior = await partialCount(page);
       await page
-        .getByRole("button", { name: "Follow system", exact: true })
+        .getByRole("group", { name: "Motion", exact: true })
+        .getByRole("button", { name: "System", exact: true })
         .click();
       await page.clock.runFor(5000);
       expect(await isComplete(page)).toBe(true);

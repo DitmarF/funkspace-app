@@ -79,7 +79,11 @@ export function bindNativeLogoMotion(
         () => {
           if (active) events.failed();
         },
+        (time, duration) => {
+          if (active) events.position?.(time, duration);
+        },
       );
+      events.position?.(timeline.time, timeline.duration);
     },
     get duration() {
       return timeline?.duration ?? 0;

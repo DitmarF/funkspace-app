@@ -58,6 +58,39 @@ function expectPositionsClose(a: ParticleSceneState, b: ParticleSceneState) {
 }
 
 describe("particle initialization and effective configuration", () => {
+  it("normalizes all five visitor settings and connection edits never change particles", () => {
+    const state = createParticleScene(bounds);
+    const initial = structuredClone(state.particles);
+    for (const key of Object.keys(
+      settings.controls,
+    ) as (keyof typeof settings.controls)[]) {
+      const control = settings.controls[key];
+      for (const invalid of [NaN, Infinity, -Infinity, null, "2", {}, []]) {
+        const previous = state.config;
+        expect(configureParticles(state, { [key]: invalid })).toEqual(previous);
+      }
+      expect(configureParticles(state, { [key]: -Number.MAX_VALUE })[key]).toBe(
+        control.min,
+      );
+      expect(configureParticles(state, { [key]: Number.MAX_VALUE })[key]).toBe(
+        control.max,
+      );
+      expect(
+        configureParticles(state, { [key]: control.min + control.step / 2 })[
+          key
+        ],
+      ).toBeCloseTo(control.min + control.step);
+    }
+    configureParticles(state, DEFAULT_PARTICLE_CONFIG);
+    expect(state.particles).toEqual(initial);
+    const survivors = [...state.particles];
+    configureParticles(state, {
+      connectionsPerParticle: 1,
+      connectionDistance: 10,
+    });
+    expect(state.particles).toEqual(initial);
+    expect(state.particles.every((p, i) => p === survivors[i])).toBe(true);
+  });
   it("uses approved defaults and copies inputs rather than borrowing them", () => {
     const inputBounds = { ...bounds };
     const inputConfig = { count: 60, speed: 0.5, size: 1.5 };
@@ -65,7 +98,12 @@ describe("particle initialization and effective configuration", () => {
     inputBounds.width = 1;
     inputConfig.count = 240;
     expect(state.bounds).toEqual(bounds);
-    expect(state.config).toEqual({ count: 60, speed: 0.5, size: 1.5 });
+    expect(state.config).toEqual({
+      ...DEFAULT_PARTICLE_CONFIG,
+      count: 60,
+      speed: 0.5,
+      size: 1.5,
+    });
     const defaults = createParticleScene(bounds);
     expect(defaults.seed).toBe(0x46533431);
     expect(defaults.config).toEqual(DEFAULT_PARTICLE_CONFIG);
@@ -141,7 +179,12 @@ describe("particle initialization and effective configuration", () => {
       });
       expect(
         configureParticles(state, { count: input, speed: input, size: input }),
-      ).toEqual({ count: 72, speed: 0.5, size: 1.5 });
+      ).toEqual({
+        ...DEFAULT_PARTICLE_CONFIG,
+        count: 72,
+        speed: 0.5,
+        size: 1.5,
+      });
       expect(
         createParticleScene(bounds, { count: input, speed: input, size: input })
           .config,
@@ -173,6 +216,7 @@ describe("particle initialization and effective configuration", () => {
         size: -Number.MAX_VALUE,
       }),
     ).toEqual({
+      ...DEFAULT_PARTICLE_CONFIG,
       count: settings.controls.count.min,
       speed: settings.controls.speed.min,
       size: settings.controls.size.min,
@@ -185,6 +229,7 @@ describe("particle initialization and effective configuration", () => {
         size: Number.MAX_VALUE,
       }),
     ).toEqual({
+      ...DEFAULT_PARTICLE_CONFIG,
       count: MAX_PARTICLE_COUNT,
       speed: settings.controls.speed.max,
       size: settings.controls.size.max,
@@ -360,6 +405,8 @@ describe("movement, delta and independence", () => {
     resizeParticleScene(state, { ...bounds, dpr: 1 });
     expect(state).toEqual(before);
     expect(Object.keys(state.config).sort()).toEqual([
+      "connectionDistance",
+      "connectionsPerParticle",
       "count",
       "size",
       "speed",
@@ -495,7 +542,12 @@ describe("population, resizing, reset and static data", () => {
     resetParticles(state);
     expect(state.suspended).toBe(true);
     expect(state.particles).toEqual(expected.particles);
-    expect(state.config).toEqual({ count: 84, speed: 0.5, size: 1.5 });
+    expect(state.config).toEqual({
+      ...DEFAULT_PARTICLE_CONFIG,
+      count: 84,
+      speed: 0.5,
+      size: 1.5,
+    });
     expect(advanceParticles(state, 50)).toBe(0);
     resetParticles(state);
     expect(state.particles).toEqual(expected.particles);

@@ -16,6 +16,8 @@ export interface LogoMotionBinding {
 }
 
 export interface LogoMotionEvents {
+  /** Optional observation of the existing renderer clock; never owns a loop. */
+  position?(timeMs: number, durationMs: number): void;
   visibility(visible: boolean): void;
   completed(): void;
   failed(): void;

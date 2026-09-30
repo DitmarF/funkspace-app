@@ -1,6 +1,14 @@
-import { MAX_PARTICLE_COUNT, type ParticleBounds } from "./ParticleScene";
+import {
+  MAX_PARTICLE_COUNT,
+  normalizeParticleSetting,
+  type ParticleBounds,
+} from "./ParticleScene";
 
-import { PARTICLE_SETTINGS } from "./ParticleSettings";
+import {
+  PARTICLE_SETTINGS,
+  DEFAULT_PARTICLE_CONFIG,
+  type ParticleConfig,
+} from "./ParticleSettings";
 const settings = PARTICLE_SETTINGS.connections;
 /** Derived compatibility view; edit ParticleSettings.ts instead. */
 export const PARTICLE_CONNECTIONS = Object.freeze({
@@ -8,8 +16,8 @@ export const PARTICLE_CONNECTIONS = Object.freeze({
   targetLines: settings.densityTargetLines,
   width: settings.widthCssPx,
   opacity: settings.opacity,
-  maxLines: Math.floor(MAX_PARTICLE_COUNT * settings.lineBudgetPerParticle),
-  candidatesPerParticle: settings.candidateVisitsPerParticle,
+  maxLines: settings.maxLines,
+  maxCandidateChecks: settings.maxCandidateChecks,
   maxParticles: MAX_PARTICLE_COUNT,
   maxPasses: settings.maxPasses,
 });
@@ -25,8 +33,9 @@ type Sample = {
 };
 
 /**
- * Pure derived graph: every noncoincident pair inside the returned distance,
- * once, independent of bucket boundaries and point order. No degree quota.
+ * Pure derived graph: noncoincident pairs inside the returned distance, at most
+ * once, independent of bucket boundaries. The degree cap selects shortest pairs
+ * first with spatial tie-breaking, rather than taking an input-order prefix.
  * Results/buffers are borrowed until the next call; particles are never changed.
  * If a complete graph exceeds a limit, retry with a smaller radius. Never return
  * an input-order prefix. Exhausted work returns an empty graph at distance 0.
@@ -51,6 +60,15 @@ export function createParticleConnectionSampler(
     opacity: 0,
     width: 0,
   }));
+  const candidates = links.map(() => ({
+    from: 0,
+    to: 0,
+    opacity: 0,
+    width: 0,
+  }));
+  const distances = new Float64Array(rules.maxLines);
+  const order = new Uint16Array(rules.maxLines);
+  const degrees = new Uint16Array(rules.maxParticles);
   const result: Sample = {
     links,
     count: 0,
@@ -63,6 +81,10 @@ export function createParticleConnectionSampler(
   return (
     points: readonly Point[],
     bounds: ParticleBounds | null,
+    config: Pick<
+      ParticleConfig,
+      "connectionsPerParticle" | "connectionDistance"
+    > = DEFAULT_PARTICLE_CONFIG,
   ): Readonly<Sample> => {
     const length = Math.min(points.length, rules.maxParticles);
     result.count = result.candidateChecks = result.distance = 0;
@@ -84,10 +106,27 @@ export function createParticleConnectionSampler(
     );
     let distance = Math.min(
       rules.distance,
-      settings.distanceMultiplier *
-        Math.sqrt((2 * target * area) / (Math.PI * length * (length - 1))),
+      normalizeParticleSetting(
+        config.connectionDistance,
+        DEFAULT_PARTICLE_CONFIG.connectionDistance,
+        "connectionDistance",
+      ) * Math.sqrt((2 * target * area) / (Math.PI * length * (length - 1))),
     );
-    const budget = rules.maxParticles * rules.candidatesPerParticle;
+    // Start within the retained absolute line budget instead of spending the
+    // work budget on obviously over-dense retries at the new 1,000 count limit.
+    const budgetDistance = Math.sqrt(
+      (2 * rules.maxLines * area) / (Math.PI * length * (length - 1)),
+    );
+    if (distance > budgetDistance) {
+      distance = budgetDistance;
+      result.limited = true;
+    }
+    const budget = rules.maxCandidateChecks;
+    const degreeLimit = normalizeParticleSetting(
+      config.connectionsPerParticle,
+      DEFAULT_PARTICLE_CONFIG.connectionsPerParticle,
+      "connectionsPerParticle",
+    );
 
     for (
       let pass = 0;
@@ -102,6 +141,8 @@ export function createParticleConnectionSampler(
       heads.clear();
       next.fill(-1);
       result.count = 0;
+      degrees.fill(0);
+      let needsDegreeCap = false;
       for (let i = length - 1; i >= 0; i--) {
         if (!valid(points[i])) continue;
         const cell = key(
@@ -141,7 +182,14 @@ export function createParticleConnectionSampler(
                 overflow = true;
                 break scan;
               }
-              const link = links[result.count++];
+              const index = result.count++;
+              const link = candidates[index];
+              distances[index] = separation;
+              order[index] = index;
+              degrees[i]++;
+              degrees[j]++;
+              if (degrees[i] > degreeLimit || degrees[j] > degreeLimit)
+                needsDegreeCap = true;
               link.from = i;
               link.to = j;
               const size = Math.max(
@@ -161,6 +209,43 @@ export function createParticleConnectionSampler(
       }
       if (!overflow) {
         result.distance = distance;
+        const count = result.count;
+        if (needsDegreeCap) {
+          const comparePoint = (a: number, b: number) =>
+            points[a].x - points[b].x || points[a].y - points[b].y;
+          // Canonical endpoint coordinates keep ties independent of grid/input order.
+          const endpoints = (link: Connection, first: boolean) =>
+            comparePoint(link.from, link.to) <= 0 === first
+              ? link.from
+              : link.to;
+          order
+            .subarray(0, count)
+            .sort(
+              (a, b) =>
+                distances[a] - distances[b] ||
+                comparePoint(
+                  endpoints(candidates[a], true),
+                  endpoints(candidates[b], true),
+                ) ||
+                comparePoint(
+                  endpoints(candidates[a], false),
+                  endpoints(candidates[b], false),
+                ),
+            );
+        }
+        degrees.fill(0);
+        result.count = 0;
+        for (let n = 0; n < count; n++) {
+          const link = candidates[order[n]];
+          if (
+            degrees[link.from] >= degreeLimit ||
+            degrees[link.to] >= degreeLimit
+          )
+            continue;
+          degrees[link.from]++;
+          degrees[link.to]++;
+          Object.assign(links[result.count++], link);
+        }
         return result;
       }
       result.limited = true;

@@ -61,7 +61,8 @@ test("controlled Motion story supports long, enlarged narrow content without pro
   await page
     .getByRole("button", { name: "Accessibility", exact: true })
     .click();
-  await expect(
-    motion.getByRole("button", { name: "Follow system" }),
-  ).toHaveAttribute("aria-pressed", "true");
+  await expect(motion.getByRole("button", { name: "System" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
 });

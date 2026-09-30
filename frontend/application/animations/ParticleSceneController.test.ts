@@ -105,6 +105,38 @@ function fixture(available = true) {
   };
 }
 describe("particle permission orchestration", () => {
+  it("holds the same valid frame behind a modal without resuming local Pause", async () => {
+    const f = fixture();
+    f.visibility(true);
+    await flush();
+    const runtime = f.runtime();
+    vi.mocked(f.binding.prepare).mock.calls[0][2].frameReady(true);
+    f.attempts[0].resolve(runtime);
+    await flush();
+    runtime.resume.mockClear();
+    f.controller.setPresentation({
+      introReady: true,
+      coverReady: true,
+      occluded: true,
+    });
+    expect(f.controller.getSnapshot()).toMatchObject({
+      frameReady: true,
+      presentation: "hold-frame",
+    });
+    expect(runtime.setVisible).toHaveBeenLastCalledWith(true);
+    expect(runtime.pause).toHaveBeenCalled();
+    expect(runtime.resume).not.toHaveBeenCalled();
+    f.controller.pause();
+    f.controller.setPresentation({
+      introReady: true,
+      coverReady: true,
+      occluded: false,
+    });
+    expect(runtime.resume).not.toHaveBeenCalled();
+    expect(f.attempts).toHaveLength(1);
+    expect(runtime.reset).not.toHaveBeenCalled();
+    f.controller.destroy();
+  });
   it("distinguishes palette rejection from unmeasured or hidden geometry without granting preparation", async () => {
     const f = fixture();
     expect(f.controller.getSnapshot().paletteUnavailable).toBe(false);
@@ -197,7 +229,7 @@ describe("particle permission orchestration", () => {
     expect(f.controller.getSnapshot().status).toBe("failed");
     f.controller.destroy();
   });
-  it.each(["system", "off"] as const)(
+  it.each(["system"] as const)(
     "%s stays static with device reduction and never loads",
     async (preference) => {
       const f = fixture();
@@ -209,36 +241,39 @@ describe("particle permission orchestration", () => {
       f.controller.destroy();
     },
   );
-  it("Reduced prepares a visible still, never resumes, and preserves local Pause", async () => {
-    const f = fixture();
-    f.change({ preference: "reduced" });
-    f.visibility(true);
-    await flush();
-    const runtime = f.runtime();
-    f.attempts[0].resolve(runtime);
-    await flush();
-    expect(runtime.setVisible).toHaveBeenLastCalledWith(true);
-    expect(runtime.pause).toHaveBeenCalled();
-    expect(runtime.resume).not.toHaveBeenCalled();
-    expect(f.controller.getSnapshot()).toMatchObject({
-      reducedMotion: true,
-      locallyPaused: false,
-      presentation: "hold-frame",
-    });
-    f.controller.resume();
-    expect(runtime.resume).not.toHaveBeenCalled();
-    f.controller.pause();
-    f.change({ preference: "on" });
-    expect(runtime.resume).not.toHaveBeenCalled();
-    f.controller.resume();
-    expect(runtime.resume).toHaveBeenCalledTimes(1);
-    f.change({ preference: "reduced" });
-    expect(f.attempts).toHaveLength(1);
-    expect(runtime.reset).not.toHaveBeenCalled();
-    f.change({ documentVisible: false });
-    expect(runtime.setVisible).toHaveBeenLastCalledWith(false);
-    f.controller.destroy();
-  });
+  it.each(["reduced", "off"] as const)(
+    "%s prepares a visible still, never resumes, and preserves local Pause",
+    async (preference) => {
+      const f = fixture();
+      f.change({ preference });
+      f.visibility(true);
+      await flush();
+      const runtime = f.runtime();
+      f.attempts[0].resolve(runtime);
+      await flush();
+      expect(runtime.setVisible).toHaveBeenLastCalledWith(true);
+      expect(runtime.pause).toHaveBeenCalled();
+      expect(runtime.resume).not.toHaveBeenCalled();
+      expect(f.controller.getSnapshot()).toMatchObject({
+        reducedMotion: preference === "reduced",
+        locallyPaused: false,
+        presentation: "hold-frame",
+      });
+      f.controller.resume();
+      expect(runtime.resume).not.toHaveBeenCalled();
+      f.controller.pause();
+      f.change({ preference: "on" });
+      expect(runtime.resume).not.toHaveBeenCalled();
+      f.controller.resume();
+      expect(runtime.resume).toHaveBeenCalledTimes(1);
+      f.change({ preference: "reduced" });
+      expect(f.attempts).toHaveLength(1);
+      expect(runtime.reset).not.toHaveBeenCalled();
+      f.change({ documentVisible: false });
+      expect(runtime.setVisible).toHaveBeenLastCalledWith(false);
+      f.controller.destroy();
+    },
+  );
   it("feature denial, pending policy, intro, cover and occlusion deny preparation", async () => {
     const off = fixture(false);
     off.visibility(true);

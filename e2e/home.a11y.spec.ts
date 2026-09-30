@@ -20,7 +20,9 @@ test.describe("A11y — Home", () => {
       // Storage normalization is best effort; the resolved UI establishes
       // readiness even when browser storage cannot be written.
       await expect(
-        page.getByRole("button", { name: "System", exact: true }),
+        page
+          .getByRole("group", { name: "Appearance", exact: true })
+          .getByRole("button", { name: "System", exact: true }),
       ).toHaveAttribute("aria-pressed", "true");
       await selectTheme(page, theme);
 

@@ -94,7 +94,7 @@ for (const width of [320, 1280]) {
         await expect.poll(() => page.evaluate(() => scrollY)).toBe(sourceY);
         const main = await page.locator("#main-content").elementHandle();
 
-        await openSettings(page);
+        await openSettings(page, { preserveScroll: true });
         expect(await page.evaluate(() => scrollY)).toBe(sourceY);
         const dialog = page.getByRole("dialog");
         if (scenario.legal)

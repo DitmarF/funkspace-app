@@ -12,7 +12,6 @@ import {
   createParticleScene,
   DEFAULT_PARTICLE_CONFIG,
   getParticleStill,
-  MAX_PARTICLE_COUNT,
 } from "@/domain/particles/ParticleScene";
 import type {
   ParticleSceneHandle,
@@ -22,6 +21,8 @@ import type { MotionPreference } from "@/domain/motion/MotionPolicy";
 import Button from "../Controls/Button";
 import MotionChoices from "../Layouts/MotionChoices";
 import styles from "./ParticleLifecycleFixture.module.css";
+import controls from "../Controls/AnimationFixture.module.css";
+import fields from "../Controls/fields.module.css";
 
 const fallback = getParticleStill(
   createParticleScene({ width: 640, height: 360 }),
@@ -91,7 +92,7 @@ export default function ParticleLifecycleFixture({
     snapshot?.frameReady &&
     snapshot.presentation !== "complete-static";
   return (
-    <main className={styles.fixture}>
+    <main className={`${styles.fixture} ${controls.panel}`}>
       <h1>
         {aperture
           ? "Aperture replacement fixture"
@@ -104,79 +105,105 @@ export default function ParticleLifecycleFixture({
         Start explicitly; motion choices and the build availability flag still
         apply. This is not the homepage animation.
       </p>
-      {aperture && <ThemeSwitcher presentation="outlined" />}
-      <MotionChoices
-        value={preference}
-        onChange={(value) => services.motionPolicy.setPreference(value)}
-      />
-      <div className={styles.controls}>
-        {aperture && (
-          <>
-            <Button
-              onClick={() =>
-                setSelection((value) =>
-                  value === "web" ? "technical-diamond" : "web",
-                )
+      <fieldset className={controls.group}>
+        <legend>Playback</legend>
+        <div className={controls.row}>
+          <Button onClick={() => setMounted((value) => !value)}>
+            {mounted ? "Destroy scene" : "Start scene"}
+          </Button>
+          <Button
+            variant="outlined"
+            disabled={!mounted}
+            onClick={() =>
+              snapshot?.locallyPaused
+                ? handle.current?.resume()
+                : handle.current?.pause()
+            }
+          >
+            {snapshot?.locallyPaused ? "Resume scene" : "Pause scene"}
+          </Button>
+          <Button
+            variant="outlined"
+            disabled={!mounted}
+            onClick={() => handle.current?.reset()}
+          >
+            Reset seeded state
+          </Button>
+        </div>
+      </fieldset>
+      <fieldset className={controls.group}>
+        <legend>Scene & frame</legend>
+        <div className={controls.fields}>
+          {aperture && (
+            <label className={fields.field}>
+              <span className={fields.label}>Aperture</span>
+              <select
+                className={fields.control}
+                value={selection}
+                onChange={(event) =>
+                  setSelection(event.target.value as SceneApertureSelection)
+                }
+              >
+                <option value="web">WEB</option>
+                <option value="technical-diamond">Diamond</option>
+              </select>
+            </label>
+          )}
+          <label className={fields.field}>
+            <span className={fields.label}>Frame width</span>
+            <select
+              className={fields.control}
+              value={fixtureSize}
+              onChange={(event) =>
+                setFixtureSize(event.target.value as typeof fixtureSize)
               }
             >
-              Replace aperture
-            </Button>
-            <Button onClick={() => setShort((value) => !value)}>
-              Toggle short frame
-            </Button>
-          </>
+              <option value="compact">Compact · 320 px</option>
+              <option value="standard">Standard · 640 px</option>
+              <option value="large">Large · 1280 px</option>
+            </select>
+          </label>
+          <label className={controls.timeline}>
+            <span>
+              Particle count ·{" "}
+              {snapshot?.config.count ?? DEFAULT_PARTICLE_CONFIG.count}
+            </span>
+            <input
+              type="range"
+              aria-label="Particle count"
+              disabled={!mounted}
+              min={PARTICLE_SETTINGS.controls.count.min}
+              max={PARTICLE_SETTINGS.controls.count.max}
+              step={PARTICLE_SETTINGS.controls.count.step}
+              value={snapshot?.config.count ?? DEFAULT_PARTICLE_CONFIG.count}
+              onChange={(event) =>
+                handle.current?.configure({ count: Number(event.target.value) })
+              }
+            />
+          </label>
+        </div>
+        {aperture && (
+          <label className={controls.row}>
+            <input
+              type="checkbox"
+              checked={short}
+              onChange={(event) => setShort(event.target.checked)}
+            />
+            Short frame (4:1)
+          </label>
         )}
-        <Button onClick={() => setMounted((value) => !value)}>
-          {mounted ? "Destroy scene" : "Start scene"}
-        </Button>
-        <Button
-          disabled={!mounted}
-          onClick={() =>
-            snapshot?.locallyPaused
-              ? handle.current?.resume()
-              : handle.current?.pause()
-          }
-        >
-          {snapshot?.locallyPaused ? "Resume scene" : "Pause scene"}
-        </Button>
-        <Button disabled={!mounted} onClick={() => handle.current?.reset()}>
-          Reset seeded state
-        </Button>
-        <Button
-          onClick={() =>
-            setFixtureSize((value) =>
-              value === "standard"
-                ? "compact"
-                : value === "compact"
-                  ? "large"
-                  : "standard",
-            )
-          }
-        >
-          Resize fixture
-        </Button>
-        <Button
-          disabled={!mounted}
-          onClick={() =>
-            handle.current?.configure({
-              count:
-                snapshot?.config.count === DEFAULT_PARTICLE_CONFIG.count
-                  ? DEFAULT_PARTICLE_CONFIG.count === MAX_PARTICLE_COUNT
-                    ? Math.max(
-                        PARTICLE_SETTINGS.controls.count.min,
-                        Math.floor(
-                          MAX_PARTICLE_COUNT /
-                            2 /
-                            PARTICLE_SETTINGS.controls.count.step,
-                        ) * PARTICLE_SETTINGS.controls.count.step,
-                      )
-                    : MAX_PARTICLE_COUNT
-                  : DEFAULT_PARTICLE_CONFIG.count,
-            })
-          }
-        >
-          Toggle particle count
-        </Button>
+      </fieldset>
+      <div className={controls.group}>
+        <MotionChoices
+          value={preference}
+          onChange={(value) => services.motionPolicy.setPreference(value)}
+        />
+        {aperture && (
+          <fieldset className={controls.theme}>
+            <legend>Theme</legend>
+            <ThemeSwitcher presentation="outlined" />
+          </fieldset>
+        )}
       </div>
       <p role="status">
         {mounted ? (snapshot?.status ?? "unprepared") : "unmounted"} ·{" "}
@@ -227,8 +254,8 @@ export default function ParticleLifecycleFixture({
       )}
       <p>
         The static representation is independent of Canvas. Reset here resets
-        the current seeded configuration and retains local Pause; product Reset
-        belongs to later customization work.
+        the current seeded configuration and retains local Pause. To restore
+        default controls, use the animation details page’s customization dialog.
       </p>
     </main>
   );

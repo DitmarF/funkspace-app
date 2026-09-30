@@ -13,6 +13,11 @@ describe("portfolio destination contract", () => {
         label: "More about FunkSpace",
         href: "/about",
       },
+      aperture: {
+        focusId: "main-content",
+        label: "More about Aperture - 1",
+        href: "/animations/aperture",
+      },
       impressum: {
         focusId: "main-content",
         label: "Legal notice",

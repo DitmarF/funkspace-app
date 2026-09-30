@@ -27,8 +27,12 @@ it("keeps ready destinations as anchors and future entries noninteractive", () =
     "href",
     "/impressum",
   );
-  expect(screen.getAllByText("Coming soon")).toHaveLength(4);
-  expect(navigation.querySelectorAll('[aria-disabled="true"]')).toHaveLength(4);
+  expect(screen.getByRole("link", { name: "Aperture - 1" })).toHaveAttribute(
+    "href",
+    "/animations/aperture",
+  );
+  expect(screen.getAllByText("Coming soon")).toHaveLength(3);
+  expect(navigation.querySelectorAll('[aria-disabled="true"]')).toHaveLength(3);
   expect(
     navigation.querySelectorAll(
       '[aria-disabled="true"] a, [aria-disabled="true"][href], button',
@@ -91,6 +95,7 @@ it("places Contact last and renders the matching destination artwork", () => {
     "Home",
     "About",
     "Animations",
+    "Aperture - 1",
     "Games",
     "Privacy",
     "Privacy policy",
