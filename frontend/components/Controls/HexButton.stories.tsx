@@ -24,10 +24,12 @@ const meta = {
         "a11y",
         "chat-bot",
         "languages",
+        "play",
+        "pause",
       ],
     },
     size: { control: "select", options: ["small", "medium", "large"] },
-    iconSize: { control: "select", options: [24, 36, 48] },
+    iconSize: { control: "select", options: [16, 24, 36, 48] },
     variant: {
       control: "select",
       options: ["primary", "secondary", "outlined", "accent-outlined"],
@@ -46,6 +48,22 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Menu: Story = {};
+
+export const Playback: Story = {
+  render: function PlaybackControl() {
+    const [paused, setPaused] = useState(false);
+    return (
+      <HexButton
+        size="small"
+        iconSize={16}
+        variant="outlined"
+        icon={paused ? "play" : "pause"}
+        aria-label={paused ? "Resume animation" : "Pause animation"}
+        onClick={() => setPaused(!paused)}
+      />
+    );
+  },
+};
 
 export const SelectedNavigation: Story = {
   args: {

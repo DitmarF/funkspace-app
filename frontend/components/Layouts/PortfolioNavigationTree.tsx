@@ -32,7 +32,17 @@ function RowContent({ item }: { item: PortfolioNavigationItem }) {
           />
         </span>
       )}
-      <Icon name={item.icon} size={24} className={styles.icon} />
+      {/* CSS selects the existing size-specific artwork without hydration state. */}
+      <Icon
+        name={item.icon}
+        size={24}
+        className={`${styles.icon} ${styles.smallIcon}`}
+      />
+      <Icon
+        name={item.icon}
+        size={36}
+        className={`${styles.icon} ${styles.largeIcon}`}
+      />
       <span className={styles.label}>
         {item.label}
         {item.kind === "pending" && (

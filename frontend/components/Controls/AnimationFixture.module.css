@@ -10,7 +10,7 @@
 .panel button {
   --standard-font-size: var(--fs-font-size-sm);
   --standard-padding: var(--fs-space-sm);
-  --standard-font-weight: var(--fs-font-weight-semibold);
+  --standard-font-weight: var(--fs-font-weight-medium);
 }
 
 .panel h1 {

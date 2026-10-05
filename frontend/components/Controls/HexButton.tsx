@@ -45,11 +45,13 @@ export type HexButtonProps = Omit<
     | "a11y"
     | "chat-bot"
     | "languages"
+    | "play"
+    | "pause"
   >;
   variant?: ControlVariant;
   size?: HexButtonSize;
-  /** Optional artwork size at the nominal button size; scales with the hexagon. */
-  iconSize?: IconSize;
+  /** Display size at the nominal button size; 16 uses the existing 24px artwork. */
+  iconSize?: IconSize | 16;
 };
 
 function controlClassName(
@@ -85,9 +87,9 @@ function HexArtwork({
         <path d={artwork.path} strokeWidth={artwork.stroke} />
       </svg>
       <Icon
-        className={styles.icon}
+        className={`${styles.icon} ${icon === "play" ? styles.playIcon : ""}`}
         name={icon}
-        size={iconSize ?? artwork.icon}
+        size={iconSize === 16 ? 24 : (iconSize ?? artwork.icon)}
         style={
           iconDimension
             ? { width: iconDimension, height: iconDimension }
@@ -136,6 +138,8 @@ const HexButton = forwardRef<HTMLButtonElement, HexButtonProps>(
                 a11y: "Accessibility",
                 "chat-bot": "Chat-bot",
                 languages: "Languages",
+                play: "Play",
+                pause: "Pause",
               }[icon]
         }
         {...props}

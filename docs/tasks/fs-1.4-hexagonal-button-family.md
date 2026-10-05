@@ -2,6 +2,11 @@
 
 **Current contract amendment — 2026-09-24:** Dimi's FS-3.1 correction supersedes the mandatory visible Menu caption below. HexButton is icon-only by default with a meaningful accessible name; explicit captions remain optional. Production Nav/Settings has no extra text field or rectangular background. Medium artwork/icon remain 72/36px at normal text size, within a 76px square native target including its transparent border. Preserve visible focus and at least 48px targets. The earlier descriptions, test results and approvals below are historical evidence, not the current caption requirement. See [FS-3.1 revision](fs-3.1-navigation-settings-overlay.md).
 
+**Typography amendment — 2026-10-05:** optional text captions now use medium
+weight (500), a lowercase initial letter and optical vertical centering under
+Dimi's [shared button request](button-text-typography.md).
+Icon-only controls, artwork and native targets retain their existing contracts.
+
 ## Task metadata
 
 - **Status:** Complete — Dimi reports manual and visual tests PASS for FS-1.4 and accepts the final implementation on 2026-09-16. Codex review remains scheduled for FS-1.7.

@@ -55,7 +55,9 @@ async function setup(p: Page, choice = "on") {
     };
     const focus = HTMLElement.prototype.focus;
     HTMLElement.prototype.focus = function (...args) {
-      stats.focuses.push(this.textContent?.trim() ?? "");
+      stats.focuses.push(
+        this.getAttribute("aria-label") ?? this.textContent?.trim() ?? "",
+      );
       return focus.apply(this, args);
     };
   }, choice);
@@ -596,9 +598,9 @@ for (const state of ["playing", "paused", "reduced", "off", "failed"]) {
       await modal(page).getByRole("slider", { name: label }).fill(value);
     await modal(page).getByRole("button", { name: "Reset animation" }).click();
     for (const [label, value] of [
-      ["Density", "200"],
-      ["Speed", "0.4"],
-      ["Size", "1"],
+      ["Density", String(DEFAULT_PARTICLE_CONFIG.count)],
+      ["Speed", String(DEFAULT_PARTICLE_CONFIG.speed)],
+      ["Size", String(DEFAULT_PARTICLE_CONFIG.size)],
     ])
       await expect(
         modal(page).getByRole("slider", { name: label }),

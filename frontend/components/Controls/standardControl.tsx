@@ -4,7 +4,7 @@ import { controlAppearanceClassName } from "./controlAppearance";
 
 import type { ControlVariant } from "./controlAppearance";
 export type ButtonVariant = ControlVariant;
-export type ButtonSize = "small" | "medium" | "large";
+export type ButtonSize = "small" | "medium" | "large" | "small-to-medium";
 
 // Preserve the original single-slot API. Named slots also support the revised
 // Figma matrix; never mix the two forms. A visible label remains required.

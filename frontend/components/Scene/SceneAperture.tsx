@@ -17,16 +17,18 @@ interface Props {
   transparent?: boolean;
   onReady?(ready: boolean): void;
 }
-const circleHref =
+// Trusted bundled geometry also supplies the independent solid fallback. WEB
+// must never depend on a request/decode race with a different loading shape.
+const webHref =
   "data:image/svg+xml," +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="black"/></svg>',
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${webViewBox}"><path d="${webPath}" fill="black" fill-rule="nonzero"/></svg>`,
   );
 type LoadedAsset = { selection: SceneApertureSelection; href: string };
 
 /** Full rectangular cover. Only the nested opening is contained/centered. */
 export default function SceneAperture({
-  selection = "circle",
+  selection = "web",
   showStatic = false,
   transparent = false,
   onReady,
@@ -41,7 +43,7 @@ export default function SceneAperture({
   useEffect(() => {
     let current = true;
     setAsset(undefined);
-    if (selection === "circle") return;
+    if (selection === "web") return;
     const release = apertureAssets.load(sceneApertures[selection], (href) => {
       if (current) setAsset(href ? { selection, href } : undefined);
     });
@@ -67,7 +69,7 @@ export default function SceneAperture({
       data-overlay-transparent={transparent && !solid}
       style={{ opacity: transparent && !solid ? 0 : 1 }}
       data-mask-ready={supported === true}
-      data-aperture={useAsset ? selection : "circle"}
+      data-aperture={useAsset ? selection : "web"}
     >
       <defs>
         <mask
@@ -81,16 +83,18 @@ export default function SceneAperture({
           style={{ maskType: "luminance" }}
         >
           <rect width="100%" height="100%" fill="white" />
-          <image
-            x="10%"
-            y="10%"
-            width="80%"
-            height="80%"
-            preserveAspectRatio="xMidYMid meet"
-            href={circleHref}
-            onError={() => setSupported(false)}
-            visibility={useAsset ? "hidden" : "visible"}
-          />
+          <g className={styles.webOpening}>
+            <image
+              x="10%"
+              y="10%"
+              width="80%"
+              height="80%"
+              preserveAspectRatio="xMidYMid meet"
+              href={webHref}
+              onError={() => setSupported(false)}
+              visibility={useAsset ? "hidden" : "visible"}
+            />
+          </g>
           {href && (
             <image
               key={href}
@@ -114,25 +118,23 @@ export default function SceneAperture({
         mask={solid ? undefined : `url(#${maskId})`}
       />
       {solid && (
-        <svg
-          x="10%"
-          y="10%"
-          width="80%"
-          height="80%"
-          viewBox={selection === "web" ? webViewBox : "0 0 100 100"}
-          preserveAspectRatio="xMidYMid meet"
-          data-aperture-fallback
-        >
-          {selection === "web" ? (
+        <g className={styles.webOpening}>
+          <svg
+            x="10%"
+            y="10%"
+            width="80%"
+            height="80%"
+            viewBox={webViewBox}
+            preserveAspectRatio="xMidYMid meet"
+            data-aperture-fallback
+          >
             <path
               d={webPath}
               fillRule="nonzero"
               className={styles.silhouette}
             />
-          ) : (
-            <circle cx="50" cy="50" r="50" className={styles.silhouette} />
-          )}
-        </svg>
+          </svg>
+        </g>
       )}
     </svg>
   );

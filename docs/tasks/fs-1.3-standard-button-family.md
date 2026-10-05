@@ -1,5 +1,11 @@
 # Task FS-1.3 — Extend the Standard Button family
 
+**Typography amendment — 2026-10-05:** Dimi now requests medium weight (500), a
+lowercase initial letter and optically centered labels for all text buttons.
+[Current implementation and evidence](button-text-typography.md)
+supersede earlier weight/capitalization specifications only. Existing target geometry,
+colors, native behavior and acceptance history remain otherwise unchanged.
+
 **Current contract:** Dimi revised the reduced matrix after visual review. The
 [Figma matrix correction](#figma-matrix-correction--2026-09-15) below supersedes
 the initial one-size/one-icon restriction and initial visual evidence. Earlier

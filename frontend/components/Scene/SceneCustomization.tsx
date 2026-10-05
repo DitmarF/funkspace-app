@@ -12,6 +12,7 @@ import type {
   ParticleSceneSnapshot,
 } from "@/domain/ports/ParticleScenePort";
 import Button from "../Controls/Button";
+import { Icon } from "../Icons/Icon";
 import Dialog from "../Controls/Dialog";
 import InlineStatus from "../Controls/InlineStatus";
 import { FieldFrame, useField } from "../Controls/field";
@@ -121,6 +122,8 @@ export default function SceneCustomization({
       <Button
         ref={trigger}
         variant="outlined"
+        icon={<Icon name="playground" size={24} />}
+        aria-label="Customize animation"
         aria-haspopup="dialog"
         aria-expanded={Boolean(open)}
         disabled={!overlays?.navigationReady || unavailable}
@@ -129,9 +132,10 @@ export default function SceneCustomization({
           if (!overlays?.request("customization")) setUnavailable(true);
         }}
       >
-        Customize animation
+        Customize
       </Button>
       <InlineStatus
+        className={styles.triggerStatus}
         message={
           unavailable
             ? "Customization is unavailable. The animation page and navigation remain usable."

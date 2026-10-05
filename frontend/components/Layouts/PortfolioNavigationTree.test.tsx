@@ -42,9 +42,9 @@ it("keeps ready destinations as anchors and future entries noninteractive", () =
     navigation.querySelectorAll('[role="tree"], [role="menu"]'),
   ).toHaveLength(0);
   for (const row of navigation.querySelectorAll('a, [aria-disabled="true"]'))
-    expect(row.querySelectorAll("svg")).toHaveLength(1);
+    expect(row.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(2);
   for (const summary of navigation.querySelectorAll("summary")) {
-    expect(summary.querySelectorAll("svg")).toHaveLength(3);
+    expect(summary.querySelectorAll('svg[aria-hidden="true"]')).toHaveLength(4);
     for (const [index, direction] of ["right", "down"].entries()) {
       const source = new DOMParser().parseFromString(
         readFileSync(
@@ -113,17 +113,21 @@ it("places Contact last and renders the matching destination artwork", () => {
     ["Legal notice", "legal-notice"],
   ]) {
     const row = screen.getByText(label, { exact: true }).closest("a, summary")!;
-    const icon = row.querySelector(":scope > svg")!;
-    const source = new DOMParser().parseFromString(
-      readFileSync(`frontend/public/svg/icons/${family}-24.svg`, "utf8"),
-      "image/svg+xml",
-    );
-    expect(
-      [...icon.querySelectorAll("path")].map((path) => path.getAttribute("d")),
-    ).toEqual(
-      [...source.querySelectorAll("path")].map((path) =>
-        path.getAttribute("d"),
-      ),
-    );
+    for (const size of [24, 36]) {
+      const icon = row.querySelector(`:scope > svg[width="${size}"]`)!;
+      const source = new DOMParser().parseFromString(
+        readFileSync(`frontend/public/svg/icons/${family}-${size}.svg`, "utf8"),
+        "image/svg+xml",
+      );
+      expect(
+        [...icon.querySelectorAll("path")].map((path) =>
+          path.getAttribute("d"),
+        ),
+      ).toEqual(
+        [...source.querySelectorAll("path")].map((path) =>
+          path.getAttribute("d"),
+        ),
+      );
+    }
   }
 });

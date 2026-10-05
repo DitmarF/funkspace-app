@@ -10,7 +10,10 @@ import type {
   ParticleSceneSnapshot,
 } from "@/domain/ports/ParticleScenePort";
 import { useScenePresentation } from "../Layouts/ScenePresentationContext";
-import Button from "../Controls/Button";
+import HexButton from "../Controls/HexButton";
+import ButtonLink from "../Controls/ButtonLink";
+import { Icon } from "../Icons/Icon";
+import { portfolioDestinations } from "@/data/portfolioDestinations";
 import SceneAperture from "./SceneAperture";
 import styles from "./StartScene.module.css";
 
@@ -159,23 +162,57 @@ export default function StartScene({
         />
       </div>
       <div className={styles.controls}>
-        <div className={styles.action}>
-          {snapshot && (
-            <Button
-              variant="outlined"
-              disabled={Boolean(restriction) || snapshot.reducedMotion}
-              aria-describedby={statusId}
-              onClick={() =>
-                snapshot.locallyPaused
-                  ? handle.current?.resume()
-                  : handle.current?.pause()
-              }
-            >
-              {snapshot.locallyPaused ? "Resume animation" : "Pause animation"}
-            </Button>
-          )}
+        <div className={styles.actionRow} data-scene-actions>
+          <div className={styles.action}>
+            {snapshot && (
+              <HexButton
+                size="small"
+                iconSize={16}
+                icon={snapshot.locallyPaused ? "play" : "pause"}
+                aria-label={
+                  snapshot.locallyPaused
+                    ? "Resume animation"
+                    : "Pause animation"
+                }
+                variant="outlined"
+                disabled={Boolean(restriction) || snapshot.reducedMotion}
+                aria-describedby={statusId}
+                onClick={() =>
+                  snapshot.locallyPaused
+                    ? handle.current?.resume()
+                    : handle.current?.pause()
+                }
+              />
+            )}
+          </div>
+          <div className={styles.secondaryAction}>
+            {customizable ? (
+              snapshot &&
+              handle.current && (
+                <SceneCustomization
+                  scene={handle.current}
+                  snapshot={snapshot}
+                  statusMessage={message}
+                  overlayTransparent={overlayTransparent}
+                  onOverlayTransparentChange={setOverlayTransparent}
+                />
+              )
+            ) : (
+              <ButtonLink
+                href={portfolioDestinations.aperture.href}
+                aria-label={portfolioDestinations.aperture.label}
+                icon={<Icon name="more" size={24} />}
+              >
+                More
+              </ButtonLink>
+            )}
+          </div>
         </div>
-        <p id={statusId} role={snapshot ? "status" : undefined}>
+        <p
+          id={statusId}
+          role={snapshot ? "status" : undefined}
+          className="sr-only"
+        >
           {snapshot
             ? message
             : "Static artwork. Animation follows your motion settings."}
@@ -183,15 +220,6 @@ export default function StartScene({
             ? " Your local Pause is retained."
             : ""}
         </p>
-        {customizable && snapshot && handle.current && (
-          <SceneCustomization
-            scene={handle.current}
-            snapshot={snapshot}
-            statusMessage={message}
-            overlayTransparent={overlayTransparent}
-            onOverlayTransparentChange={setOverlayTransparent}
-          />
-        )}
       </div>
     </>
   );

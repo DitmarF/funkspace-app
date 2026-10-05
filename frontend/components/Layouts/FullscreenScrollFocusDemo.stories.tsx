@@ -168,13 +168,13 @@ function FocusPaddingWithStickyHeaderDemo() {
             <div className="flex gap-4 justify-center">
               <button
                 type="button"
-                className="rounded-lg bg-white px-6 py-3 font-semibold text-fs-blue hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-fs-blue"
+                className="rounded-lg bg-white px-6 py-3 font-medium text-fs-blue hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-fs-blue"
               >
                 Focusable Button 1
               </button>
               <button
                 type="button"
-                className="rounded-lg bg-white/20 px-6 py-3 font-semibold text-white hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white"
+                className="rounded-lg bg-white/20 px-6 py-3 font-medium text-white hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white"
               >
                 Focusable Button 2
               </button>
@@ -205,7 +205,7 @@ function FocusPaddingWithStickyHeaderDemo() {
             <div className="flex gap-4 justify-center">
               <a
                 href="#contact"
-                className="rounded-lg bg-white px-6 py-3 font-semibold text-fs-violet hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-fs-violet"
+                className="rounded-lg bg-white px-6 py-3 font-medium first-letter:lowercase text-fs-violet hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-fs-violet"
               >
                 Anchor Link to Contact
               </a>
@@ -251,7 +251,7 @@ function FocusPaddingWithStickyHeaderDemo() {
               />
               <button
                 type="submit"
-                className="w-full rounded-lg bg-white px-6 py-3 font-semibold text-fs-green hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-fs-green"
+                className="w-full rounded-lg bg-white px-6 py-3 font-medium text-fs-green hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-fs-green"
               >
                 Submit
               </button>
@@ -308,7 +308,7 @@ export const ScrollPaddingWithoutSticky: Story = {
           </p>
           <button
             type="button"
-            className="mt-4 rounded-lg bg-white px-6 py-3 font-semibold text-fs-blue focus:outline-none focus:ring-2 focus:ring-white"
+            className="mt-4 rounded-lg bg-white px-6 py-3 font-medium text-fs-blue focus:outline-none focus:ring-2 focus:ring-white"
           >
             Focusable Element
           </button>
@@ -328,7 +328,7 @@ export const ScrollPaddingWithoutSticky: Story = {
           </p>
           <a
             href="#section-a"
-            className="mt-4 inline-block rounded-lg bg-white px-6 py-3 font-semibold text-fs-violet focus:outline-none focus:ring-2 focus:ring-white"
+            className="mt-4 inline-block rounded-lg bg-white px-6 py-3 font-medium first-letter:lowercase text-fs-violet focus:outline-none focus:ring-2 focus:ring-white"
           >
             Anchor Link to Section A
           </a>

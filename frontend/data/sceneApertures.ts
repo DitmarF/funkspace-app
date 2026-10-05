@@ -16,4 +16,4 @@ export const sceneApertures = {
   web: webAperture,
   "technical-diamond": technicalDiamond,
 } as const;
-export type SceneApertureSelection = "circle" | keyof typeof sceneApertures;
+export type SceneApertureSelection = keyof typeof sceneApertures;

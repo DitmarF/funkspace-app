@@ -245,3 +245,119 @@ are reported in the session handoff only after Git confirms them.
 separately requested, subject to its own contract and approval checkpoints.
 FS-3.4 is not started by this closure. FS-G1 remains pending; no PR, merge,
 deployment or external configuration change is authorized here.
+
+## Accessibility secondary buttons — 2026-10-05
+
+Dimi requested the existing secondary button type for the settings Accessibility
+area. Both Appearance and Motion now opt into that presentation. The selected
+choice retains `aria-pressed` and reverses the secondary foreground/surface so it
+remains distinct from unselected filled buttons. Small labels use the normal-text
+hover token to preserve 4.5:1 contrast. Other ThemeSwitcher/MotionChoices consumers
+retain their previous default or outlined presentation.
+
+This is a presentation-only amendment: ThemeService, provider-owned motion policy,
+storage, four motion choices, settings ownership and responsive layout are
+unchanged. No tokens, generated files or runtime sources changed.
+
+Candidate: `737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` plus the pending working
+tree. Exact incremental/full diff hashes, tested source hashes, build ID, commands,
+screenshots and results are retained in the
+[local evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/accessibility-secondary-2026-10-05/README.md).
+The packet distinguishes this amendment from the pre-existing pending changes.
+
+Validation: 68 focused component/integration tests; validation types; lint; app
+and Storybook builds; 20 production navigation/theme journeys; five Storybook
+navigation checks all passed. Production checks include selected/unselected and
+hover contrast in all four themes, unfiltered accessibility scans, keyboard focus,
+320–1440px layouts, 200% text and theme persistence. Tablet and mobile screenshots
+were inspected. Browser coverage is local Chrome, not physical-device or Safari
+acceptance. Initial sandbox-denied server/cache attempts are retained separately
+from successful reruns. Lighthouse results are recorded in the evidence packet.
+
+No independent review, Dimi visual acceptance, commit, push or deployment is
+claimed for this amendment.
+
+## Responsive Accessibility button sizing — 2026-10-05
+
+Dimi clarified the size amendment: small on mobile; medium on tablets and
+desktops. Appearance and Motion now select the shared `small-to-medium` preset:
+the existing small metrics below 48rem (768px at the default root size) and
+medium metrics from 48rem. Minimum height/text size are 48/24px and 72/36px
+respectively, with the shared padding, stroke, radius and weight 500. The old
+settings-only 16px text and 8px padding overrides were removed. The preset uses
+CSS media queries on the same native button, without resize state or duplicate
+interactive elements. Other consumers retain their existing sizes.
+
+Secondary treatment and selected-state inversion remain. Appearance labels now
+render fully lowercase, including “high contrast”; metadata, accessible names,
+stored theme identifiers and service behavior are unchanged.
+
+Candidate remains HEAD `737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` plus pending
+work. The [sizing evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/accessibility-sizing-2026-10-05/README.md)
+records the incremental/full patch hashes, final build ID, exact commands,
+results, screenshots and preservation of unrelated work. This supersedes the
+preceding amendment's sizing, without reopening completed EPIC 3 work.
+
+Validation: 68 component/integration tests, types, lint, app/Storybook builds,
+20 production navigation/theme journeys and five Storybook checks passed.
+Browser assertions verify small/medium dimensions and weight, lowercase rendering,
+selection/hover contrast and unfiltered accessibility across themes. Existing
+200% text, scrolling and keyboard tests pass. Mobile/tablet screenshots were
+visually inspected. The first production run caught a CSS-reset capitalization
+failure (5 failed/15 passed); it was corrected and the full 20-case run passed.
+Initial evidence is retained rather than relabeled. Lighthouse results and
+remaining coverage limits are in the packet; no physical-device acceptance,
+commit, push or deployment is claimed.
+
+## Settings heading, hover and description amendment — 2026-10-05
+
+Dimi requested larger settings/navigation titles and headings, Accessibility
+hover colors matching the other shared buttons, and no visible explanation
+under Motion. Menu titles now use 30px on mobile / 40px from 48rem; Appearance
+and Motion legends use 30px / 36px. Existing semantic font/line-height tokens
+supply these proportions and preserve Close alignment. Other fixture headings
+retain their existing styling.
+
+The secondary choice hover overrides have been removed: unselected buttons use
+the shared `action-hover-large` background, while persistent selected states
+remain distinct. The former normal-text override was needed for 16px labels;
+the current shared small/medium buttons have verified 24/36px labels and use
+the existing approved large-text hover pairing. Browser checks assert that
+exact shared color and its 3:1 large-text contrast; normal selected/unselected
+states still assert 4.5:1. This does not change tokens or the shared hover rule.
+
+The menu opts out of visible Motion descriptions; its existing status remains
+screen-reader-only. Other MotionSettings consumers retain their descriptions.
+Policy, services, persistence, button sizes and navigation ownership are unchanged.
+
+The [settings polish evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/settings-polish-2026-10-05/README.md)
+records the exact candidate/diff, build identity, commands, screenshots and
+validation. Base HEAD remains `737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` plus
+the preserved pending working tree. No commit, push or deployment is included.
+
+## Tablet/desktop Accessibility section spacing — 2026-10-05
+
+Dimi requested more space above Appearance and Motion on tablets/desktops,
+with mobile unchanged. Both settings fieldsets receive an additional
+`margin-block-start: var(--fs-space-lg)` (24px at default root size) inside the
+existing 48rem breakpoint. Using external section spacing also moves each
+legend; fieldset padding would instead add space below its legend. Mobile
+margins remain zero. Titles, button geometry/hover, selection and policy remain
+unchanged.
+
+The [spacing evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/settings-spacing-2026-10-05/README.md)
+records exact candidate hashes, commands/results and screenshots against HEAD
+`737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` plus the pending working tree.
+Existing responsive browser checks now verify 0px mobile / 24px tablet-desktop
+spacing on both fieldsets. No shared service, token or generated file changes;
+no commit, push or deployment.
+
+### Spacing revision: 4rem — 2026-10-05
+
+Dimi replaced the preceding 24px choice with **4rem**. The tablet/desktop rule
+now uses the existing `--fs-space-3xl` token (64px at default root size) above
+both Appearance and Motion. The 48rem breakpoint and zero added mobile margin
+remain unchanged. The browser spacing assertion now expects 64px on wider
+screens. The preceding packet records historical validation at 24px; the
+[4rem revision packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/settings-spacing-4rem-2026-10-05/README.md)
+contains this revision's exact candidate, commands/results and screenshots.

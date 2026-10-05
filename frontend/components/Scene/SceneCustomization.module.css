@@ -1,3 +1,12 @@
+.dialog,
+.dialog button {
+  text-align: left;
+}
+
+.dialog button {
+  justify-content: flex-start;
+}
+
 .dialog[open] {
   /* Scroll the whole panel: an enlarged header must not consume short screens. */
   display: block;
@@ -7,4 +16,8 @@
 .range {
   accent-color: var(--fs-color-content-primary);
   cursor: pointer;
+}
+.triggerStatus {
+  /* Keep the live region mounted without reserving a blank line in the action row. */
+  min-height: 0;
 }

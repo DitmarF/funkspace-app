@@ -1,6 +1,59 @@
 # FS-4.7 — Independent scene performance and failure review
 
-Latest handoff: [Codex R3](#codex-r3--f7-correction-re-review--2026-09-30) returns **PASS for F7**, closing the remaining correction finding. F1–F6 remain closed by R2. Overall FS-4.7 is **BLOCKED** on required Xperia/Safari evidence; FS-4.8 acceptance remains outstanding.
+Latest functional handoff: the [2026-10-05 pending-candidate review](#pending-candidate-review-and-authorized-delivery--2026-10-05) returns **PASS for the reviewed change scope**, with no actionable regression found. [Codex R3](#codex-r3--f7-correction-re-review--2026-09-30) previously closed F7; F1–F6 remain closed by R2. Overall FS-4.7 is **BLOCKED** on required Xperia/Safari evidence; FS-4.8 acceptance remains outstanding.
+
+**Later tuning — 2026-10-01:** [R20 defaults](fs-4.1-scene-contract.md#r20--web-animation-defaults--2026-10-01) change count/speed/size to 286 / 0.2× / 0.1×. This review and its performance samples remain tied to the pinned earlier candidate (200 / 0.4× / 1×); no performance PASS for the new defaults is inferred. Required future default measurements must use R20.
+
+**Later aperture correction — 2026-10-01:** [R21 implementation](fs-4.4-svg-aperture.md#built-in-web-correction--2026-10-01) removes the circle and bundles the trusted WEB opening to eliminate request-dependent wrong-mask rendering. Its focused tests and production/Storybook checks are functional evidence for a changed candidate, not new performance certification or closure of required device evidence. Future measurements must include this correction and R20 defaults.
+
+## Pending-candidate review and authorized delivery — 2026-10-05
+
+Dimi requested review of all uncommitted work, then explicitly authorized updating
+documentation, committing and pushing it. The review left application sources
+unchanged and returned **PASS for the bounded change scope**, not performance
+certification, final visual acceptance or EPIC completion.
+
+Candidate: `feature/funkspace-minimum-usable`, HEAD
+`737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c`, plus all 76 pending files (including
+16 untracked files). Complete pending patch SHA-256:
+`9f695c976ee0640c45af8e4a70935117e7f4bfc818984960f838795277c8201e`.
+The [review report and local evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/uncommitted-review-2026-10-05/review.md)
+retain the complete diff, per-file hashes, exact commands, results and captures.
+All candidate hashes were verified unchanged before this documentation update;
+the delivery diff adds only this handoff and the feature-plan entry.
+
+Reviewed scope: approved R20 particle defaults; built-in WEB/circle removal and
+mobile fitting; scene action layout, icons, hidden status and slower reveal;
+shared button typography; responsive navigation/settings sizes, secondary
+appearance, headings and 4rem tablet/desktop section spacing; associated tests,
+stories, asset provenance and decision records. No actionable regression was
+found. Existing controller, policy and Canvas ownership remain intact.
+
+Fresh checks on isolated copies of the exact candidate:
+
+- `pnpm coverage`: 120 files / **1,850 tests PASS**. Configured coverage:
+  statements 87.47%, branches 84.60%, functions 86.34%, lines 89.58%. These
+  percentages cover the configured denominator, not every tested layer.
+- `pnpm typecheck:validation` and `pnpm lint`: **PASS**.
+- Separately compiled flag-On and flag-Off `pnpm build`, plus
+  `pnpm storybook:build`: **PASS**. On build `8HiZA4Arzzw888KKyTx8y`;
+  Off build `UJpbuW4s-rFbzE78PTVnl`.
+- Chrome **154.0.8037.95**: **108 On + 58 Off + 58 Storybook = 224 browser
+  checks PASS**, zero skips, unexpected failures or flaky outcomes; retries 0.
+  Existing flag-dependent test branches remain distinct. Coverage includes
+  navigation/focus, policy/Pause/customization, aperture fallback/replacement,
+  responsive controls, accessibility and no-JavaScript routes.
+- Mobile scene controls and desktop accessibility captures were visually
+  inspected. Diff whitespace and source integrity checks pass; owned ports were
+  released. Tests ran concurrently and supply functional, not timing, evidence.
+
+No new Lighthouse, sustained frame/CPU, transfer or physical-device measurements
+were made. Earlier measurements retain their own candidate/conditions and score
+warning; Safari/Firefox and Xperia were not rerun. Required FS-4.7 evidence and
+FS-4.8 human acceptance remain open. Existing lint-deprecation/chunk warnings and
+two pre-existing historical FS-1.4 links to the removed story stylesheet are
+recorded in the report. Commit/push authorization does not authorize deployment,
+PR creation, merging or repository settings changes.
 
 ## Candidate and scope
 

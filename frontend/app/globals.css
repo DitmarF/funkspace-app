@@ -7,6 +7,15 @@
 /* stylelint-enable at-rule-no-unknown */
 
 @layer base {
+  /* Native demo/theme controls follow the shared text-button typography too. */
+  button {
+    font-weight: var(--fs-font-weight-medium);
+  }
+
+  button::first-letter {
+    text-transform: lowercase;
+  }
+
   body {
     background-color: var(--fs-color-surface-background);
     color: var(--fs-color-content-primary);

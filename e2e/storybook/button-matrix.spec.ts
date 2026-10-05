@@ -107,8 +107,8 @@ for (const theme of themes) {
     await settleStyles(page);
     const evidence = [];
     for (const [size, height, fontSize, weight] of [
-      ["small", 48, 24, "700"],
-      ["medium", 72, 36, "600"],
+      ["small", 48, 24, "500"],
+      ["medium", 72, 36, "500"],
       ["large", 96, 48, "500"],
     ] as const) {
       const section = root.getByRole("region", { name: size, exact: true });

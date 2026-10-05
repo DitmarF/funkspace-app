@@ -6,6 +6,10 @@
   min-width: 0;
 }
 
+.choices button {
+  text-transform: lowercase;
+}
+
 .choices button[aria-pressed="true"],
 .choices button[aria-pressed="true"]:hover:not(:disabled) {
   --control-foreground: var(--fs-color-content-inverse);
@@ -14,8 +18,17 @@
 }
 
 /* Retain the theme chooser's established text-contrast contract on hover. */
-.choices button[aria-pressed="false"]:hover:not(:active):not(:disabled) {
+.choices[data-presentation="outlined"]
+  button[aria-pressed="false"]:hover:not(:active):not(:disabled) {
   --control-foreground: var(--fs-color-action-hover);
+}
+
+/* Secondary choices keep a persistent inverse selection. */
+.choices[data-presentation="secondary"]
+  button[aria-pressed="true"]:not(:disabled) {
+  --control-foreground: var(--fs-color-content-primary);
+  --control-background: var(--fs-color-content-inverse);
+  --control-border: var(--control-foreground);
 }
 
 @media (min-width: 48rem) {

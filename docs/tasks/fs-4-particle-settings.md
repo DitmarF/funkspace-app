@@ -4,19 +4,19 @@
 
 Dimi requests a typed, single authoring source for particle tuning, suitable for later customization controls. This is consolidation within the existing Domain boundary, not a new settings service, persistence authority or UI. Current local tuning is the baseline; no approval of its performance is inferred. Branch `feature/funkspace-minimum-usable`, HEAD `0eabf793240ec44e7352247c8160aa7f901de927`, plus the pre-existing uncommitted FS-4.4 candidate. Preserve WEB Black, theme/motion authorities and composition.
 
-## Current tuning — 2026-09-30, R18 customization
+## Current tuning — 2026-10-01, R20 defaults
 
 Edit `frontend/domain/particles/ParticleSettings.ts` for authoring defaults and
 limits; the detail-page controls consume that same metadata. Effective runtime
-values come back from Domain normalization. Current defaults preserve count 200,
-speed 0.4×, size 1× and distance 6×. The new connection cap defaults to 100, so it
-does not restrict the ordinary default graph. Reload restores defaults.
+values come back from Domain normalization. Dimi explicitly selected count 286, speed 0.2× and size 0.1× on 2026-10-01.
+Distance remains 6× and the per-particle connection cap remains 100. Initial
+loads and user Reset consume these shared defaults; reload restores them.
 
 | Control key                       | Default | Range / step | Meaning                                                                                         |
 | --------------------------------- | ------- | ------------ | ----------------------------------------------------------------------------------------------- |
-| `controls.count`                  | 200     | 10–1000 / 1  | Particle count                                                                                  |
-| `controls.speed`                  | 0.4     | 0.1–2 / 0.1  | Multiplier on seeded 8–24 CSS px/s velocity                                                     |
-| `controls.size`                   | 1       | 0.1–4 / 0.1  | Multiplier on seeded 1–3 CSS px radii                                                           |
+| `controls.count`                  | 286     | 10–1000 / 1  | Particle count                                                                                  |
+| `controls.speed`                  | 0.2     | 0.1–2 / 0.1  | Multiplier on seeded 8–24 CSS px/s velocity                                                     |
+| `controls.size`                   | 0.1     | 0.1–4 / 0.1  | Multiplier on seeded 1–3 CSS px radii                                                           |
 | `controls.connectionsPerParticle` | 100     | 1–100 / 1    | Maximum degree at **both** endpoints, not a promise that every particle has this many neighbors |
 | `controls.connectionDistance`     | 6       | 1–10 / 0.1   | Multiplier on the density-derived distance                                                      |
 
@@ -47,6 +47,33 @@ complete. It never enters particle configuration or changes the runtime. User
 Reset restores all five controls, opaque WEB and the seeded composition while
 retaining Pause/theme/shared restrictions. Low-level reset still keeps the
 current configuration. See [FS-4.6 C4](fs-4.6-customization-overlay.md#c4--expanded-customization--2026-09-30).
+
+## R20 default tuning — 2026-10-01
+
+Scope: only the three authoring defaults change from 200 / 0.4× / 1× to
+286 / 0.2× / 0.1×, at base `737d5fa`. Seed, ranges/steps, connection
+settings, budgets, aperture, policy, Pause and Reset semantics remain unchanged.
+Resulting particle radii are 0.1–0.3 CSS px and speeds 1.6–4.8 CSS px/s;
+these are derived values, not changes to the underlying seeded ranges.
+Existing density/size-dependent connection rules still apply. Earlier FS-4.7
+measurements describe their pinned candidate and old defaults; no new performance
+certification or FS-4.8 acceptance is inferred.
+
+Validation: 11 focused files / **213 tests pass**, covering settings/rules,
+connections, controller, actual adapter/binding, Start scene and customization
+(including Reset). Frontend and validation type checks pass. Existing lint passes;
+the first attempt was blocked only when writing its ESLint cache, then the same
+command passed with scoped cache access. No test assertion was changed.
+
+Actual Chrome 154.0.8037.92 against the existing local development app confirms
+286 / 0.2× / 0.1× on initial load, after edits and Reset, and after reload;
+connection degree 100, distance 6× and opaque overlay remain unchanged. Reset
+preserves local Pause. The control screenshot was inspected. See the
+[focused test log](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/web-defaults-2026-10-01/focused.log)
+and [browser result](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/web-defaults-2026-10-01/browser-result.json).
+Production/Storybook builds and performance sampling were not rerun for this
+three-default change; this browser check is development-mode functional evidence.
+No commit or push was requested for this tuning change.
 
 ## Historical tuning — 2026-09-29, FS-4.4B correction
 

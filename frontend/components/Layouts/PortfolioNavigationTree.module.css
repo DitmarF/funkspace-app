@@ -1,4 +1,6 @@
 .tree {
+  --tree-arrow-size: 16px;
+  --tree-indent: min(var(--fs-space-md), 16px);
   min-width: 0;
   width: 100%;
   max-width: 36rem;
@@ -12,9 +14,9 @@
 }
 
 .branch > .list {
-  /* Center the 2px line under the 16px arrow; retain the child-row indent. */
-  margin-inline-start: 7px;
-  padding-inline-start: calc(min(var(--fs-space-md), 16px) - 8px);
+  /* Keep the 2px branch line centered beneath either arrow size. */
+  margin-inline-start: calc(var(--tree-arrow-size) / 2 - 1px);
+  padding-inline-start: calc(var(--tree-indent) - var(--tree-arrow-size) / 2);
   border-inline-start: 2px solid var(--fs-color-border-subtle);
 }
 
@@ -22,7 +24,7 @@
   --fs-icon-background: var(--fs-color-surface-background);
   display: grid;
   /* Keep decorative slots compact when text grows beside the fixed rail. */
-  grid-template-columns: 16px 24px minmax(0, 1fr);
+  grid-template-columns: var(--tree-arrow-size) 24px minmax(0, 1fr);
   align-items: center;
   gap: min(var(--fs-space-xs), 8px);
   min-height: var(--fs-space-2xl);
@@ -57,8 +59,8 @@
 }
 .arrow {
   grid-column: 1;
-  width: 16px;
-  height: 16px;
+  width: var(--tree-arrow-size);
+  height: var(--tree-arrow-size);
 }
 .arrow > svg {
   width: 100%;
@@ -76,6 +78,9 @@
   width: 24px;
   height: 24px;
 }
+.largeIcon {
+  display: none;
+}
 .label {
   grid-column: 3;
   min-width: 0;
@@ -85,6 +90,37 @@
   display: block;
   font-size: var(--fs-font-size-sm);
   font-weight: var(--fs-font-weight-regular);
+}
+
+@media (min-width: 48rem) {
+  .tree {
+    --tree-arrow-size: 24px;
+    --tree-indent: min(var(--fs-space-lg), 24px);
+  }
+
+  .row {
+    grid-template-columns: var(--tree-arrow-size) 36px minmax(0, 1fr);
+    gap: min(var(--fs-space-sm), 12px);
+    min-height: calc(var(--fs-space-2xl) * 1.5);
+    font-size: var(--fs-font-size-xl);
+  }
+
+  .icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .smallIcon {
+    display: none;
+  }
+
+  .largeIcon {
+    display: block;
+  }
+
+  .pendingLabel {
+    font-size: var(--fs-font-size-md);
+  }
 }
 
 @media (forced-colors: active) {

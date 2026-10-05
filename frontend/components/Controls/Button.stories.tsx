@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 
 import Button, { type ButtonProps } from "./Button";
+import ButtonLink from "./ButtonLink";
+import HexButton from "./HexButton";
+import ThemeSwitcher from "../ThemeSwitcher";
 import type { StandardIconProps } from "./standardControl";
 import { Icon } from "../Icons/Icon";
 import { ButtonArrow, ButtonSettings } from "./Button.story-icons";
@@ -33,6 +36,22 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {};
+
+export const TextTypography: Story = {
+  render: () => (
+    <div className="grid gap-fs-md p-fs-md">
+      <Button leadingIcon={<Icon name="playground" size={24} />}>
+        Transparent WEB overlay: Off
+      </Button>
+      <Button disabled>Reset WEB animation</Button>
+      <ButtonLink href="#typography">More about FunkSpace</ButtonLink>
+      <HexButton icon="play" size="small" variant="outlined">
+        Play WEB animation
+      </HexButton>
+      <ThemeSwitcher />
+    </div>
+  ),
+};
 
 export const AccentOutlined: Story = {
   args: { variant: "accent-outlined", children: "Accent outline" },

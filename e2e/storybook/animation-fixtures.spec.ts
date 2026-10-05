@@ -86,7 +86,8 @@ for (const [name, url] of [
     page,
   }) => {
     await page.setViewportSize({ width: 320, height: 740 });
-    await page.goto(url + "&globals=theme:dark");
+    // The explicit unfiltered Axe scan owns this test visit, as in EssentialSet.
+    await page.goto(url + "&globals=theme:dark;a11y.manual:!true");
     if (name === "logo") {
       await page.getByRole("button", { name: "Off", exact: true }).click();
     } else {

@@ -12,3 +12,13 @@
 .silhouette {
   fill: var(--fs-color-content-primary);
 }
+
+/* Enlarge only the WEB opening; the full cover and scene geometry stay fixed.
+   Share SVG geometry between the live mask and independent solid artwork. */
+@media (width < 640px) {
+  .webOpening {
+    transform-box: view-box;
+    transform-origin: center;
+    transform: scale(1.2);
+  }
+}

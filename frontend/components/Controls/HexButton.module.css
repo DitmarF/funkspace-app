@@ -32,19 +32,19 @@
 .small {
   --hex-size: var(--fs-space-2xl);
   --hex-label-size: var(--fs-font-size-md);
-  --hex-label-weight: var(--fs-font-weight-semibold);
+  --hex-label-weight: var(--fs-font-weight-medium);
 }
 
 .medium {
   --hex-size: calc(var(--fs-space-2xl) * 1.5);
   --hex-label-size: var(--fs-font-size-md);
-  --hex-label-weight: var(--fs-font-weight-semibold);
+  --hex-label-weight: var(--fs-font-weight-medium);
 }
 
 .large {
   --hex-size: calc(var(--fs-space-2xl) * 2);
   --hex-label-size: var(--fs-font-size-xl);
-  --hex-label-weight: var(--fs-font-weight-bold);
+  --hex-label-weight: var(--fs-font-weight-medium);
 }
 
 .artwork {
@@ -79,8 +79,21 @@
 }
 
 .label {
+  display: block;
+  /* Match Standard labels; keep the artwork and native target stationary. */
+  position: relative;
+  top: -0.06em;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.label::first-letter {
+  text-transform: lowercase;
+}
+
+.playIcon {
+  /* Optical correction requested for the triangular Play artwork. */
+  transform: translateX(1px);
 }
 
 .control:disabled {

@@ -48,9 +48,9 @@ export interface ParticleSettings {
 export const PARTICLE_SETTINGS: ParticleSettings = Object.freeze({
   // Controls and direct callers share these defaults, clamps and steps.
   controls: Object.freeze({
-    count: Object.freeze({ default: 200, min: 10, max: 1000, step: 1 }),
-    speed: Object.freeze({ default: 0.4, min: 0.1, max: 2, step: 0.1 }),
-    size: Object.freeze({ default: 1, min: 0.1, max: 4, step: 0.1 }),
+    count: Object.freeze({ default: 286, min: 10, max: 1000, step: 1 }),
+    speed: Object.freeze({ default: 0.2, min: 0.1, max: 2, step: 0.1 }),
+    size: Object.freeze({ default: 0.1, min: 0.1, max: 4, step: 0.1 }),
     connectionsPerParticle: Object.freeze({
       default: 100,
       min: 1,

@@ -24,13 +24,14 @@
   cursor: pointer;
 }
 
-.small {
+.small,
+.small-to-medium {
   --standard-height: var(--fs-space-2xl);
   --standard-gap: var(--fs-space-xs);
   --standard-padding: var(--fs-space-md);
   --standard-icon-size: var(--fs-space-lg);
   --standard-font-size: var(--fs-font-size-xl);
-  --standard-font-weight: var(--fs-font-weight-bold);
+  --standard-font-weight: var(--fs-font-weight-medium);
   --standard-radius: calc(var(--fs-space-xs) * 0.75);
   --standard-stroke: 1.5px;
 }
@@ -41,7 +42,7 @@
   --standard-padding: var(--fs-space-lg);
   --standard-icon-size: calc(var(--fs-space-lg) * 1.5);
   --standard-font-size: calc(var(--fs-font-size-xl) * 1.5);
-  --standard-font-weight: var(--fs-font-weight-semibold);
+  --standard-font-weight: var(--fs-font-weight-medium);
   --standard-radius: calc(var(--fs-space-sm) * 0.75);
   --standard-stroke: 2px;
 }
@@ -57,6 +58,20 @@
   --standard-stroke: 3px;
 }
 
+/* Opt-in settings preset: preserve one button and native focus across resize. */
+@media (min-width: 48rem) {
+  .small-to-medium {
+    --standard-height: calc(var(--fs-space-2xl) * 1.5);
+    --standard-gap: var(--fs-space-sm);
+    --standard-padding: var(--fs-space-lg);
+    --standard-icon-size: calc(var(--fs-space-lg) * 1.5);
+    --standard-font-size: calc(var(--fs-font-size-xl) * 1.5);
+    --standard-font-weight: var(--fs-font-weight-medium);
+    --standard-radius: calc(var(--fs-space-sm) * 0.75);
+    --standard-stroke: 2px;
+  }
+}
+
 .control:disabled {
   cursor: not-allowed;
 }
@@ -66,11 +81,19 @@
 }
 
 .label {
+  display: block;
+  /* Optically center lowercase Work Sans without moving icons or the target. */
+  position: relative;
+  top: -0.06em;
   /* Move onto its own row instead of collapsing between fixed icon slots. */
   flex-shrink: 0;
   max-width: 100%;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.label::first-letter {
+  text-transform: lowercase;
 }
 
 .icon {

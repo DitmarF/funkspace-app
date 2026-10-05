@@ -1,5 +1,50 @@
 # FS-3.1 — Expandable navigation rows
 
+## Larger tablet and desktop tree — 2026-10-05
+
+Dimi requests a one-size-larger tree for tablets and desktops (interpreting
+“doctors” as desktops). At the menu's existing **48rem / 768px** breakpoint,
+use **36px destination icons, 24px labels, 24px disclosure arrows and 72px
+minimum rows**. Coming-soon text becomes 16px, gaps 12px and the nested indent
+setting 24px (25px total row offset including branch geometry). Below the
+breakpoint retain the existing 24px icons, 16px labels/arrows
+and 48px minimum rows. Text still grows with the root font; decorative slots
+remain bounded so enlarged text wraps.
+
+CSS selects the existing 24/36 artwork exports; both decorative SVG variants
+are rendered with exactly one displayed. No viewport subscription, React size
+state, shared Icon API, new navigation component or hydration replacement.
+Keep the 2px branch line centered beneath either arrow size, native disclosure
+state, accessible names, focus, links, history and dialog ownership unchanged.
+This supersedes older fixed-small-size statements below only. Imported artwork
+is reused; no new Figma retrieval or design approval is claimed.
+
+Branch/base: `feature/funkspace-minimum-usable`,
+`737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` plus preserved pending work. One writer.
+Existing tree/native-navigation tests are extended for responsive geometry,
+correct source artwork, 200% wrapping and focus/open-state continuity on resize.
+Exact candidate and checks: [local evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/navigation-size-2026-10-05/README.md).
+Independent review and Dimi's visual acceptance remain separate; no commit,
+push or deployment is authorized by this request.
+
+Fresh validation: **99 unit tests** across tree/navigation/shell/icons, types,
+lint, production and Storybook builds PASS. Storybook **5/5 PASS** covers narrow,
+tablet and desktop long labels at 200% text and resize continuity across the
+breakpoint. Initial production **38/41 PASS**; three cases still expected the
+old 16px desktop text. Update those expectations to 24px and strengthen the
+minimum desktop row assertion to 72px. The affected suite then passes **18/18**;
+all other accessibility, native behavior, sizing and focus assertions remain.
+Passing production evidence covers branch alignment, themes/unfiltered Axe,
+keyboard, short/200% text, native no-JS, delayed hydration and ultrawide layouts.
+Tablet and expanded desktop screenshots were visually inspected.
+Build: `ZBxEifDzVP65L4FK6Dw-_`. No retries/skips. Physical devices, Safari/Firefox
+and a fresh flag-off build remain unverified for this update.
+
+Fresh three-sample desktop/devtools Lighthouse: LCP **3113.073–3134.262ms**,
+CLS **0**, within existing 5000ms/0.1 limits. Scores **0.81/0.81/0.81** retain
+the existing 0.9 warning. No field-p75 or broad performance-certification claim.
+Final diff/format/link checks pass and unrelated pending work is preserved.
+
 ## Completion update — 2026-09-25
 
 Included in the completed FS-3.1 change set. Dimi gives device acceptance,

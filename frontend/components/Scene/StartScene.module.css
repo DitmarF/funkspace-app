@@ -21,7 +21,7 @@
 /* Denied startup stays static; an expired parser deadline never hides/re-fades
    already visible artwork when delayed application code eventually arrives. */
 .scene[data-scene-reveal="fade"] {
-  animation: sceneReadyIn var(--fs-motion-duration-400)
+  animation: sceneReadyIn var(--fs-motion-duration-800)
     var(--fs-motion-easing-ease-out) both;
 }
 .scene[data-scene-startup="static"][data-scene-reveal="waiting"],
@@ -43,8 +43,18 @@
   margin-top: var(--fs-space-md);
 }
 .action {
-  min-height: var(--fs-space-3xl);
+  min-height: calc(var(--fs-space-2xl) + 4px);
+  transform: translateX(-2px);
 }
-.controls > p {
-  min-height: 3lh;
+.actionRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--fs-space-md);
+}
+.secondaryAction {
+  justify-self: end;
+  min-width: 0;
+  max-width: 100%;
+  text-align: right;
 }

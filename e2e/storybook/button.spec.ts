@@ -121,13 +121,15 @@ for (const suffix of ["interaction", "leading-icon", "trailing-icon"]) {
         labelBefore!.x + labelBefore!.width,
       );
     }
+    const fontSize = await button.evaluate((node) =>
+      parseFloat(getComputedStyle(node).fontSize),
+    );
+    // Labels now have a lowercase optical lift; icons stay centered.
     expect(
-      Math.abs(
-        iconBefore.y +
-          iconBefore.height / 2 -
-          (labelBefore!.y + labelBefore!.height / 2),
-      ),
-    ).toBeLessThan(1);
+      iconBefore.y +
+        iconBefore.height / 2 -
+        (labelBefore!.y + labelBefore!.height / 2),
+    ).toBeCloseTo(fontSize * 0.06, 1);
     await page.keyboard.press("Space");
     await expect(button).toHaveAttribute("aria-busy", "true");
     await expect(slot).toHaveText("…");
@@ -436,7 +438,7 @@ for (const id of [
     for (const button of await buttons.all()) {
       await expect(button).toHaveAttribute("type", "button");
       await expect(button).toHaveCSS("font-size", "24px");
-      await expect(button).toHaveCSS("font-weight", "700");
+      await expect(button).toHaveCSS("font-weight", "500");
       const box = await button.boundingBox();
       expect(box!.height).toBeGreaterThanOrEqual(48);
       expect(box!.x).toBeGreaterThanOrEqual(0);

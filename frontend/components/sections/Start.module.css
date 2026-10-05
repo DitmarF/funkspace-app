@@ -4,10 +4,3 @@
   font-weight: var(--fs-font-weight-semibold);
   line-height: var(--fs-line-height-tight);
 }
-
-.introduction {
-  max-width: 42rem;
-  margin-top: var(--fs-space-lg);
-  font-size: var(--fs-font-size-md);
-  line-height: var(--fs-line-height-normal);
-}

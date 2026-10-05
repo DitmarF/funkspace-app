@@ -1,6 +1,6 @@
 # FunkSpace icons
 
-Twenty-four Figma families, displayed at 24, 36 and 48 CSS pixels.
+Twenty-eight Figma families, displayed at 24, 36 and 48 CSS pixels.
 The gallery is **Icons / Library / Gallery** in Storybook. Playground exposes
 name and size controls; Accent demonstrates inherited semantic color.
 
@@ -180,3 +180,33 @@ are unchanged. Dimi owns final visual/device acceptance.
 4. The gallery and name control use `iconNames`, so they include the family
    automatically. Check all themes, accessible labeling and repeated IDs;
    run the focused icon tests and Storybook build.
+
+### Playback additions and Games replacement — 2026-10-02
+
+Dimi requested Play, Pause, Stop, Replay and the replacement Games artwork
+(“fames” in the request; the actual Figma family is `games`). Exact SVGs were
+retrieved with design context and inspected screenshots from the same UI Library.
+
+| Family              | 24 node | 36 node | 48 node |
+| ------------------- | ------- | ------- | ------- |
+| play                | 253:4   | 253:3   | 253:2   |
+| pause               | 253:16  | 253:15  | 253:14  |
+| stop                | 253:26  | 253:25  | 253:24  |
+| replay              | 253:39  | 253:38  | 253:37  |
+| games (replacement) | 210:146 | 210:145 | 210:144 |
+
+All 15 exact exports live at `public/svg/icons/{family}-{size}.svg`. Games
+replaces the prior three files; the four new families appear automatically in
+**Icons / Library / Gallery** and **Playground**. The shared Games component also
+updates existing consumers such as navigation, without changing interactions.
+Playback buttons are not rewired by this library task.
+
+Actual Games export bounds are 24×25, 36×37 and 48×49, including artwork outside
+the named Figma frames. Play/Pause remain non-square; Replay/48 retains its
+47.9981×47.9982 viewBox. The existing square display slots preserve proportions.
+No geometry is cropped, scaled into another size's paths or redrawn. The existing
+inline registry adapts black paint to currentColor and drops unused source IDs;
+raw exports retain their original bytes. All exports contain only SVG/groups/paths,
+without scripts, handlers, linked resources or raster content.
+
+Execution/results: [icon integration record](../../../docs/tasks/fs-icons-playback-update.md).

@@ -15,10 +15,10 @@ for (const theme of themes) {
           : theme;
     await page.setViewportSize({ width: 2048, height: 800 });
     await page.goto(
-      `/iframe.html?id=icons-library--gallery&viewMode=story&globals=theme:${global}`,
+      `/iframe.html?id=icons-library--gallery&viewMode=story&globals=theme:${global};a11y.manual:!true`,
     );
     const root = page.locator("#storybook-root");
-    await expect(root.locator("svg")).toHaveCount(72);
+    await expect(root.locator("svg")).toHaveCount(84);
     await expect
       .poll(
         async () =>
@@ -28,7 +28,7 @@ for (const theme of themes) {
     await settleStyles(page);
     for (const size of [24, 36, 48]) {
       const section = page.getByRole("region", { name: `${size}px icons` });
-      await expect(section.getByRole("listitem")).toHaveCount(24);
+      await expect(section.getByRole("listitem")).toHaveCount(28);
       for (const item of await section.getByRole("listitem").all()) {
         expect((await renderedPair(item)).ratio).toBeGreaterThanOrEqual(4.5);
         const svg = item.locator("svg");

@@ -6,7 +6,7 @@ import {
   openFallbackNavigation,
 } from "./helpers/foundation";
 
-for (const width of [320, 1280]) {
+for (const width of [320, 768, 1280]) {
   test(`branch lines center under down arrows at ${width}px and enlarged text`, async ({
     page,
   }, testInfo) => {
@@ -72,16 +72,19 @@ test("disclosures support keyboard use, independent branches, themes and ready d
   const downArrow = animations.locator("svg").nth(1);
   await expect(rightArrow).toBeVisible();
   await expect(downArrow).toBeHidden();
-  await expect(rightArrow).toHaveCSS("width", "16px");
-  await expect(animations.locator("svg").nth(2)).toHaveCSS("width", "24px");
+  await expect(rightArrow).toHaveCSS("width", "24px");
+  await expect(animations.locator(":scope > svg:visible")).toHaveCSS(
+    "width",
+    "36px",
+  );
   for (const link of await nav.getByRole("link").all())
-    await expect(link.locator("svg")).toHaveCount(1);
+    await expect(link.locator("svg:visible")).toHaveCount(1);
   await animations.focus();
   await page.keyboard.press("Enter");
   await expect(animations.locator("..")).toHaveAttribute("open", "");
   await expect(rightArrow).toBeHidden();
   await expect(downArrow).toBeVisible();
-  await expect(downArrow).toHaveCSS("width", "16px");
+  await expect(downArrow).toHaveCSS("width", "24px");
   await games.focus();
   await page.keyboard.press("Space");
   await expect(games.locator("..")).toHaveAttribute("open", "");
@@ -89,7 +92,7 @@ test("disclosures support keyboard use, independent branches, themes and ready d
   await expect(nav.locator('[aria-disabled="true"]')).toHaveCount(3);
   await expect(nav.locator('[aria-disabled="true"] a')).toHaveCount(0);
   for (const row of await nav.locator('[aria-disabled="true"]').all())
-    await expect(row.locator("svg")).toHaveCount(1);
+    await expect(row.locator("svg:visible")).toHaveCount(1);
   await games.press("Space");
   await expect(games.locator("..")).not.toHaveAttribute("open");
   await expect(games.locator("svg").nth(0)).toBeVisible();

@@ -107,12 +107,11 @@
   display: flex;
   align-items: center;
   min-height: calc(var(--navigation-close-artwork-size) + 4px);
+  line-height: var(--fs-line-height-tight);
 }
 
-.details :is(a, button) {
-  --standard-font-size: var(--fs-font-size-md);
-  --standard-font-weight: var(--fs-font-weight-semibold);
-  --standard-padding: var(--fs-space-sm);
+.details :is(h3, legend) {
+  font-size: calc(var(--fs-font-size-xl) * 1.25);
 }
 
 .group {
@@ -139,8 +138,17 @@
 }
 
 /* These small labels need the normal-text hover token, without overriding active. */
-.choices button[aria-pressed="false"]:hover:not(:active):not(:disabled) {
+.choices[data-presentation="outlined"]
+  button[aria-pressed="false"]:hover:not(:active):not(:disabled) {
   --control-foreground: var(--fs-color-action-hover);
+}
+
+/* Secondary choices keep a persistent inverse selection. */
+.choices[data-presentation="secondary"]
+  button[aria-pressed="true"]:not(:disabled) {
+  --control-foreground: var(--fs-color-content-primary);
+  --control-background: var(--fs-color-content-inverse);
+  --control-border: var(--control-foreground);
 }
 
 .overlay .rail {
@@ -214,6 +222,18 @@
 }
 
 @media (min-width: 48rem) {
+  .details .group {
+    margin-block-start: var(--fs-space-3xl);
+  }
+
+  .details h3 {
+    font-size: calc(var(--fs-font-size-lg) * 2);
+  }
+
+  .details legend {
+    font-size: calc(var(--fs-font-size-xl) * 1.5);
+  }
+
   .fallback > nav {
     top: calc(100% + var(--fs-space-sm));
     bottom: auto;

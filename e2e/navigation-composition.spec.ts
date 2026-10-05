@@ -1,6 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { openSettings, openAppearance, themes } from "./helpers/foundation";
+import {
+  openSettings,
+  openAppearance,
+  renderedPair,
+  themes,
+} from "./helpers/foundation";
 
 async function expectCloseAlignment(page: Page) {
   const dialog = page.getByRole("dialog");
@@ -134,12 +139,12 @@ for (const viewport of [
       }
       await expect(
         dialog.getByRole("link", { name: "Home", exact: true }),
-      ).toHaveCSS("font-size", "16px");
+      ).toHaveCSS("font-size", viewport.width < 768 ? "16px" : "24px");
       expect(
         (await dialog
           .getByRole("link", { name: "Home", exact: true })
           .boundingBox())!.height,
-      ).toBeGreaterThanOrEqual(48);
+      ).toBeGreaterThanOrEqual(viewport.width < 768 ? 48 : 72);
       expect(await dialog.boundingBox()).toEqual({ x: 0, y: 0, ...viewport });
       await expect(
         dialog.getByRole("button", { name: "Navigation", exact: true }),
@@ -177,6 +182,27 @@ for (const viewport of [
       await page.screenshot({ path: info.outputPath("navigation.png") });
       await openAppearance(page);
       await expect(
+        dialog.getByRole("heading", { name: "Accessibility", exact: true }),
+      ).toHaveCSS("font-size", viewport.width < 768 ? "30px" : "40px");
+      for (const legend of await dialog.locator("legend").all()) {
+        await expect(legend.locator("..")).toHaveCSS(
+          "margin-block-start",
+          viewport.width < 768 ? "0px" : "64px",
+        );
+        await expect(legend).toHaveCSS(
+          "font-size",
+          viewport.width < 768 ? "30px" : "36px",
+        );
+      }
+      await expect(dialog.getByRole("status")).toHaveCSS(
+        "position",
+        "absolute",
+      );
+      await expect(dialog.getByRole("status")).toHaveCSS(
+        "clip",
+        "rect(0px, 0px, 0px, 0px)",
+      );
+      await expect(
         dialog.getByRole("group", { name: "Appearance" }),
       ).toBeVisible();
       await expect(
@@ -184,6 +210,9 @@ for (const viewport of [
       ).toBeVisible();
       await page.mouse.move(0, 0);
       await page.screenshot({ path: info.outputPath("accessibility.png") });
+      await expect(
+        dialog.getByRole("button", { name: "High Contrast" }).locator("span"),
+      ).toHaveCSS("text-transform", "lowercase");
       for (const [theme, label] of [
         ["default", "Light"],
         ["dark", "Dark"],
@@ -208,6 +237,61 @@ for (const viewport of [
             "data-theme",
             theme,
           );
+        await page.mouse.move(0, 0);
+        for (const name of ["Appearance", "Motion"]) {
+          const choices = dialog.getByRole("group", { name, exact: true });
+          const selected = choices.locator('button[aria-pressed="true"]');
+          const unselected = choices
+            .locator('button[aria-pressed="false"]')
+            .first();
+          const selectedPair = await renderedPair(selected);
+          const unselectedPair = await renderedPair(unselected);
+          for (const button of [selected, unselected]) {
+            await expect(button).toHaveCSS(
+              "min-height",
+              viewport.width < 768 ? "48px" : "72px",
+            );
+            await expect(button).toHaveCSS(
+              "font-size",
+              viewport.width < 768 ? "24px" : "36px",
+            );
+            await expect(button).toHaveCSS("font-weight", "500");
+          }
+          // Secondary is filled; persistent selection reverses its foreground/surface.
+          expect(selectedPair.foreground).toBe(
+            `rgb(${unselectedPair.background.join(", ")})`,
+          );
+          expect(unselectedPair.foreground).toBe(
+            `rgb(${selectedPair.background.join(", ")})`,
+          );
+          expect(selectedPair.ratio).toBeGreaterThanOrEqual(4.5);
+          expect(unselectedPair.ratio).toBeGreaterThanOrEqual(4.5);
+          await unselected.hover();
+          const hoverPair = await renderedPair(unselected);
+          const sharedHover = await unselected.evaluate((node) =>
+            (
+              getComputedStyle(node)
+                .getPropertyValue("--fs-color-action-hover-large")
+                .match(/[\d.]+/g) ?? []
+            )
+              .slice(0, 3)
+              .map(Number),
+          );
+          expect(hoverPair.background).toEqual(sharedHover);
+          // The verified 24/36px labels use the same approved 3:1 large-text
+          // hover pairing as the shared buttons (not the former 16px override).
+          expect(hoverPair.ratio).toBeGreaterThanOrEqual(3);
+          await selected.hover();
+          expect((await renderedPair(selected)).background).toEqual(
+            selectedPair.background,
+          );
+          await selected.focus();
+          await expect(selected).toBeFocused();
+          await page.mouse.move(0, 0);
+        }
+        await page.screenshot({
+          path: info.outputPath(`accessibility-${theme}.png`),
+        });
         expect((await new AxeBuilder({ page }).analyze()).violations).toEqual(
           [],
         );

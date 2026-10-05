@@ -22,6 +22,18 @@ This feature plan owns milestone scope and current milestone status. The [consol
 - **Approval limit:** Dimi explicitly approved option A, the portfolio branch name and FS-G0, then the particular Vercel corrections/production game-baseline merge. Those approvals do not complete FS-0.4/0.5, approve new services or contact delivery, or authorize later portfolio publication. Documentation drafting alone proves no implementation or human acceptance.
 - **Current gate decision (2026-09-12):** after preservation/source reconciliation and independent review, Dimi explicitly approved FS-G0 and the six-file patch based on `156c28c8486352328a184d587a6540eee42b8bc1`, SHA-256 `677b435d304376692d2e32c47aac19072e06e86c7dc9d8ebab68816b94f874d8`. The [decision record](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12) preserves the actual answer and separate commit/push authorization. Earlier approval/review stages remain historical evidence.
 
+## Latest EPIC 4 functional handoff — 2026-10-05
+
+The [pending-candidate review](../tasks/fs-4.7-scene-performance-review.md#pending-candidate-review-and-authorized-delivery--2026-10-05)
+returns **PASS for all 76 reviewed pending files**, covering current WEB defaults
+and aperture, scene controls, playback icons, button typography and responsive
+navigation/accessibility settings. Fresh validation passes 1,850 unit/integration
+tests, 224 browser checks, configured coverage, types/lint, both flag builds and
+Storybook. Dimi explicitly authorized documentation, commit and push after review.
+This is a functional handoff; required FS-4.7 device/performance evidence and
+FS-4.8 human acceptance remain open. Earlier candidate measurements are not
+transferred to these changes, and publication is not authorized by this handoff.
+
 ## Goal
 
 Deliver an animation-led, mobile-first website with Start, About, and Contact/footer sections, normal scrolling, the existing FunkSpace logo and semantic design foundations, one customizable Canvas scene behind a replaceable SVG aperture, usable navigation/settings, real contact delivery, and completed secondary pages. End when the portfolio is ready to host game integration. Do not implement game integration in this milestone.

@@ -235,7 +235,7 @@ export default function ParticleLifecycleFixture({
       {aperture && (
         <div className={styles.gallery} data-aperture-gallery>
           <FunkSpaceLogoInline className={styles.identity} />
-          {(["web", "circle", "technical-diamond"] as const).map((shape) => (
+          {(["web", "technical-diamond"] as const).map((shape) => (
             <div key={shape} className={styles.thumbnail}>
               <svg className={styles.still} aria-hidden="true">
                 {fallback.particles.map((particle) => (

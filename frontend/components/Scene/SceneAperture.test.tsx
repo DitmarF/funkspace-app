@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderToString } from "react-dom/server";
 import SceneAperture from "./SceneAperture";
 import { FunkSpaceLogoInline } from "../Logo/FunkSpaceLogoInline";
+import { webPath, webViewBox } from "@/data/webApertureGeometry";
 const fake = vi.hoisted(() => ({ checkMask: vi.fn(), load: vi.fn() }));
 vi.mock("@/application/providers/ServiceProvider", () => ({
   useServices: () => ({ apertureAssets: fake }),
@@ -15,6 +16,30 @@ beforeEach(() => {
   fake.load.mockReset().mockReturnValue(vi.fn());
 });
 describe("aperture composition", () => {
+  it("uses the same built-in WEB for the live opening and static art without fetching an export", () => {
+    const view = render(<SceneAperture />);
+    expect(fake.load).not.toHaveBeenCalled();
+    expect(
+      view.container.querySelector("[data-scene-aperture]"),
+    ).toHaveAttribute("data-aperture", "web");
+    const href = view.container
+      .querySelector("mask image")!
+      .getAttribute("href")!;
+    const image = new DOMParser().parseFromString(
+      decodeURIComponent(href.slice(href.indexOf(",") + 1)),
+      "image/svg+xml",
+    );
+    expect(image.documentElement.getAttribute("viewBox")).toBe(webViewBox);
+    expect(image.querySelector("path")?.getAttribute("d")).toBe(webPath);
+    expect(image.querySelector("path")?.getAttribute("fill")).toBe("black");
+    expect(image.querySelector("circle")).toBeNull();
+    view.rerender(<SceneAperture showStatic />);
+    expect(
+      view.container.querySelector("[data-aperture-fallback] path"),
+    ).toHaveAttribute("d", webPath);
+    expect(view.container.querySelector("circle")).toBeNull();
+    expect(fake.load).not.toHaveBeenCalled();
+  });
   it("makes only a ready cover transparent and retains its mask identity and static fallback", () => {
     const view = render(<SceneAperture selection="web" />);
     const mask = view.container.querySelector("mask");
@@ -88,7 +113,7 @@ describe("aperture composition", () => {
     );
     expect(fake.checkMask).toHaveBeenCalledTimes(1);
   });
-  it("failed selected-image decoding retains the built-in circle", () => {
+  it("failed selected-image decoding retains the built-in WEB", () => {
     fake.load.mockImplementation((_asset, result) => {
       result("data:image/svg+xml,broken");
       return vi.fn();
@@ -99,7 +124,7 @@ describe("aperture composition", () => {
     fireEvent.load(selected);
     expect(
       view.container.querySelector("[data-scene-aperture]"),
-    ).toHaveAttribute("data-aperture", "circle");
+    ).toHaveAttribute("data-aperture", "web");
   });
   it("SSR has independent complete artwork; IDs are scoped across cover/thumbnail/logo", () => {
     const html = renderToString(
@@ -125,7 +150,7 @@ describe("aperture composition", () => {
       "mask-type:luminance",
     );
   });
-  it("holds circle until validated asset load and ignores stale callbacks after replacement", async () => {
+  it("holds WEB until validated asset load and ignores stale callbacks after replacement", async () => {
     const callbacks: ((href: string | null) => void)[] = [];
     fake.load.mockImplementation((_asset, cb) => {
       callbacks.push(cb);
@@ -137,7 +162,7 @@ describe("aperture composition", () => {
     const images = view.container.querySelectorAll("image");
     expect(
       view.container.querySelector("[data-scene-aperture]"),
-    ).toHaveAttribute("data-aperture", "circle");
+    ).toHaveAttribute("data-aperture", "web");
     fireEvent.load(images[1]);
     expect(
       view.container.querySelector("[data-scene-aperture]"),
@@ -152,9 +177,9 @@ describe("aperture composition", () => {
     act(() => callbacks[1](null));
     expect(
       view.container.querySelector("[data-scene-aperture]"),
-    ).toHaveAttribute("data-aperture", "circle");
+    ).toHaveAttribute("data-aperture", "web");
   });
-  it("asset decode failure retains circle and mask failure never signals readiness", () => {
+  it("mask failure retains solid WEB and never signals readiness", () => {
     fake.checkMask.mockImplementation((cb) => {
       cb(false);
       return vi.fn();

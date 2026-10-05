@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import { useServices } from "@/application/providers/ServiceProvider";
 import { THEME_METADATA, type Theme } from "@/domain/theme/Theme";
-import Button from "./Controls/Button";
+import Button, { type ButtonProps } from "./Controls/Button";
 import styles from "./ThemeSwitcher.module.css";
 
 export default function ThemeSwitcher({
   presentation = "default",
+  size,
 }: {
-  presentation?: "default" | "outlined";
+  presentation?: "default" | "outlined" | "secondary";
+  size?: ButtonProps["size"];
 }) {
   const { themeService } = useServices();
 
@@ -27,13 +29,14 @@ export default function ThemeSwitcher({
     themeService.setTheme(theme);
   };
 
-  if (presentation === "outlined")
+  if (presentation !== "default")
     return (
-      <div className={styles.choices}>
+      <div className={styles.choices} data-presentation={presentation}>
         {THEME_METADATA.map((theme) => (
           <Button
             key={theme.value}
-            variant="outlined"
+            variant={presentation}
+            size={size}
             aria-pressed={currentTheme === theme.value}
             onClick={() => selectTheme(theme.value)}
           >
@@ -55,7 +58,7 @@ export default function ThemeSwitcher({
             px-fs-md
             py-fs-xs
             rounded-lg 
-            font-medium 
+            font-medium
             focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fs-border-focus
             border ${
               currentTheme === theme.value

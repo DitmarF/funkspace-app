@@ -142,7 +142,7 @@ for (const javaScriptEnabled of [true, false]) {
         await expectVisibleBrand(page);
         await expectSemanticsAndSkip(page);
         if (entry.route === "/") {
-          await expect(page.locator("[data-start-introduction]")).toHaveText(
+          await expect(page.locator("#start")).not.toContainText(
             startIntroduction,
           );
           await expect(page.locator("#about p[lang=la]")).toHaveText(

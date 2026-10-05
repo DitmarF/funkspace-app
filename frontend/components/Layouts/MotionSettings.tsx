@@ -2,9 +2,15 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 import { useServices } from "@/application/providers/ServiceProvider";
-import MotionChoices from "./MotionChoices";
+import MotionChoices, { type MotionChoicesProps } from "./MotionChoices";
 
-export default function MotionSettings() {
+export default function MotionSettings({
+  presentation,
+  size,
+  showDescription = true,
+}: Pick<MotionChoicesProps, "presentation" | "size"> & {
+  showDescription?: boolean;
+}) {
   const { motionPolicy, decorativeMotionAvailable } = useServices();
   const subscribe = useCallback(
     (changed: () => void) => motionPolicy.subscribe(changed),
@@ -34,11 +40,15 @@ export default function MotionSettings() {
   return (
     <div>
       <MotionChoices
+        presentation={presentation}
+        size={size}
         value={snapshot.preference}
         disabled={snapshot.status !== "ready"}
         onChange={(value) => motionPolicy.setPreference(value)}
       />
-      <p role="status">{status}</p>
+      <p role="status" className={showDescription ? undefined : "sr-only"}>
+        {status}
+      </p>
     </div>
   );
 }

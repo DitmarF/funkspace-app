@@ -2,10 +2,22 @@
 
 ## Task metadata
 
-**Current revision: R19 (2026-09-30)** — Dimi's scene identity, dialog and Off-still
-amendment below supersedes earlier preview/Off fallback behavior. R18 still owns
-the numeric controls and degree limits. The revision and
-status entries immediately below retain the historical record through R17.
+**Current revision: R26 (2026-10-05)** — Dimi removes all visible status copy
+beneath WEB. Waiting, restrictions, failure and static descriptions remain
+screen-reader-accessible without layout space; customization explanations and
+motion rules remain unchanged. See the R26 amendment below.
+
+R25 restored small playback controls and
+also removes the visible local-Pause status beneath WEB. The 1px Play-icon offset
+and other R24 refinements remain. R24 previously enlarged controls and requested
+a 1px rightward Play-icon correction and left-aligned customization text, and
+removes the visible playing status and development introduction from Start.
+See the R24 amendment below. R23 established paired actions below WEB:
+hexagonal Play/Pause on the left, More on the right on the homepage, and Customize
+with the Playground icon on the right on the details page. This changes action
+presentation only. R22 mobile fitting, R21 built-in WEB, R20 defaults and the
+existing motion/dialog contracts remain unchanged. Earlier revisions retain
+their historical evidence and approval limits.
 
 **Implementation checkpoint — 2026-09-30:** FS-4.6 C7 received Codex R2 technical
 PASS against R19; F1–F3 are closed. See the [review closure and remaining limits](fs-4.6-customization-overlay.md#codex-r2-closure-and-authorized-delivery--2026-09-30).
@@ -19,6 +31,105 @@ This adds evidence, not a product-contract revision or final visual acceptance.
 - **Inspected HEAD/base:** `1ab13095edb3cf0c9b38897ddcbb75a16d0ff498`; R1 started from a clean tree; R2 started with only the untracked R1 document. The historical reference happens to equal HEAD; no reset or remote fetch was performed.
 - **Scope authority:** [feature plan](../features/funkspace-minimum-usable.md), [EPIC 3 closure and API handoff](fs-3.6-integrated-validation.md), [workflow](../development/ai-workflow.md), [task template](../templates/task.md).
 - **Candidate identity:** Reviewed R2 was the base above plus this one added document; its exact hash is retained in the acceptance record. R3 also updated the feature plan and had no runtime diff. Exact R3 diff/hashes/checks remain in the acceptance packet. R4 implementation and fresh evidence belong to the FS-4.3 connection amendment.
+
+## R26 — No visible WEB status copy — 2026-10-05
+
+Dimi requests no extra status text beneath WEB, including “Animation waits
+until…”. All scene status messages on homepage and details, including loading,
+restrictions, failure and no-JavaScript descriptions, remain accessible to screen
+readers without occupying layout space. Retain the Pause/Resume description,
+disabled-state rules and the existing explanations inside customization. This
+supersedes R25's visible restriction/failure copy only; scene behavior is unchanged.
+Implementation and evidence: [FS-4.6 status follow-up](fs-4.6-customization-overlay.md#quiet-scene-status--2026-10-05).
+
+## R25 — Small playback controls and quiet Pause — 2026-10-05
+
+Latest optical follow-up: Dimi subsequently requests smaller icons and two
+successive 1px left shifts of the whole button. Use 16px display size from the
+existing 24px artwork, retaining the small hex/52px native target and internal
+Play correction. The final wrapper offset is -2px. See the latest refinement in
+the linked FS-4.6 record; the initial 24px icon instruction below is historical.
+
+Restore the existing small Play/Pause control on homepage and details (48px
+artwork, 24px icon, 52px native target), retaining Play's 1px rightward adjustment.
+Neither ordinary playing nor local-Pause status appears visually beneath WEB;
+both remain screen-reader-accessible without reserved layout space. Keep visible
+restriction/failure explanations and actual Pause/resume behavior unchanged.
+The Playback story follows the same size. This supersedes R24's medium size and
+visible local-Pause explanation; all other R24 refinements stand. Implementation
+and checks: [FS-4.6 follow-up](fs-4.6-customization-overlay.md#small-playback-follow-up--2026-10-05).
+
+## R24 — Playback and copy refinements — 2026-10-05
+
+Dimi requests the next existing playback-button size on homepage and details:
+medium (72px hex artwork, 36px icon, 76px native target including border), with
+only the triangular Play icon shifted right by 1 CSS px. Pause remains centered.
+All customization-dialog text is left-aligned, independent of the right-aligned
+trigger row. Remove visible “Animation playing.” below WEB; retain its accessible
+status/description without layout space and preserve visible Pause/restriction/
+failure explanations. Remove the development introduction paragraph from Start;
+retain the existing metadata description. Scene/runtime behavior is unchanged.
+This instruction supersedes R23's small playback size and routine visible status.
+Implementation/checks are in the [refinement record](fs-4.6-customization-overlay.md#playback-and-copy-refinements--2026-10-05).
+
+## R23 — Paired WEB scene actions — 2026-10-05
+
+Dimi supplies `/Users/dimi/Desktop/scr_01.png` as a mobile wireframe and explicitly
+requests an outlined hexagonal Play/Pause button on the left below WEB. The
+homepage has the existing native More link on the right, with its More icon.
+The details page replaces that link with an outlined Customize button bearing
+the Playground icon, opening the existing customization dialog.
+
+Use existing small controls (48px nominal hex artwork and 24px icons). Preserve
+the Pause/Resume accessible names, explanatory motion status and all policy
+restrictions. More remains available without JavaScript; unavailable playback
+or customization must not become a dead no-JavaScript control. Ordinary dismissal
+returns focus to Customize. Retain the current heading and scene size; the
+wireframe's counters, dots, corner marks and placeholder frame do not authorize
+a carousel, counters, border or new animation selection. Implementation evidence
+is in the [FS-4.6 action-layout amendment](fs-4.6-customization-overlay.md#paired-scene-actions--2026-10-05).
+
+## R22 — Larger mobile WEB — 2026-10-02
+
+Dimi requests a larger WEB aperture on mobile and states that tablet/desktop
+sizing is already satisfactory. Use a centered **96%** fitting box below **640 CSS
+px viewport width**, retaining **80%** at 640 px and above. The selected 96% is
+the implementation's reversible interpretation of “larger,” not a separately
+approved numeric product decision. Preserve intrinsic proportions and apply the
+same fitting to the live WEB opening and independent solid fallback, including
+no-JavaScript output. Full rectangular cover, scene height, Canvas bounds,
+particle settings, motion policy and the diagnostic diamond remain unchanged.
+See [implementation evidence](fs-4.4-svg-aperture.md#larger-mobile-web--2026-10-02).
+
+## R21 — Built-in WEB aperture; no circle — 2026-10-01
+
+Dimi's supplied screenshot shows Aperture - 1 playing through a circle instead
+of WEB. Dimi explicitly requests fixing the wrong mask and removing the circle.
+Use the existing trusted, outlined Work Sans Black WEB geometry as the built-in
+native SVG image and loading/error aperture. The production WEB opening must not
+depend on fetching its separate export. Remove circle from the selection type
+and diagnostic gallery. Keep independent lightweight solid WEB when preparation
+or mask support fails; do not restore SVG particle graphs.
+
+The diagnostic diamond remains available for mounted replacement checks, with
+validated async loading, cancellation and WEB fallback. Preserve full rectangular
+coverage, proportional centered fitting, stable IDs and Canvas continuity. No
+particle rules, runtime, shared policy or R20 tuning change is authorized by this
+amendment. [Implementation and fresh evidence](fs-4.4-svg-aperture.md#built-in-web-correction--2026-10-01)
+are separate from independent review, device certification and FS-4.8 acceptance.
+
+## R20 — WEB animation defaults — 2026-10-01
+
+Dimi explicitly requests density **286 particles**, speed **0.2×** and size
+**0.1×**; all other settings remain unchanged. These shared authoring defaults
+apply to initial scene configuration and user-facing Reset. Connection degree
+100, distance 6×, seed, ranges/steps, resource budgets, theme/motion behavior
+and aperture are unchanged. Existing density/size-dependent rendering still
+applies; no new visual algorithm is introduced.
+
+Implementation and checks are recorded in the [particle settings task](fs-4-particle-settings.md#r20-default-tuning--2026-10-01). Prior FS-4.7 default measurements
+remain historical for 200 / 0.4× / 1×; current-default performance evidence must
+use this new configuration. This tuning request is not FS-4.8 acceptance.
 
 ## R19 — Aperture - 1 and retained still frames — 2026-09-30
 

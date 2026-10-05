@@ -42,7 +42,7 @@ for (const viewport of [
         await expect(
           page.locator("#start [data-aperture-fallback] path"),
         ).toBeVisible();
-        await expect(page.locator("[data-start-introduction]")).toHaveText(
+        await expect(page.locator("#start")).not.toContainText(
           "FunkSpace is a design-system-first web experience built as a PNPM workspace.",
         );
         await expect(page.getByRole("heading", { level: 1 })).toHaveText(
@@ -66,8 +66,8 @@ for (const viewport of [
             .getBoundingClientRect();
           return {
             bottom: frame.bottom,
-            copy: section
-              .querySelector("[data-start-introduction]")!
+            actions: section
+              .querySelector("[data-scene-actions]")!
               .getBoundingClientRect().top,
             border: getComputedStyle(
               section.querySelector("[data-start-scene]")!,
@@ -76,7 +76,7 @@ for (const viewport of [
             overflow: document.documentElement.scrollWidth > innerWidth,
           };
         });
-        expect(layout.bottom).toBeLessThanOrEqual(layout.copy);
+        expect(layout.bottom).toBeLessThanOrEqual(layout.actions);
         expect(layout.height).toBeCloseTo(
           Math.max(200, Math.min(400, viewport.width * 0.4)),
           2,

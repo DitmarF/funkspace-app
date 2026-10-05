@@ -53,9 +53,9 @@ for (const theme of themes) {
     const evidence = [];
     await expect(root.getByRole("button")).toHaveCount(24);
     for (const [size, dimension, fontSize, weight] of [
-      ["small", 48, 16, "600"],
-      ["medium", 72, 16, "600"],
-      ["large", 96, 24, "700"],
+      ["small", 48, 16, "500"],
+      ["medium", 72, 16, "500"],
+      ["large", 96, 24, "500"],
     ] as const) {
       for (const variant of [
         "accent-outlined",

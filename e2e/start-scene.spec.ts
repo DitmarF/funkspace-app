@@ -532,6 +532,9 @@ test("context loss replaces a drawn scene with solid WEB without a retry", async
 test("actual On scene suspends for document/offscreen visibility and responds to live OS changes", async ({
   page,
 }) => {
+  // Without visible status copy, the shorter page can leave a sliver of WEB
+  // onscreen at 720px height even after scrolling to Contact.
+  await page.setViewportSize({ width: 1280, height: 600 });
   await instrument(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
@@ -558,6 +561,11 @@ test("actual On scene suspends for document/offscreen visibility and responds to
   const restored = await frames(page);
   await expect.poll(() => frames(page)).toBeGreaterThan(restored + 2);
   await page.locator("#contact").scrollIntoViewIfNeeded();
+  await expect
+    .poll(() =>
+      canvas(page).evaluate((node) => node.getBoundingClientRect().bottom),
+    )
+    .toBeLessThan(0);
   await stopped(page);
   await page.locator("#start").scrollIntoViewIfNeeded();
   const returned = await frames(page);

@@ -1,5 +1,212 @@
 # FS-4.6 — Details-page customization and overlay coordination
 
+## WEB fade duration follow-up — 2026-10-05
+
+Dimi requests increasing WEB's fade-in duration by 100%: **400ms → 800ms**.
+Select the existing `--fs-motion-duration-800` token in StartScene's shared
+stylesheet for homepage and details. Easing, readiness gating, once-per-mount
+reveal, local Pause and Reduced/Off/static behavior remain unchanged; no global
+token values, generated files or runtime code change. This is a local authorized
+visual adjustment, not independent approval or final EPIC acceptance.
+
+Base: `737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` plus preserved pending work.
+Exact diff and checks: [fade evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/scene-fade-2026-10-05/README.md).
+
+Fresh checks: **33/33** scene unit tests, types, lint, app and Storybook builds
+PASS. **8/8** production browser checks PASS: computed duration **0.8s** and
+browser animation timing **800ms** on both homepage/details, no fade for
+Reduced/Off, and the existing delayed-draw/timeout regressions. Browser timing
+checks are evidence-only files in the isolated checkout; no permanent new test
+scaffold. Build: `R9ASfsBklg_lVu2z4IMHW`. No retries or skips.
+
+Three fresh desktop/devtools Lighthouse samples pass existing LCP/CLS limits:
+**3115.979–3129.41ms**, **CLS 0**. All three performance scores are **0.81**,
+retaining the existing 0.9 warning. No field-p75 or complete scene-audit claim.
+Diff/format/link checks pass; prior work and generated outputs are preserved.
+
+Status-copy amendment: [quiet scene status](#quiet-scene-status--2026-10-05)
+implements Dimi's follow-up under contract R26. Earlier C7/R2
+approval applies to its recorded candidate, not automatically to this amendment.
+
+## Quiet scene status — 2026-10-05
+
+Dimi requests removing all extra text beneath WEB because it disrupts the layout,
+including the waiting message. Use the existing `sr-only` treatment for every
+StartScene status on homepage and details, removing the obsolete three-line
+status reservation. Preserve live-region text and the playback button's
+`aria-describedby`; customization-dialog explanations remain in the active modal.
+No policy, runtime, Pause, reveal or shared-service behavior changes. R26 in the
+[scene contract](fs-4.1-scene-contract.md#r26--no-visible-web-status-copy--2026-10-05)
+supersedes the previous visible restriction/failure-copy decision.
+
+Base: `737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` plus preserved pending work on
+`feature/funkspace-minimum-usable`. Exact incremental diff, candidate hashes and
+checks: [local evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/scene-quiet-status-2026-10-05/README.md).
+This is a local implementation update; independent review and human visual
+acceptance are separate. No commit, push or deployment is authorized.
+
+Fresh checks: **43/43** focused unit tests and **27/27** production browser checks
+PASS, plus types, lint, app and Storybook builds. Browser coverage includes all
+four motion choices, OS changes, delayed loading, palette/context failures,
+visibility, local Pause, action layout and no-JavaScript content. Waiting status
+behind customization and the no-JavaScript description retain a 1px accessible
+box with absolute positioning, taking no row space. Failure-state and mobile
+screenshots were inspected. Build: `ELk6jTZwuioS0WDF2exkG`.
+
+The first browser run passed 26/27: after removing the status height, scrolling
+to Contact at 720px leaves a thin strip of Canvas onscreen, so the animation
+correctly continues. The existing offscreen test now uses a 600px viewport and
+asserts Canvas bottom < 0 before retaining its exact stopped-frame assertion.
+The full rerun passes without retries or skips. No runtime correction was needed.
+Physical devices, Safari/Firefox and a fresh flag-off build were not exercised.
+
+Final three-sample desktop/devtools Lighthouse: LCP **3129.075–3134.52ms** and
+CLS **0** pass the existing 5000ms/0.1 limits. Scores **0.81/0.81/0.82** retain
+the existing 0.9 warning. These local samples are not field p75 or a full scene
+performance certification. Final diff/format/link checks and candidate hashes
+are in the packet; unrelated pending work is preserved.
+
+## Small playback follow-up — 2026-10-05
+
+Latest refinement: Dimi requests one-size smaller Play/Pause icons and another
+1px left shift. Render existing 24px SVG artwork at 16px through HexButton's
+existing size override (now accepting 16); do not invent a new icon export.
+Retain the 48px hex/52px native target and Play's internal 1px right correction.
+The whole scene playback wrapper is now 2px left of its original grid position.
+Playback Storybook matches the icon size; other controls keep their defaults.
+Checks and exact candidate: [icon-size evidence](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/scene-icon-size-2026-10-05/README.md).
+
+Subsequent optical refinement: Dimi requests moving the whole Play/Pause button
+1 CSS px left on both pages. Translate only the scene's playback wrapper; retain
+the small target, icon-only Play correction, right-side action and focus behavior.
+The existing responsive browser assertion now checks the requested -1px offset.
+Validation is recorded in the [offset evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/scene-button-offset-2026-10-05/README.md).
+
+Dimi requests restoring small Play/Pause and removing “Animation paused here.”
+from below WEB. StartScene and the Playback story use the existing small variant;
+the row reserves its 52px native target. Both ordinary playing and local-Pause
+messages are screen-reader-only with no space beneath the row. Restrictions and
+failures remain visible. Play's 1px offset, left-aligned dialog and removed Start
+development paragraph remain. No runtime, policy, shared preference or modal
+behavior changes. Paused-message removal applies to the WEB action area; dialog
+restrictions/explanations remain available inside the active modal.
+
+Base `737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` plus prior pending work. Exact
+candidate, changed-byte validation and evidence are recorded in the
+[local packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/scene-small-playback-2026-10-05/README.md).
+Validation: 51 focused tests, frontend/validation types, lint, both production
+builds and Storybook PASS. Production action/static checks pass 7/7 per flag
+variant, including keyboard Pause/Resume, 52px targets, hidden paused status,
+responsive layout, no-JS and restriction fallbacks. Paused mobile screenshot
+inspected. Exact build IDs/hashes and preserved work are pinned in the packet.
+Fresh Lighthouse/physical-device checks not run for this small follow-up; earlier
+results remain historical. No independent approval, commit, push or deployment.
+
+## Playback and copy refinements — 2026-10-05
+
+Dimi requests four bounded refinements to the R23 action layout: use one-size
+larger playback controls with Play shifted 1px right; left-align all customization
+text; remove the visible playing status; remove the Start development paragraph.
+Use existing medium HexButton on both routes and in its Playback story. Apply
+the optical correction to Play only; the source SVG exports remain untouched.
+The dialog now explicitly owns left alignment (including button text), avoiding
+inheritance from its right-aligned trigger container. Keep the playing status
+screen-reader-only with no reserved space; other explanations remain visible.
+Remove the paragraph and unused CSS, retaining the site metadata description.
+
+Candidate: `737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` plus preserved prior pending
+work and this refinement. Presentation/styles, the existing Playback story,
+affected Start/static/action tests and contract/task records only. No simulation,
+service, policy, intro or dialog-lifecycle edits. Existing current instructions,
+architecture/workflow/template, plan sections 5.3–5.6, current contract and actual
+consumer/control/tests inspected. The older plan's policy proposals do not reopen
+accepted decisions. Source SVGs and generated token/bootstrap outputs preserved.
+
+The [local evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/scene-polish-2026-10-05/README.md)
+records exact incremental/full diffs, candidate/source hashes, commands, logs and
+screenshots. Focused Start/scene/customization/Hex tests **53/53**, types,
+validation types and full lint PASS. Production On/Off builds and Storybook PASS;
+the affected production suites each pass **67/67** and shared Hex browser checks
+pass **12/12**. Visual inspection then refined only the dialog's button-content
+alignment (`justify-content: flex-start`); both production builds and Storybook
+were rebuilt and the affected On actions/scrolling **5/5** and Off actions **3/3**
+passed. No retry/skip used. Final build IDs: On `3ANq32g_qyg_I_oT4G7Ot`,
+Off `Ph3TZawQiJTXTYEv2Oz1d`.
+
+Fresh Lighthouse samples retain the existing desktop/devtools method, three runs
+per separately compiled flag variant, LCP <=5000ms / CLS <=0.1 assertions and
+performance >=0.9 warning. Both variants PASS LCP/CLS; On retains the 0.82
+score warning and Off scores 1.00. Exact measurements and Chrome version are
+in the packet; local sample aggregation is not field p75 or complete
+scene performance certification. The initial two-state suites preceded only the
+last CSS alignment refinement; final affected checks cover those changed bytes.
+Mobile homepage/details and final dialog screenshots were inspected. Physical
+phone/Safari/Firefox, independent review and final Dimi acceptance remain open.
+No commit, push, deployment, runtime/policy change or threshold relaxation.
+
+## Paired scene actions — 2026-10-05
+
+Dimi supplies `/Users/dimi/Desktop/scr_01.png` and requests left-aligned hexagonal
+Play/Pause beneath WEB, with More on the right on the homepage. The details page
+uses the same layout with Customize and the Playground icon in place of More.
+[R23](fs-4.1-scene-contract.md#r23--paired-web-scene-actions--2026-10-05) records
+this bounded presentation change. The wireframe is an inspected visual reference;
+its counters/dots/corner marks do not add a carousel or new scene selection.
+
+The existing small outlined HexButton gains Play/Pause icon support and a
+Storybook Playback example. StartScene owns one responsive action row; its left
+control calls the unchanged scene pause/resume handle, with the existing dynamic
+accessible names and status description. The right side renders the native More
+ButtonLink with its More icon, or the existing SceneCustomization trigger with
+Playground and visible label Customize (accessible name Customize animation).
+The dialog title, actual-invoker ref, release/restore behavior and inline failure
+feedback stay intact. Only this trigger's empty live-region reservation is
+removed so it does not offset the row; the live region stays mounted.
+
+More moves out of the Start section's separate block into that row and remains
+server-rendered without JavaScript. No dead playback/customization button is
+rendered before the consumer exists. Status explanations stay below the row.
+Both actions can wrap at narrow widths/enlarged text without clipping focus.
+Heading, WEB sizing, defaults, simulation/runtime, resolver, shared services,
+intro, navigation and modal ownership are unchanged.
+
+Candidate base: `737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c`, branch
+`feature/funkspace-minimum-usable`, plus preserved pending WEB/icon work and this
+action-layout patch. Paths: HexButton component/story, StartScene component/CSS,
+SceneCustomization component/CSS, Start section, new scene-actions browser test,
+the existing customization regression test and these two task/contract records.
+The [local evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/scene-actions-2026-10-05/README.md)
+pins exact hashes, incremental/full diffs, builds, commands, screenshots and logs.
+
+Regression maintenance: the broad suite exposed five Reset cases still expecting
+pre-R20 defaults 200/0.4/1. They now assert the existing shared default configuration
+(286/0.2/0.1), preserving all state/RAF/runtime assertions. The focus spy records
+the accessible label before text so route-departure checks remain meaningful
+with the shorter visible Customize label. No policy/runtime fix or threshold
+relaxation is included.
+
+Validation: focused StartScene, SceneCustomization and HexButton tests **51/51**;
+frontend types, validation types and full lint PASS. Separate production builds
+PASS with animations enabled (`mMl0CgF5waNi0htuk3txn`) and disabled
+(`kVWuySZzfTTUZJfpON612`); each passes **54/54** production browser checks for
+scene actions, customization, policy and static/no-JavaScript behavior, with no
+retries or skips. Storybook build PASS and existing hex-button browser checks
+**12/12**, including four-theme accessibility, keyboard, touch-emulated targets,
+enlarged labels and forced colors. The new paired-action checks exercise 320,
+375, 768 and 1280 CSS px, 200% text, icon identity, keyboard pause/resume, native
+More navigation and Customize dismissal/focus. Final settled 375px homepage and
+details screenshots were visually inspected. Installed Chrome version and exact
+commands are recorded in the evidence packet; touch emulation is not phone proof.
+
+Initial runs exposed an unnamed Storybook render hook, the empty trigger-status
+line's vertical offset, and the five stale Reset expectations. These were fixed
+and the affected full checks rerun; initial failing logs remain available. The
+first homepage test screenshot was taken during intro readiness, so the packet
+also includes an explicitly settled capture after playback becomes available.
+No Safari/Firefox/physical-device certification, fresh Lighthouse/performance
+audit, independent review or Dimi visual acceptance is claimed. Existing FS-4.7
+and FS-4.8 limits remain open. No commit, push or deployment in this task.
+
 ## Task metadata
 
 - Status: C7 / contract R19 has Codex R2 technical PASS; F1–F3 closed. Firefox precision follow-up, FS-4.7 performance and FS-4.8 human acceptance remain open.

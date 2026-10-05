@@ -1,5 +1,93 @@
 # FS-4.4 — SVG aperture and replacement proof
 
+## Larger mobile WEB — 2026-10-02
+
+Dimi requests larger mobile artwork while retaining satisfactory tablet/desktop
+sizing. [R22](fs-4.1-scene-contract.md#r22--larger-mobile-web--2026-10-02) records
+the mobile-only fitting change: below 640 CSS px viewport width, scale the
+centered 80% WEB opening by 1.2 to 96%. At 640 px and above it remains 80%.
+The live SVG image and independent solid WEB each use the same small SVG group
+and CSS transform around the outer viewport center. The full rectangular cover,
+scene height, particle coordinates/configuration, Canvas and diagnostic diamond
+are unchanged. This is presentation scaling, with no JS viewport listener,
+extra particle markup or runtime recreation.
+
+Scope: `SceneAperture.tsx`, `SceneAperture.module.css`, responsive regressions in
+`e2e/particle-aperture.spec.ts`, and these existing task/contract records. Prior
+uncommitted R20 defaults and R21 circle removal are preserved. Base remains
+`737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c`; the
+[local packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/web-mobile-size-2026-10-02/README.md)
+pins the exact incremental files and complete pending diff.
+
+Validation: 44 focused tests pass; frontend/validation types and lint pass.
+Production On and Storybook builds pass. Chrome production aperture/static checks
+pass 22/22; Storybook animation fixtures pass 4/4. New checks cover both homepage
+and details, 320/375/639/640/768/1280 px widths, centered proportional fitting,
+no clipping/overflow, matching live/static scaling and no-JavaScript fallback.
+Existing replacement tests retain identical mounted Canvas/paused pixels.
+
+The first CSS geometry approach did not enlarge nested static SVG consistently
+and was replaced with the shared group transform. Test development also corrected
+assumptions about unused mask bounds, content bounding boxes and differing SVG
+computed-style representations. Failed attempts remain in the packet; final
+assertions retain exact size, aspect, centering, containment and breakpoint checks.
+Existing next-lint/chunk warnings remain. No fresh flag-off build, Lighthouse,
+full coverage, Safari/Firefox/physical-phone or performance acceptance is claimed
+for this CSS-only fitting change. No commit, push or deployment.
+
+## Built-in WEB correction — 2026-10-01
+
+**Implemented; bounded checks pass.** [Contract R21](fs-4.1-scene-contract.md#r21--built-in-web-aperture-no-circle--2026-10-01)
+records Dimi's explicit circle removal request. The inspected screenshot is
+`/Users/dimi/Desktop/Screenshot 2026-10-01 at 16.59.54.png`. Reproduction against
+the pre-fix local details page with a failed WEB export request leaves visible
+Canvas inside `data-aperture="circle"`, matching that screenshot. The compositor
+used the circle while the fetched WEB asset was pending or failed.
+
+The compositor now embeds existing trusted `webPath`/`webViewBox` as an SVG data
+image. The same geometry supplies the independent solid fallback. WEB makes no
+export request; circle is removed from the selection type and gallery. Optional
+diagnostic diamond loading still validates assets, ignores stale completions and
+falls back to WEB. Mask/decode failure still signals the consumer to retain
+complete solid WEB and hide unsafe Canvas. Coverage, fitting, per-instance IDs,
+transparent-overlay behavior and service ownership remain unchanged.
+
+Source scope: `SceneAperture.tsx`, `sceneApertures.ts`,
+`ParticleLifecycleFixture.tsx`; regressions in `SceneAperture.test.tsx` and
+`e2e/particle-aperture.spec.ts`. No domain/controller/binding/Canvas-update or
+generated geometry change. Existing uncommitted R20 defaults (286 / 0.2× / 0.1×)
+and their documentation are preserved. Candidate base is
+`737d5fa9147eb9f3cac0ce0f3f8edc3c73e3ae8c` on
+`feature/funkspace-minimum-usable`; exact changes, hashes and commands are in the
+[local evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/web-aperture-fix-2026-10-01/README.md).
+
+Fresh validation:
+
+- 224 focused tests / 12 files pass: scene controls/compositor, pure domain,
+  controller and actual adapter, including WEB geometry parity/no fetch,
+  cancellation, late image errors and retained runtime identity.
+- Frontend and validation TypeScript checks, repository lint and formatting pass.
+- Separately compiled On/Off production builds pass trusted-export parity and
+  existing build prerequisites. Isolated build IDs: On `u8bN4sLCsLeArWNTcbWnC`,
+  Off `VqyGrA8lhS8iiGxY99cf7`.
+- Chrome **154.0.8037.92**: 40 production checks per flag, 80 total, zero retries.
+  Includes homepage/details missing/delayed WEB export interception (zero requests),
+  mounted WEB/diamond replacement with identical paused Canvas pixels, stale and
+  rejected assets, mask/decode failure, theme/policy/Pause and no-JavaScript cases.
+  Wide dark and narrow light captures were visually inspected: complete WEB,
+  open counters and covered rectangle; no circle opening.
+- Storybook build and all four animation-fixture browser checks pass, including
+  mounted Canvas identity and unfiltered accessibility. Existing chunk-size and
+  next-lint deprecation warnings remain.
+
+Initial test-only XML matcher failure was corrected to native DOM attribute
+checks; its log is retained. Initial sandbox-only local-port/cache failures were
+rerun successfully with authorized access, without changing application code.
+No full coverage, Lighthouse/frame-budget or fresh Firefox/Safari/physical-phone
+result is claimed. Previous FS-4.7 samples remain pinned to their earlier candidate;
+required device evidence and FS-4.8 acceptance remain open. This is implementation
+evidence, not independent technical approval. No commit, push or deployment.
+
 ## FS-4.4B review corrections — 2026-09-29
 
 **Status: Codex R2 PASS for F1–F3 correction scope; all three findings closed against the exact reviewed candidate.** Scope is F1/P2 static short-frame coverage, F2/P2 stale domain tests, and F3/P3 tuning documentation. Base: HEAD `0eabf793240ec44e7352247c8160aa7f901de927` plus the full reviewed patch SHA-256 `03e713428005b8ea0839bec81ae18abd3962967d7b9d11ba976eb51e5ff86b9d`. The existing local tuning is preserved, including 200 default/max particles, speed 0.5 and size 3. No new product approval, task/EPIC completion or remote action is inferred.
