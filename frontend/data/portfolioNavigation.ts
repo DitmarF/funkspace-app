@@ -17,12 +17,12 @@ export type PortfolioNavigationItem = NavigationRow &
         readonly kind: "group";
         readonly children: readonly PortfolioNavigationItem[];
       }
-    | { readonly kind: "pending" }
+    | { readonly kind: "pending" | "disabled" }
   );
 
 // Labels belong to this navigation; hrefs retain the shared destination identities.
 // Pending entries reuse their category artwork until item-specific artwork exists.
-export const portfolioNavigation = [
+export const portfolioMainNavigation = [
   {
     id: "home",
     label: "Home",
@@ -37,6 +37,17 @@ export const portfolioNavigation = [
     kind: "link",
     destination: "aboutPage",
   },
+  {
+    id: "contact",
+    label: "Contact",
+    icon: "contact",
+    kind: "disabled",
+  },
+] as const satisfies readonly PortfolioNavigationItem[];
+
+export const portfolioNavigation = [
+  portfolioMainNavigation[0],
+  portfolioMainNavigation[1],
   {
     id: "animations",
     label: "Animations",
@@ -100,4 +111,5 @@ export const portfolioNavigation = [
       },
     ],
   },
+  portfolioMainNavigation[2],
 ] as const satisfies readonly PortfolioNavigationItem[];

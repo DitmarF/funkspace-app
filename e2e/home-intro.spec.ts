@@ -54,10 +54,9 @@ for (const preference of ["on", "reduced", "system"] as const) {
               },
             ),
           }));
-        await expect(page.locator('header a[href="/"]')).toHaveCSS(
-          "opacity",
-          "1",
-        );
+        await expect(
+          page.locator('header a[aria-label="FunkSpace"]'),
+        ).toHaveCSS("opacity", "1");
         expect(await artwork()).toEqual({
           opacity: 1,
           parts: 19,
@@ -248,7 +247,7 @@ for (const preference of ["on", "reduced", "system"] as const) {
       await route.continue();
     });
     await page.goto("/", { waitUntil: "commit" });
-    const identity = page.locator('header a[href="/"]');
+    const identity = page.locator('header a[aria-label="FunkSpace"]');
     try {
       await expect(identity).toHaveCSS("opacity", available ? "0" : "1");
       await page.clock.runFor(500);
@@ -458,7 +457,10 @@ for (const scenario of [
     );
     await expect(page.locator("main")).toHaveCSS("opacity", "1");
     await expect(page.locator("main")).toBeVisible();
-    await expect(page.locator('header a[href="/"]')).toHaveCSS("opacity", "1");
+    await expect(page.locator('header a[aria-label="FunkSpace"]')).toHaveCSS(
+      "opacity",
+      "1",
+    );
   });
 }
 
@@ -494,12 +496,15 @@ test("failed hydration opens content after a bounded deadline", async ({
       "data-home-intro",
       "preparing",
     );
-  await expect(page.locator('header a[href="/"]')).toHaveCSS(
+  await expect(page.locator('header a[aria-label="FunkSpace"]')).toHaveCSS(
     "opacity",
     available ? "0" : "1",
   );
   await page.clock.runFor(5100);
-  await expect(page.locator('header a[href="/"]')).toHaveCSS("opacity", "1");
+  await expect(page.locator('header a[aria-label="FunkSpace"]')).toHaveCSS(
+    "opacity",
+    "1",
+  );
   await expect(page.locator("main")).toHaveCSS("opacity", "1");
   await openFallbackNavigation(page);
   await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
@@ -514,7 +519,10 @@ test("no JavaScript retains static content and ordinary navigation", async ({
     const page = await context.newPage();
     await page.goto(baseURL!);
     await expect(page.locator("main")).toHaveCSS("opacity", "1");
-    await expect(page.locator('header a[href="/"]')).toHaveCSS("opacity", "1");
+    await expect(page.locator('header a[aria-label="FunkSpace"]')).toHaveCSS(
+      "opacity",
+      "1",
+    );
     await openFallbackNavigation(page);
     await page
       .getByRole("navigation", { name: "Primary" })

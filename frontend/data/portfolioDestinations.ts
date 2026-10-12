@@ -29,3 +29,15 @@ export const portfolioDestinations = {
 } as const satisfies Record<string, Destination>;
 
 export type PortfolioDestinationKey = keyof typeof portfolioDestinations;
+
+/** Page identity excludes section anchors; Next supplies a query-free pathname. */
+export function isCurrentPortfolioDestination(
+  pathname: string | null,
+  destination: PortfolioDestinationKey,
+): boolean {
+  return (
+    pathname !== null &&
+    (pathname.replace(/\/+$/, "") || "/") ===
+      portfolioDestinations[destination].href
+  );
+}

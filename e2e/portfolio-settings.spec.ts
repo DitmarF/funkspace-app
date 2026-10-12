@@ -56,7 +56,9 @@ for (const viewport of [
       expect(triggerBox!.x + triggerBox!.width).toBeLessThan(viewport.width);
       expect(triggerBox!.y + triggerBox!.height).toBeLessThan(viewport.height);
       await expectArtworkAlignment(page);
-      await expect(page.locator("header nav")).toHaveCount(0);
+      await expect(
+        page.getByRole("navigation", { name: "Main", exact: true }),
+      ).toBeVisible();
       await expect(
         page.getByRole("button", { name: "Dark", exact: true }),
       ).toHaveCount(0);

@@ -1,13 +1,17 @@
-import Link from "next/link";
+"use client";
+
+import { usePathname } from "next/navigation";
 import {
-  portfolioDestinations,
+  isCurrentPortfolioDestination,
   type PortfolioDestinationKey,
 } from "../../data/portfolioDestinations";
 import {
   portfolioNavigation,
   type PortfolioNavigationItem,
 } from "../../data/portfolioNavigation";
-import { Icon } from "../Icons/Icon";
+import PortfolioNavigationRow, {
+  NavigationRowContent,
+} from "./PortfolioNavigationRow";
 import styles from "./PortfolioNavigationTree.module.css";
 
 interface Props {
@@ -15,72 +19,46 @@ interface Props {
   onNavigate?: (destination: PortfolioDestinationKey) => void;
 }
 
-function RowContent({ item }: { item: PortfolioNavigationItem }) {
-  return (
-    <>
-      {item.kind === "group" && (
-        <span className={styles.arrow} aria-hidden="true">
-          <Icon
-            name="arrow-right-small"
-            size={24}
-            className={styles.collapsedArrow}
-          />
-          <Icon
-            name="arrow-down-small"
-            size={24}
-            className={styles.expandedArrow}
-          />
-        </span>
-      )}
-      {/* CSS selects the existing size-specific artwork without hydration state. */}
-      <Icon
-        name={item.icon}
-        size={24}
-        className={`${styles.icon} ${styles.smallIcon}`}
-      />
-      <Icon
-        name={item.icon}
-        size={36}
-        className={`${styles.icon} ${styles.largeIcon}`}
-      />
-      <span className={styles.label}>
-        {item.label}
-        {item.kind === "pending" && (
-          <span className={styles.pendingLabel}>Coming soon</span>
-        )}
-      </span>
-    </>
+function containsCurrentPage(
+  items: readonly PortfolioNavigationItem[],
+  pathname: string | null,
+): boolean {
+  return items.some((item) =>
+    item.kind === "group"
+      ? containsCurrentPage(item.children, pathname)
+      : item.kind === "link" &&
+        isCurrentPortfolioDestination(pathname, item.destination),
   );
 }
 
 function Rows({
   items,
   onNavigate,
-}: Required<Pick<Props, "items">> & Pick<Props, "onNavigate">) {
+  pathname,
+}: Required<Pick<Props, "items">> &
+  Pick<Props, "onNavigate"> & { pathname: string | null }) {
   return (
     <ul className={styles.list}>
       {items.map((item) => (
         <li key={item.id}>
           {item.kind === "group" ? (
-            <details className={styles.branch}>
-              <summary className={styles.row}>
-                <RowContent item={item} />
-              </summary>
-              <Rows items={item.children} onNavigate={onNavigate} />
-            </details>
-          ) : item.kind === "link" ? (
-            <Link
-              className={styles.row}
-              href={portfolioDestinations[item.destination].href}
-              prefetch={false}
-              onNavigate={() => onNavigate?.(item.destination)}
+            <details
+              className={styles.branch}
+              open={containsCurrentPage(item.children, pathname)}
+              // Native disclosure input may precede hydration.
+              suppressHydrationWarning
             >
-              <RowContent item={item} />
-            </Link>
+              <summary className={styles.row}>
+                <NavigationRowContent item={item} />
+              </summary>
+              <Rows
+                items={item.children}
+                onNavigate={onNavigate}
+                pathname={pathname}
+              />
+            </details>
           ) : (
-            <span className={styles.row} aria-disabled="true">
-              <RowContent item={item} />
-            </span>
+            <PortfolioNavigationRow item={item} onNavigate={onNavigate} />
           )}
         </li>
       ))}
@@ -93,9 +71,15 @@ export default function PortfolioNavigationTree({
   items = portfolioNavigation,
   onNavigate,
 }: Props) {
+  const pathname = usePathname();
   return (
     <nav aria-label="Primary" className={styles.tree}>
-      <Rows items={items} onNavigate={onNavigate} />
+      <Rows
+        key={pathname}
+        items={items}
+        onNavigate={onNavigate}
+        pathname={pathname}
+      />
     </nav>
   );
 }

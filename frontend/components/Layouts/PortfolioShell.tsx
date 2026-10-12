@@ -22,6 +22,7 @@ import { portfolioDestinations as destinations } from "../../data/portfolioDesti
 import { LogoMotion, type LogoMotionRef } from "../Logo/LogoMotion";
 import PortfolioNavigation from "./PortfolioNavigation";
 import PortfolioLegalLinks from "./PortfolioLegalLinks";
+import PortfolioMainNavigation from "./PortfolioMainNavigation";
 import styles from "./PortfolioShell.module.css";
 
 type Props = {
@@ -120,6 +121,7 @@ function ShellContent({ children, animateIdentity = false }: Props) {
             />
           </span>
         </a>
+        <PortfolioMainNavigation />
       </Container>
       <Container
         as="main"

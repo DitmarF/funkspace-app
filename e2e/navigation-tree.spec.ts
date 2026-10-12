@@ -17,7 +17,7 @@ for (const width of [320, 768, 1280]) {
     const nav = page.getByRole("navigation", { name: "Primary" });
     for (const label of ["Animations", "Games", "Privacy"])
       await nav.locator("summary").filter({ hasText: label }).click();
-    await expect(nav.locator("a, summary")).toHaveText([
+    await expect(nav.locator('a, summary, [aria-current="page"]')).toHaveText([
       "Home",
       "About",
       "Animations",
@@ -165,7 +165,10 @@ test("native groups and legal destinations work without JavaScript", async ({
     await nav.getByRole("link", { name: "Privacy policy" }).click();
     await expect(page).toHaveURL("/privacy");
     await openFallbackNavigation(page);
-    await nav.getByText("Privacy", { exact: true }).click();
+    await expect(privacy.locator("..")).toHaveAttribute("open", "");
+    await expect(
+      nav.getByRole("button", { name: "Privacy policy" }),
+    ).toBeVisible();
     await nav.getByRole("link", { name: "Legal notice" }).click();
     await expect(page).toHaveURL("/impressum");
   } finally {

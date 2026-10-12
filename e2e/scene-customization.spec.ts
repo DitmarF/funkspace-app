@@ -942,7 +942,13 @@ test("details work without JavaScript: complete solid WEB and native navigation,
     page.getByRole("heading", { level: 1, name: "Aperture - 1" }),
   ).toBeVisible();
   await expect(page.locator("[data-aperture-fallback] path")).toBeVisible();
-  await expect(page.getByRole("button")).toHaveCount(0);
+  await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);
+  await expect(page.locator("button:not(:disabled)")).toHaveCount(0);
+  await expect(
+    page
+      .getByRole("navigation", { name: "Main", exact: true })
+      .getByRole("button", { name: "Contact" }),
+  ).toBeDisabled();
   await expect(canvas(page)).toHaveCount(0);
   await page.locator('footer details[class*="fallback"] > summary').click();
   await page

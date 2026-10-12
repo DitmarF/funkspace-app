@@ -1,0 +1,29 @@
+.navigation {
+  min-width: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0 var(--fs-space-md);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+@media (min-width: 48rem) {
+  .list {
+    flex-direction: row;
+    align-items: center;
+    column-gap: calc(var(--fs-space-md) * 2);
+  }
+}
+
+.list > li {
+  display: grid;
+  min-width: 0;
+  max-width: 100%;
+}

@@ -1,8 +1,57 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { expect, it } from "vitest";
+import { beforeEach, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import PortfolioNavigationTree from "./PortfolioNavigationTree";
 import { portfolioNavigation } from "../../data/portfolioNavigation";
+
+const route = vi.hoisted(() => ({ pathname: null as string | null }));
+vi.mock("next/navigation", () => ({ usePathname: () => route.pathname }));
+beforeEach(() => {
+  route.pathname = null;
+});
+
+it("reveals the current page and keeps native manual toggling across rerenders", () => {
+  route.pathname = "/animations/aperture/";
+  const view = render(<PortfolioNavigationTree />);
+  const summary = screen.getByText("Animations", { exact: true });
+  const branch = summary.closest("details")!;
+  expect(branch).toHaveAttribute("open");
+  expect(screen.getByRole("button", { name: "Aperture - 1" })).toBeDisabled();
+  expect(view.container.querySelectorAll("details[open]")).toHaveLength(1);
+  fireEvent.click(summary);
+  view.rerender(<PortfolioNavigationTree />);
+  expect(branch).not.toHaveAttribute("open");
+  fireEvent.click(summary);
+  expect(branch).toHaveAttribute("open");
+});
+
+it("reveals every ancestor and resets groups when the route changes", () => {
+  route.pathname = "/animations/aperture";
+  const items = [
+    {
+      id: "collection",
+      kind: "group" as const,
+      label: "Collection",
+      icon: "settings-burger" as const,
+      children: portfolioNavigation,
+    },
+  ];
+  const view = render(<PortfolioNavigationTree items={items} />);
+  expect(view.container.querySelectorAll("details[open]")).toHaveLength(2);
+  expect(screen.getByRole("button", { name: "Aperture - 1" })).toBeVisible();
+  route.pathname = "/privacy";
+  view.rerender(<PortfolioNavigationTree items={items} />);
+  expect(screen.getByText("Animations").closest("details")).not.toHaveAttribute(
+    "open",
+  );
+  expect(
+    screen.getByText("Privacy", { exact: true }).closest("details"),
+  ).toHaveAttribute("open");
+  expect(screen.getByRole("button", { name: "Privacy policy" })).toBeVisible();
+  route.pathname = "/about/child";
+  view.rerender(<PortfolioNavigationTree items={items} />);
+  expect(view.container.querySelectorAll("details[open]")).toHaveLength(0);
+});
 
 it("keeps ready destinations as anchors and future entries noninteractive", () => {
   render(<PortfolioNavigationTree />);
@@ -35,9 +84,11 @@ it("keeps ready destinations as anchors and future entries noninteractive", () =
   expect(navigation.querySelectorAll('[aria-disabled="true"]')).toHaveLength(3);
   expect(
     navigation.querySelectorAll(
-      '[aria-disabled="true"] a, [aria-disabled="true"][href], button',
+      '[aria-disabled="true"] a, [aria-disabled="true"][href], button:not(:disabled)',
     ),
   ).toHaveLength(0);
+  expect(screen.getByRole("button", { name: "Contact" })).toBeDisabled();
+  expect(screen.queryByRole("link", { name: "Contact" })).toBeNull();
   expect(
     navigation.querySelectorAll('[role="tree"], [role="menu"]'),
   ).toHaveLength(0);
@@ -82,7 +133,7 @@ it("allows further nested groups with native destination anchors", () => {
   expect(view.container.querySelector('a[href="/about"]')).toBeInTheDocument();
 });
 
-it("omits deferred Contact and renders the matching destination artwork", () => {
+it("keeps Contact disabled and renders the matching destination artwork", () => {
   render(<PortfolioNavigationTree />);
   const navigation = screen.getByRole("navigation", { name: "Primary" });
   for (const summary of navigation.querySelectorAll("summary"))

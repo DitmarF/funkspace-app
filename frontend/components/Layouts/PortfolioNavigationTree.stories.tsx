@@ -5,12 +5,21 @@ import { portfolioNavigation } from "../../data/portfolioNavigation";
 const meta = {
   title: "Layouts/PortfolioNavigationTree",
   component: PortfolioNavigationTree,
-  parameters: { layout: "padded" },
+  parameters: {
+    layout: "padded",
+    nextjs: { appDirectory: true, navigation: { pathname: "/" } },
+  },
 } satisfies Meta<typeof PortfolioNavigationTree>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+export const AboutActive: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/about" } } },
+};
+export const ApertureActive: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/animations/aperture" } } },
+};
 export const GrowingContent: Story = {
   args: {
     items: [

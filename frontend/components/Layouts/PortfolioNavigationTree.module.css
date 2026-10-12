@@ -31,6 +31,8 @@
   padding: var(--fs-space-xs) 0;
   color: var(--fs-color-content-primary);
   background: transparent;
+  border: 0;
+  text-align: start;
   font-family: var(--font-work-sans, var(--fs-font-family-display));
   font-size: var(--fs-font-size-md);
   font-weight: var(--fs-font-weight-semibold);
@@ -46,16 +48,32 @@
 .row::marker {
   content: "";
 }
-.row:hover:not([aria-disabled="true"]) :is(.arrow, .icon) {
+.row:hover:not([aria-disabled="true"]):not(:disabled) :is(.arrow, .icon) {
   color: var(--fs-color-action-hover);
 }
 .row:focus-visible {
   outline: 2px solid var(--fs-color-border-focus);
   outline-offset: 2px;
 }
-.row[aria-disabled="true"] {
+.row[aria-disabled="true"],
+.row:disabled {
   cursor: default;
   font-weight: var(--fs-font-weight-regular);
+}
+.row[aria-current="page"] {
+  font-weight: var(--fs-font-weight-semibold);
+}
+.row[aria-current="page"] > .icon {
+  color: var(--fs-color-action-hover);
+}
+.compact {
+  grid-template-columns: 24px minmax(0, 1fr);
+}
+.compact > .icon {
+  grid-column: 1;
+}
+.compact > .label {
+  grid-column: 2;
 }
 .arrow {
   grid-column: 1;
@@ -93,7 +111,7 @@
 }
 
 @media (min-width: 48rem) {
-  .row:hover:not([aria-disabled="true"]) {
+  .row:hover:not([aria-disabled="true"]):not(:disabled) {
     color: var(--fs-color-action-hover);
   }
 
@@ -114,6 +132,23 @@
     height: 36px;
   }
 
+  .compact {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  .compact > .icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .compact > .smallIcon {
+    display: block;
+  }
+
+  .compact > .largeIcon {
+    display: none;
+  }
+
   .smallIcon {
     display: none;
   }
@@ -131,8 +166,13 @@
   .row {
     color: LinkText;
   }
-  .row[aria-disabled="true"] {
+  .row[aria-disabled="true"],
+  .row:disabled {
     color: GrayText;
+  }
+  .row[aria-current="page"],
+  .row[aria-current="page"] > .icon {
+    color: Highlight;
   }
   .row:focus-visible {
     outline-color: Highlight;

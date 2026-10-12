@@ -85,23 +85,29 @@ for (const width of [320, 1280]) {
       await page.keyboard.press("Escape");
       await unlocked(page);
     });
-    test("N3 repeated About page reveals and focuses without late return", async ({
+    test("current About cannot be reselected and dismissal still restores focus", async ({
       page,
     }) => {
       await page.goto("/about");
       await menu(page).waitFor();
       await page.evaluate(() => scrollTo(0, 0));
       await openSettings(page);
-      await modal(page)
-        .getByRole("link", { name: "About", exact: true })
-        .press("Enter");
-      await aboutArrival(page);
-      await page.evaluate(() => scrollTo(0, 0));
-      await openSettings(page);
-      await modal(page)
-        .getByRole("link", { name: "About", exact: true })
-        .click();
-      await aboutArrival(page);
+      for (let cycle = 0; cycle < 2; cycle++) {
+        const current = modal(page).getByRole("button", {
+          name: "About",
+          exact: true,
+        });
+        await expect(current).toBeDisabled();
+        await expect(current).toHaveAttribute("aria-current", "page");
+        await current.evaluate((node: HTMLButtonElement) => node.click());
+        await frames(page);
+        await expect(modal(page)).toBeVisible();
+        await expect(page).toHaveURL("/about");
+        await page.keyboard.press("Escape");
+        await unlocked(page);
+        await expect(menu(page)).toBeFocused();
+        if (cycle === 0) await openSettings(page);
+      }
     });
     for (const route of ["/privacy", "/impressum"])
       for (const dismissal of ["Close", "Escape"]) {
@@ -148,8 +154,13 @@ for (const width of [320, 1280]) {
         ["Legal notice", "/impressum"],
       ]) {
         await openSettings(page);
-        if (label !== "About")
-          await modal(page).getByText("Privacy", { exact: true }).click();
+        if (label !== "About") {
+          const privacy = modal(page)
+            .locator("summary")
+            .filter({ hasText: /^Privacy$/ });
+          if ((await privacy.locator("..").getAttribute("open")) === null)
+            await privacy.click();
+        }
         await modal(page)
           .getByRole("link", { name: label, exact: true })
           .press("Enter");

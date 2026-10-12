@@ -73,8 +73,22 @@
 }
 
 .header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
+  gap: var(--fs-space-md);
+  align-items: center;
   padding-top: max(var(--fs-space-lg), var(--shell-safe-top));
   padding-bottom: var(--fs-space-lg);
+}
+
+.header > nav {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.header > .identity {
+  grid-row: 1;
+  grid-column: 1;
 }
 
 .identity {
@@ -149,6 +163,8 @@
   }
 
   .header {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
     padding-top: max(var(--fs-space-xl), var(--shell-safe-top));
     padding-bottom: var(--fs-space-xl);
     padding-right: calc(

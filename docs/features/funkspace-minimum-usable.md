@@ -53,6 +53,32 @@ historical contracts, superseded for the current page by this amendment. EPIC 3
 closure is unchanged; EPIC 5 must establish the replacement entry point rather
 than assuming the old Contact shell exists.
 
+## Header navigation refinement — 2026-10-12
+
+Dimi requested persistent Home, About and Contact controls in the header, using
+the tree's borderless icon-left styling. Home and About retain `/` and `/about`;
+Contact is a disabled button in both the header and the tree, with no route or
+homepage section restored. This supersedes the Contact navigation-row removal
+above while preserving its EPIC 5 deferral. Header links sit beside the desktop
+settings hex and at the top right on mobile, where the hex stays at bottom right.
+The subsequent refinement uses 24px header icons (desktop tree icons stay 36px)
+and doubles the inter-button gap to `2 × --fs-space-md` from `48rem` upward.
+On mobile, the buttons stack vertically to the right of the logo, with the logo
+vertically centered beside the stack, as explicitly clarified by Dimi.
+See the [implementation and validation record](../tasks/maintenance-main-navigation.md).
+
+Dimi's subsequent current-page amendment disables the matching page item in
+both header and tree and colors its icon with the existing hover token. Exact
+pathname matching includes query/fragment variants of the same page. This
+supersedes earlier current-page reselection and self-link query-removal UI
+contracts; shared handoff behavior for other navigation remains intact. Contact
+stays separately disabled without a destination. See the [active-state record](../tasks/maintenance-active-navigation.md).
+
+The tree also opens the current page's ancestor groups on entry, including when
+Home's More link leads to the animation detail page. Native manual toggling is
+preserved; pathname changes reveal the new current page. This behavior applies
+to direct visits, server rendering and the no-JavaScript fallback.
+
 ## Goal
 
 Deliver an animation-led, mobile-first website with Start and About sections, a legal-link footer, normal scrolling, the existing FunkSpace logo and semantic design foundations, one customizable Canvas scene behind a replaceable SVG aperture, usable navigation/settings, real contact delivery through EPIC 5's new concept, and completed secondary pages. End when the portfolio is ready to host game integration. Do not implement game integration in this milestone.
