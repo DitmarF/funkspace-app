@@ -82,7 +82,6 @@ describe("Portfolio navigation composition", () => {
     for (const [label, href] of [
       ["Home", "/"],
       ["About", "/about"],
-      ["Contact", "/#contact"],
     ]) {
       expect(dialog.getByRole("link", { name: label })).toHaveAttribute(
         "href",
@@ -100,7 +99,8 @@ describe("Portfolio navigation composition", () => {
     for (const name of ["Chat-bot", "Languages"])
       expect(dialog.getByRole("button", { name })).toBeDisabled();
     expect(dialog.queryByRole("menu")).toBeNull();
-    expect(dialog.getAllByRole("link")).toHaveLength(6);
+    expect(dialog.getAllByRole("link")).toHaveLength(5);
+    expect(dialog.queryByRole("link", { name: "Contact" })).toBeNull();
     await user.click(dialog.getByRole("button", { name: "Accessibility" }));
     expect(dialog.getByRole("group", { name: "Appearance" })).toBeVisible();
     expect(dialog.getByRole("group", { name: "Motion" })).toBeVisible();

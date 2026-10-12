@@ -26,19 +26,18 @@ for (const width of [320, 768, 1280]) {
       "Privacy",
       "Privacy policy",
       "Legal notice",
-      "Contact",
     ]);
     await page.screenshot({
       path: testInfo.outputPath(`navigation-${width}.png`),
     });
     await nav
-      .getByRole("link", { name: "Contact", exact: true })
+      .getByRole("link", { name: "Legal notice", exact: true })
       .scrollIntoViewIfNeeded();
     await expect(
-      nav.getByRole("link", { name: "Contact", exact: true }),
+      nav.getByRole("link", { name: "Legal notice", exact: true }),
     ).toBeInViewport();
     await page.screenshot({
-      path: testInfo.outputPath(`navigation-${width}-contact-last.png`),
+      path: testInfo.outputPath(`navigation-${width}-legal-last.png`),
     });
     for (const fontSize of ["100%", "200%"]) {
       await page.evaluate((size) => {

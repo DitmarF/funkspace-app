@@ -5,7 +5,6 @@ import Home from "@/app/page";
 import PrivacyPage from "@/app/privacy/page";
 import AboutPage from "@/app/about/page";
 import ImpressumPage from "@/app/impressum/page";
-import { contactEmail, contactHref } from "@/data/contactContent";
 import { aboutContent } from "@/data/aboutContent";
 import { ServiceProvider } from "@/application/providers/ServiceProvider";
 import { portfolioDestinations as destinations } from "@/data/portfolioDestinations";
@@ -63,7 +62,6 @@ describe("server-rendered portfolio documents", () => {
       for (const destination of [
         { label: "Home", href: destinations.home.href },
         { label: "About", href: destinations.aboutPage.href },
-        destinations.contact,
       ]) {
         expect(
           within(screen.getByRole("navigation", { name: "Primary" })).getByRole(
@@ -78,10 +76,9 @@ describe("server-rendered portfolio documents", () => {
         }),
       ).toHaveAttribute("href", destinations.privacy.href);
       expect(screen.getAllByRole("link")).toHaveLength(
-        name === "Home" ? 14 : name === "About" ? 11 : 12,
+        name === "Home" ? 11 : name === "About" ? 9 : 10,
       );
       for (const destination of [
-        destinations.contact,
         destinations.impressum,
         destinations.privacy,
       ]) {
@@ -95,7 +92,7 @@ describe("server-rendered portfolio documents", () => {
     });
   }
 
-  it("renders ordered homepage targets with the supplied email and no simulated form", () => {
+  it("renders cornered Start and plain About without Contact or dead Contact links", () => {
     document.body.innerHTML = renderToStaticMarkup(
       <ServiceProvider>
         <Home />
@@ -104,24 +101,23 @@ describe("server-rendered portfolio documents", () => {
     const sections = Array.from(
       screen.getByRole("main").querySelectorAll("section"),
     );
-    expect(sections.map((section) => section.id)).toEqual([
-      "start",
-      "about",
-      "contact",
-    ]);
+    expect(sections.map((section) => section.id)).toEqual(["start", "about"]);
     for (const section of sections) {
       expect(section.textContent?.trim()).not.toBe("");
-      expect(
-        destinations[section.id as "start" | "about" | "contact"].href,
-      ).toBe(`/#${section.id}`);
+      expect(destinations[section.id as "start" | "about"].href).toBe(
+        `/#${section.id}`,
+      );
     }
     for (const paragraph of aboutContent.preview) {
       expect(screen.getByText(paragraph)).toBeVisible();
     }
-    expect(screen.getByRole("link", { name: contactEmail })).toHaveAttribute(
-      "href",
-      contactHref,
-    );
+    expect(sections[0].querySelectorAll(":scope > svg")).toHaveLength(4);
+    expect(sections[1].querySelectorAll(":scope > svg")).toHaveLength(0);
+    expect(
+      document.querySelector(
+        '#contact, a[href="/#contact"], a[href^="mailto:"]',
+      ),
+    ).toBeNull();
     expect(document.querySelector("form, input, textarea, canvas")).toBeNull();
     expect(
       screen.queryByRole("button", { name: /menu|send/i }),

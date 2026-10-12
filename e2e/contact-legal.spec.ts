@@ -9,7 +9,7 @@ for (const javaScriptEnabled of [true, false]) {
     test.use({ javaScriptEnabled });
 
     for (const route of ["/about", "/impressum", "/privacy"]) {
-      test(`${route} loads directly, refreshes and returns to the real email fallback`, async ({
+      test(`${route} loads directly, refreshes and retains legal email access`, async ({
         page,
       }) => {
         const errors: string[] = [];
@@ -33,33 +33,7 @@ for (const javaScriptEnabled of [true, false]) {
         }
         await expect(page.locator("#contact")).toHaveCount(0);
         await page.reload();
-        const contact = page
-          .getByRole("navigation", { name: "Footer" })
-          .getByRole("link", { name: "Contact", exact: true });
-        await expect(contact).toHaveAttribute("href", "/#contact");
-        await contact.focus();
-        await page.keyboard.press("Enter");
-        await expect(page).toHaveURL("/#contact");
-        const section = page.getByRole("region", {
-          name: "Contact",
-          exact: true,
-        });
-        await expect(section).toBeInViewport();
-        await expect(section.getByRole("heading", { level: 2 })).toHaveText(
-          "Contact",
-        );
-        const mail = section.getByRole("link", { name: email, exact: true });
-        await expect(mail).toHaveAttribute("href", `mailto:${email}`);
-        await mail.focus();
-        await expect(mail).toBeFocused();
-        // Check pointer actionability without launching a mail application or sending.
-        await mail.click({ trial: true });
-        await expect(page.locator("form, input, textarea")).toHaveCount(0);
-        await expect(
-          page.getByRole("button", { name: /send|copy/i }),
-        ).toHaveCount(0);
-        await page.goBack();
-        await expect(page).toHaveURL(route);
+        await expect(page.locator('a[href="/#contact"]')).toHaveCount(0);
         for (const [label, href] of [
           ["Legal notice", "/impressum"],
           ["Privacy", "/privacy"],
@@ -72,6 +46,18 @@ for (const javaScriptEnabled of [true, false]) {
           await expect(page.getByRole("heading", { level: 1 })).toHaveText(
             label,
           );
+          const mail = page
+            .getByRole("article")
+            .getByRole("link", { name: email, exact: true });
+          await expect(mail).toHaveAttribute("href", `mailto:${email}`);
+          await mail.focus();
+          await expect(mail).toBeFocused();
+          // Verify actionability without opening a mail application.
+          await mail.click({ trial: true });
+          await expect(page.locator("form, input, textarea")).toHaveCount(0);
+          await expect(
+            page.getByRole("button", { name: /send|copy/i }),
+          ).toHaveCount(0);
         }
         expect(errors).toEqual([]);
       });
@@ -86,7 +72,7 @@ for (const javaScriptEnabled of [true, false]) {
         { width: 1440, height: 900 },
       ]) {
         await page.setViewportSize(viewport);
-        for (const route of ["/", "/impressum", "/privacy"]) {
+        for (const route of ["/impressum", "/privacy"]) {
           await page.goto(route);
           await page.evaluate(() =>
             document.documentElement.style.setProperty(
@@ -100,10 +86,7 @@ for (const javaScriptEnabled of [true, false]) {
               () => document.documentElement.scrollWidth <= innerWidth,
             ),
           ).toBe(true);
-          const content =
-            route === "/"
-              ? page.locator("#contact")
-              : page.getByRole("article");
+          const content = page.getByRole("article");
           expect(
             await content.evaluate((element) => {
               for (
@@ -131,7 +114,7 @@ for (const javaScriptEnabled of [true, false]) {
           await mail.click({ trial: true });
           await page.screenshot({
             path: testInfo.outputPath(
-              `${route === "/" ? "contact" : route.slice(1)}-${viewport.width}-200percent.png`,
+              `${route.slice(1)}-${viewport.width}-200percent.png`,
             ),
           });
           const privacy = page

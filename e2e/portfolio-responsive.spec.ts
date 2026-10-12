@@ -160,7 +160,7 @@ for (const viewport of viewports) {
           await page.keyboard.press("End");
           const footer = page.getByRole("navigation", { name: "Footer" });
           await expect(footer).toBeInViewport();
-          for (const name of ["Contact", "Legal notice", "Privacy"])
+          for (const name of ["Legal notice", "Privacy"])
             await footer
               .getByRole("link", { name, exact: true })
               .click({ trial: true });
@@ -185,10 +185,10 @@ for (const viewport of viewports) {
           if (route === "/") {
             expect(
               await page
-                .locator("main section > svg")
+                .locator("#start > svg")
                 .evaluateAll(
                   (marks) =>
-                    marks.length === 12 &&
+                    marks.length === 4 &&
                     marks.every(
                       (mark) =>
                         mark.getAttribute("aria-hidden") === "true" &&
@@ -261,15 +261,16 @@ test.describe("fresh no-JavaScript reading and long-content fixtures", () => {
         await expect(page).toHaveURL("/privacy");
         await page
           .getByRole("navigation", { name: "Footer" })
-          .getByRole("link", { name: "Contact", exact: true })
+          .getByRole("link", { name: "Legal notice", exact: true })
           .click();
-        await expect(page).toHaveURL("/#contact");
-        await expect(
-          page.getByRole("link", {
-            name: "diamondfunk13@gmail.com",
-            exact: true,
-          }),
-        ).toBeInViewport();
+        await expect(page).toHaveURL("/impressum");
+        const email = page.getByRole("link", {
+          name: "diamondfunk13@gmail.com",
+          exact: true,
+        });
+        await email.focus();
+        await expect(email).toBeFocused();
+        await expect(email).toBeInViewport();
       }
     });
   }

@@ -451,7 +451,7 @@ for (const scenario of [
           value: undefined,
         });
     }, scenario);
-    await page.goto(scenario === "hash" ? "/#contact" : "/");
+    await page.goto(scenario === "hash" ? "/#about" : "/");
     await expect(page.locator(shell)).toHaveAttribute(
       "data-home-intro",
       "visible",

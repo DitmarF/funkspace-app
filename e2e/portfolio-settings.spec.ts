@@ -108,16 +108,16 @@ for (const viewport of [
       await dialog.getByRole("button", { name: "Close", exact: true }).click();
       await expect(trigger).toBeFocused();
       await openSettings(page);
-      const contact = dialog.getByRole("link", {
-        name: "Contact",
+      const about = dialog.getByRole("link", {
+        name: "About",
         exact: true,
       });
-      await expect(contact).toHaveAttribute("href", "/#contact");
-      await contact.click();
-      await expect(page).toHaveURL("/#contact");
+      await expect(about).toHaveAttribute("href", "/about");
+      await about.click();
+      await expect(page).toHaveURL("/about");
       await expect(dialog).toHaveCount(0);
-      await expect(page.locator("#contact")).toBeInViewport();
-      await expect(page.locator("#contact")).toBeFocused();
+      await expect(page.locator("#main-content")).toBeInViewport();
+      await expect(page.locator("#main-content")).toBeFocused();
       await expect(page.locator("body")).not.toHaveCSS("position", "fixed");
       const legal = page
         .getByRole("contentinfo")

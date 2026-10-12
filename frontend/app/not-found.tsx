@@ -17,11 +17,6 @@ export default function NotFound() {
                 Back to FunkSpace
               </ButtonLink>
             </li>
-            <li className="min-w-0 max-w-full">
-              <ButtonLink href={destinations.contact.href}>
-                {destinations.contact.label}
-              </ButtonLink>
-            </li>
           </ul>
         </nav>
       </div>

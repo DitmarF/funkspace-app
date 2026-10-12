@@ -8,6 +8,6 @@
 
 @media (min-width: 48rem) {
   .sections {
-    --section-gap: calc(var(--fs-space-3xl) * 3);
+    --section-gap: calc(var(--fs-space-3xl) * 1.5);
   }
 }

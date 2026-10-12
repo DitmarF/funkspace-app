@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { portfolioDestinations as destinations } from "../frontend/data/portfolioDestinations";
+import { aboutContent } from "../frontend/data/aboutContent";
 import { openSettings, openFallbackNavigation } from "./helpers/foundation";
 
 for (const javaScriptEnabled of [true, false]) {
@@ -28,7 +29,6 @@ for (const javaScriptEnabled of [true, false]) {
           .evaluateAll((nodes) => nodes.map((node) => node.id));
         expect(new Set(ids).size).toBe(ids.length);
         for (const destination of [
-          destinations.contact,
           destinations.impressum,
           destinations.privacy,
         ]) {
@@ -50,14 +50,13 @@ for (const javaScriptEnabled of [true, false]) {
       });
     }
 
-    test("secondary-page links reach Home, the About page and Contact, and native Back restores Privacy", async ({
+    test("secondary-page links reach Home and the About page, and native Back restores Privacy", async ({
       page,
     }) => {
       await page.goto("/privacy");
       for (const destination of [
         { label: "Home", href: destinations.home.href },
         { label: "About", href: destinations.aboutPage.href },
-        destinations.contact,
       ]) {
         if (javaScriptEnabled) await openSettings(page);
         else await openFallbackNavigation(page);
@@ -76,14 +75,14 @@ for (const javaScriptEnabled of [true, false]) {
             destination.href === "/about" ? "About FunkSpace" : "Aperture - 1",
           );
         await expect(page.locator("main section")).toHaveCount(
-          destination.href === "/about" ? 0 : 3,
+          destination.href === "/about" ? aboutContent.sections.length : 2,
         );
         await page.goBack();
         await expect(page).toHaveURL("/privacy");
       }
       await page.getByRole("link", { name: "FunkSpace", exact: true }).click();
       await expect(page).toHaveURL("/");
-      for (const id of ["start", "about", "contact"]) {
+      for (const id of ["start", "about"]) {
         await expect(page.locator(`#${id}`)).toHaveCount(1);
       }
       await page

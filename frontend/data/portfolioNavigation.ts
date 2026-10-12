@@ -100,11 +100,4 @@ export const portfolioNavigation = [
       },
     ],
   },
-  {
-    id: "contact",
-    label: "Contact",
-    icon: "contact",
-    kind: "link",
-    destination: "contact",
-  },
 ] as const satisfies readonly PortfolioNavigationItem[];

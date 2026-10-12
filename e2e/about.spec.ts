@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { aboutContent } from "../frontend/data/aboutContent";
-import { contactEmail } from "../frontend/data/contactContent";
 import {
   openSettings,
   openFallbackNavigation,
@@ -62,10 +61,7 @@ test("full-width preview typography and reading spacing respond to the viewport"
       "font-weight",
       width < 768 ? "500" : "700",
     );
-    await expect(page.locator("#contact-heading")).toHaveCSS(
-      "font-size",
-      "40px",
-    );
+    await expect(page.locator("#contact")).toHaveCount(0);
     const positions = await more.evaluate((link) => ({
       icon: link.querySelector("svg")!.getBoundingClientRect().x,
       label: link.querySelector("span")!.getBoundingClientRect().right,
@@ -92,7 +88,7 @@ for (const javaScriptEnabled of [true, false]) {
   test.describe(`About, JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
     test.use({ javaScriptEnabled });
 
-    test("preview, native Back, direct load, refresh and cross-page Contact", async ({
+    test("preview, native Back, direct load, refresh and cross-page Home", async ({
       page,
     }) => {
       const errors: string[] = [];
@@ -149,16 +145,14 @@ for (const javaScriptEnabled of [true, false]) {
       );
       if (javaScriptEnabled) await openSettings(page);
       else await openFallbackNavigation(page);
-      const contact = page
+      const homeLink = page
         .getByRole("navigation", { name: "Primary" })
-        .getByRole("link", { name: "Contact", exact: true });
-      await expect(contact).toHaveAttribute("href", "/#contact");
-      await contact.click();
-      await expect(page).toHaveURL("/#contact");
-      await expect(page.locator("#contact")).toBeInViewport();
-      await expect(
-        page.getByRole("link", { name: contactEmail }),
-      ).toBeVisible();
+        .getByRole("link", { name: "Home", exact: true });
+      await expect(homeLink).toHaveAttribute("href", "/");
+      await homeLink.click();
+      await expect(page).toHaveURL("/");
+      await expect(page.locator("#start")).toBeInViewport();
+      await expect(page.locator("#about")).toBeVisible();
       await page.goBack();
       await expect(page).toHaveURL("/about");
       await page.getByRole("link", { name: "FunkSpace", exact: true }).click();

@@ -17,7 +17,6 @@ import { useServices } from "@/application/providers/ServiceProvider";
 import { HomeIntroScript } from "@/application/providers/HomeIntroScript";
 import type { HomeIntroBinding } from "@/domain/ports/HomeIntroPort";
 import type { LogoPlaybackState } from "@/domain/ports/LogoMotionPort";
-import ButtonLink from "../Controls/ButtonLink";
 import Container from "./Container";
 import { portfolioDestinations as destinations } from "../../data/portfolioDestinations";
 import { LogoMotion, type LogoMotionRef } from "../Logo/LogoMotion";
@@ -144,11 +143,6 @@ function ShellContent({ children, animateIdentity = false }: Props) {
         <PortfolioNavigation onOcclusionChange={setOccluded} />
         <nav aria-label="Footer" data-home-content="">
           <ul className={styles.links}>
-            <li>
-              <ButtonLink href={destinations.contact.href}>
-                {destinations.contact.label}
-              </ButtonLink>
-            </li>
             <PortfolioLegalLinks />
           </ul>
         </nav>

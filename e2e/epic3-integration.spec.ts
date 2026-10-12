@@ -73,10 +73,14 @@ for (const viewport of viewports) {
       await openSettings(page);
       await page
         .getByRole("dialog")
-        .getByRole("link", { name: "Contact", exact: true })
+        .getByText("Privacy", { exact: true })
         .click();
-      await expect(page).toHaveURL("/#contact");
-      await expect(page.locator("#contact")).toBeFocused();
+      await page
+        .getByRole("dialog")
+        .getByRole("link", { name: "Legal notice", exact: true })
+        .click();
+      await expect(page).toHaveURL("/impressum");
+      await expect(page.locator("#main-content")).toBeFocused();
       await page.keyboard.press("Tab");
       await expect(page.locator('a[href^="mailto:"]').first()).toBeFocused();
       // Inspect the fallback; never activate an external mail application.

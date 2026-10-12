@@ -206,7 +206,7 @@ for (const javaScriptEnabled of [true, false]) {
       });
     }
 
-    test("reading, About, Back, Contact and legal journeys remain native and visible", async ({
+    test("reading, About, Back and legal email journeys remain native and visible", async ({
       page,
     }) => {
       await page.goto("/");
@@ -220,7 +220,7 @@ for (const javaScriptEnabled of [true, false]) {
       await page.reload();
       await page.goBack();
       await expect(page).toHaveURL("/");
-      for (const hash of ["start", "about", "contact"]) {
+      for (const hash of ["start", "about"]) {
         await page.goto(`/#${hash}`);
         await expect(page.locator(`#${hash}`)).toBeInViewport();
         await expect(page.locator(`#${hash} h1, #${hash} h2`)).toBeVisible();
@@ -229,11 +229,11 @@ for (const javaScriptEnabled of [true, false]) {
         await page.goto(route);
         const footer = page.getByRole("navigation", { name: "Footer" });
         await footer
-          .getByRole("link", { name: "Contact", exact: true })
+          .getByRole("link", { name: "Legal notice", exact: true })
           .click();
-        await expect(page).toHaveURL("/#contact");
+        await expect(page).toHaveURL("/impressum");
         const mail = page
-          .locator("#contact")
+          .getByRole("article")
           .getByRole("link", { name: "diamondfunk13@gmail.com", exact: true });
         await expect(mail).toBeVisible();
         await expect(mail).toHaveAttribute(
@@ -301,11 +301,14 @@ for (const javaScriptEnabled of [true, false]) {
       await expect(page).toHaveURL("/");
       await page.goBack();
       expect((await page.reload())?.status()).toBe(404);
-      await recovery
-        .getByRole("link", { name: "Contact", exact: true })
+      await expect(recovery.getByRole("link")).toHaveCount(1);
+      await expect(page.locator('a[href="/#contact"]')).toHaveCount(0);
+      await page
+        .getByRole("navigation", { name: "Footer" })
+        .getByRole("link", { name: "Legal notice", exact: true })
         .click();
-      await expect(page).toHaveURL("/#contact");
-      await expect(page.locator("#contact").getByRole("link")).toBeVisible();
+      await expect(page).toHaveURL("/impressum");
+      await expect(page.getByRole("article").getByRole("link")).toBeVisible();
       expect(errors).toEqual([]);
       expect(badAssets).toEqual([]);
     });
@@ -325,7 +328,7 @@ test("not-found recovery is accessible with enlarged text on a short viewport", 
   ).toBe(true);
   await page
     .getByRole("navigation", { name: "Page recovery" })
-    .getByRole("link", { name: "Contact" })
+    .getByRole("link", { name: "Back to FunkSpace" })
     .click({ trial: true });
   const axe = await new AxeBuilder({ page }).analyze();
   expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);

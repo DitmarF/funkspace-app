@@ -7,7 +7,7 @@
 - **Related epic/task:** Portfolio EPICs 0–6; publication task [FS-0.4](../tasks/fs-0.4-authoritative-feature-plan.md).
 - **Decision entry point:** [Authoritative decision register](#pending-decisions-and-latest-needed-points); [FS-0.5 technical rationale and answer provenance](../tasks/fs-0.5-product-and-technical-decisions.md). Dimi leads/approves FS-0.5; Codex is its designated documentation writer.
 - **Target release:** Minimum Usable Experience, before separate Wave Survivor EPIC 7; no portfolio release date assigned.
-- **Last updated:** 2026-09-28.
+- **Last updated:** 2026-10-12.
 - **Related ADRs:** [001](../decisions/ADR-001-monorepo-strategy.md), [002](../decisions/ADR-002-design-token-source-of-truth.md), [003](../decisions/ADR-003-interactive-experience-boundary.md), [004](../decisions/ADR-004-game-development-architecture.md).
 
 ### Authority and source provenance
@@ -34,9 +34,28 @@ This is a functional handoff; required FS-4.7 device/performance evidence and
 FS-4.8 human acceptance remain open. Earlier candidate measurements are not
 transferred to these changes, and publication is not authorized by this handoff.
 
+## Section presentation and Contact deferral — 2026-10-12
+
+Dimi requested two shared section appearances: SVG corners for control-rich
+experiences such as WEB/Start, and plain sections for static content such as
+About. The existing `PortfolioSection` owns both variants, with identical token
+spacing and native semantics. See the [implementation and validation record](../tasks/maintenance-section-variants.md).
+
+The homepage section gap and trailing section padding use `--fs-space-3xl`
+below `48rem` and `1.5 × --fs-space-3xl` at tablet/desktop widths (`48rem` and
+above), following Dimi's spacing refinement on the same date.
+
+The homepage Contact section and its navigation/footer/recovery entry points are
+removed at Dimi's request. The new contact concept belongs to EPIC 5; its design
+is not implied by this change. Legal pages retain the supplied email address.
+Earlier Contact-section and Contact-last navigation descriptions below are
+historical contracts, superseded for the current page by this amendment. EPIC 3
+closure is unchanged; EPIC 5 must establish the replacement entry point rather
+than assuming the old Contact shell exists.
+
 ## Goal
 
-Deliver an animation-led, mobile-first website with Start, About, and Contact/footer sections, normal scrolling, the existing FunkSpace logo and semantic design foundations, one customizable Canvas scene behind a replaceable SVG aperture, usable navigation/settings, real contact delivery, and completed secondary pages. End when the portfolio is ready to host game integration. Do not implement game integration in this milestone.
+Deliver an animation-led, mobile-first website with Start and About sections, a legal-link footer, normal scrolling, the existing FunkSpace logo and semantic design foundations, one customizable Canvas scene behind a replaceable SVG aperture, usable navigation/settings, real contact delivery through EPIC 5's new concept, and completed secondary pages. End when the portfolio is ready to host game integration. Do not implement game integration in this milestone.
 
 Approved routes: `/`, `/about`, `/impressum`, `/privacy`, plus future `/animations/aperture` under the accepted FS-4.1 amendment. Dimi selected English first; German and other languages are possible later, without adding multilingual implementation to this milestone. Preserve `/play/wave-survivor` as the following game milestone's route, not a link to an unfinished page.
 
@@ -73,10 +92,10 @@ The earlier layout plan mandates snapping and fullscreen panels, conflicting wit
 ### User flow or behavior
 
 1. Load the static Start section with existing logo geometry and reserved scene space.
-2. Scroll naturally through About and Contact; follow ordinary route/anchor links.
+2. Scroll naturally through Start and About; follow ordinary route/anchor links. Contact's replacement entry point belongs to EPIC 5.
 3. Open shared navigation/settings, choose appearance and decorative-motion settings, and dismiss or navigate with correct focus behavior.
 4. Enhance the reserved space with one bounded Canvas scene and trusted replaceable SVG aperture; customize or pause it without changing gameplay time.
-5. Use email fallback, then the validated provider-backed form when its separate contract and server work are complete.
+5. Use the email links retained on legal pages, then EPIC 5's contact experience when its separate concept, contract and server work are complete.
 
 ### Key implementation decisions
 
@@ -945,7 +964,7 @@ absolute rendering budgets remain in force. [R18](../tasks/fs-4.1-scene-contract
 
 **Goal:** Provide an honest, secure contact journey that sends real messages without building an unnecessary backend platform.
 
-**Dependencies:** FS-0.5 operating decisions; EPIC 1 fields; EPIC 2 Contact shell. Can run alongside EPIC 4 when files/contracts are isolated.
+**Dependencies:** FS-0.5 operating decisions; EPIC 1 fields; a new Contact concept and entry point following the 2026-10-12 removal of the EPIC 2 homepage shell. Can run alongside EPIC 4 when files/contracts are isolated.
 
 **Affected areas:** Frontend contact UI; pure validation; application contact use case; server-only mail adapter/composition; one route handler (proposed /api/contact); legal copy and operational documentation.
 

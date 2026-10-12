@@ -4,11 +4,11 @@ import { openSettings } from "./helpers/foundation";
 const triggerSelector = 'button[aria-label="Menu: navigation and settings"]';
 const cases = [
   {
-    label: "Contact",
+    label: "Home",
     source: "/?utm_source=review",
-    destination: "/#contact",
-    focusId: "contact",
-    nextTab: '#contact a[href^="mailto:"]',
+    destination: "/",
+    focusId: "main-content",
+    nextTab: "#main-content :is(a, button):not([disabled])",
     legal: false,
   },
   {
@@ -89,7 +89,7 @@ for (const width of [320, 1280]) {
             ),
           width === 320 ? 150 : 20,
         );
-        if (scenario.focusId === "contact") expect(sourceY).toBeGreaterThan(0);
+        if (scenario.label === "Home") expect(sourceY).toBeGreaterThan(0);
         await page.evaluate((y) => scrollTo(0, y), sourceY);
         await expect.poll(() => page.evaluate(() => scrollY)).toBe(sourceY);
         const main = await page.locator("#main-content").elementHandle();
@@ -133,8 +133,8 @@ for (const width of [320, 1280]) {
           targetFocused: true,
           targetInViewport: true,
         });
-        if (scenario.focusId === "contact")
-          expect.soft(arrival.scrollY).toBeGreaterThan(sourceY + 200);
+        if (scenario.label === "Home")
+          expect.soft(arrival.scrollY).toBeLessThan(sourceY);
 
         await afterCleanup(page);
         const settled = await pageState(page, scenario.focusId);
@@ -147,10 +147,11 @@ for (const width of [320, 1280]) {
         await afterCleanup(page);
         const nextFocused = await page
           .locator(scenario.nextTab)
+          .first()
           .evaluate((node) => document.activeElement === node);
         expect.soft(nextFocused, "next Tab follows the destination").toBe(true);
         const afterTab = await pageState(page, scenario.focusId);
-        if (scenario.focusId === "contact")
+        if (scenario.label === "Home")
           expect.soft(afterTab.scrollY).toBe(arrival.scrollY);
         // Other next-Tab targets may legitimately scroll into view. Preserve
         // that actual position on Forward rather than forcing a heading scroll.

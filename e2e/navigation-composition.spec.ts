@@ -160,7 +160,7 @@ for (const viewport of [
         await expect(
           dialog.getByRole("button", { name, exact: true }),
         ).toBeDisabled();
-      await expect(dialog.getByRole("link")).toHaveCount(3);
+      await expect(dialog.getByRole("link")).toHaveCount(2);
       await expect(
         dialog.getByRole("link", { name: "About", exact: true }),
       ).toHaveAttribute("href", "/about");
@@ -176,7 +176,7 @@ for (const viewport of [
       await expect(
         dialog.getByText("Coming soon", { exact: true }),
       ).toHaveCount(3);
-      await expect(dialog.getByRole("link")).toHaveCount(6);
+      await expect(dialog.getByRole("link")).toHaveCount(5);
       await expect(dialog.getByRole("menu")).toHaveCount(0);
       await page.mouse.move(0, 0);
       await page.screenshot({ path: info.outputPath("navigation.png") });
@@ -477,7 +477,9 @@ test("keyboard scrolling keeps the full navigation row below fixed Close", async
   const navigation = dialog.getByRole("navigation", { name: "Primary" });
   for (const name of ["Animations", "Games", "Privacy"])
     await navigation.locator("summary").filter({ hasText: name }).click();
-  await navigation.getByRole("link", { name: "Contact", exact: true }).focus();
+  await navigation
+    .getByRole("link", { name: "Legal notice", exact: true })
+    .focus();
   const home = navigation.getByRole("link", { name: "Home", exact: true });
   for (let tab = 0; tab < 10; tab++) {
     if (await home.evaluate((node) => node === document.activeElement)) break;

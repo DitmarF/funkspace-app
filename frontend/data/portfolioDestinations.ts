@@ -15,7 +15,6 @@ export const portfolioDestinations = {
   },
   start: { focusId: "start", label: "Start", href: "/#start" },
   about: { focusId: "about", label: "About", href: "/#about" },
-  contact: { focusId: "contact", label: "Contact", href: "/#contact" },
   aboutPage: {
     focusId: "main-content",
     label: "More about FunkSpace",

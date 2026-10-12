@@ -7,7 +7,12 @@ import styles from "./AboutPreview.module.css";
 
 export default function AboutPreview() {
   return (
-    <PortfolioSection id="about" tabIndex={-1} aria-labelledby="about-heading">
+    <PortfolioSection
+      variant="plain"
+      id="about"
+      tabIndex={-1}
+      aria-labelledby="about-heading"
+    >
       <h2 id="about-heading" className={styles.heading}>
         About
       </h2>

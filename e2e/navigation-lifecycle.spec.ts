@@ -20,17 +20,33 @@ async function unlocked(page: Page) {
   await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
   await expect(page.locator("html")).not.toHaveCSS("overflow", "hidden");
 }
-async function contactArrival(page: Page) {
-  await expect(page).toHaveURL(/\/#contact$/);
-  await expect(page.locator("#contact")).toBeFocused();
+async function fragmentArrival(page: Page) {
+  await expect(page).toHaveURL(/\/#about$/);
+  await expect(page.locator("#about")).toBeFocused();
   await unlocked(page);
   await frames(page);
-  const y = await page.evaluate(() => scrollY);
-  await expect(page.locator("#contact")).toBeFocused();
-  const email = page.locator('#contact a[href^="mailto:"]');
-  await expect(email).toBeInViewport();
+  await expect(page.locator("#about")).toBeFocused();
+  const more = page.locator('#about a[href="/about"]');
   await page.keyboard.press("Tab");
-  await expect(email).toBeFocused();
+  await expect(more).toBeFocused();
+  await expect(more).toBeInViewport();
+  // About's longer copy legitimately scrolls on Tab; no later correction may
+  // return to the heading or departing invoker after the link is revealed.
+  const y = await page.evaluate(() => scrollY);
+  await frames(page);
+  await expect(more).toBeFocused();
+  expect(await page.evaluate(() => scrollY)).toBe(y);
+}
+async function aboutArrival(page: Page) {
+  await expect(page).toHaveURL("/about");
+  await expect(page.locator("#main-content")).toBeFocused();
+  await unlocked(page);
+  await frames(page);
+  await expect(page.locator("#main-content")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(menu(page)).toBeFocused();
+  const y = await page.evaluate(() => scrollY);
+  await frames(page);
   expect(await page.evaluate(() => scrollY)).toBe(y);
 }
 for (const width of [320, 1280]) {
@@ -69,27 +85,27 @@ for (const width of [320, 1280]) {
       await page.keyboard.press("Escape");
       await unlocked(page);
     });
-    test("N3 repeated Contact reveals and focuses without late return", async ({
+    test("N3 repeated About page reveals and focuses without late return", async ({
       page,
     }) => {
-      await page.goto("/#contact");
+      await page.goto("/about");
       await menu(page).waitFor();
       await page.evaluate(() => scrollTo(0, 0));
       await openSettings(page);
       await modal(page)
-        .getByRole("link", { name: "Contact", exact: true })
+        .getByRole("link", { name: "About", exact: true })
         .press("Enter");
-      await contactArrival(page);
+      await aboutArrival(page);
       await page.evaluate(() => scrollTo(0, 0));
       await openSettings(page);
       await modal(page)
-        .getByRole("link", { name: "Contact", exact: true })
+        .getByRole("link", { name: "About", exact: true })
         .click();
-      await contactArrival(page);
+      await aboutArrival(page);
     });
     for (const route of ["/privacy", "/impressum"])
       for (const dismissal of ["Close", "Escape"]) {
-        test(`N4 delayed Contact from ${route}, ${dismissal}, final focus and Tab`, async ({
+        test(`N4 delayed About from ${route}, ${dismissal}, final focus and Tab`, async ({
           page,
         }) => {
           await page.goto(route);
@@ -103,7 +119,7 @@ for (const width of [320, 1280]) {
             entered = r;
           });
           await page.route(
-            (url) => url.pathname === "/",
+            (url) => url.pathname === "/about",
             async (request) => {
               entered();
               await gate;
@@ -111,7 +127,7 @@ for (const width of [320, 1280]) {
             },
           );
           await modal(page)
-            .getByRole("link", { name: "Contact", exact: true })
+            .getByRole("link", { name: "About", exact: true })
             .click();
           await requested;
           if (dismissal === "Close")
@@ -121,7 +137,7 @@ for (const width of [320, 1280]) {
           else await page.keyboard.press("Escape");
           await unlocked(page);
           release();
-          await contactArrival(page);
+          await aboutArrival(page);
         });
       }
     test("N2 legal/full About links arrive at main", async ({ page }) => {
@@ -148,9 +164,9 @@ for (const width of [320, 1280]) {
       await page.goto("/#start");
       await menu(page).waitFor();
       await page.evaluate(() => {
-        location.hash = "contact";
+        location.hash = "about";
       });
-      await expect(page).toHaveURL("/#contact");
+      await expect(page).toHaveURL("/#about");
       await frames(page);
       // Opening a desktop header invoker legitimately reveals that invoker first.
       await openSettings(page);
@@ -158,7 +174,7 @@ for (const width of [320, 1280]) {
       await page.goBack();
       await unlocked(page);
       await page.goForward();
-      await expect(page).toHaveURL("/#contact");
+      await expect(page).toHaveURL("/#about");
       await frames(page);
       expect(await page.evaluate(() => scrollY)).toBe(position);
       await unlocked(page);
@@ -179,8 +195,11 @@ test("N5 changed hash preserves the actual departing scroll position", async ({
   const before = await page.evaluate(() => scrollY);
   expect(before).toBe(150);
   await openSettings(page);
-  await modal(page).getByRole("link", { name: "Contact", exact: true }).click();
-  await expect(page).toHaveURL("/#contact");
+  await page.evaluate(() => {
+    location.hash = "about";
+  });
+  await expect(page).toHaveURL("/#about");
+  await unlocked(page);
   await frames(page);
   await page.goBack();
   await frames(page);
@@ -241,7 +260,7 @@ test("N5 full document departure and persisted pageshow leave no stale overlay",
 });
 
 for (const dismissal of [false, true]) {
-  test(`N4 hard-navigation redirected Contact preserves focus and Tab (dismissed=${dismissal})`, async ({
+  test(`N4 hard-navigation redirected About fragment preserves focus and Tab (dismissed=${dismissal})`, async ({
     page,
   }) => {
     await page.setViewportSize({ width: 320, height: 720 });
@@ -266,7 +285,7 @@ for (const dismissal of [false, true]) {
         } else {
           await route.fulfill({
             status: 307,
-            headers: { location: "/#contact" },
+            headers: { location: "/#about" },
           });
         }
       },
@@ -278,32 +297,33 @@ for (const dismissal of [false, true]) {
       await unlocked(page);
     }
     release();
-    await contactArrival(page);
+    await fragmentArrival(page);
   });
 }
-test("N4 destination input supersedes scheduled Contact correction", async ({
+test("N4 destination input supersedes scheduled About correction", async ({
   page,
 }) => {
   await page.goto("/privacy");
   await openSettings(page);
   await page.evaluate(() => {
     const observer = new MutationObserver(() => {
-      const email = document.querySelector<HTMLAnchorElement>(
-        '#contact a[href^="mailto:"]',
+      const more = document.querySelector<HTMLButtonElement>(
+        'button[aria-label="Menu: navigation and settings"]',
       );
-      if (!email) return;
+      if (location.pathname !== "/about") return;
+      if (!more) return;
       observer.disconnect();
-      email.focus({ preventScroll: true });
-      email.dispatchEvent(
+      more.focus({ preventScroll: true });
+      more.dispatchEvent(
         new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }),
       );
     });
     observer.observe(document.body, { childList: true, subtree: true });
   });
-  await modal(page).getByRole("link", { name: "Contact", exact: true }).click();
-  await expect(page).toHaveURL("/#contact");
+  await modal(page).getByRole("link", { name: "About", exact: true }).click();
+  await expect(page).toHaveURL("/about");
   await frames(page);
-  await expect(page.locator('#contact a[href^="mailto:"]')).toBeFocused();
+  await expect(menu(page)).toBeFocused();
 });
 
 test("N1 hidden invoker falls back to main; N7 immediate reopen ignores old close", async ({
@@ -438,13 +458,13 @@ test("N5 external fragment activation releases an open overlay without old scrol
   await page.goto("/");
   await openSettings(page);
   await page.evaluate(() => {
-    location.hash = "contact";
+    location.hash = "about";
   });
-  await expect(page).toHaveURL("/#contact");
+  await expect(page).toHaveURL("/#about");
   await unlocked(page);
-  await expect(page.locator("#contact")).toBeInViewport();
+  await expect(page.locator("#about")).toBeInViewport();
   await frames(page);
-  await expect(page.locator("#contact")).toBeInViewport();
+  await expect(page.locator("#about")).toBeInViewport();
 });
 
 test("N4 failed route releases the departing document and Back restores usable navigation", async ({
@@ -464,7 +484,7 @@ test("N4 failed route releases the departing document and Back restores usable n
   await expect(page).toHaveURL("/");
   await unlocked(page);
   await openSettings(page);
-  await modal(page).getByRole("link", { name: "Contact", exact: true }).click();
-  await expect(page).toHaveURL("/#contact");
-  await contactArrival(page);
+  await modal(page).getByRole("link", { name: "About", exact: true }).click();
+  await expect(page).toHaveURL("/about");
+  await aboutArrival(page);
 });

@@ -82,7 +82,7 @@ it("allows further nested groups with native destination anchors", () => {
   expect(view.container.querySelector('a[href="/about"]')).toBeInTheDocument();
 });
 
-it("places Contact last and renders the matching destination artwork", () => {
+it("omits deferred Contact and renders the matching destination artwork", () => {
   render(<PortfolioNavigationTree />);
   const navigation = screen.getByRole("navigation", { name: "Primary" });
   for (const summary of navigation.querySelectorAll("summary"))
@@ -100,12 +100,10 @@ it("places Contact last and renders the matching destination artwork", () => {
     "Privacy",
     "Privacy policy",
     "Legal notice",
-    "Contact",
   ]);
   for (const [label, family] of [
     ["Home", "home"],
     ["About", "about"],
-    ["Contact", "contact"],
     ["Animations", "animations"],
     ["Games", "games"],
     ["Privacy", "privacy"],

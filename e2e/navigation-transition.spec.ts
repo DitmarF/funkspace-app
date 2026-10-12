@@ -85,12 +85,12 @@ for (const width of [320, 1280]) {
       await openSettings(page);
       await page
         .getByRole("dialog")
-        .getByRole("link", { name: "Contact", exact: true })
+        .getByRole("link", { name: "About", exact: true })
         .click();
-      await expect(page).toHaveURL("/#contact");
+      await expect(page).toHaveURL("/about");
       await expect(page.getByRole("dialog")).toHaveCount(0);
-      await expect(page.locator("#contact")).toBeInViewport();
-      await expect(page.locator("#contact")).toBeFocused();
+      await expect(page.locator("#main-content")).toBeInViewport();
+      await expect(page.locator("#main-content")).toBeFocused();
       await expect(page.locator("body")).not.toHaveCSS("position", "fixed");
     });
   }

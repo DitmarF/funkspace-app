@@ -72,17 +72,17 @@ for (const width of [375, 1280]) {
             await expect(summary).toBeFocused();
             await page.keyboard.press("Tab");
           }
-          const footerContact = page
+          const footerLegal = page
             .getByRole("navigation", { name: "Footer" })
-            .getByRole("link", { name: "Contact", exact: true });
-          await expect(footerContact).toBeFocused();
+            .getByRole("link", { name: "Legal notice", exact: true });
+          await expect(footerLegal).toBeFocused();
           const menu = page.getByRole("button", {
             name: "Menu: navigation and settings",
             exact: true,
           });
           await expect(menu).toBeVisible();
           await expect(fallback).toHaveCount(0);
-          await expect(footerContact).toBeFocused();
+          await expect(footerLegal).toBeFocused();
           await menu.click();
           await expect(page.getByRole("dialog")).toHaveCount(1);
           await page.keyboard.press("Escape");
