@@ -33,6 +33,32 @@ email links remain available. See the
 [task record](../../../docs/tasks/maintenance-section-variants.md) for scope and
 validation evidence.
 
+## Footer navigation
+
+`PortfolioFooterNavigation` supplies three centered native links: Legal notice
+(`/impressum`), Privacy policy (`/privacy`) and the icon-only FunkSpace project
+link to `https://github.com/DitmarF/funkspace-app`. The GitHub link has an
+accessible name and uses normal same-tab navigation; it makes no external
+request until activated. Legal content and publication readiness are unchanged.
+
+The footer reuses compact navigation-row styling with registered 24px legal
+icons and the next-size 36px GitHub artwork,
+including borderless Work Sans labels, semantic hover colors and visible focus.
+Links remain native anchors even on the current legal page, preserving the
+existing footer contract. The centered flex layout wraps at narrow widths, with
+32px horizontal gaps on mobile and 48px on tablet/desktop. Mobile bottom padding
+is one `--fs-space-2xl` plus the bottom safe area; tablet/desktop retain their
+existing padding.
+GitHub occupies its own centered row on mobile so the tighter gutter does not
+put its target behind the fixed settings button. Tablet/desktop use one row.
+When enlarged text leaves less than 16em of footer width, the mobile social row
+reserves the settings control's remaining vertical overlap. This adds no space
+at ordinary text size on supported 320px-and-wider screens.
+
+Storybook **Layouts/PortfolioFooterNavigation** exposes Default and InShell;
+the latter exercises the complete responsive footer and settings control.
+See the [footer task record](../../../docs/tasks/maintenance-footer-navigation.md).
+
 ## Header and tree navigation
 
 `PortfolioMainNavigation` supplies Home, About and disabled Contact in the

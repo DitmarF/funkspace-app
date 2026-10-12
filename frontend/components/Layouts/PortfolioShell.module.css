@@ -119,17 +119,6 @@
   scroll-margin-bottom: var(--fs-space-md);
 }
 
-.links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--fs-space-md);
-}
-
-.links > li {
-  min-width: 0;
-  max-width: 100%;
-}
-
 .identity:focus-visible {
   outline: 2px solid var(--fs-color-border-focus);
   outline-offset: var(--fs-space-xs);
@@ -190,8 +179,7 @@
   display: grid;
   gap: var(--fs-space-lg);
   padding-top: var(--fs-space-lg);
-  /* Any footer link can scroll fully above the fixed settings trigger. */
-  padding-bottom: calc(var(--fs-space-2xl) * 3 + var(--shell-safe-bottom));
+  padding-bottom: calc(var(--fs-space-2xl) * 1 + var(--shell-safe-bottom));
 }
 
 @media (min-width: 48rem) {

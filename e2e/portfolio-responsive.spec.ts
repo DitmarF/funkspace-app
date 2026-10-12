@@ -160,7 +160,7 @@ for (const viewport of viewports) {
           await page.keyboard.press("End");
           const footer = page.getByRole("navigation", { name: "Footer" });
           await expect(footer).toBeInViewport();
-          for (const name of ["Legal notice", "Privacy"])
+          for (const name of ["Legal notice", "Privacy policy"])
             await footer
               .getByRole("link", { name, exact: true })
               .click({ trial: true });
@@ -256,7 +256,7 @@ test.describe("fresh no-JavaScript reading and long-content fixtures", () => {
         ).toBeHidden();
         const privacy = page
           .getByRole("navigation", { name: "Footer" })
-          .getByRole("link", { name: "Privacy", exact: true });
+          .getByRole("link", { name: "Privacy policy", exact: true });
         await privacy.click();
         await expect(page).toHaveURL("/privacy");
         await page

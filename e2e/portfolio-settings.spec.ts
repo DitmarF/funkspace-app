@@ -123,7 +123,7 @@ for (const viewport of [
       await expect(page.locator("body")).not.toHaveCSS("position", "fixed");
       const legal = page
         .getByRole("contentinfo")
-        .getByRole("link", { name: "Privacy", exact: true });
+        .getByRole("link", { name: "Privacy policy", exact: true });
       await legal.scrollIntoViewIfNeeded();
       await legal.click();
       await expect(page).toHaveURL("/privacy");

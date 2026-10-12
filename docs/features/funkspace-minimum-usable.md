@@ -633,6 +633,13 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-2.4 — Build Contact/footer and legal-page structure
 
+**Footer amendment — 2026-10-12:** Dimi requests three centered footer links:
+Legal notice, Privacy policy and an icon-only GitHub project link. The footer
+uses the existing compact navigation styling and icons, wraps on narrow screens
+and preserves native legal navigation. Contact remains deferred to EPIC 5;
+legal-page content/publication blockers are unchanged. See the
+[implementation and validation record](../tasks/maintenance-footer-navigation.md).
+
 **Current status:** Complete — Dimi explicitly accepted the bounded Contact/footer and draft legal structure and authorized documentation closure, commit and push on 2026-09-20. The delivery uses the supplied `diamondfunk13@gmail.com`, only the Contact heading/email, a compact footer and authorized incomplete legal routes grounded in Codex's technical fact sheet. Missing operator, current hosting/mailbox-processing facts and final legal approval remain release blockers; future provider-specific finalization stays FS-5.5. See [FS-2.4 completion, evidence and gap register](../tasks/fs-2.4-contact-footer-and-legal-structure.md#dimi-completion-and-commitpush-authorization--2026-09-20). The routes pass technical usability with authorized readable drafts; Dimi subsequently accepted the bounded EPIC 2 static checkpoint. This does not approve legal completeness or publication.
 
 **Lead:** Sites

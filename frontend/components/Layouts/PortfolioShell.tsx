@@ -21,7 +21,7 @@ import Container from "./Container";
 import { portfolioDestinations as destinations } from "../../data/portfolioDestinations";
 import { LogoMotion, type LogoMotionRef } from "../Logo/LogoMotion";
 import PortfolioNavigation from "./PortfolioNavigation";
-import PortfolioLegalLinks from "./PortfolioLegalLinks";
+import PortfolioFooterNavigation from "./PortfolioFooterNavigation";
 import PortfolioMainNavigation from "./PortfolioMainNavigation";
 import styles from "./PortfolioShell.module.css";
 
@@ -143,11 +143,7 @@ function ShellContent({ children, animateIdentity = false }: Props) {
         className={`${styles.frame} ${styles.footer}`}
       >
         <PortfolioNavigation onOcclusionChange={setOccluded} />
-        <nav aria-label="Footer" data-home-content="">
-          <ul className={styles.links}>
-            <PortfolioLegalLinks />
-          </ul>
-        </nav>
+        <PortfolioFooterNavigation />
       </Container>
     </div>
   );

@@ -34,9 +34,9 @@ for (const javaScriptEnabled of [true, false]) {
         await expect(page.locator("#contact")).toHaveCount(0);
         await page.reload();
         await expect(page.locator('a[href="/#contact"]')).toHaveCount(0);
-        for (const [label, href] of [
-          ["Legal notice", "/impressum"],
-          ["Privacy", "/privacy"],
+        for (const [label, href, heading] of [
+          ["Legal notice", "/impressum", "Legal notice"],
+          ["Privacy policy", "/privacy", "Privacy"],
         ]) {
           await page
             .getByRole("navigation", { name: "Footer" })
@@ -44,7 +44,7 @@ for (const javaScriptEnabled of [true, false]) {
             .click();
           await expect(page).toHaveURL(href);
           await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-            label,
+            heading,
           );
           const mail = page
             .getByRole("article")
@@ -119,7 +119,7 @@ for (const javaScriptEnabled of [true, false]) {
           });
           const privacy = page
             .getByRole("navigation", { name: "Footer" })
-            .getByRole("link", { name: "Privacy", exact: true });
+            .getByRole("link", { name: "Privacy policy", exact: true });
           await privacy.click();
           await expect(page).toHaveURL("/privacy");
         }

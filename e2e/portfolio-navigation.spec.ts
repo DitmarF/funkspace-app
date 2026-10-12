@@ -30,7 +30,7 @@ for (const javaScriptEnabled of [true, false]) {
         expect(new Set(ids).size).toBe(ids.length);
         for (const destination of [
           destinations.impressum,
-          destinations.privacy,
+          { ...destinations.privacy, label: "Privacy policy" },
         ]) {
           await expect(
             page

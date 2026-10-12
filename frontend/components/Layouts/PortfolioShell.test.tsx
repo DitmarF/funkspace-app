@@ -71,12 +71,15 @@ describe("server-rendered portfolio documents", () => {
         ).toHaveAttribute("href", destination.href);
       }
       expect(
-        within(screen.getByRole("contentinfo")).getByRole("link", {
-          name: destinations.privacy.label,
-        }),
+        within(screen.getByRole("navigation", { name: "Footer" })).getByRole(
+          "link",
+          {
+            name: "Privacy policy",
+          },
+        ),
       ).toHaveAttribute("href", destinations.privacy.href);
       expect(screen.getAllByRole("link")).toHaveLength(
-        name === "Home" ? 13 : name === "About" ? 11 : 12,
+        name === "Home" ? 14 : name === "About" ? 12 : 13,
       );
       const mainNav = header.getByRole("navigation", { name: "Main" });
       expect(
@@ -90,7 +93,7 @@ describe("server-rendered portfolio documents", () => {
       ).toBeDisabled();
       for (const destination of [
         destinations.impressum,
-        destinations.privacy,
+        { ...destinations.privacy, label: "Privacy policy" },
       ]) {
         expect(
           within(screen.getByRole("navigation", { name: "Footer" })).getByRole(
@@ -99,6 +102,20 @@ describe("server-rendered portfolio documents", () => {
           ),
         ).toHaveAttribute("href", destination.href);
       }
+      const footer = within(screen.getByRole("navigation", { name: "Footer" }));
+      expect(footer.getAllByRole("link")).toHaveLength(3);
+      const github = footer.getByRole("link", {
+        name: "FunkSpace project on GitHub",
+      });
+      expect(github).toHaveAttribute(
+        "href",
+        "https://github.com/DitmarF/funkspace-app",
+      );
+      expect(github.textContent).toBe("");
+      expect(github.querySelector("svg")).toHaveAttribute(
+        "aria-hidden",
+        "true",
+      );
     });
   }
 
