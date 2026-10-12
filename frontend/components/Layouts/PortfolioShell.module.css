@@ -125,11 +125,22 @@
   outline-offset: var(--fs-space-xs);
 }
 
+/* Safari can mark route/dialog focus as focus-visible after a pointer click.
+   Retain actual focus and native field cues; the next key restores all rings. */
+:global(html[data-portfolio-pointer-focus])
+  .shell
+  :where(a, button, summary, [tabindex="-1"]):focus {
+  outline: none;
+  box-shadow: none;
+}
+
 .launcher {
   /* Medium artwork: 72-unit viewBox, right path edge 66.1768, stroke 2.
      Include the native button's 2px border without changing its hit target. */
   position: fixed;
   z-index: 20;
+  /* Keep the same compositing/pixel origin across absolute → fixed hydration. */
+  transform: translateZ(0);
   /* Match Container's centered wide (80rem) shell and responsive gutters. */
   right: var(--navigation-inline-end);
   bottom: max(var(--navigation-block-gutter), var(--shell-safe-bottom));

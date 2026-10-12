@@ -144,9 +144,9 @@ for (const viewport of [
         dialog.getByRole("button", { name: "Home", exact: true }),
       ).toHaveCSS("font-size", viewport.width < 768 ? "16px" : "24px");
       expect(
-        (await dialog
+        await dialog
           .getByRole("button", { name: "Home", exact: true })
-          .boundingBox())!.height,
+          .evaluate((node) => (node as HTMLElement).offsetHeight),
       ).toBeGreaterThanOrEqual(viewport.width < 768 ? 48 : 72);
       expect(await dialog.boundingBox()).toEqual({ x: 0, y: 0, ...viewport });
       await expect(
@@ -281,11 +281,15 @@ for (const viewport of [
               .slice(0, 3)
               .map(Number),
           );
-          expect(hoverPair.foreground).toBe(`rgb(${sharedHover.join(", ")})`);
+          expect(hoverPair.foreground).toBe(unselectedPair.foreground);
+          await expect(unselected).toHaveCSS(
+            "border-top-color",
+            `rgb(${sharedHover.join(", ")})`,
+          );
           expect(hoverPair.background).toEqual(unselectedPair.background);
-          // The verified 24px labels use the same approved 3:1 large-text
-          // hover pairing as the shared buttons (not the former 16px override).
-          expect(hoverPair.ratio).toBeGreaterThanOrEqual(3);
+          // Preserve the stricter existing settings-text gate; accent remains
+          // a border cue. Shared non-settings button treatments are unchanged.
+          expect(hoverPair.ratio).toBeGreaterThanOrEqual(4.5);
           await selected.hover();
           expect((await renderedPair(selected)).background).toEqual(
             selectedPair.background,

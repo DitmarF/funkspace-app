@@ -1,18 +1,14 @@
+import { forwardRef, useId, type ComponentPropsWithoutRef } from "react";
 import {
-  forwardRef,
-  useId,
-  type ComponentPropsWithoutRef,
-  type ReactNode,
-} from "react";
-import {
-  iconArtwork,
+  isSpriteIcon,
   closeViewBoxSize,
   type IconName,
   type IconSize,
-} from "./iconArtwork";
+} from "./iconMetadata";
+import { iconArtwork } from "./iconArtwork";
 import { categoryIconViewBoxes } from "./categoryIconViewBoxes";
 
-export { iconNames, type IconName, type IconSize } from "./iconArtwork";
+export { iconNames, type IconName, type IconSize } from "./iconMetadata";
 
 export type IconProps = Omit<
   ComponentPropsWithoutRef<"svg">,
@@ -36,7 +32,6 @@ export type IconProps = Omit<
 export const Icon = forwardRef<SVGSVGElement, IconProps>(
   ({ name, size = 24, label, ...props }, ref) => {
     const prefix = useId();
-    const artwork: (prefix: string) => ReactNode = iconArtwork[name][size];
     const viewBoxSize = name === "close" ? closeViewBoxSize[size] : size;
     const viewBox =
       name in categoryIconViewBoxes
@@ -59,7 +54,11 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(
         aria-labelledby={label ? `${prefix}-title` : undefined}
       >
         {label ? <title id={`${prefix}-title`}>{label}</title> : null}
-        {artwork(prefix)}
+        {isSpriteIcon(name) ? (
+          <use href={`/svg/icons/sprite.svg#${name}-${size}`} />
+        ) : (
+          iconArtwork[name][size](prefix)
+        )}
       </svg>
     );
   },

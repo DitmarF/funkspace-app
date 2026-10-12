@@ -22,6 +22,12 @@ export function createPortfolioNavigationHandoff(
   const owners = new WeakMap<HTMLElement, number>();
   let pending: Receipt | undefined;
   let cancelFrame: (() => void) | undefined;
+  // Presentation cue for Safari's scripted-focus heuristic. Keep the last input
+  // across route owners; never change actual focus or suppress keyboard input.
+  let pointerFocus = false;
+  let inputObservers = 0;
+  let previousPointerCue: string | null = null;
+  const pointerCue = "data-portfolio-pointer-focus";
   const owner = (main: HTMLElement | null) => {
     if (!main) return 0;
     let id = owners.get(main);
@@ -226,6 +232,10 @@ export function createPortfolioNavigationHandoff(
       const doc = getDocument();
       const win = doc?.defaultView;
       if (!doc || !win) return () => {};
+      if (inputObservers++ === 0) {
+        previousPointerCue = doc.documentElement.getAttribute(pointerCue);
+        if (pointerFocus) doc.documentElement.setAttribute(pointerCue, "");
+      }
       const depart = (cause: "history" | "fragment" | "document") => {
         cancel();
         notify(cause);
@@ -236,20 +246,39 @@ export function createPortfolioNavigationHandoff(
       const show = (event: PageTransitionEvent) => {
         if (event.persisted) depart("document");
       };
-      const input = () => cancelPreferred();
+      const pointerInput = () => {
+        pointerFocus = true;
+        doc.documentElement.setAttribute(pointerCue, "");
+        cancelPreferred();
+      };
+      const keyboardInput = (event: KeyboardEvent) => {
+        if (!["Shift", "Control", "Alt", "Meta"].includes(event.key)) {
+          pointerFocus = false;
+          doc.documentElement.removeAttribute(pointerCue);
+        }
+        cancelPreferred();
+      };
       win.addEventListener("popstate", history);
       win.addEventListener("hashchange", hash);
       win.addEventListener("pagehide", hide);
       win.addEventListener("pageshow", show);
-      doc.addEventListener("pointerdown", input, true);
-      doc.addEventListener("keydown", input, true);
+      doc.addEventListener("pointerdown", pointerInput, true);
+      doc.addEventListener("keydown", keyboardInput, true);
+      let released = false;
       return () => {
+        if (released) return;
+        released = true;
         win.removeEventListener("popstate", history);
         win.removeEventListener("hashchange", hash);
         win.removeEventListener("pagehide", hide);
         win.removeEventListener("pageshow", show);
-        doc.removeEventListener("pointerdown", input, true);
-        doc.removeEventListener("keydown", input, true);
+        doc.removeEventListener("pointerdown", pointerInput, true);
+        doc.removeEventListener("keydown", keyboardInput, true);
+        if (--inputObservers === 0) {
+          if (previousPointerCue === null)
+            doc.documentElement.removeAttribute(pointerCue);
+          else doc.documentElement.setAttribute(pointerCue, previousPointerCue);
+        }
       };
     },
   };

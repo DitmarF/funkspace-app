@@ -10,6 +10,12 @@
   text-transform: lowercase;
 }
 
+.choices[data-presentation="outlined"]
+  button:hover:not(:disabled):not([aria-pressed="true"]):not(:active) {
+  --control-foreground: var(--fs-color-content-primary);
+  --control-border: var(--fs-color-action-hover);
+}
+
 .choices button[aria-pressed="true"],
 .choices button[aria-pressed="true"]:hover:not(:disabled) {
   --control-foreground: var(--fs-color-content-inverse);

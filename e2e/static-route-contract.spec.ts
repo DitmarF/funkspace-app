@@ -241,13 +241,16 @@ for (const javaScriptEnabled of [true, false]) {
           "mailto:diamondfunk13@gmail.com",
         );
         await mail.click({ trial: true });
-        for (const legal of ["Legal notice", "Privacy"]) {
+        for (const legal of ["Legal notice", "Privacy policy"]) {
           await page
             .getByRole("navigation", { name: "Footer" })
             .getByRole("link", { name: legal, exact: true })
             .click();
           await expect(
-            page.getByRole("heading", { level: 1, name: legal }),
+            page.getByRole("heading", {
+              level: 1,
+              name: legal === "Privacy policy" ? "Privacy" : legal,
+            }),
           ).toBeVisible();
           await expect(
             page.getByRole("article").getByText(/Draft —/),

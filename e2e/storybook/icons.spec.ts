@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import {
+  isSpriteIcon,
+  type IconName,
+} from "../../frontend/components/Icons/iconMetadata";
 import { readFileSync } from "node:fs";
 import { renderedPair, settleStyles, themes } from "../helpers/foundation";
 
@@ -45,6 +49,17 @@ for (const theme of themes) {
         const box = await svg.boundingBox();
         expect(box!.width).toBe(size);
         expect(box!.height).toBe(size);
+        if (isSpriteIcon(name as IconName)) {
+          // These monochrome groups inherit this SVG's currentColor. Geometry
+          // is checked against original exports in Icon.test; exact external /
+          // inline pixels in all four themes are checked in icon-sprite.spec.
+          await expect(svg.locator("use")).toHaveAttribute(
+            "href",
+            `/svg/icons/sprite.svg#${name}-${size}`,
+          );
+          expect((await renderedPair(svg)).ratio).toBeGreaterThanOrEqual(4.5);
+          continue;
+        }
         const paints = await svg.evaluate((node) => {
           const css = getComputedStyle(node);
           return {

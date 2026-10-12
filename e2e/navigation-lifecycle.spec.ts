@@ -392,7 +392,7 @@ test("N6 download activation leaves the same-tab overlay intact", async ({
   await unlocked(page);
 });
 
-test("N9 scrolled mobile invoker moved out of view on desktop uses main fallback", async ({
+test("N9 scrolled mobile invoker becomes sticky on desktop and retains return focus", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 568 });
@@ -402,17 +402,13 @@ test("N9 scrolled mobile invoker moved out of view on desktop uses main fallback
   await page.evaluate(() => scrollTo(0, 300));
   await openSettings(page);
   await page.setViewportSize({ width: 1280, height: 568 });
-  await expect
-    .poll(async () => {
-      const b = await menu(page).boundingBox();
-      return b!.y + b!.height;
-    })
-    .toBeLessThan(0);
+  await expect(page.locator("[data-sticky-header]")).toHaveCount(1);
+  await expect(menu(page)).toBeInViewport({ ratio: 1 });
   await expect(
     modal(page).getByRole("button", { name: "Close", exact: true }),
   ).toBeInViewport();
   await modal(page).getByRole("button", { name: "Close", exact: true }).click();
-  await expect(page.locator("#main-content")).toBeFocused();
+  await expect(menu(page)).toBeFocused();
   await unlocked(page);
 });
 

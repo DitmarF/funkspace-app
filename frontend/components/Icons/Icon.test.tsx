@@ -1,7 +1,11 @@
-import { createRef } from "react";
+import { createElement, createRef } from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Icon, iconNames } from "./Icon";
+import { spriteIconArtwork } from "./spriteIconArtwork";
+import { isSpriteIcon } from "./iconMetadata";
+import { iconArtwork } from "./iconArtwork";
+import { renderToStaticMarkup } from "react-dom/server";
 import { readFileSync } from "node:fs";
 
 describe("Icon", () => {
@@ -16,6 +20,28 @@ describe("Icon", () => {
           raw,
           "image/svg+xml",
         ).documentElement;
+        // Validate authoring geometry as well as the generated delivery asset.
+        const authored = new DOMParser().parseFromString(
+          renderToStaticMarkup(
+            createElement(
+              "svg",
+              { xmlns: "http://www.w3.org/2000/svg" },
+              (isSpriteIcon(name)
+                ? spriteIconArtwork[name][size]
+                : iconArtwork[name][size])("author-proof"),
+            ),
+          ),
+          "image/svg+xml",
+        );
+        expect(
+          [...authored.querySelectorAll("path")].map((path) =>
+            path.getAttribute("d"),
+          ),
+        ).toEqual(
+          [...source.querySelectorAll("path")].map((path) =>
+            path.getAttribute("d"),
+          ),
+        );
         const { container } = render(
           <>
             <Icon name={name} size={size} label="First" />
@@ -23,11 +49,27 @@ describe("Icon", () => {
           </>,
         );
         const icon = screen.getByRole("img", { name: "First" });
+        const sprite = new DOMParser().parseFromString(
+          readFileSync("frontend/public/svg/icons/sprite.svg", "utf8"),
+          "image/svg+xml",
+        );
+        const symbol = isSpriteIcon(name)
+          ? sprite.getElementById(`${name}-${size}`)!
+          : icon;
+        if (isSpriteIcon(name)) {
+          expect(icon.querySelector("use")).toHaveAttribute(
+            "href",
+            `/svg/icons/sprite.svg#${name}-${size}`,
+          );
+          expect(symbol.getAttribute("data-view-box")).toBe(
+            source.getAttribute("viewBox"),
+          );
+        }
         expect(icon.getAttribute("viewBox")).toBe(
           source.getAttribute("viewBox"),
         );
         expect(
-          [...icon.querySelectorAll("path")].map((path) =>
+          [...symbol.querySelectorAll("path")].map((path) =>
             path.getAttribute("d"),
           ),
         ).toEqual(
@@ -88,9 +130,17 @@ describe("Icon", () => {
     expect(screen.getByRole("img", { name: "Back" })).toBeInTheDocument();
     const ids = [...container.querySelectorAll("[id]")].map((node) => node.id);
     expect(new Set(ids).size).toBe(ids.length);
-    for (const node of container.querySelectorAll("[clip-path]")) {
+    const sprite = new DOMParser().parseFromString(
+      readFileSync("frontend/public/svg/icons/sprite.svg", "utf8"),
+      "image/svg+xml",
+    );
+    const spriteIds = [...sprite.querySelectorAll("[id]")].map(
+      (node) => node.id,
+    );
+    expect(new Set(spriteIds).size).toBe(spriteIds.length);
+    for (const node of sprite.querySelectorAll("[clip-path]")) {
       const id = node.getAttribute("clip-path")!.slice(5, -1);
-      expect(ids).toContain(id);
+      expect(spriteIds).toContain(id);
     }
   });
 });

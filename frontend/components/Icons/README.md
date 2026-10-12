@@ -1,8 +1,19 @@
 # FunkSpace icons
 
-Twenty-eight Figma families, displayed at 24, 36 and 48 CSS pixels.
+Thirty-one Figma families, displayed at 24, 36 and 48 CSS pixels.
 The gallery is **Icons / Library / Gallery** in Storybook. Playground exposes
 name and size controls; Accent demonstrates inherited semantic color.
+
+Category/social artwork is authored in `spriteIconArtwork.tsx` and generated into the same-origin
+`public/svg/icons/sprite.svg` with `pnpm build:icons`. `Icon` references a sprite
+group; it retains native SVG sizing, inherited semantic paint and accessible
+names without shipping the category/social paths in initial JavaScript. Group references avoid
+an extra viewBox transformation, preserving source pixels in Chrome/Firefox.
+The individual Figma exports remain the geometry reference. Never hand-edit the
+sprite. Dev, app and Storybook builds generate it; lint/tests check freshness
+with `pnpm check:icons`. After editing artwork during an existing dev session,
+regenerate the sprite. No-JS supports native external SVG references; if the
+asset fails, control names, text and native hit targets remain available.
 
 ```tsx
 import { Icon } from "@/components/Icons/Icon";
@@ -21,7 +32,7 @@ when it performs an action.
 
 [UI Library Icons page](https://www.figma.com/design/o39DgxXnQ0jogb2ez6WKfq?node-id=6-2),
 exported 2026-09-15. Raw SVGs below are exact exports with original paint/IDs.
-They are provenance/download files; consume the inline Icon for theme-aware UI.
+They are provenance/download files; consume Icon for theme-aware UI.
 The original seven families use `0 0 size size`; Close preserves the actual
 26/40/48-unit frames described below. All 24 exports are available.
 Replacement/design owner: Dimi; latest-needed task: this requested FS-1.3
@@ -173,8 +184,11 @@ are unchanged. Dimi owns final visual/device acceptance.
 1. Export the real Figma component for each supported size; do not assume the
    24-unit drawing is a scaled 48-unit drawing. Record its node and actual name.
 2. Add the unmodified export under `frontend/public/svg/icons/` and a row above.
-3. Add its logical name and exact geometry to `iconArtwork.tsx`, following the
-   current paint/ID adaptation. Add no loader, runtime SVG parser or dependency.
+3. Add its logical name in `iconMetadata.ts` and exact geometry in
+   `iconArtwork.tsx` (inline controls) or `spriteIconArtwork.tsx` (category/social
+   families listed in `spriteIconNames`). Follow the current paint/ID adaptation;
+   regenerate sprite artwork with `pnpm build:icons`. Add no runtime SVG parser
+   or dependency.
    The strict size record requires evidence for all three display sizes before
    publishing a family; retain and document any differing source viewBoxes.
 4. The gallery and name control use `iconNames`, so they include the family
@@ -204,8 +218,7 @@ Playback buttons are not rewired by this library task.
 Actual Games export bounds are 24×25, 36×37 and 48×49, including artwork outside
 the named Figma frames. Play/Pause remain non-square; Replay/48 retains its
 47.9981×47.9982 viewBox. The existing square display slots preserve proportions.
-No geometry is cropped, scaled into another size's paths or redrawn. The existing
-inline registry adapts black paint to currentColor and drops unused source IDs;
+No geometry is cropped, scaled into another size's paths or redrawn. The artwork registry adapts black paint to currentColor and drops unused source IDs;
 raw exports retain their original bytes. All exports contain only SVG/groups/paths,
 without scripts, handlers, linked resources or raster content.
 
@@ -231,7 +244,7 @@ the extra exported unit above its named 48-high frame. The existing square Icon
 slots preserve each drawing's proportions; no geometry is cropped or redrawn.
 Exports contain only SVG/groups/paths, with no scripts, event handlers, linked
 resources or raster content. The raw root's `display: block` style is retained
-in the source file; the shared Icon owns inline display/accessibility behavior.
+in the source file; the shared Icon owns SVG display/accessibility behavior.
 
 Gallery and Playground now expose **31 families / 93 size variants**. The WEB
 scene's existing **Web Aperture** tree row uses `s-web`; the Animations parent

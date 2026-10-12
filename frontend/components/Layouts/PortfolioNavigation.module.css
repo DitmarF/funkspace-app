@@ -131,6 +131,14 @@
   min-width: 0;
 }
 
+/* Keep text above the existing 4.5:1 project gate; the action color remains
+   the hover border cue rather than becoming low-contrast body text. */
+.choices[data-presentation="outlined"]
+  button:hover:not(:disabled):not([aria-pressed="true"]):not(:active) {
+  --control-foreground: var(--fs-color-content-primary);
+  --control-border: var(--fs-color-action-hover);
+}
+
 .choices button[aria-pressed="true"],
 .choices button[aria-pressed="true"]:hover:not(:disabled) {
   --control-foreground: var(--fs-color-content-inverse);

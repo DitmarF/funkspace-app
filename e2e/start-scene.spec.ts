@@ -565,7 +565,9 @@ test("actual On scene suspends for document/offscreen visibility and responds to
     .scrollIntoViewIfNeeded();
   await expect
     .poll(() =>
-      canvas(page).evaluate((node) => node.getBoundingClientRect().bottom),
+      page
+        .locator("[data-start-scene]")
+        .evaluate((node) => node.getBoundingClientRect().bottom),
     )
     .toBeLessThan(0);
   await stopped(page);
@@ -584,6 +586,9 @@ test("actual On scene suspends for document/offscreen visibility and responds to
   const overridden = await frames(page);
   await expect.poll(() => frames(page)).toBeGreaterThan(overridden + 2);
   await page.getByRole("button", { name: "Pause animation" }).click();
+  await expect(
+    page.getByRole("button", { name: "Resume animation" }),
+  ).toBeEnabled();
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await stopped(page);
   await expect(

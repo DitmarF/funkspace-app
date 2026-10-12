@@ -43,6 +43,44 @@ beforeEach(() => {
 afterEach(() => {
   vi.restoreAllMocks();
   document.body.innerHTML = "";
+  document.documentElement.removeAttribute("data-portfolio-pointer-focus");
+});
+
+it("keeps the pointer focus cue across route owners and clears it before keyboard focus", () => {
+  const h = createPortfolioNavigationHandoff();
+  const stop = h.observeDeparture(vi.fn());
+  document.dispatchEvent(new Event("pointerdown"));
+  expect(document.documentElement).toHaveAttribute(
+    "data-portfolio-pointer-focus",
+  );
+  const nextStop = h.observeDeparture(vi.fn());
+  stop();
+  stop();
+  expect(document.documentElement).toHaveAttribute(
+    "data-portfolio-pointer-focus",
+  );
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift" }));
+  expect(document.documentElement).toHaveAttribute(
+    "data-portfolio-pointer-focus",
+  );
+  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab" }));
+  expect(document.documentElement).not.toHaveAttribute(
+    "data-portfolio-pointer-focus",
+  );
+  document.dispatchEvent(new Event("pointerdown"));
+  nextStop();
+  expect(document.documentElement).not.toHaveAttribute(
+    "data-portfolio-pointer-focus",
+  );
+  const resumedStop = h.observeDeparture(vi.fn());
+  expect(document.documentElement).toHaveAttribute(
+    "data-portfolio-pointer-focus",
+  );
+  resumedStop();
+  document.dispatchEvent(new Event("pointerdown"));
+  expect(document.documentElement).not.toHaveAttribute(
+    "data-portfolio-pointer-focus",
+  );
 });
 
 it.each(["release-first", "arrival-first"])(

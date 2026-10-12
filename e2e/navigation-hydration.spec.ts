@@ -83,6 +83,10 @@ for (const width of [375, 1280]) {
           await expect(menu).toBeVisible();
           await expect(fallback).toHaveCount(0);
           await expect(footerLegal).toBeFocused();
+          // Footer focus scrolls down. The approved smart header is hidden
+          // there until the user reverses direction; reveal before pointer use.
+          if (width >= 768) await page.mouse.wheel(0, -80);
+          await expect(menu).toBeInViewport({ ratio: 1 });
           await menu.click();
           await expect(page.getByRole("dialog")).toHaveCount(1);
           await page.keyboard.press("Escape");

@@ -105,13 +105,22 @@ for (const route of ["/about", "/privacy", "/impressum"]) {
             clip: initialBox,
           });
           expect(await viewport()).toEqual({ width, height: 720 });
-          await expect(
-            tree.getByRole("link", {
+          if (route === "/about") {
+            const current = tree.getByRole("button", {
               name: "About",
               exact: true,
               includeHidden: true,
-            }),
-          ).toHaveAttribute("href", "/about");
+            });
+            await expect(current).toBeDisabled();
+            await expect(current).toHaveAttribute("aria-current", "page");
+          } else
+            await expect(
+              tree.getByRole("link", {
+                name: "About",
+                exact: true,
+                includeHidden: true,
+              }),
+            ).toHaveAttribute("href", "/about");
           release();
           const menu = page.getByRole("button", {
             name: "Menu: navigation and settings",

@@ -30,6 +30,7 @@ export default defineConfig({
         "**/*.test.{ts,tsx}",
         "**/node_modules/**",
         "**/.next/**",
+        "**/.next-dev/**",
         // Config files
         "**/*.config.{ts,tsx,js,mjs}",
         "**/next-env.d.ts",

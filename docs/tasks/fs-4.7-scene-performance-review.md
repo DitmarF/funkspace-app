@@ -1,5 +1,652 @@
 # FS-4.7 — Independent scene performance and failure review
 
+## FS-4.7 closure and authorized delivery — 2026-10-13
+
+**Status: COMPLETE — Dimi explicitly closed FS-4.7 on 2026-10-13.** His instruction
+was: “FS-4.7 are done, update the documetation then commit and push all changes.”
+This is the current task-status authority and supersedes the earlier BLOCKED
+status and return-to-measurement instructions below. Those entries retain their
+historical candidate, results and limitations.
+
+The [Codex correction re-review](#fs-47a-correction-re-review--2026-10-13) closes
+A1–A5; [FS-4.7B](#fs-47b--bounded-correction-disposition--2026-10-13) requires no
+additional correction. Dimi reports all manual smartphone, Safari and Firefox
+tests PASS. The reviewed implementation remains HEAD
+`749342717ddac85b67a3275d669363ef9bf86d2e` plus patch SHA-256
+`777659cbba4b81d64e417d84596ffdbbf23cf63ee6e63478b30652dee978342b`;
+all 46 non-documentation files retain their reviewed bytes before delivery.
+
+Closure is Dimi's task decision, not an invented measurement result. The missing
+raw phone performance/refresh/comfort packet and absence of a final-candidate
+Lighthouse rerun remain disclosed evidence limits. Earlier numerical budgets,
+LCP/CLS assertions and the On score warning are unchanged. Neither historical
+measurements nor Dimi's general manual PASS are relabeled as fresh numeric PASS.
+These limits no longer keep FS-4.7 open under Dimi's explicit closure instruction.
+
+Delivery includes all pending reviewed corrections, regression tests, generated
+icon delivery, preview isolation, touch/Safari focus fixes and their documentation
+on `feature/funkspace-minimum-usable`. Commit and push are now explicitly
+authorized; prior prohibitions below describe earlier task stages. Raw evidence
+packets linked in this record remain local artifacts outside the repository.
+
+**Next task: FS-4.8 — Dimi's final scene acceptance.** It remains separate and has
+not been performed or inferred from FS-4.7 closure. No PR, merge, deployment or
+publication is authorized by this delivery request.
+
+## FS-4.7B — bounded correction disposition — 2026-10-13
+
+**No additional correction needed for the supplied findings.** The requested
+Sites correction checkpoint was checked against the
+[current Codex re-review](#fs-47a-correction-re-review--2026-10-13), which closes
+A1–A5. Historical CHANGES REQUIRED entries below do not reopen those findings.
+No new scene/UI/runtime defect was assigned in this request.
+
+Candidate remains branch `feature/funkspace-minimum-usable`, HEAD
+`749342717ddac85b67a3275d669363ef9bf86d2e`, plus non-documentation patch SHA-256
+`777659cbba4b81d64e417d84596ffdbbf23cf63ee6e63478b30652dee978342b`.
+The current pending file set and all 46 file hashes match the accessible FS-4.7A
+evidence manifest. This checkpoint adds only this documentation section; there
+is no new implementation/test diff, build or independent approval claim.
+
+| Supplied finding               | Current reviewed disposition                                       | FS-4.7B action                                  |
+| ------------------------------ | ------------------------------------------------------------------ | ----------------------------------------------- |
+| A1 — initial JavaScript        | Closed; measured growth below 15 KiB in both flags.                | None; retain current delivery and budget.       |
+| A2 — media API setup crash     | Closed; optional setup/cleanup and production failure cases pass.  | None; retain static fallback.                   |
+| A3 — contracts / contrast      | Closed; approved UI contracts and contrast gate retained.          | None; no shared-policy handoff needed.          |
+| A4 — Storybook scan/readiness  | Closed; unfiltered scan and readiness checks pass.                 | None; retain regression coverage.               |
+| A5 — browser/focus regressions | Closed; automated checks and Dimi's reported manual PASS recorded. | None; retain focus, Pause and pointer behavior. |
+
+Validation for this documentation-only disposition: candidate file-set/hash
+comparison, review/contract consistency, section link, Prettier and
+`git diff --check`. All pass. Defect reproduction and new regression tests are
+not applicable because no unresolved defect is assigned; unit/browser/build and
+performance checks were not rerun. The preceding re-review's 1,906 tests and 170
+browser checks remain evidence from that review, not new results from this step.
+
+**Return to Codex / FS-4.7A:** no corrected source requires another independent
+re-review. Continue the outstanding measured-evidence work against this exact
+candidate: P01 phone traces/conditions and P02 current-candidate Lighthouse and
+final measurement packet. Missing measurements are not reclassified as cosmetic
+or silently passed. H01 / FS-4.8 remains open; no final acceptance is attempted.
+Dimi's manual PASS remains accepted for its stated scope.
+
+Unrelated pending work, shared motion policy and all running previews are
+preserved. No commit, push, PR, deployment or external handoff message was made.
+
+## FS-4.7A correction re-review — 2026-10-13
+
+**Current correction verdict: PASS; A1–A5 closed for the pending patch. No new
+actionable source finding. Dimi-reported manual smartphone/Safari/Firefox tests:
+PASS. Overall FS-4.7 remains BLOCKED on the measured evidence listed below;
+FS-4.8 acceptance remains open.** This dated entry supersedes the correction
+handoff and missing manual-confirmation status below, without rewriting their
+historical results.
+
+### Request, candidate and review scope
+
+Dimi reports: “I done all manual tests on my smartphone, safary and firefoxe,
+all test pass” and requests documentation and re-review of all changes required
+for `7493427`. This closes the outstanding user-reported usability confirmation,
+including the subsequent touch-hover and Safari focus repairs. It is a manual
+result supplied by Dimi, not a Codex-observed device session. No per-case checklist,
+current phone/browser/OS versions, viewport/DPR/refresh, timings or trace files
+accompany the report. Do not infer numeric budget compliance, a specific screen
+reader result, a timed comfort session or formal FS-4.8 acceptance from it.
+
+Reviewed branch: `feature/funkspace-minimum-usable`; HEAD:
+`749342717ddac85b67a3275d669363ef9bf86d2e`. The complete pending
+non-documentation patch includes 46 tracked/new implementation, configuration,
+generated-asset and test files. SHA-256:
+`777659cbba4b81d64e417d84596ffdbbf23cf63ee6e63478b30652dee978342b`.
+The [re-review evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/fs-4.7a-rereview-2026-10-13/README.md)
+contains this patch, per-file hashes, exact external test configurations, results
+and current bundle inventory. Documentation has its own final snapshot/hashes.
+
+Codex performed this source-read-only review in the same chat as implementation;
+it is not a second human reviewer. Only the five current status/task documents
+were edited. The full pending diff and new files were inspected against the
+current contract, prior finding resolutions and architecture checklist: icon
+source/delivery/geometry, optional header setup and cleanup, navigation focus
+ownership, offscreen Pause permission, hover/contrast, build isolation and test
+contract changes. Domain/controller/Canvas renderer, shared-service ownership,
+tokens and game integration remain unchanged by these corrections. No new
+dependency, scheduler, settings authority, engine or relaxed threshold was found.
+
+### Finding dispositions
+
+| Finding                         | Re-review disposition | Evidence                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1 — initial JavaScript         | **PASS / closed**     | Current On growth 2.11 KiB and Off 1.71 KiB, below the approved 15 KiB. Sprite transfer remains separately counted; source/export geometry and current Firefox pixels pass.                                                                                                                                                                       |
+| A2 — media API setup crash      | **PASS / closed**     | Optional setup is contained and partial cleanup is idempotent; current full adapter suite and production throwing getter/call, missing media, storage and no-JS cases pass in both compiled flags.                                                                                                                                                |
+| A3 — stale contracts / contrast | **PASS / closed**     | Assertions match Dimi's recorded spacing, typography, current-page, compact status and footer amendments. The existing 4.5:1 settings-text gate is preserved; no assertion is weakened to accept low contrast. Prior complete correction checks remain identified below.                                                                          |
+| A4 — Storybook scan/readiness   | **PASS / closed**     | One explicit unfiltered Axe owner, violation negative control and font/layout readiness; fresh form-field, essential-set and sticky-header browser checks pass.                                                                                                                                                                                   |
+| A5 — browser/focus regressions  | **PASS / closed**     | Pointer targets retain their position, keyboard clearance and offscreen Pause retain focus, and exact paint assertions remain. Current On/Off navigation lifecycle/focus/touch checks and Firefox focus/icon checks pass; Dimi reports manual browser/phone PASS. Earlier responsive/hydration delivery checks retain their own candidate labels. |
+
+The later preview repair uses separate `.next-dev`/`.next` output. Touch hover
+depends on pointer capability; Safari focus styling follows existing captured
+input without changing actual focus. Keyboard cues recover immediately and
+overlapping navigation owners release their resources. Their task records now
+include Dimi's manual confirmation rather than leaving it pending.
+
+### Current build and validation evidence
+
+| Flag | Production build ID     | Homepage modern gzip JS | Growth from same-flag 177,754 B baseline |
+| ---- | ----------------------- | ----------------------: | ---------------------------------------: |
+| On   | `KjrafQG-kqcdKVfCguqkh` |               179,919 B |                       2,165 B / 2.11 KiB |
+| Off  | `ZPhT2a3xV2ue9gjrGfEF3` |               179,501 B |                       1,747 B / 1.71 KiB |
+
+Method: unique initially required modern scripts in generated HTML, gzip level 9,
+mtime 0; compatibility scripts listed separately. Details-route initial JS is
+179,900 B On / 179,482 B Off. Sprite remains 52,285 B raw / 22,456 B gzip;
+removing executable artwork does not eliminate its network transfer. On is the
+existing final focus-repair production build at :3001; Off was freshly compiled
+from the current source in `/private/tmp/fs47-rereview-off`, tested on isolated
+:3797. All 46 pending non-documentation file hashes match that copy. Existing
+development and production previews were preserved.
+
+Fresh checks for this review:
+
+- `pnpm coverage --maxWorkers=2`: **123 files / 1,906 tests PASS**. Statements
+  87.48%, branches 85.37%, functions 86.37%, lines 89.64%; existing thresholds.
+- Frontend `tsc --noEmit`, `pnpm typecheck:validation`, `pnpm lint`: **PASS**,
+  including icon/bootstrap freshness, ESLint and repository formatting.
+- `NEXT_PUBLIC_ANIMATIONS_ENABLED=false pnpm --dir /private/tmp/fs47-rereview-off build`:
+  **PASS**, including token generation, common types, aperture checks and required
+  standalone game compilation. On and Storybook builds are the successful latest
+  focus-repair builds, reused without claiming a new build in this review.
+- Production Chromium: **64/64 On and 64/64 Off PASS**, one worker, zero retries.
+  Each run includes 43 route/dialog/touch/focus cases and 21 startup cases.
+- Firefox: **10/10 PASS**, five exact icon/fallback cases and five pointer/keyboard
+  route/dialog focus cases, one worker, zero retries.
+- Static Storybook: **32/32 PASS**, form-fields, essential-set and sticky-header,
+  isolated :3798, one worker, zero retries.
+- Documentation links/content, formatting and `git diff --check`: **PASS**.
+  Source hashes remained unchanged throughout this documentation/review task.
+
+Local environment: Node 22.22.0, pnpm 10.30.3, Playwright 1.55.1, installed Chrome
+154.0.8037.98 and automated Firefox 146.0.1 on the previously recorded macOS host.
+The manual Safari/Firefox versions in Dimi's new report are unspecified. No
+Safari automated run is claimed here. Prior full production suites, standalone
+browser checks, import graph, resource probes and Lighthouse results are retained
+with their original candidate and are not silently counted as fresh executions.
+
+### Remaining measured gate and FS-4.8 handoff
+
+The original section 7 matrix below belongs to clean `7493427`. Its A1–A5 failures
+are resolved by the correction evidence above; its absent general phone/Safari
+manual result is superseded by Dimi's report. It is not a newly measured complete
+acceptance matrix for this changed candidate.
+
+- **P01 remains BLOCKED** for the required current phone default/maximum callback
+  CPU and frame-delivery evidence: device/browser/build/viewport/DPR/refresh,
+  three 30-second samples after warm-up, raw samples/traces, separate paint and
+  compositing, and the recorded comfort-session conditions. The JS sub-budget
+  passes. Dimi's existing measurements can supply this packet; no failed phone
+  behavior or need to repeat completed manual tests is inferred.
+- **P02 current-candidate rerun: NOT RUN in this review.** The prior On/Off
+  Lighthouse LCP/CLS PASS and On score warning remain historical, with unchanged
+  5,000 ms / 0.1 assertions and 0.9 warning. A final measured packet must bind
+  those checks and sustained/resource evidence to its exact candidate; local
+  sample aggregation is never field p75.
+- **H01 / FS-4.8 remains open.** After the measured packet is complete, present
+  the exact candidate and any remaining limitations for Dimi's explicit EPIC
+  acceptance. The manual report is accepted for its stated scope; no unrelated
+  release, legal, export or remote-action approval is inferred.
+
+No implementation repair, commit, push, PR or deployment occurred in this review.
+
+## FS-4.7A correction — implementation and validation — 2026-10-12
+
+**Technical correction verdict: PASS for the locally validated A1–A5 scope.**
+This is a changed candidate for independent re-review, not independent closure or
+Dimi acceptance. Required physical Xperia / MacBook Safari evidence remains
+**BLOCKED**, as directed by Dimi; FS-4.8 remains not started.
+
+Dimi explicitly requested fixing all current findings. That authorizes these
+bounded implementation changes after the read-only review, not commit, push or
+deployment. One writer; pre-existing review/feature documentation and unrelated
+work were preserved. Base: `749342717ddac85b67a3275d669363ef9bf86d2e`, branch
+`feature/funkspace-minimum-usable`. The complete non-documentation correction
+patch (including generated and new files) has SHA-256
+`ecbbcf1ef2ed5bcec85b42fd4c1ff025ff7a51e6278ac9df649caa61853d7f19`.
+All 35 implementation/test/generated files match both final build copies and
+the repository; no commit was created. Documentation is recorded separately.
+
+[Accessible correction evidence](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/fs-4.7a-corrections-2026-10-12/README.md)
+contains the exact patch, per-file hashes, build IDs, commands/configurations,
+raw reports, failures, screenshots and traces. Builds are isolated under
+`/private/tmp/fs47fix/delivery-on` and `delivery-off`; existing :3000 / :3391 previews
+and the earlier review builds remain untouched. Actual local environment remains
+Mac17,2 / Apple M5, macOS 26.7, Chrome 154.0.8037.98, Firefox 146.0.1,
+Playwright 1.55.1, Node 22.22.0 and pnpm 10.30.3. Headless desktop results do not
+establish phone performance, physical refresh, Safari support or comfort.
+
+### Bounded corrections and retained contracts
+
+- **A1:** the 11 category/social icon families now use a generated same-origin
+  SVG sprite (33 authored sizes). Inline control icons, public Icon props,
+  accessible titles, Figma geometry and semantic colors remain intact. The
+  source registry feeds `build:icons`; `check:icons` detects drift. Development,
+  production and Storybook builds generate the asset. Exact PNG comparisons
+  across all four themes and three sizes test external references against inline
+  artwork in Chrome and Firefox; original export geometry is also checked.
+  Missing sprite leaves named navigation operable. No engine, dependency,
+  renderer migration, threshold relaxation or delayed navigation was introduced.
+- **A2:** sticky-header setup now contains media API getters/calls and partial
+  setup failures. Its idempotent cleanup releases every acquired resource even
+  if one disposer throws, removes enhancement attributes and preserves the
+  usable static header/homepage. Actual production throwing-getter/call cases
+  are exercised in both compiled flags. Existing anchor clearance is retained.
+- **A3:** updated stale assertions to the approved 96px section gap, 500 button
+  weight, screen-reader Motion status, disabled current destination, stationary
+  Off header and Privacy policy label. Appearance/Motion hover text keeps
+  primary contrast; the border supplies the semantic hover accent. A conflicting
+  navigation test was strengthened from 3:1 to the existing 4.5:1 settings gate.
+  No accessibility rule, native navigation, focus or no-JavaScript check was removed.
+- **A4:** form-field fixtures select manual addon mode before rendering; their
+  explicit unfiltered Axe scan is the sole owner. A deliberately unnamed button
+  proves violations are detected, then is removed before the clean scan. Sticky
+  Storybook measurements wait for fonts and delivered layout frames rather than
+  a fixed sleep. The implicated suites are repeated without retries.
+- **A5:** pointer focus no longer scrolls a button between press/release, fixing
+  Firefox's missed Pause click; keyboard clearance remains. The menu launcher
+  retains a consistent compositing origin across hydration; exact paint checks
+  retain zero tolerance. Enlarged mobile footer targets gain one semantic spacing
+  increment of menu clearance. Hydration tests reveal the approved hidden header
+  before clicking. Firefox geometry uses the painted path's screen transform and
+  declared mask geometry; target minima use native integer layout dimensions.
+  Chromium-only CDP touch is explicitly excluded from Firefox evidence.
+  Additional Firefox landscape checks exposed partially clipped native keyboard
+  focus at the viewport bottom. The existing adapter now clears that lower edge
+  on tablet/desktop, including when a tall header disables stickiness. Pointer
+  targets remain untouched. Two adapter cases cover enabled/oversized headers;
+  original browser geometry assertions are retained (a polling-only experiment
+  did not fix the issue and was removed).
+- **Additional A5 regression discovered during correction:** at 320×568 / 200%
+  text, tabbing to Pause scrolls the artwork offscreen; disabling that focused
+  control lost keyboard focus (three unchanged repeats failed). A ready scene
+  now accepts local Pause/Resume intent while offscreen, with intro/cover/occlusion
+  and hard-policy restrictions retained. The controller still forbids hidden
+  playback. A real-controller unit regression verifies focus, Pause persistence,
+  hidden Resume suppression and Off disabling; the original browser focus/geometry
+  assertions are unchanged. Only scene presentation changed; simulation,
+  controller, renderer and scheduling remain untouched.
+
+### Fresh budget and build evidence
+
+| Compiled flag | Build ID                | Initial modern gzip JS | Growth over same-flag 177,754-byte baseline | Approved ceiling |
+| ------------- | ----------------------- | ---------------------: | ------------------------------------------: | ---------------: |
+| On            | `FIl1YqNWzN4N8GEQgY8uA` |              179,379 B |                          1,625 B / 1.59 KiB |           15 KiB |
+| Off           | `O1fKPQWDjbKx-rETOLBvj` |              179,381 B |                          1,627 B / 1.59 KiB |           15 KiB |
+
+Method is unchanged: unique modern initial scripts from generated route HTML,
+gzip level 9 / mtime 0; no-module compatibility payload listed separately. The
+sprite is **52,285 B raw / 22,456 B gzip**, separately requested and cached. This
+moves artwork out of executable JavaScript and shortens HTML; it does not claim
+that all removed JS bytes disappear from network transfer. Per-route script,
+HTML and sprite hashes/bytes are in `bundle-delivery.json`. Homepage runtime
+import graph: 83 local files / 201 edges; zero game paths/imports. Lazy Canvas and
+game isolation remain separately checked; shared services retain their owners.
+
+### Validation performed
+
+| Check                            | Result and candidate scope                                                                                                                                                                                                                                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Full unit/coverage               | **PASS**, 123 files / 1,905 tests on delivery, two workers; statements 87.41%, branches 85.17%, functions 86.37%, lines 89.57%. Existing thresholds/exclusions unchanged.                                                                                                                                                |
+| Types / lint / generated checks  | **PASS**: frontend + validation TypeScript, ESLint, Prettier, icon/bootstrap freshness; build checks aperture assets.                                                                                                                                                                                                    |
+| Production / Storybook builds    | **PASS**, separately compiled delivery On/Off plus Storybook.                                                                                                                                                                                                                                                            |
+| Full Chrome production           | **367/367 On + 367/367 Off PASS** on the immediately preceding candidate, before the final lower-edge adapter correction.                                                                                                                                                                                                |
+| Final affected production        | **91/91 On PASS, clean exit** on delivery; **112/112 Off PASS, clean exit** combines the same 91 affected cases with 21 startup cases in one worker. Six affected suites include hydration, exact paint, keyboard, scene, native fallback and stationary/moving headers.                                                 |
+| Final startup fault matrix       | **21/21 On PASS, clean exit**; all 21 Off startup cases pass in the clean 112-case run. Includes actual throwing media getter/call, blocked storage and no-JS.                                                                                                                                                           |
+| Firefox                          | **109/109 portable scene/navigation/icon checks PASS** before final lower-edge correction; final **12/12 PASS**, three repeats each of short-landscape 100/200%, mobile 200% Pause focus and actual Pause/OS lifecycle, original strict assertions, clean exit. Chromium-only touch excluded, not counted PASS.          |
+| Storybook browsers               | **171/171 PASS**, then **96/96** threefold repeats for form-fields/essential-set/sticky; final adapter receives new build and **15/15** sticky repeats. No retries/rule filtering.                                                                                                                                       |
+| Standalone game                  | **PASS**, types + compiled demo; **18/18** browser regressions using existing unbundled mock/runtime fixture. No game imports in homepage graph.                                                                                                                                                                         |
+| Cold resources / optional bundle | **PASS**, five fresh contexts per flag, zero page errors. Optional Canvas aggregate **2,721 B gzip**, under 35 KiB; no optional scene request for denied System/reduce or no-JS, or any flag-Off sample. Explicit Reduced/Off still preparation remains the accepted contract.                                           |
+| Lighthouse                       | **PASS** LCP/CLS in both compiled flags, three serial samples each: On LCP 3,117–3,207 ms, Off 444–448 ms; CLS 0 in all six. On performance 80/82/81 retains the ≥90 warning; Off 100/100/100. Same desktop DevTools latency/throughput and local p75 aggregation; not field p75. No intro cost is attributed to Canvas. |
+
+Sprite network body is **22,014 B encoded / 52,285 B decoded** in local Next
+responses (different compressor from the standardized gzip-9 inventory); a later
+cached reference has zero body bytes. The cold-load screenshots retain the current
+WEB/nav artwork; the default On capture was visually inspected. These samples do
+not replace sustained performance/device measurements.
+
+Earlier correction iterations remain in the evidence packet: the first full
+scoped run had five stale hover assertions in each flag, plus the real enlarged
+Pause focus failure in On. Corrected contrast journeys passed 18/18 per flag;
+the unmodified failing focus journey reproduced three times before the source
+correction. Initial broader sprite experiments and interrupted runs are diagnostic
+history, not final passes. No failed run is silently relabeled green. The final On affected run completed
+naturally with exit 0. Final Off affected/startup runs passed all 91/21 assertions
+but stalled after browser shutdown and were interrupted (exit 130); their clean
+rerun is recorded separately. A full coverage run under concurrent browser load
+had one fixture timeout; the complete unchanged gate passes with two workers.
+One theme command omitted the required test flag, and a game harness initially
+used bundled preview instead of its unbundled interception fixture; corrected
+commands and failed raw logs are retained, not inferred application defects.
+
+### Limits and independent re-review handoff
+
+Re-review this exact changed patch/build pair for A1–A5. The original acceptance
+matrix below records the clean `7493427` review and is historical for this changed
+candidate; correction checks do not silently rewrite all rows to PASS. No fresh
+three-by-30-second defaults/maxima CPU, frame delivery, paint/compositing or
+physical-device session is claimed in this implementation pass. The particle
+loop/domain/controller/renderer are unchanged; the prior timing packet remains
+identified with its original candidate. Current phone/browser/refresh, comfort
+and Safari evidence still block the required device rows. Dimi's acceptance and
+FS-4.8 remain separate; no export or approval is invented.
+
+## FS-4.7A — current candidate review — 2026-10-12
+
+Historical review of clean `7493427`, before the authorized correction above.
+Its verdict and matrix remain attached to that original candidate.
+
+**Technical verdict: CHANGES REQUIRED. Required device evidence: BLOCKED.**
+The available local FS-4.7A review is complete; FS-4.7 acceptance is not complete
+and FS-4.8 is not ready. Dimi requests a fresh measured review after the
+extra maintenance tasks. Pinned clean source:
+`749342717ddac85b67a3275d669363ef9bf86d2e` on
+`feature/funkspace-minimum-usable`; no implementation patch. Existing findings
+and measurements below remain historical, not current passes. The scene source
+is protected throughout review; only review documentation and bounded evidence
+artifacts may change. No commit, push or deployment is authorized for this task.
+
+The supplied `/Users/dimi/Downloads/FunkSpace_EPIC_4_Detailed_Plan.md` sections
+4/7/9, accepted FS-4.1 resource table and later R18–R26 amendments govern this
+review. Current defaults are 286 / 0.2× / 0.1× / 100 links / 6× reach; maxima are
+1000 / 2× / 4× / 100 / 10×. WEB is built in; R5 repository-authored assets and
+R21 circle removal supersede the original export/circle prerequisites. No
+original Illustrator export or physical-device observation is invented.
+
+Plan: verify source/import graph and prior resolutions; run prerequisite order,
+types/lint/coverage, independently compiled On/Off builds, Storybook and
+production regressions; then serial cold-load/Lighthouse, sustained timing and
+resource/failure probes. Retain three 30-second samples after five-second warm-up
+for desktop and explicitly emulated mobile defaults/maxima. Map every section 7
+row and return bounded owner findings. Existing preview is preserved through
+isolated `/private/tmp/fs47a/on` and `/private/tmp/fs47a/off` copies and ports.
+
+Evidence packet:
+`/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/fs-4.7a-review-2026-10-12/`.
+Source hashes, full pre-scene-to-current diff and measurement harnesses are
+retained there. Dimi explicitly directs missing current Xperia and MacBook
+Safari evidence to remain **BLOCKED**, while available local work proceeds.
+
+### Current candidate and fresh checks
+
+Full historical comparison: 248 files; SHA-256
+`01d62b2a4bc4d28b6c81bacac2671810056d7a08ed1e71c464cd8d728377478d`.
+Supplied plan SHA-256:
+`9b910c45941989d599cd8bfe0109c17f0a4792d46cfec8ea8a1d68150cc57178`.
+Independent production build IDs: On `FIC54XLNZn67t_HSlQo0U`, Off
+`-rKoUN5NPo40W1qFYm3wd`. Both use actual compiled flags and identical source;
+generated files match the pinned candidate. No implementation/test patch.
+
+Actual local environment: Mac17,2 / Apple M5 / arm64, macOS 26.7 (25G229),
+Chrome 154.0.8037.98, Firefox 146.0.1, Playwright 1.55.1, Node 22.22.0,
+pnpm 10.30.3. Headless delivery is not physical refresh. Built-in display refresh
+was not reported; external displays report 50/60Hz. Xperia browser/version/
+viewport/DPR/refresh and current Safari observations remain missing.
+Existing :3000 and occupied :3391 previews were preserved; On tests used :3591.
+
+The [accessible local evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/fs-4.7a-review-2026-10-12/README.md)
+retains exact commands, results, hashes, traces, screenshots and review-only
+harnesses. Artifacts are outside Git; remote reviewers need the packet or a
+reproduction. Baseline files were actually read and copied with hashes.
+
+Reviewed the full diff inventory, runtime/shared-boundary deltas, affected tests,
+prior resolutions and current amendments. Resolved homepage/layout graph:
+82 files / 199 edges, including the lazy Canvas edge, no game-runtime import.
+Domain stays pure; scheduling/geometry stay in adapters; construction stays in
+`createServices`. No per-frame React state or competing preference authority;
+scene consumers do not initialize/dispose shared services. Historical F1–F7
+remain closed for their original candidate; later changes need fresh evidence.
+The new scan collision below is outside the corrected essential-set fixture.
+The previously fixed initial-anchor clearance is not reopened.
+
+| Check                                                           | Fresh result                                                                                                                                                                                                |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prerequisite order and types                                    | PASS: bootstrap freshness before generation; tokens; common types; game build before frontend consumers; frontend and validation types.                                                                     |
+| Focused Domain/controller/actual-adapter/shared regressions     | PASS: 35 files / 516 tests.                                                                                                                                                                                 |
+| Full tests and configured coverage                              | PASS: 123 files / 1,897 tests; statements 87.36%, branches 85.02%, functions 86.27%, lines 89.54%. Unchanged denominator/gates; not every tested layer is in coverage.                                      |
+| Dedicated bootstrap coverage                                    | PASS: 5 files / 61 tests; 100% of its configured scope.                                                                                                                                                     |
+| Lint                                                            | PASS; existing lint-command deprecation remains.                                                                                                                                                            |
+| Separate On/Off app builds, Storybook build, aperture validator | PASS; existing Storybook chunk advisory remains.                                                                                                                                                            |
+| Full Chrome production On                                       | FAIL: 348 pass / 14 fail / 362; no skips/retries.                                                                                                                                                           |
+| Full Chrome production Off                                      | FAIL: 344 pass / 18 fail / 362; no skips/retries.                                                                                                                                                           |
+| Dedicated theme startup On / Off                                | FAIL: each 19 pass / 2 fail, media-call/media-access crash. Storage access/read/write and absent-media cases pass.                                                                                          |
+| Full Storybook Chrome                                           | FAIL: 164 pass / 6 fail / 170; four weight expectations, Axe collision, sticky-header hide observation.                                                                                                     |
+| Unchanged form-fields / sticky-header repeats                   | 52 pass / 2 Axe failures / 54; all 15 sticky-header cases pass. Cleanup stalled after cases; interrupted exit 130, not a clean suite pass.                                                                  |
+| Supplemental BFCache                                            | PASS once per flag with actual persisted pageshow. External copy changes only module resolution/installed-Chrome launch; every assertion retained. Original bundled-browser setup failures remain recorded. |
+| Selected Firefox regressions                                    | FAIL: 95 pass / 10 fail / 105; two subpixel targets, six SVG bounds, unsupported mobile/CDP fixture, one Pause interaction. Pause case fails 3/3 unchanged repeats; see A5.                                 |
+| Installed WebKit                                                | BLOCKED before page creation: Playwright 1.55.1 / WebKit 2248 protocol error, “Only page targets are expected … frame”. No Safari result inferred.                                                          |
+| Standalone game                                                 | PASS: types, 58 files / 920 tests, demo build, 18 Chrome browser checks. No game source changes; shared/composition changes justify regression.                                                             |
+
+`browser-gates.json` retains individual outcomes, including direct routes,
+navigation/theme/logo, controls, delayed hydration and no-JS. No threshold,
+scan rule, assertion or retry policy was weakened. The external BFCache copy's
+exact change is `bfcache-harness.patch`, SHA-256
+`f61a5c0016c6bc6c61e698df0f758a15e71a4b77fd887498bdb3658ef7a5f935`;
+it does not change product identity.
+
+### Lifecycle, failures and replacement
+
+Twenty navigation cycles provide 141 snapshots; document origins show full
+departures, so these alone are not same-document leak proof. Twenty additional
+same-document mount/replacement/Reset/destroy cycles (101 snapshots), plus
+20 actual-composition subscription cycles, provide complementary evidence.
+Mounted maxima: one Canvas, one pending scene RAF, one ResizeObserver, one
+IntersectionObserver, one context-loss listener, one resolution listener and
+one theme/motion consumer subscription each. Settled paused/hidden RAF is zero;
+destroyed scenes retain zero owned Canvas/listeners/observers/subscriptions.
+These counts exclude logo/shared resources. Visibility is explicitly injected,
+not described as a physical background-tab test.
+
+Actual homepage fillRect, arc, setTransform, stroke, append and removal-after-
+native-removal faults all leave solid WEB, no Canvas, settled scheduling and
+usable navigation. The removal probe does not certify permanently hostile DOM
+removal. Current adapter/controller/browser tests cover delayed/rejected prepare,
+late resolution after destruction, null/lost Canvas, missing palette, missing/
+delayed/rejected assets and late image errors. Off/no-JS retain independent art.
+
+WEB/diamond replacement retains the existing handle/Canvas. Domain and Canvas
+update modules have no aperture-geometry dependency. Trusted export validation
+passes. R5 supersedes Illustrator delivery; R21 supersedes circle fallback.
+These are repository-authored assets, not Dimi originals. Practical replacement
+and visual acceptance remain distinct FS-4.8 evidence.
+
+### Bounded findings and owners
+
+1. **A1 — P2, initial JavaScript budget FAIL; Sites integration owner.** Unique
+   modern initial gzip: **201,193 bytes On / 201,195 Off**, versus same-flag
+   pre-scene **177,754**. Growth **23,439 / 23,441 bytes (22.89 KiB)** exceeds
+   the approved **15 KiB** by 8,079 / 8,081 bytes. This is whole-candidate growth,
+   including navigation/icons/shared maintenance, not all Canvas. Inspect initial
+   dependencies and bounded loading/splitting, then remeasure both flags. Keep
+   the approved budget; no engine/worker/WebGL migration.
+2. **A2 — P2, fail-open homepage regression; Sites sticky-header owner.**
+   `frontend/infrastructure/dom/StickyHeaderBinding.ts:12–15` reads/calls
+   `matchMedia` outside failure containment. A throwing getter or call escapes
+   the shell effect and replaces the page with Next's client exception screen
+   in both builds. Existing theme-startup tests and traces reproduce both.
+   Preserve the static page/header on failed setup, clean up anything acquired,
+   add bounded adapter coverage and rerun both existing fault cases. This is
+   separate from the closed anchor-clearance finding.
+3. **A3 — P2, integrated validation drift; navigation/control test owners.**
+   Reconcile recorded approvals with stale expectations: About gap 192→96px;
+   button weight 700→500; visually hidden Motion status; disabled current About;
+   stationary sticky header in Off; “Privacy policy” versus “Privacy”. Preserve
+   native/focus/no-JS/accessibility coverage. Light Motion hover still fails the
+   existing 4.5 project assertion at **3.0204** (24px/600). Large-text semantics
+   differ, but this review neither relaxes the gate nor invents approval. The
+   shared accessibility owner must reconcile the actual current contract.
+4. **A4 — P2, scan ownership; Storybook validation owner.** Explicit scans in
+   `e2e/storybook/form-fields.spec.ts:26` collide with the addon: once in the full
+   run and twice in three repeats. Apply the established single-owner pattern;
+   retain unfiltered scans and a negative control. No swallowed error/fixed sleep.
+   Review readiness for the first sticky-header light failure; 15 repeat passes
+   do not erase that failure or the cleanup interruption.
+5. **A5 — P2, unresolved interaction/paint gates; navigation/scene UI owners.**
+   Desktop hydration click timeouts, exact trigger PNG differences and Off
+   390×844/200% focus failure remain open. Some assumptions predate sticky
+   behavior; reproduce real journeys before choosing source/test correction,
+   preserving accepted hydration/focus behavior. Firefox's repeated Pause case
+   is **not loss of a confirmed Pause**: diagnostic clicks miss the button and
+   status remains “playing” before the OS change. Resolve click/scroll/layout
+   readiness, then rerun unchanged lifecycle assertions. Its SVG tests measure
+   mask definitions/nested viewport bounds; painted-path captures match Chrome
+   closely. Make measurements portable without merely widening tolerances.
+   CDP/isMobile supplies no Firefox touch evidence; retain the older subpixel
+   target follow-up separately. Not all ten failures are product defects.
+
+Sites owns bounded corrections; Codex independently rechecks the changed
+candidate. This is the owner handoff, not permission to repair/commit/push or
+begin FS-4.8.
+
+### Sustained performance and approved budgets
+
+Each of four conditions retained **three 30-second traces after five seconds of
+warm-up**, nearest-rank per-run/pooled p95, unthrottled installed headless Chrome,
+System/OS-allow, visible page, built-in WEB, default seed `0x46533431`. Defaults
+use the actual homepage; maximum uses the details page and native End-key slider
+changes to 1000 / 2× / 4× / 100 / 10×. No concurrent review test/build/Lighthouse
+work ran during these samples. Ordinary host activity is not controlled.
+
+| Condition                | Viewport / DPR | Callback p95, runs 1/2/3 (ms) | Draw-submission subset p95 (ms) | Delivery interval p95 (ms) | Frames, runs 1/2/3 |
+| ------------------------ | -------------- | ----------------------------- | ------------------------------- | -------------------------- | ------------------ |
+| Desktop defaults         | 1280×720 / 1   | 0.8 / 0.8 / 0.8               | 0.8 / 0.8 / 0.8                 | 16.8 / 16.8 / 16.7         | 1801 / 1800 / 1800 |
+| Desktop maximum          | 1280×720 / 1   | 1.3 / 1.3 / 1.3               | 1.3 / 1.3 / 1.3                 | 16.7 / 16.7 / 16.7         | 1800 / 1800 / 1801 |
+| Emulated mobile defaults | 390×844 / 3    | 0.9 / 0.8 / 0.9               | 0.8 / 0.8 / 0.9                 | 16.8 / 16.7 / 16.7         | 1800 / 1800 / 1801 |
+| Emulated mobile maximum  | 390×844 / 3    | 1.4 / 1.4 / 1.4               | 1.4 / 1.4 / 1.4                 | 16.7 / 16.8 / 16.8         | 1800 / 1800 / 1800 |
+
+21,603 callbacks retained. No sampled long task or interval above 1.5× each
+run's median. Per-frame non-draw remainder p95 is about 0.1ms in every run;
+it includes update, transforms, scheduling and instrumentation, not pure Domain
+CPU. Draw subset starts at fillRect; quantiles cannot be subtracted to derive
+update cost. Raw precision and per-run/pooled samples remain in the packet.
+These Mac results do **not** pass the required Xperia ≤6ms default / ≤10ms
+maximum CPU or default ≤20ms delivery budget at verified 60Hz. Those remain
+BLOCKED on real-device/browser/refresh evidence.
+
+Traces separately contain Blink paint-update p95 **0.006–0.007ms**, compositor
+commit **0.001–0.002ms**, DirectRenderer draw **0.009–0.047ms**, and presentation-
+event interval p95 **17.06–17.50ms**. Events belong to different threads/processes
+and may overlap; they are not added to callback CPU or called physical paint/GPU
+latency. Generic Paint/RasterTask names are absent, not zero-cost proof. Raw
+traces and `trace-analysis.json` retain counts/durations/GC observations.
+
+Actual desktop raster is **1184×400 = 473,600 pixels**. Emulated mobile uses
+CSS 319×200, raster **638×400 = 255,200 pixels**, proving the DPR-3 input is capped
+at 2. Both remain below 4,000,000 pixels / 4096px sides. Observed particle counts
+are 286/1000; CSS radii approximately 0.1003–0.2995 / 4.0077–11.9918px.
+Observed line counts desktop 3810/4464, mobile 4171/4534, below 4800. Adversarial
+Domain tests establish ≤38,400 candidate visits / ≤16 passes; these are not
+claimed as browser counters. Raster/count guards PASS locally; phone heat,
+stutter, input delay and comfort session remain NOT RUN.
+
+Initial JS fails A1. Unique additional Canvas chunk is
+`37.fdb5db788c83205a.js`: **6,206 raw / 2,721 gzip bytes (2.66 KiB)**, below the
+35 KiB aggregate optional-runtime budget, with already-initial dependencies
+excluded. It is fetched for enabled System/Reduced/Off; no optional chunk or
+Canvas for System+OS-reduce, no-JS, or any disabled-build choice. All ten cold
+captures have no page error; no-JS fetches no application scripts.
+Actual enabled-System JS encoded/transfer bytes: **204,625 / 208,225**; denied
+System: **201,897 / 205,197**; disabled build: **201,901 / 205,201**.
+These transport totals include server compression/headers and are separate from
+the identical Python gzip-9/mtime-0 budget calculation, independently reproduced.
+Details-route initial gzip is 201,175/201,177 bytes; no pre-scene details route
+exists for a like-for-like delta.
+
+Homepage HTML raw/gzip On: **112,833 / 30,169**, baseline **68,658 / 16,458**;
+Off: **112,835 / 30,170**, baseline **68,659 / 16,461**. This growth is recorded,
+not assigned an invented byte ceiling. Settled default DOM counts are 454 On /
+457 Off, with zero per-particle SVG circle/line nodes in Start. Asset selection
+and masks remain independent of these DOM counts.
+
+Twenty real menu clicks (ten defaults, ten maxima) at 1280×900 give p95 input
+delay **1.0 / 0.6ms**, dialog-open mutation **3.8 / 2.0ms**, and two-RAF opportunity
+**31.4 / 31.5ms**. Retained Event Timing maxima are 32/24ms. This is bounded local
+responsiveness evidence, not field INP, physical paint latency or phone comfort.
+
+### Lighthouse and pre-scene comparison
+
+Both separately compiled builds PASS the unchanged three-run desktop DevTools
+LCP≤5000ms and CLS≤0.1 local-p75 error assertions. Conditions: 1350×940 DPR 1,
+150ms request latency, 9216 Kbit/s up/down, CPU multiplier 1. The score≥0.9
+warning remains unchanged. Local sample aggregation is not field p75.
+
+| Build | Current LCP, three runs (ms)   | CLS       | Scores                      | Accessible pre-scene comparison        |
+| ----- | ------------------------------ | --------- | --------------------------- | -------------------------------------- |
+| On    | 3138.821 / 3166.655 / 3130.983 | 0 / 0 / 0 | 0.81 / 0.81 / 0.82; warning | 3081.097–3093.192ms, CLS 0, score 0.82 |
+| Off   | 447.822 / 443.310 / 443.875    | 0 / 0 / 0 | 1 / 1 / 1                   | 455.000–462.171ms, CLS 0, score 1      |
+
+Baseline is the actual FS-4.1B capture at `1ab13095…`, retained with its original
+date, same flag/profile and Chrome 154.0.8037.57; current Chrome is .98. It was
+read, not rerun. Baseline hardware probes were restricted. Timing differences
+are not a controlled causal estimate of Canvas alone.
+Current unthrottled cold On capture reaches intro-visible at 2328.2ms, first
+scene draw at 2344.8ms, and text-paragraph LCP at 2348ms. This is separate from
+throttled Lighthouse and supports keeping intro/scene attribution distinct.
+Real-clock Reduced second-tab waiting/menu/fading/visible phases also passed.
+
+### Section 7 acceptance mapping — current candidate only
+
+PASS below is scoped to the stated fresh local evidence. An overall row with a
+required missing device/manual part is BLOCKED, even where local checks pass.
+FAIL can identify an unfulfilled validation gate without claiming every failed
+assertion is a product defect. Current amendments supersede stale plan wording.
+
+| Row | Status  | Evidence and limits                                                                                                                                                                                                                                  |
+| --- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| S01 | PASS    | Pure deterministic seed/config/delta, reset and clamp regressions; current full suite.                                                                                                                                                               |
+| S02 | PASS    | Invalid/extreme configuration tests, 1,000-count ceiling, radius/speed normalization and actual raster guards. Current source retains ≤4,800 lines, ≤38,400 candidate checks, ≤16 passes.                                                            |
+| S03 | PASS    | Domain identity/relative-resize and actual-adapter DPR tests; browser resize behavior. DPR changes raster, not simulation physics.                                                                                                                   |
+| L01 | PASS    | Actual-adapter tests and scene-owned probes: ≤1 pending RAF; settled Pause/destroy zero. Firefox failed click does not establish a paused controller violation.                                                                                      |
+| L02 | PASS    | Delayed/rejected preparation, teardown generation and late disposal tests; real delayed import/route cases.                                                                                                                                          |
+| L03 | PASS    | 20 same-document mounts and actual-composition subscription cycles, plus separate 20 route cycles; bounded counts above. No heap-retention certification beyond measured resources.                                                                  |
+| L04 | BLOCKED | Chrome document/offscreen/overlay suspension and Pause preservation pass; Xperia real background/foreground and comfort observations missing. Injected visibility is labeled.                                                                        |
+| A01 | BLOCKED | WEB/diamond local themes/aspects exercised; Safari/Dimi visual evidence missing, Firefox geometry-test portability unresolved. Circle wording NOT APPLICABLE under R21; Dimi-original-export prerequisite superseded by R5.                          |
+| A02 | PASS    | Current concurrent-instance/ID/cover browser checks and SceneAperture tests; no logo-ID collision or exposed-strip failure in local checks.                                                                                                          |
+| A03 | PASS    | Actual built-in WEB, rejected/missing/delayed second asset, mask capability and late-image failure coverage; complete fallback. Firefox mask-definition bounds failures are not accepted as painted-geometry evidence.                               |
+| A04 | PASS    | Replacement changes selection/asset geometry, not Domain/Canvas updates; same mounted handle/Canvas retained in probe. Repository-authored provenance recorded, no invented Dimi export.                                                             |
+| M01 | FAIL    | Normal pending/unknown/reduced/off/flag-off behavior passes, but throwing media API crashes the homepage via sticky setup (A2). Explicit Reduced/Off still-Canvas preparation is allowed by later amendments; denied System/flag-off remains static. |
+| M02 | PASS    | Actual On override and independent feature/readiness/visibility/Pause gates pass in Chrome and current controller tests.                                                                                                                             |
+| M03 | BLOCKED | Chrome Pause/theme/preference/environment/Reset checks pass. Firefox repeat fails before Pause activation (A5); required Dimi/device confirmation missing.                                                                                           |
+| T01 | PASS    | Recolor-in-place and blocked storage access/read/write cases pass; no second settings authority. Separate media API crash is retained under M01/A2.                                                                                                  |
+| C01 | PASS    | Current labels/effective values/help, native keyboard ranges, extrema and live control tests; maxima set through native End keys for measurements.                                                                                                   |
+| C02 | PASS    | Stable Canvas/handle across sliders and Reset, retained local/global restrictions; no second preview loop.                                                                                                                                           |
+| C03 | PASS    | Reopen retains local values, reload/new mount restores R20 defaults; no scene storage writes in regression coverage.                                                                                                                                 |
+| O01 | PASS    | One-modal ownership, release-before-switch, opening failures, route teardown and scroll-lock tests.                                                                                                                                                  |
+| O02 | FAIL    | Broad current focus gate remains red: old scrolled-invoker assumption, desktop hydration click and Off enlarged focus cases require bounded owner resolution (A3/A5). Earlier isolated passes do not close the gate.                                 |
+| O03 | FAIL    | Native continuity cases exercised, but desktop hydration completion journeys and exact trigger paint checks fail (A5). Keep accepted focus/hydration contract; no relaxed screenshot assertion.                                                      |
+| F01 | PASS    | Actual homepage Canvas failures retain complete art and stop scheduling; six additional exception probes plus null/context-loss regressions. A2 concerns a different shell failure and remains blocking.                                             |
+| F02 | PASS    | Current no-JS artwork, semantic content and native navigation/controls pass. Broad legal-journey test has stale Privacy label; no-JS runtime is not called an overall full-suite pass.                                                               |
+| P01 | FAIL    | Initial-JS delta exceeds approved budget (A1). Local sustained/raster evidence is recorded separately; required physical phone CPU/delivery/comfort evidence remains BLOCKED.                                                                        |
+| P02 | PASS    | Actual separate On/Off builds pass unchanged Lighthouse LCP/CLS criteria; On score warning retained. Cold traces distinguish intro/scene work. Local comparison limitations above, no field-p75 claim.                                               |
+| U01 | FAIL    | Current Chrome scene-control, forced-color and short/enlarged cases pass; broad Off focus and contrast gates remain unresolved. Manual/assistive/device parts BLOCKED, not replaced by Axe.                                                          |
+| G01 | PASS    | Resolved import graph excludes game runtime; fresh standalone types/920 tests/demo build/18 browser cases pass after shared/composition changes.                                                                                                     |
+| H01 | BLOCKED | Dimi has not accepted this exact candidate under FS-4.8. Technical failures and required device evidence remain open.                                                                                                                                |
+
+### Technical handoff and FS-4.8 prerequisites
+
+**CHANGES REQUIRED** for A1–A5; **BLOCKED** for required Xperia/Safari and human
+acceptance. Local measurement completion is not technical PASS, Dimi acceptance
+or EPIC completion. Complete bounded owner corrections, independently review
+their exact diff and rerun affected gates/budgets; preserve thresholds and all
+four motion choices. Record current Xperia XQ-CC54 browser/Android version,
+actual viewport/DPR/refresh, three warmed default/max samples and comfort/input/
+heat observations; obtain current MacBook Safari functional/visual evidence.
+Then Dimi can review the exact homepage build, WEB appearance, static modes,
+controls, practical replacement and phone readability for FS-4.8.
+
+Only this task record and the feature-plan status change in the repository.
+Application/test/generated sources remain unchanged. Documentation formatting,
+local links, acceptance-row coverage, diff and final source integrity are checked
+at handoff; exact review-document patch/hash is in the local packet. No commit,
+push, PR, deployment, publication or source repair was performed.
+
+### Earlier review history
+
 Latest functional handoff: the [2026-10-05 pending-candidate review](#pending-candidate-review-and-authorized-delivery--2026-10-05) returns **PASS for the reviewed change scope**, with no actionable regression found. [Codex R3](#codex-r3--f7-correction-re-review--2026-09-30) previously closed F7; F1–F6 remain closed by R2. Overall FS-4.7 is **BLOCKED** on required Xperia/Safari evidence; FS-4.8 acceptance remains outstanding.
 
 **Later tuning — 2026-10-01:** [R20 defaults](fs-4.1-scene-contract.md#r20--web-animation-defaults--2026-10-01) change count/speed/size to 286 / 0.2× / 0.1×. This review and its performance samples remain tied to the pinned earlier candidate (200 / 0.4× / 1×); no performance PASS for the new defaults is inferred. Required future default measurements must use R20.

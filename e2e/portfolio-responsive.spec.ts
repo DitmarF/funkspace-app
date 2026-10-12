@@ -61,37 +61,43 @@ async function expectDocumentFlow(page: Page) {
 
 async function expectClearFocus(link: Locator) {
   await expect(link).toBeFocused();
-  expect(
-    await link.evaluate((node) => {
-      const box = node.getBoundingClientRect();
-      const css = getComputedStyle(node);
-      const point = document.elementFromPoint(
-        box.x + box.width / 2,
-        box.y + box.height / 2,
-      );
-      const trigger = document.querySelector(
-        'button[aria-label="Menu: navigation and settings"]',
-      );
-      const triggerBox = trigger?.getBoundingClientRect();
-      const overlapsTrigger =
-        trigger !== node &&
-        triggerBox &&
-        box.left < triggerBox.right &&
-        box.right > triggerBox.left &&
-        box.top < triggerBox.bottom &&
-        box.bottom > triggerBox.top;
-      return (
-        box.left >= 0 &&
-        box.right <= innerWidth + 1 &&
-        box.top >= 0 &&
-        box.bottom <= innerHeight + 1 &&
-        css.outlineStyle !== "none" &&
-        parseFloat(css.outlineWidth) > 0 &&
-        !overlapsTrigger &&
-        (node === point || node.contains(point))
-      );
-    }),
-  ).toBe(true);
+  const result = await link.evaluate((node) => {
+    const box = node.getBoundingClientRect();
+    const css = getComputedStyle(node);
+    const point = document.elementFromPoint(
+      box.x + box.width / 2,
+      box.y + box.height / 2,
+    );
+    const trigger = document.querySelector(
+      'button[aria-label="Menu: navigation and settings"]',
+    );
+    const triggerBox = trigger?.getBoundingClientRect();
+    const overlapsTrigger =
+      trigger !== node &&
+      triggerBox &&
+      box.left < triggerBox.right &&
+      box.right > triggerBox.left &&
+      box.top < triggerBox.bottom &&
+      box.bottom > triggerBox.top;
+    const clear =
+      box.left >= 0 &&
+      box.right <= innerWidth + 1 &&
+      box.top >= 0 &&
+      box.bottom <= innerHeight + 1 &&
+      css.outlineStyle !== "none" &&
+      parseFloat(css.outlineWidth) > 0 &&
+      !overlapsTrigger &&
+      (node === point || node.contains(point));
+    return {
+      clear,
+      label: node.textContent,
+      box: box.toJSON(),
+      triggerBox: triggerBox?.toJSON(),
+      point: point?.outerHTML,
+      outline: css.outlineStyle,
+    };
+  });
+  expect(result.clear, JSON.stringify(result)).toBe(true);
 }
 
 for (const viewport of viewports) {
@@ -199,7 +205,14 @@ for (const viewport of viewports) {
             ).toBe(true);
             if (viewport.width >= 768) {
               await page.keyboard.press("End");
-              await expect(menu).not.toBeInViewport();
+              const shell = page.locator("main").locator("..");
+              if ((await shell.getAttribute("data-sticky-header")) !== null) {
+                // Off/Reduced keep the approved stationary sticky navigation.
+                const moving =
+                  (await shell.getAttribute("data-header-motion")) === "true";
+                if (moving) await expect(menu).not.toBeInViewport();
+                else await expect(menu).toBeInViewport({ ratio: 1 });
+              } else await expect(menu).not.toBeInViewport();
             }
           }
         }
@@ -317,7 +330,7 @@ test("emulated touch scroll moves the document and reaches the footer", async ({
   });
   const page = await context.newPage();
   try {
-    await page.goto("http://localhost:3000/");
+    await page.goto("/");
     const session = await context.newCDPSession(page);
     await session.send("Input.dispatchTouchEvent", {
       type: "touchStart",
@@ -335,9 +348,9 @@ test("emulated touch scroll moves the document and reaches the footer", async ({
     await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
     const privacy = page
       .getByRole("navigation", { name: "Footer" })
-      .getByRole("link", { name: "Privacy" });
+      .getByRole("link", { name: "Privacy policy" });
     await privacy.tap();
-    await expect(page).toHaveURL("http://localhost:3000/privacy");
+    await expect(page).toHaveURL(/\/privacy$/);
     await expectDocumentFlow(page);
   } finally {
     await context.close();

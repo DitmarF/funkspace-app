@@ -165,14 +165,24 @@ it("keeps Contact disabled and renders the matching destination artwork", () => 
     const row = screen.getByText(label, { exact: true }).closest("a, summary")!;
     for (const size of [24, 36]) {
       const icon = row.querySelector(`:scope > svg[width="${size}"]`)!;
+      expect(icon.querySelector("use")).toHaveAttribute(
+        "href",
+        `/svg/icons/sprite.svg#${family}-${size}`,
+      );
       const source = new DOMParser().parseFromString(
         readFileSync(`frontend/public/svg/icons/${family}-${size}.svg`, "utf8"),
         "image/svg+xml",
       );
       expect(
-        [...icon.querySelectorAll("path")].map((path) =>
-          path.getAttribute("d"),
-        ),
+        [
+          ...new DOMParser()
+            .parseFromString(
+              readFileSync("frontend/public/svg/icons/sprite.svg", "utf8"),
+              "image/svg+xml",
+            )
+            .getElementById(`${family}-${size}`)!
+            .querySelectorAll("path"),
+        ].map((path) => path.getAttribute("d")),
       ).toEqual(
         [...source.querySelectorAll("path")].map((path) =>
           path.getAttribute("d"),

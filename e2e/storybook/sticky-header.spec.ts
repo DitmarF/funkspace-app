@@ -8,7 +8,13 @@ for (const theme of ["light", "dark", "muted", "highContrast"]) {
     );
     const shell = page.locator("[data-sticky-header]");
     await expect(shell).toHaveCount(1);
-    await page.evaluate(() => scrollTo(0, 600));
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      );
+      scrollTo(0, 600);
+    });
     await expect(shell).toHaveAttribute("data-header-hidden", "true");
     await page.evaluate(() => scrollTo(0, 570));
     await expect(shell).toHaveAttribute("data-header-hidden", "false");

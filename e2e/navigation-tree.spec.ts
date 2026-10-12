@@ -45,11 +45,25 @@ for (const width of [320, 768, 1280]) {
         "viewBox",
         raw.match(/viewBox="([^"]+)"/)![1],
       );
-      expect(
-        await icon
-          .locator("path")
-          .evaluateAll((paths) => paths.map((path) => path.getAttribute("d"))),
-      ).toEqual([...raw.matchAll(/ d="([^"]+)"/g)].map((match) => match[1]));
+      await expect(icon.locator("use")).toHaveAttribute(
+        "href",
+        `/svg/icons/sprite.svg#${family}-${size}`,
+      );
+      const sprite = await page.request.get("/svg/icons/sprite.svg");
+      expect(sprite.ok()).toBe(true);
+      const paths = await icon.evaluate(
+        (_, { text, id }) =>
+          [
+            ...new DOMParser()
+              .parseFromString(text, "image/svg+xml")
+              .getElementById(id)!
+              .querySelectorAll("path"),
+          ].map((path) => path.getAttribute("d")),
+        { text: await sprite.text(), id: `${family}-${size}` },
+      );
+      expect(paths).toEqual(
+        [...raw.matchAll(/ d="([^"]+)"/g)].map((match) => match[1]),
+      );
     }
     await page.screenshot({
       path: testInfo.outputPath(`navigation-${width}.png`),

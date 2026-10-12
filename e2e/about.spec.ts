@@ -45,7 +45,7 @@ test("full-width preview typography and reading spacing respond to the viewport"
     expect(geometry.copyRight).toBeCloseTo(geometry.expectedRight, 0);
     expect(geometry.copyGap).toBe("48px");
     expect(geometry.headingGap).toBeCloseTo(64, 0);
-    expect(geometry.gap).toBe(width < 768 ? "64px" : "192px");
+    expect(geometry.gap).toBe(width < 768 ? "64px" : "96px");
     const more = preview.getByRole("link", { name: "More about FunkSpace" });
     await expect(more).toHaveText("more");
     await expect(more).toHaveCSS("border-width", "2px");

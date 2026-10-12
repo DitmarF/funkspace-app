@@ -2,7 +2,14 @@ import { expect, test } from "@playwright/test";
 import { openSettings } from "./helpers/foundation";
 test.use({
   channel: "chromium",
-  launchOptions: { ignoreDefaultArgs: ["--disable-back-forward-cache"] },
+});
+test.use({
+  launchOptions: async ({ launchOptions }, use) => {
+    await use({
+      ...launchOptions,
+      ignoreDefaultArgs: ["--disable-back-forward-cache"],
+    });
+  },
 });
 test("N5 real BFCache return keeps the overlay closed and usable", async ({
   page,

@@ -1,4 +1,5 @@
 frontend/.next
+frontend/.next-dev
 pnpm-lock.yaml
 .lighthouse/
 .lighthouseci/

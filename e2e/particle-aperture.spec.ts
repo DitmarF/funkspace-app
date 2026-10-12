@@ -260,7 +260,22 @@ for (const sceneRoute of ["/", "/animations/aperture"]) {
           const fallbackElement = element.querySelector(
             "[data-aperture-fallback]",
           )!;
-          const fallback = fallbackElement.getBoundingClientRect();
+          // SVG viewport bounding boxes differ between engines. Transform the
+          // declared artwork viewBox through its actual screen matrix instead.
+          const svg = fallbackElement as SVGSVGElement;
+          const box = svg.viewBox.baseVal;
+          const matrix = svg.querySelector("path")!.getScreenCTM()!;
+          const first = new DOMPoint(box.x, box.y).matrixTransform(matrix);
+          const last = new DOMPoint(
+            box.x + box.width,
+            box.y + box.height,
+          ).matrixTransform(matrix);
+          const fallback = {
+            x: first.x,
+            y: first.y,
+            width: last.x - first.x,
+            height: last.y - first.y,
+          };
           const path = element
             .querySelector("[data-aperture-fallback] path")!
             .getBoundingClientRect();
@@ -337,9 +352,19 @@ for (const sceneRoute of ["/", "/animations/aperture"]) {
         await scene.scrollIntoViewIfNeeded();
         await expect(aperture).toHaveAttribute("data-aperture", "web");
         await expect(aperture).toHaveAttribute("data-mask-ready", "true");
-        const opening = await aperture.locator("mask image").boundingBox();
-        const coverBox = await aperture.boundingBox();
-        expect(opening!.width / coverBox!.width).toBeCloseTo(
+        // Definitions have no painted bounds in Firefox. Inspect native image
+        // fitting and its composed scale; retained screenshots cover masking.
+        const openingFraction = await aperture
+          .locator("mask image")
+          .evaluate((image) => {
+            const scale = new DOMMatrixReadOnly(
+              getComputedStyle(image.parentElement!).transform,
+            ).a;
+            return (
+              (Number.parseFloat(image.getAttribute("width")!) / 100) * scale
+            );
+          });
+        expect(openingFraction).toBeCloseTo(
           assetState === "delayed" ? 0.96 : 0.8,
           3,
         );

@@ -14,9 +14,9 @@
     "pnpm": "10.30.3"
   },
   "scripts": {
-    "lint": "pnpm check:theme-bootstrap && pnpm --filter frontend exec next lint --max-warnings=0 && prettier --check .",
-    "test": "pnpm check:theme-bootstrap && vitest run",
-    "coverage": "pnpm check:theme-bootstrap && vitest run --coverage",
+    "lint": "pnpm check:icons && pnpm check:theme-bootstrap && pnpm --filter frontend exec next lint --max-warnings=0 && prettier --check .",
+    "test": "pnpm check:icons && pnpm check:theme-bootstrap && vitest run",
+    "coverage": "pnpm check:icons && pnpm check:theme-bootstrap && vitest run --coverage",
     "test:theme-bootstrap": "pnpm check:theme-bootstrap && vitest run --config vitest.theme-bootstrap.config.ts --coverage",
     "build:theme-bootstrap": "node scripts/build-theme-bootstrap.mjs",
     "check:theme-bootstrap": "node scripts/build-theme-bootstrap.mjs --check",
@@ -39,7 +39,9 @@
     "lhci:off": "cross-env NEXT_PUBLIC_ANIMATIONS_ENABLED=false pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.off.json",
     "lhci:on": "cross-env NEXT_PUBLIC_ANIMATIONS_ENABLED=true pnpm run lhci:build && lhci autorun --config=.lighthouse/lighthouserc.on.json",
     "lhci:ci": "pnpm run lhci:off && pnpm run lhci:on",
-    "check:scene-apertures": "node --import tsx scripts/check-scene-apertures.mjs"
+    "check:scene-apertures": "node --import tsx scripts/check-scene-apertures.mjs",
+    "build:icons": "node --import tsx scripts/build-icon-sprite.mjs",
+    "check:icons": "node --import tsx scripts/build-icon-sprite.mjs --check"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",

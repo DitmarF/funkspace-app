@@ -1,5 +1,57 @@
 # Maintenance — Web Aperture details and compact customization
 
+## Dimi manual confirmation — 2026-10-13
+
+Dimi reports all manual smartphone, Safari and Firefox tests pass. The pending
+physical-phone confirmation of the touch-hover correction below is therefore
+**Dimi-reported manual PASS**. Browser versions and individual test steps were
+not supplied; no numeric performance result is inferred. See the
+[combined re-review](fs-4.7-scene-performance-review.md#fs-47a-correction-re-review--2026-10-13)
+for the current candidate and separate FS-4.7/FS-4.8 status.
+
+## Touch hover correction — 2026-10-13
+
+Dimi reported that Reset and Full field retain the hover accent after a mobile
+tap. Reproduced in Chromium with a touch pointer at 375px: after tapping Full field,
+its text/border remained `rgb(204, 103, 59)` instead of the resting content color.
+The new browser regression fails on the pre-fix CSS at that assertion.
+
+The shared `controlAppearance.module.css` owns this behavior for Button,
+ButtonLink and HexButton. Gate its two hover rules with `(hover: hover) and
+(pointer: fine)`, independently of viewport width. Native pressed feedback,
+focus-visible rings, disabled/pending styling and persistent switch/selection
+semantics remain unchanged. No blur handler, dialog-specific override or new
+input authority is introduced. Existing Storybook stories inherit the fix.
+
+Candidate: `749342717ddac85b67a3275d669363ef9bf86d2e` plus the preserved pending
+FS-4.7A/preview corrections and this bounded CSS/test/documentation patch. Codex
+is the current writer; this new repair does not inherit historical commit/push
+authorization or confer EPIC acceptance.
+
+New `e2e/customization-pointer-states.spec.ts` exercises
+touch at 375/820px and mouse at 375/1280px, Full field toggling, Reset, keyboard
+focus/Space activation, Escape and focus return. Validation:
+
+- Four browser cases PASS on development :3000 and all four PASS on production
+  :3001, after reproducing the pre-fix failure. Chromium touch emulation is not
+  physical-phone acceptance.
+- Frontend TypeScript, validation TypeScript, `pnpm lint` and diff checks PASS.
+- Button, HexButton and SceneCustomization unit tests: 34/34 PASS.
+- `pnpm check:theme-bootstrap && pnpm build && pnpm storybook:build`: PASS.
+  Production build ID: `UUB_a2MUIQuq_NwFTBIPC`; :3001 restarted with the fix.
+  Existing Storybook module-directive/chunk-size advisories remain warnings.
+- Storybook Button matrix/HexButton checks initially passed 16/17. The first
+  default-theme hover assertion failed while build jobs were also active; no
+  cause is confirmed. Three unchanged isolated repeats of that case PASS.
+  The complete unchanged suite then passed 17/17. No assertion or threshold was
+  changed to obtain those passes.
+
+Only the shared appearance CSS, new browser regression and this task record
+change for this repair. Existing stories receive the shared CSS; no extra story
+or runtime state is needed. The development and phone production previews remain
+available. Reload the phone page to fetch the new stylesheet. No commit, push or
+deployment; physical-phone confirmation remains Dimi's next check.
+
 ## Task metadata
 
 - **Status:** Implemented and reviewed; technical checks passed. Dimi authorized documentation, commit and push on 2026-10-12. This is not EPIC 4 acceptance or FS-4.7/4.8 completion.

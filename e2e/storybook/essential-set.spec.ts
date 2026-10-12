@@ -126,7 +126,7 @@ for (const theme of themes) {
     expect([heading.fontWeight, field.fontWeight, control.fontWeight]).toEqual([
       "600",
       "400",
-      "700",
+      "500",
     ]);
     for (const family of [environment.display, environment.sans])
       expect(

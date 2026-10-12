@@ -128,6 +128,17 @@ export default function StartScene({
       : snapshot?.blockers.find(
           (value) => value !== "local-pause" && value !== "runtime-not-ready",
         );
+  // Keyboard focus can scroll the artwork offscreen while its controls remain
+  // visible. Keep local intent usable for a prepared scene; the controller still
+  // suspends playback until visibility returns. Hard restrictions stay disabled.
+  const canSetOffscreenPause =
+    snapshot?.status === "ready" &&
+    introReady &&
+    coverReady &&
+    !occluded &&
+    snapshot.blockers.every(
+      (value) => value === "consumer-hidden" || value === "local-pause",
+    );
   const message = snapshot?.paletteUnavailable
     ? "Scene colors are unavailable. Artwork stays still."
     : restriction
@@ -175,7 +186,10 @@ export default function StartScene({
                     : "Pause animation"
                 }
                 variant="outlined"
-                disabled={Boolean(restriction) || snapshot.reducedMotion}
+                disabled={
+                  (Boolean(restriction) && !canSetOffscreenPause) ||
+                  snapshot.reducedMotion
+                }
                 aria-describedby={statusId}
                 onClick={() =>
                   snapshot.locallyPaused

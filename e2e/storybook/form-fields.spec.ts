@@ -10,7 +10,7 @@ async function open(page: Page, story: string, theme = "default") {
         ? "highContrast"
         : theme;
   await page.goto(
-    `/iframe.html?id=controls-formfields--${story}&viewMode=story&globals=theme:${global}`,
+    `/iframe.html?id=controls-formfields--${story}&viewMode=story&globals=theme:${global};a11y.manual:!true`,
   );
   await expect(page.locator("#storybook-root input").first()).toBeVisible();
   await expect
@@ -292,4 +292,35 @@ test("forced colors preserve error text, focus and native disabled cues", async 
     path: testInfo.outputPath("fields-forced-colors.png"),
     fullPage: true,
   });
+});
+
+test("explicit field scans detect an unnamed button", async ({ page }) => {
+  await open(page, "normal");
+  await page.locator("#storybook-root").evaluate((root) => {
+    const button = document.createElement("button");
+    button.id = "field-a11y-negative-control";
+    root.append(button);
+  });
+  try {
+    const result = await new AxeBuilder({ page })
+      .include("#storybook-root")
+      .analyze();
+    expect(
+      result.violations.some(
+        (rule) =>
+          rule.id === "button-name" &&
+          rule.nodes.some((node) =>
+            node.target.includes("#field-a11y-negative-control"),
+          ),
+      ),
+    ).toBe(true);
+  } finally {
+    await page
+      .locator("#field-a11y-negative-control")
+      .evaluate((node) => node.remove());
+  }
+  expect(
+    (await new AxeBuilder({ page }).include("#storybook-root").analyze())
+      .violations,
+  ).toEqual([]);
 });

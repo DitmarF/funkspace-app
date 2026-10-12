@@ -374,8 +374,11 @@ test("live Motion controls and explanation remain reachable on a short screen wi
     .getByRole("dialog")
     .getByRole("status")
     .filter({ hasText: "Decorative animation is off." });
-  await status.scrollIntoViewIfNeeded();
-  await expect(status).toBeInViewport();
+  // The accepted compact settings design keeps this announcement screen-reader
+  // accessible; the selected native control supplies its visible feedback.
+  await expect(status).toHaveText("Decorative animation is off.");
+  await expect(status).toHaveClass("sr-only");
+  await expect(off).toHaveAttribute("aria-pressed", "true");
   expect(
     await page
       .getByRole("dialog")

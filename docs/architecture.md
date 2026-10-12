@@ -313,6 +313,18 @@ while the existing resolver gate still denies Canvas preparation. Unmeasured or
 temporarily hidden geometry alone does not settle the initial reveal. Valid
 palette recovery uses the existing binding observation and never replays the fade.
 
+### Icon delivery
+
+Control artwork stays inline, including its existing two-tone paint checks.
+The existing Icon component keeps its name/size/label contract and native SVG
+frame. Eleven category/social families become a generated same-origin SVG sprite; client
+components reference its groups instead of importing the entire path registry.
+Original Figma exports and `spriteIconArtwork.tsx` remain the geometry sources. The
+sprite has no script, browser service, runtime preference or scheduling owner.
+Native no-JS references work; explicit icon-only labels preserve control meaning
+if the asset is unavailable. Build generation and lint/test freshness checks
+prevent stale artwork. This changes delivery, not approved icon geometry.
+
 ### Details-only particle customization
 
 The WEB scene is named **Web Aperture** (Dimi's 2026-10-12 naming amendment).

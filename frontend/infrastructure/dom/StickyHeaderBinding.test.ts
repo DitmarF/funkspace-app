@@ -305,3 +305,88 @@ it("clears newly focused content obscured by the sticky header without moving mo
   button.focus();
   expect(button.scrollIntoView).toHaveBeenCalledTimes(1);
 });
+
+it.each(["access", "call"])(
+  "keeps native content usable when media %s throws",
+  (kind) => {
+    if (kind === "access")
+      Object.defineProperty(window, "matchMedia", {
+        configurable: true,
+        get() {
+          throw new Error("denied");
+        },
+      });
+    else
+      vi.stubGlobal("matchMedia", () => {
+        throw new Error("denied");
+      });
+    expect(() => bind()).not.toThrow();
+    expect(root).not.toHaveAttribute("data-sticky-header");
+    expect(root.querySelector("main button")).toHaveTextContent("Content");
+    cleanup();
+  },
+);
+
+it("rolls back partially acquired observers and listeners when subscription setup fails", () => {
+  const remove = vi.spyOn(window, "removeEventListener");
+  const subscribe = vi.spyOn(policy, "subscribe").mockImplementation(() => {
+    throw new Error("setup");
+  });
+  expect(() => bind()).not.toThrow();
+  expect(disconnect).toHaveBeenCalledTimes(1);
+  expect(remove).toHaveBeenCalledWith("scroll", expect.any(Function));
+  expect(root).not.toHaveAttribute("data-sticky-header");
+  resize();
+  expect(root).not.toHaveAttribute("data-sticky-header");
+  subscribe.mockRestore();
+});
+
+it("continues cleanup after an owned resource throws", () => {
+  bind();
+  unsubscribe.mockImplementationOnce(() => {
+    throw new Error("cleanup");
+  });
+  expect(cleanup).not.toThrow();
+  expect(disconnect).toHaveBeenCalledTimes(1);
+  expect(root).not.toHaveAttribute("data-sticky-header");
+  cleanup();
+  expect(unsubscribe).toHaveBeenCalledTimes(1);
+});
+
+it.each([160, 500])(
+  "clears the lower edge of keyboard targets with header height %s",
+  (headerHeight) => {
+    height = headerHeight;
+    const button = root.querySelector("main button") as HTMLButtonElement;
+    button.scrollIntoView = vi.fn();
+    vi.spyOn(button, "getBoundingClientRect").mockReturnValue({
+      top: 840,
+      bottom: 940,
+    } as DOMRect);
+    bind();
+    button.focus();
+    expect(button.scrollIntoView).toHaveBeenCalledWith({
+      block: "end",
+      behavior: "instant",
+    });
+  },
+);
+
+it("does not move a pointer target between press and click, but clears later keyboard focus", () => {
+  const button = root.querySelector<HTMLButtonElement>("main button")!;
+  button.scrollIntoView = vi.fn();
+  vi.spyOn(button, "getBoundingClientRect").mockReturnValue({
+    top: 20,
+    bottom: 60,
+  } as DOMRect);
+  bind();
+  button.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+  button.focus();
+  expect(button.scrollIntoView).not.toHaveBeenCalled();
+  button.blur();
+  root.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "Tab", bubbles: true }),
+  );
+  button.focus();
+  expect(button.scrollIntoView).toHaveBeenCalledTimes(1);
+});

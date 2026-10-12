@@ -209,6 +209,48 @@ it("retains local Pause through every policy/environment gate without replacing 
   expect(runtime.destroy).toHaveBeenCalledTimes(1);
 });
 
+it("keeps local Pause focus and intent usable when prepared artwork scrolls offscreen", async () => {
+  let surface = binding.getSnapshot();
+  let notify: ((value: ParticleSurface) => void) | undefined;
+  binding.getSnapshot = () => surface;
+  binding.subscribe = (cb) => {
+    notify = cb;
+    cb(surface);
+    return () => {
+      notify = undefined;
+    };
+  };
+  render(<StartScene />);
+  await waitFor(() =>
+    expect(screen.getByRole("status")).toHaveTextContent("playing"),
+  );
+  const pause = screen.getByRole("button", { name: "Pause animation" });
+  pause.focus();
+  act(() => {
+    surface = { ...surface, visible: false };
+    notify?.(surface);
+  });
+  expect(pause).toHaveFocus();
+  expect(pause).toBeEnabled();
+  runtime.resume.mockClear();
+  fireEvent.click(pause);
+  const resume = screen.getByRole("button", { name: "Resume animation" });
+  expect(resume).toBeEnabled();
+  fireEvent.click(resume);
+  expect(runtime.resume).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "Pause animation" }));
+  act(() => {
+    surface = { ...surface, visible: true };
+    notify?.(surface);
+  });
+  expect(runtime.resume).not.toHaveBeenCalled();
+  expect(
+    screen.getByRole("button", { name: "Resume animation" }),
+  ).toBeEnabled();
+  change({ preference: "off" });
+  expect(screen.getByRole("button")).toBeDisabled();
+});
+
 it("failed preparation keeps complete static artwork and does not retry", async () => {
   failed = true;
   const { container } = render(<StartScene />);

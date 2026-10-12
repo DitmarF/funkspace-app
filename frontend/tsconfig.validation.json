@@ -16,5 +16,5 @@
     "../playwright*.ts",
     "../vitest-env.d.ts"
   ],
-  "exclude": ["node_modules", ".next", "storybook-static"]
+  "exclude": ["node_modules", ".next", ".next-dev", "storybook-static"]
 }

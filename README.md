@@ -29,8 +29,11 @@ pnpm build:tokens        # regenerate CSS and TypeScript token artifacts
 pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 ```
 
+- Icon artwork: `pnpm build:icons` regenerates the checked SVG sprite; dev/build/Storybook do this automatically. After editing artwork in a running session, regenerate it. `pnpm check:icons` verifies freshness before lint/tests.
 - Storybook: `pnpm storybook` (opens on http://localhost:6006).
-- Production build: `pnpm build` (tokens → common typecheck → game build → frontend build).
+- Production build: `pnpm build` (tokens → common typecheck → icon/aperture/bootstrap generation and checks → game build → Next build).
+- Development uses `frontend/.next-dev`; production build/start use `frontend/.next`. This keeps a local production build from overwriting a running development server's JavaScript. Restart an older dev server once after adopting this configuration. Stop a production server before rebuilding its own output.
+- Phone preview: after a successful `pnpm check:theme-bootstrap && pnpm build`, run `pnpm -F frontend start -H 0.0.0.0 -p 3001`. Keep the terminal running, connect the phone to the same LAN, and open `http://<Mac-LAN-IP>:3001`. `0.0.0.0` is the listening address, not a phone destination; on a Mac with Wi-Fi on `en0`, `ipconfig getifaddr en0` prints the LAN address.
 - Direct frontend builds require generated tokens first; use the root build for the complete prerequisite order.
 - Frontend dev/build generate the tracked inline theme bootstrap before Next starts. When editing its entry or shared imports, also run `pnpm watch:theme-bootstrap` in a second terminal; stop it with Ctrl-C when finished. Next watches the generated module. Ordinary component/Storybook work does not need this watcher.
 - Before regenerating a reviewed checkout, run `pnpm check:theme-bootstrap` to detect stale output. Lint, tests and CI enforce freshness. Recover missing/stale output with `pnpm build:theme-bootstrap`, review its diff, then run types/tests. Do not hand-edit `frontend/generated/theme-bootstrap.ts`.
