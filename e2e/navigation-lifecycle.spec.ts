@@ -179,7 +179,10 @@ for (const width of [320, 1280]) {
       });
       await expect(page).toHaveURL("/#about");
       await frames(page);
-      // Opening a desktop header invoker legitimately reveals that invoker first.
+      // The directional header can be hidden after fragment scrolling. Keyboard
+      // focus reveals its fixed invoker without changing the history position.
+      await menu(page).focus();
+      await expect(menu(page)).toBeInViewport();
       await openSettings(page);
       const position = await page.evaluate(() => scrollY);
       await page.goBack();

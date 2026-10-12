@@ -64,6 +64,7 @@
 }
 
 .skipLink:focus {
+  z-index: 30;
   top: max(var(--fs-space-xs), var(--shell-safe-top));
   left: max(var(--fs-space-xs), var(--shell-safe-left));
   max-width: calc(
@@ -172,6 +173,47 @@
 
   :global(html):has(.shell) {
     scroll-padding-bottom: var(--fs-space-md);
+  }
+
+  .shell[data-sticky-header] {
+    --navigation-header-scroll-y: 0px;
+  }
+
+  .shell[data-sticky-header] .header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--fs-color-surface-background);
+  }
+
+  .shell[data-sticky-header] .launcher[data-home-menu] {
+    position: fixed;
+  }
+
+  .shell[data-sticky-header][data-header-motion="true"][data-header-focused="false"]
+    :is(.header, .launcher[data-home-menu]) {
+    transition: transform var(--fs-motion-duration-400)
+      var(--fs-motion-easing-ease-out);
+  }
+
+  .shell[data-sticky-header][data-header-hidden="true"] .header {
+    transform: translateY(-100%);
+  }
+
+  .shell[data-sticky-header][data-header-hidden="true"]
+    .launcher[data-home-menu] {
+    transform: translateY(calc(-1 * var(--portfolio-header-height)));
+  }
+
+  .shell[data-sticky-header]
+    :is(main, footer)
+    :where([id], a, button, [tabindex="-1"]):not(
+      :where(dialog *, [data-home-menu] *)
+    ),
+  .shell[data-sticky-header] main {
+    scroll-margin-top: calc(
+      var(--portfolio-header-height) + var(--fs-space-md)
+    );
   }
 }
 

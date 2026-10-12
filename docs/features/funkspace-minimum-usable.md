@@ -79,6 +79,19 @@ Home's More link leads to the animation detail page. Native manual toggling is
 preserved; pathname changes reveal the new current page. This behavior applies
 to direct visits, server rendering and the no-JavaScript fallback.
 
+## Smart sticky header amendment — 2026-10-12
+
+Dimi selected hide-on-scroll-down and reveal-on-scroll-up for tablet/desktop.
+The header and settings launcher now share that behavior from `48rem`, with
+keyboard focus/open navigation pinning and a stationary sticky fallback for
+reduced or unavailable motion. Mobile and native no-JS behavior remain unchanged.
+This supersedes only FS-2.5's desktop launcher scrolling away with the initial
+header; it does not reopen that completed task. See the
+[implementation and validation record](../tasks/maintenance-smart-sticky-header.md).
+The initial-fragment clearance regression was corrected and accepted by Dimi on
+2026-10-12. Commit/push of this maintenance candidate is authorized; FS-4.7/4.8
+review and the recorded validation follow-ups remain separate.
+
 ## Goal
 
 Deliver an animation-led, mobile-first website with Start and About sections, a legal-link footer, normal scrolling, the existing FunkSpace logo and semantic design foundations, one customizable Canvas scene behind a replaceable SVG aperture, usable navigation/settings, real contact delivery through EPIC 5's new concept, and completed secondary pages. End when the portfolio is ready to host game integration. Do not implement game integration in this milestone.

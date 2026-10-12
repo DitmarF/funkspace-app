@@ -61,6 +61,22 @@ See the [footer task record](../../../docs/tasks/maintenance-footer-navigation.m
 
 ## Header and tree navigation
 
+At `48rem` and above the enhanced shell keeps the header and settings launcher
+available through a directional sticky header: down hides after 32px of travel,
+up reveals after 12px, with the opening header always shown near the top.
+Focus and open navigation pin it. Wheel/touch scrolling releases the focus pin
+without moving focus, so closing settings after Off → On resumes scroll behavior;
+new focus or keyboard use immediately pins and reveals the controls again.
+Existing motion-policy permission controls the
+400ms transform; Reduced, Off and system reduction use a stationary sticky header.
+The measured height reserves focus/anchor clearance without changing content flow.
+On initial enhancement, a fragment target covered by the header is scrolled clear
+once without moving focus. History restoration and subsequent resize/scroll retain
+their positions.
+Mobile, no-JS and short viewports with a header taller than half the viewport retain
+native scrolling. **SmartStickyHeader** is the long-page Storybook example.
+See the [behavior and validation record](../../../docs/tasks/maintenance-smart-sticky-header.md).
+
 `PortfolioMainNavigation` supplies Home, About and disabled Contact in the
 shared header. It and `PortfolioNavigationTree` reuse `portfolioMainNavigation`
 data and `PortfolioNavigationRow`, including icon artwork, typography, semantic

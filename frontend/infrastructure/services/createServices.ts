@@ -15,6 +15,7 @@ import { MotionPolicyServiceImpl } from "@/application/motion/MotionPolicyServic
 import { BrowserMotionEnvironment } from "@/infrastructure/motion/BrowserMotionEnvironment";
 import { bindNativeLogoMotion } from "@/infrastructure/motion/NativeLogoMotionBinding";
 import { bindHomeIntro } from "@/infrastructure/motion/HomeIntroBinding";
+import { bindStickyHeader } from "@/infrastructure/dom/StickyHeaderBinding";
 import { LogoMotionController } from "@/application/animations/LogoMotionController";
 import { bindNativeDialog } from "@/infrastructure/dom/NativeDialogBinding";
 import { ParticleSceneController } from "@/application/animations/ParticleSceneController";
@@ -49,6 +50,8 @@ export function createServices(fixture?: {
     process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED === "true";
 
   return {
+    bindStickyHeader: (root) =>
+      bindStickyHeader(root, motionPolicy, decorativeMotionAvailable),
     apertureAssets,
     bindParticleScene: (target, options) => {
       const controller = new ParticleSceneController(

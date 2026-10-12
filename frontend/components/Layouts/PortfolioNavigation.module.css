@@ -258,7 +258,7 @@
       var(--shell-safe-top),
       calc(
         max(var(--fs-space-xl), var(--shell-safe-top)) -
-          var(--dialog-page-scroll-y, 0px)
+          var(--navigation-header-scroll-y, var(--dialog-page-scroll-y, 0px))
       )
     );
     --navigation-close-top: calc(

@@ -63,7 +63,13 @@ function ShellContent({ children, animateIdentity = false }: Props) {
   const intro = useRef<HomeIntroBinding | null>(null);
   const identity = useRef<LogoMotionRef>(null);
   const state = useRef<LogoPlaybackState>("pending");
-  const { bindHomeIntro, decorativeMotionAvailable } = useServices();
+  const { bindHomeIntro, bindStickyHeader, decorativeMotionAvailable } =
+    useServices();
+  useEffect(() => {
+    if (!root.current) return;
+    const binding = bindStickyHeader(root.current);
+    return () => binding.release();
+  }, [bindStickyHeader]);
   const logoState = useCallback((next: LogoPlaybackState) => {
     state.current = next;
     intro.current?.logoState(next);

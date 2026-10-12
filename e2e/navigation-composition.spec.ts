@@ -9,23 +9,23 @@ import {
 
 async function expectCloseAlignment(page: Page) {
   const dialog = page.getByRole("dialog");
-  const close = (await dialog
+  const difference = await dialog
     .getByRole("button", { name: "Close", exact: true })
-    .boundingBox())!;
-  const menu = (await dialog
-    .getByRole("button", {
-      name: "Menu: close navigation and settings",
-      exact: true,
-    })
-    .boundingBox())!;
-  const mobile = page.viewportSize()!.width < 768;
-  const closeCenter = mobile
-    ? close.x + close.width / 2
-    : close.y + close.height / 2;
-  const menuCenter = mobile
-    ? menu.x + menu.width / 2
-    : menu.y + menu.height / 2;
-  expect(Math.abs(closeCenter - menuCenter)).toBeLessThan(0.5);
+    .evaluate((closeButton) => {
+      // Sample both controls in one layout. Separate browser round trips can
+      // straddle responsive enhancement after crossing the tablet breakpoint.
+      const menuButton = closeButton
+        .closest("dialog")!
+        .querySelector(
+          'button[aria-label="Menu: close navigation and settings"]',
+        )!;
+      const close = closeButton.getBoundingClientRect();
+      const menu = menuButton.getBoundingClientRect();
+      return innerWidth < 768
+        ? Math.abs(close.x + close.width / 2 - menu.x - menu.width / 2)
+        : Math.abs(close.y + close.height / 2 - menu.y - menu.height / 2);
+    });
+  expect(difference).toBeLessThan(0.5);
 }
 
 for (const viewport of [

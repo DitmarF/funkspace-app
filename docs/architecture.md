@@ -76,6 +76,15 @@ shell cleanup removes it. A new page mount has independent history. CSS uses the
 fade, then the 800 ms token for the remaining content. The existing binding advances on actual
 animation-end events. The launcher and footer links are separate targets within
 the same footer; no second navigation owner or modal is introduced.
+The shell's tablet/desktop sticky-header enhancement uses a per-mount
+`StickyHeaderBinding`, constructed by `createServices` and released by the shell.
+It owns passive document scroll, header measurement and focus/disclosure observation
+in Infrastructure; React has no scroll-frame state. Shared motion policy and
+`resolveMotionPermission` decide whether directional transitions may run. Static
+sticky presentation is retained when permission is denied. Mobile, missing browser
+measurement and very short viewports retain native document positioning. See the
+[maintenance contract](tasks/maintenance-smart-sticky-header.md).
+
 The shell preserves server-rendered children and native links; no-JS/blocked
 inline script keeps them visible. No theme-bootstrap source or pipeline changes.
 FS-4.5 adds an optional content-readiness callback to that same intro binding.

@@ -18,6 +18,7 @@ import type { ScrollService } from "../scroll/ScrollService";
 import type { AnimationService } from "../animations/AnimationService";
 import type { DialogBindingFactory } from "@/domain/ports/DialogBindingPort";
 import type { HomeIntroBinding } from "@/domain/ports/HomeIntroPort";
+import type { StickyHeaderFactory } from "@/domain/ports/StickyHeaderPort";
 import type { ParticleSceneFactory } from "@/domain/ports/ParticleScenePort";
 import type { ApertureAssets } from "@/domain/ports/ApertureAssetPort";
 
@@ -33,6 +34,7 @@ import type {
 } from "../animations/LogoMotionController";
 
 export interface ServiceContextValue {
+  bindStickyHeader: StickyHeaderFactory<HTMLElement>;
   apertureAssets: ApertureAssets;
   bindParticleScene: ParticleSceneFactory<HTMLElement>;
   bindHomeIntro(
