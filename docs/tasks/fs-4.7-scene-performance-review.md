@@ -33,6 +33,13 @@ packets linked in this record remain local artifacts outside the repository.
 not been performed or inferred from FS-4.7 closure. No PR, merge, deployment or
 publication is authorized by this delivery request.
 
+Subsequent 2026-10-13 handoff: Dimi accepts delivered `a43bbf0` and explicitly
+[closes FS-4.8 and EPIC 4](fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13).
+That record owns the final-build Lighthouse results, accepted asset/settings and
+retained phone-measurement limits. FS-4.7 stays closed; its historical missing
+final Lighthouse rerun is superseded by FS-4.8B, not rewritten as an old PASS.
+FS-G2 still requires EPIC 5 contact acceptance.
+
 ## FS-4.7B — bounded correction disposition — 2026-10-13
 
 **No additional correction needed for the supplied findings.** The requested

@@ -2,7 +2,7 @@
 
 ## Plan metadata
 
-- **Status:** Authoritative feature plan — EPICs 1–3 and FS-G1 are complete; Dimi closed EPIC 3 on 2026-09-27. The [closure and final re-review](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) and [EPIC 4 API handoff](../tasks/fs-3.6-integrated-validation.md#epic-4-implementation-handoff) remain the foundation. EPIC 4 has an accepted [FS-4.1 contract](../tasks/fs-4.1-scene-contract.md), reviewed FS-4.2–FS-4.4 renderer/aperture and FS-4.5 homepage integration, and [FS-4.6 C7 / R19 technical PASS](../tasks/fs-4.6-customization-overlay.md#codex-r2-closure-and-authorized-delivery--2026-09-30). **Dimi closed FS-4.7 on 2026-10-13** and authorized commit/push of all pending changes; the [closure and delivery record](../tasks/fs-4.7-scene-performance-review.md#fs-47-closure-and-authorized-delivery--2026-10-13) is the current continuation entry point. A1–A5 corrections pass review; Dimi reports all smartphone/Safari/Firefox manual tests PASS. Missing measurement details remain disclosed limitations, not new numerical PASS results or an open FS-4.7 task. **FS-4.8 final scene acceptance is next and remains open.** Content/legal/public-release limitations remain separate. Subsequent navigation maintenance is tracked below and does not reopen historical gate decisions.
+- **Status:** Authoritative feature plan — EPICs 1–4 and FS-G1 are complete; Dimi closed EPIC 3 on 2026-09-27. The [closure and final re-review](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) and [EPIC 4 API handoff](../tasks/fs-3.6-integrated-validation.md#epic-4-implementation-handoff) remain the foundation. EPIC 4 has an accepted [FS-4.1 contract](../tasks/fs-4.1-scene-contract.md), reviewed FS-4.2–FS-4.4 renderer/aperture and FS-4.5 homepage integration, and [FS-4.6 C7 / R19 technical PASS](../tasks/fs-4.6-customization-overlay.md#codex-r2-closure-and-authorized-delivery--2026-09-30). **Dimi closed FS-4.7 on 2026-10-13** and authorized commit/push of all pending changes; the [closure and delivery record](../tasks/fs-4.7-scene-performance-review.md#fs-47-closure-and-authorized-delivery--2026-10-13) is the current continuation entry point. A1–A5 corrections pass review; Dimi reports all smartphone/Safari/Firefox manual tests PASS. Missing measurement details remain disclosed limitations, not new numerical PASS results or an open FS-4.7 task. **Dimi accepted `a43bbf0` and explicitly closed FS-4.8 and EPIC 4 on 2026-10-13.** The [closure record](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) owns the accepted configuration/aperture, final checks and disclosed measurement limits; those limits are not open task status or fabricated numeric PASS. Content/legal/public-release limitations remain separate. Subsequent navigation maintenance is tracked below and does not reopen historical gate decisions.
 - **Owner/current writer:** Codex; product owner/final acceptance: Dimi. Sites supplies read-only counterpart review and later owns its assigned implementation tasks.
 - **Related epic/task:** Portfolio EPICs 0–6; publication task [FS-0.4](../tasks/fs-0.4-authoritative-feature-plan.md).
 - **Decision entry point:** [Authoritative decision register](#pending-decisions-and-latest-needed-points); [FS-0.5 technical rationale and answer provenance](../tasks/fs-0.5-product-and-technical-decisions.md). Dimi leads/approves FS-0.5; Codex is its designated documentation writer.
@@ -11,6 +11,13 @@
 - **Related ADRs:** [001](../decisions/ADR-001-monorepo-strategy.md), [002](../decisions/ADR-002-design-token-source-of-truth.md), [003](../decisions/ADR-003-interactive-experience-boundary.md), [004](../decisions/ADR-004-game-development-architecture.md).
 
 ### Authority and source provenance
+
+Current EPIC 4 handoff: [FS-4.8/EPIC 4 closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13)
+records Dimi’s accepted `a43bbf0` candidate and explicit completion decision.
+No source/configuration change followed review. The missing raw phone timing
+packet remains a disclosed evidence limit; FS-4.7, FS-4.8 and EPIC 4 are complete.
+Documentation commit/push is now explicitly authorized. EPIC 5 contact acceptance
+is the next milestone work; FS-G2, FS-G3, launch and game integration stay separate.
 
 This feature plan owns milestone scope and current milestone status. The [consolidated baseline](../tasks/fs-0.1-inventory-real-starting-point.md) owns inspection evidence and links its dated [tooling/command follow-up](../tasks/fs-0.2-tooling-baseline.md). Substantial [task records](../templates/task.md) own execution, reviews and handoffs; the [branch decision](../tasks/fs-0.3-branch-integration-decision.md) owns integration/approval provenance. Link those records rather than copying their logs or treating their dated pre-execution statuses as current milestone state. The [AI workflow](../development/ai-workflow.md) and [feature template](../templates/feature-plan.md) remain unchanged; the task breakdown below extends the template for this multi-epic milestone.
 
@@ -136,7 +143,13 @@ Reachable real content, usable static fallbacks, approved scene/controls, verifi
 
 EPICs 1–3 deliver the shared controls, portfolio routes/shell, navigation/settings and focus lifecycle, service-backed appearance, one shared decorative-motion preference, and production logo/settings consumption. [FS-3.3](../tasks/fs-3.3-appearance-integration.md#dimi-acceptance-and-completion--2026-09-27) corrected stale-storage replacement of live theme choices; [FS-3.4](../tasks/fs-3.4-motion-policy-implementation.md) and [FS-3.5](../tasks/fs-3.5-motion-settings-and-logo.md) implement the policy and its current consumers. [FS-3.6](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) records EPIC 3/FS-G1 completion. These are delivered foundations, not work to recreate for the next epic.
 
-Remaining milestone work includes the integrated Canvas scene/customization in EPIC 4, provider-backed contact delivery in EPIC 5, and final content/legal/rollout work. [FS-2.3](../tasks/fs-2.3-about-preview-and-page.md#supplied-about-copy--2026-10-05) now uses Dimi’s supplied preview and detailed About narrative; [FS-2.4](../tasks/fs-2.4-contact-footer-and-legal-structure.md) supplies the email fallback and accepted incomplete legal-page structure. Final section copy, operator/privacy facts and approved legal content still require their owners' input before publication. Working standalone gameplay remains separate; existing logo playback and fake scene consumers do not establish Canvas runtime correctness. FS-4.1 specification is accepted and complete; FS-4.3/4.4 have technical candidates, with repository-authored Work Sans SPACE now supplied, with Safari evidence and independent review still open.
+EPIC 4’s integrated Canvas scene, WEB aperture and customization are accepted
+and complete on `a43bbf0` by Dimi’s [explicit closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13).
+Final LCP/CLS checks pass; the On score warning and missing detailed phone timing
+evidence remain disclosed limits. Remaining milestone work is EPIC 5 provider-backed
+contact delivery and final content/legal/rollout acceptance. Supplied About copy
+and legal drafts retain their scope; scene acceptance does not supply missing
+operator/privacy facts or publication authorization. Gameplay remains separate.
 
 The earlier layout plan mandates snapping and fullscreen panels, conflicting with this milestone's ordinary scrolling. Without one scope entry point, a fresh agent could implement those historical proposals or repeat already completed tooling work. The narrow documentation reconciliation is recorded in FS-0.4; unrelated architecture migration remains deferred.
 
@@ -158,7 +171,11 @@ The shared decorative preference and production logo/settings consumption are co
 
 ### Delivery sequence
 
-Use the epic order and gates below. EPIC 3/FS-G1 is complete; EPIC 4 has an accepted FS-4.1 contract; FS-4.2–FS-4.4 reached the renderer/aperture checkpoint with FS-4.4B R2 technical PASS (F1–F3 closed). FS-4.5 homepage policy/theme integration is implemented; its latest Reduced/reveal correction has [Codex R2 technical PASS, F1 closed](../tasks/fs-4.5-scene-policy-and-themes.md#codex-r2-closure-and-authorized-delivery--2026-09-29). Final scene/device/performance acceptance remains open. Preserve dated task-stage statuses as historical evidence: later completion decisions supersede their earlier pending wording. Do not repeat completed EPIC 3 work or skip unresolved content, asset, architecture or acceptance inputs for later tasks.
+Use the epic order and gates below. EPICs 1–4, FS-G1 and FS-4.7/4.8 are complete.
+The [EPIC 4 closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) owns the accepted candidate and retained evidence
+limits. Preserve dated task-stage statuses as history, not new assignments.
+EPIC 5 contact acceptance is still required for FS-G2; do not restart delivered
+scene or EPIC 3 implementation.
 
 ### Rollout and rollback
 
@@ -354,7 +371,7 @@ These are portfolio gates, independent of the earlier Wave Survivor Gate 1/Gate 
 | ----- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | FS-G0 | APPROVED by Dimi, 2026-09-12 | Explicit approval of `156c28c…` plus reviewed patch `677b435d…`, following independent readiness review and closure of preservation/source blockers. [Actual answer and full candidate](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12). |
 | FS-G1 | Pending                      | Dimi confirms EPIC 1 acceptance only and explicitly keeps FS-G1 pending on 2026-09-18. EPIC 2–3 implementation and FS-3.6 static-site/navigation/settings acceptance remain future work.                                                                                |
-| FS-G2 | Pending                      | Integrated scene and genuine contact acceptance not performed.                                                                                                                                                                                                          |
+| FS-G2 | Pending                      | EPIC 4 scene acceptance is complete; EPIC 5 genuine contact acceptance is still required.                                                                                                                                                                               |
 | FS-G3 | Pending                      | Whole portfolio candidate and Dimi acceptance not performed. The game-baseline production release is not this portfolio gate.                                                                                                                                           |
 
 The source sequence anticipated all EPIC 0 planning before FS-G0. The first Dimi approval preceded FS-0.4/0.5 completion; those records are now reconciled, independently reviewed and covered by Dimi’s explicit refreshed-candidate approval. Retain both dated decisions and the original prerequisites. Later choices keep their named owners and deadlines.
@@ -858,7 +875,12 @@ this EPIC-level status and FS-3.6's closure supersede them. EPIC 4 is not starte
 
 ### EPIC 4 — Signature Canvas scene, replaceable SVG aperture, and customization
 
-**Latest correction — 2026-10-12:** [FS-4.7A implementation handoff](../tasks/fs-4.7-scene-performance-review.md#fs-47a-correction--implementation-and-validation--2026-10-12) corrects A1–A5 against `7493427`: initial JavaScript growth is 1.59 KiB within the 15 KiB budget; sticky-header setup fails open; current browser/control contracts are reconciled. Local implementation validation passes, with the existing Lighthouse On score warning retained. Independent re-review of the pinned working-tree patch and required Xperia/Safari evidence remain outstanding; FS-4.8 is not ready to start. The earlier clean-candidate verdict and measurements remain historical evidence.
+**Current status — 2026-10-13: COMPLETE.** Dimi accepts `a43bbf0` and explicitly
+closes FS-4.8 and EPIC 4. The [closure and evidence record](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) pins final
+builds, the accepted WEB/settings, technical checks, On score warning and missing
+raw phone measurements as disclosed limits. No source change followed review.
+Earlier dated checkpoint statuses below are historical. FS-G2 remains pending
+EPIC 5 contact acceptance; public release and game integration are separate.
 
 **Current status — 2026-09-30:** FS-4.1 specification COMPLETE following Codex R2 technical PASS and Dimi’s acceptance of all product proposals. [Accepted contract and evidence](../tasks/fs-4.1-scene-contract.md). FS-4.2–FS-4.4 reached their renderer/aperture checkpoint with FS-4.4B R2 PASS. [FS-4.5 homepage policy/theme integration](../tasks/fs-4.5-scene-policy-and-themes.md) is implemented, and its latest Reduced/reveal correction has Codex R2 PASS (F1 closed). The FS-4.5 candidate was committed/pushed as `01afc3f`. [FS-4.6 details-page customization](../tasks/fs-4.6-customization-overlay.md#codex-r2-closure-and-authorized-delivery--2026-09-30) has C7 / R19 Codex R2 technical PASS with F1–F3 closed and a non-blocking Firefox precision follow-up; [FS-4.7 R3 correction review](../tasks/fs-4.7-scene-performance-review.md#codex-r3--f7-correction-re-review--2026-09-30) closes F1–F7; required Xperia/Safari evidence remains BLOCKED; FS-4.8 remains not started. Final visual/device/performance acceptance is not implied.
 
@@ -997,7 +1019,10 @@ absolute rendering budgets remain in force. [R18](../tasks/fs-4.1-scene-contract
 
 #### FS-4.7 — Review performance, failure paths, and lifecycle
 
-**Current status — 2026-10-12:** [FS-4.7A correction](../tasks/fs-4.7-scene-performance-review.md#fs-47a-correction--implementation-and-validation--2026-10-12) implements the authorized A1–A5 owner fixes and records the exact changed candidate, builds and passing local checks. The original `7493427` review remains preserved below that handoff. Initial JavaScript now meets the unchanged budget; media-query setup failures retain the usable page; accessibility, focus, paint and test-contract corrections are covered. Independent re-review is still required, and physical Xperia/Safari evidence remains **BLOCKED** as directed by Dimi. No commit/push or FS-4.8 acceptance is implied.
+**Current status — 2026-10-13: COMPLETE by Dimi’s explicit closure.**
+The [FS-4.7 closure record](../tasks/fs-4.7-scene-performance-review.md#fs-47-closure-and-authorized-delivery--2026-10-13)
+retains A1–A5 PASS, manual-result provenance and measurement limits. Delivery is
+`a43bbf0`; [FS-4.8 and EPIC 4 are now also closed](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13).
 
 **Lead:** Codex
 
@@ -1013,7 +1038,11 @@ absolute rendering budgets remain in force. [R18](../tasks/fs-4.1-scene-contract
 
 #### FS-4.8 — Approve the signature experience
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-13: COMPLETE.** Dimi explicitly accepts `a43bbf0`
+and closes FS-4.8 and EPIC 4. The [substantive acceptance record](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) pins
+the selected configuration/aperture, builds, actual decision, final revalidation
+and evidence limits. No deferred visual polish is nominated. Commit/push of
+pending documentation is authorized; merge, deployment and later gates are not.
 
 **Lead:** Dimi
 
@@ -1256,7 +1285,7 @@ absolute rendering budgets remain in force. [R18](../tasks/fs-4.1-scene-contract
 - **Completed reference work:** The [Storybook color reference](../tasks/storybook-color-reference.md) presents the current palettes and semantic roles without changing tokens. Implementation and validation are complete; Dimi authorized documentation finalization, commit and push on 2026-09-16. FS-1.3 remains complete. FS-1.4 implementation and validation are now recorded separately.
 
 - **Recommended first step:** read this current summary, the [FS-3.6 closure](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) and [EPIC 4 API handoff](../tasks/fs-3.6-integrated-validation.md#epic-4-implementation-handoff), then inspect the actual code, branch, HEAD and accessible diff for the next authorized task. Reuse the accepted control contracts as needed. Earlier SHAs and dated pending-task statements are historical provenance, not reset targets or instructions to repeat completed work.
-- **Current implementation:** EPICs 1–3 and FS-G1 are complete. Navigation/focus, appearance and denied-storage consistency, the shared motion authority, live Motion settings, and the nominated logo/homepage sequence are delivered. The [FS-3.6 record](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) preserves independent review, Dimi's closure, both flag variants and the approved 5-second LCP budget; flag-on score 0.82 remains a warning. Missing per-device/per-action details remain evidence limitations, not a pending EPIC 3 closure. EPIC 4 has an accepted FS-4.1 contract, pure particle rules, Canvas lifecycle and WEB Black aperture. The [FS-4.4B R2 correction re-review](../tasks/fs-4.4-svg-aperture.md#codex-r2-closure-and-authorized-delivery--2026-09-29) returns PASS and closes F1–F3; Safari/physical-phone, final performance and Dimi visual acceptance remain open. The reviewed candidate was committed/pushed as `41ec5d5`. Dimi subsequently authorized [FS-4.5](../tasks/fs-4.5-scene-policy-and-themes.md); its homepage integration is implemented and the latest Reduced/reveal correction has Codex R2 technical PASS (F1 closed). That FS-4.5 candidate was committed/pushed as `01afc3f` on 2026-09-29. [FS-4.6 customization](../tasks/fs-4.6-customization-overlay.md#codex-r2-closure-and-authorized-delivery--2026-09-30) has C7 / R19 Codex R2 technical PASS, closing F1–F3; the Firefox precision follow-up remains non-blocking. Dimi authorized documentation, commit and push on 2026-09-30. Final scene/device/performance acceptance, copy/legal facts, provider-backed contact delivery and public release remain separate work; EPIC 4 is not closed.
+- **Current implementation:** EPICs 1–4, FS-G1 and FS-4.7/4.8 are complete. Dimi accepts `a43bbf0`; the [EPIC 4 closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) records the WEB scene, controls, motion/static alternatives, customization, final checks and retained measurement limits. No source revision followed review. Next is EPIC 5 contact acceptance. Content/legal completion, FS-G2/FS-G3, publication and game integration remain separate.
 - **Consumer handoff:** reuse ThemeService's selected/resolved live state, the provider-owned `motionPolicy` and pure `resolveMotionPermission`, and Dialog's dismissal/navigation handoff extension. Keep each consumer's Pause, visibility, runtime readiness and playback history independent. The logo's guarded imperative API and static/failure paths are implemented; future Canvas consumers must prove their own scheduling and teardown rather than treating logo/fake-consumer tests as scene evidence.
 - **Latest navigation maintenance:** the spacing/reload fix is committed in `602f8c3`. The subsequent [active-fallback correction](../tasks/maintenance-navigation-hydration-continuity.md) received independent read-only PASS in this session on 2026-09-28 for the 10-file candidate on that base, patch SHA-256 `52f682a4a5a36410ce6a7917ec5e40b17c695e62def9911ff4915682d3ac0bde`: 28 focused tests, 51 production Chromium checks and two supplementary Contact probes passed. This summary refresh changes documentation only; the reviewed runtime files remain unchanged. Dimi authorized commit/push of the correction and documentation refresh; the containing Git commit records delivery. New device acceptance is not inferred.
 - **Codex follow-up:** preserve exact-candidate review provenance and reuse completed tooling/service corrections. For EPIC 1, no separate post-R3 Codex review is recorded; Dimi's explicit completion decision closes that epic without inventing evidence. EPIC 2 has its own integrated review in FS-2.6; EPIC 3 has its closure and API handoff in FS-3.6.
