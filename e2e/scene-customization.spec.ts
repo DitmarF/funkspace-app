@@ -133,13 +133,13 @@ test("customization starts with Reset and overlay, retaining the frozen scene be
   await stopped(page);
 });
 
-test("Aperture - 1 is the first animation destination and labels keep stored identities", async ({
+test("Web Aperture is the first animation destination and labels keep stored identities", async ({
   page,
 }) => {
   await setup(page, "off");
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Aperture - 1", exact: true }),
+    page.getByRole("heading", { level: 1, name: "Web Aperture", exact: true }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Menu: navigation and settings", exact: true })
@@ -167,10 +167,11 @@ test("Aperture - 1 is the first animation destination and labels keep stored ide
     .filter({ has: page.locator("summary", { hasText: "Animations" }) });
   await animations.locator("summary").click();
   const link = animations.getByRole("link").first();
-  await expect(link).toHaveText("Aperture - 1");
+  await expect(link).toHaveText("Web Aperture");
   await expect(link).toHaveAttribute("href", route);
   await link.click();
   await expect(page).toHaveURL(new RegExp(route + "$"));
+  await expect(page).toHaveTitle("Web Aperture — FunkSpace");
   await expect(page.locator("#main-content")).toBeFocused();
 });
 
@@ -291,13 +292,13 @@ test("homepage More is a native details link and has no customization controls",
   await page.goto("/");
   await expect(page.getByRole("slider")).toHaveCount(0);
   await expect(custom(page)).toHaveCount(0);
-  const more = page.getByRole("link", { name: "More about Aperture - 1" });
+  const more = page.getByRole("link", { name: "More about Web Aperture" });
   await expect(more).toHaveAttribute("href", route);
   await expect(more).toHaveText("More");
   await more.click();
   await expect(page).toHaveURL(route);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Aperture - 1" }),
+    page.getByRole("heading", { level: 1, name: "Web Aperture" }),
   ).toBeVisible();
   await expect(custom(page)).toBeEnabled();
 });
@@ -939,7 +940,7 @@ test("details work without JavaScript: complete solid WEB and native navigation,
   const page = await context.newPage();
   await page.goto(new URL(route, baseURL).href);
   await expect(
-    page.getByRole("heading", { level: 1, name: "Aperture - 1" }),
+    page.getByRole("heading", { level: 1, name: "Web Aperture" }),
   ).toBeVisible();
   await expect(page.locator("[data-aperture-fallback] path")).toBeVisible();
   await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);

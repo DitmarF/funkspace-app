@@ -918,6 +918,15 @@ this EPIC-level status and FS-3.6's closure supersede them. EPIC 4 is not starte
 
 #### FS-4.6 — Add the contextual customization overlay
 
+**Naming amendment — 2026-10-12:** Dimi renames **Aperture - 1** to
+**Web Aperture** across visible labels, accessible links and details metadata.
+The existing `/animations/aperture` route and scene identities are unchanged.
+Navigation/settings overlay titles Navigation and Accessibility now use Work Sans.
+This supersedes only the name in the historical R19 record below.
+The WEB navigation row uses the new `s-web` icon alongside the revised Games
+and added GitHub/LinkedIn library artwork. See the
+[implementation, validation and delivery record](../tasks/maintenance-icons-web-social.md).
+
 **Latest amendment — 2026-09-30 (R19):** WEB is named **Aperture - 1** and is the
 first Animations navigation destination at the existing details URL. The dialog
 starts with Reset and transparent-overlay controls, omits the duplicate artwork,

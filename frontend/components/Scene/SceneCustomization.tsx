@@ -187,7 +187,7 @@ export default function SceneCustomization({
           Transparent WEB overlay: {overlayTransparent ? "On" : "Off"}
         </Button>
         <p>
-          Adjust Aperture - 1 for this visit. Closing keeps your settings;
+          Adjust Web Aperture for this visit. Closing keeps your settings;
           reloading restores defaults. Reset keeps Pause, theme and motion
           settings. Transparent overlay shows the full particle field when
           Canvas is ready. The scene stays still while this dialog is open.

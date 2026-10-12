@@ -16,13 +16,13 @@ for (const route of ["/", "/animations/aperture"]) {
     );
     await page.goto(route);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Aperture - 1" }),
+      page.getByRole("heading", { level: 1, name: "Web Aperture" }),
     ).toHaveCSS("font-size", "24px");
     const actions = page.locator("[data-scene-actions]");
     const pause = actions.getByRole("button", { name: "Pause animation" });
     const secondary =
       route === "/"
-        ? actions.getByRole("link", { name: "More about Aperture - 1" })
+        ? actions.getByRole("link", { name: "More about Web Aperture" })
         : actions.getByRole("button", { name: "Customize animation" });
     await expect(pause).toBeVisible();
     await expect(secondary).toBeVisible();
@@ -145,7 +145,7 @@ test("no-JavaScript homepage retains the More link without dead playback/customi
     );
     await expect(staticStatus).toHaveCSS("position", "absolute");
     expect((await staticStatus.boundingBox())!.height).toBe(1);
-    const more = page.getByRole("link", { name: "More about Aperture - 1" });
+    const more = page.getByRole("link", { name: "More about Web Aperture" });
     await expect(more).toHaveAttribute("href", "/animations/aperture");
     await more.click();
     await expect(page).toHaveURL(/\/animations\/aperture$/);

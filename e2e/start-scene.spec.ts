@@ -503,7 +503,7 @@ test("blocked storage and unavailable OS signals retain static System artwork", 
   await expect(page.locator("[data-aperture-fallback] path")).toBeVisible();
   await expect(canvas(page)).toHaveCount(0);
   await expect(
-    page.getByRole("heading", { name: "Aperture - 1", exact: true }),
+    page.getByRole("heading", { name: "Web Aperture", exact: true }),
   ).toBeVisible();
 });
 

@@ -39,7 +39,7 @@ for (const [story, landmark, label, group] of [
   [
     "layouts-portfolionavigationtree--aperture-active",
     "Primary",
-    "Aperture - 1",
+    "Web Aperture",
     "Animations",
   ],
 ]) {

@@ -12,7 +12,7 @@ export default function Start() {
       aria-labelledby="start-heading"
     >
       <h1 id="start-heading" className={styles.title}>
-        Aperture - 1
+        Web Aperture
       </h1>
       <StartScene />
     </PortfolioSection>

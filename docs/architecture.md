@@ -306,7 +306,8 @@ palette recovery uses the existing binding observation and never replays the fad
 
 ### Details-only particle customization
 
-R19 names the WEB scene **Aperture - 1** and adds its existing details route as
+The WEB scene is named **Web Aperture** (Dimi's 2026-10-12 naming amendment).
+R19 adds its existing details route as
 the first Animations navigation link. Customization starts with Reset and the
 overlay switch, without a duplicate artwork preview. A ready Canvas stays visible
 behind the modal with continuous playback paused; edits may request coalesced

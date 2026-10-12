@@ -210,3 +210,33 @@ raw exports retain their original bytes. All exports contain only SVG/groups/pat
 without scripts, handlers, linked resources or raster content.
 
 Execution/results: [icon integration record](../../../docs/tasks/fs-icons-playback-update.md).
+
+### Games replacement, WEB and social additions — 2026-10-12
+
+Retrieved from the same UI Library Icons page using current design context and
+screenshots for each of the twelve variants. This replaces the Games exports
+from October 2; prior node IDs remain stable, but their geometry has changed.
+
+| Family   | 24 node | 36 node | 48 node | Actual export frames (24 / 36 / 48) |
+| -------- | ------- | ------- | ------- | ----------------------------------- |
+| games    | 210:146 | 210:145 | 210:144 | 21×24 / 33×36 / 43×49               |
+| s-web    | 262:18  | 262:17  | 262:12  | 22×24 / 33×36 / 44×48               |
+| github   | 263:14  | 263:13  | 263:12  | 24×23 / 36×34 / 48×46               |
+| linkedin | 263:24  | 263:23  | 263:22  | 24×23 / 36×35 / 47.9975×46.9976     |
+
+All original SVG bytes remain at `public/svg/icons/{family}-{size}.svg`.
+The registry preserves the exported paths/groups and exact viewBoxes, adapting
+black paint to currentColor and removing unused IDs as before. Games/48 retains
+the extra exported unit above its named 48-high frame. The existing square Icon
+slots preserve each drawing's proportions; no geometry is cropped or redrawn.
+Exports contain only SVG/groups/paths, with no scripts, event handlers, linked
+resources or raster content. The raw root's `display: block` style is retained
+in the source file; the shared Icon owns inline display/accessibility behavior.
+
+Gallery and Playground now expose **31 families / 93 size variants**. The WEB
+scene's existing **Web Aperture** tree row uses `s-web`; the Animations parent
+and pending second animation keep `animations`. Existing Games consumers use
+the revised artwork. GitHub and LinkedIn are available library icons; this task
+does not add social links or destinations.
+
+Execution/results: [WEB and social icon record](../../../docs/tasks/maintenance-icons-web-social.md).

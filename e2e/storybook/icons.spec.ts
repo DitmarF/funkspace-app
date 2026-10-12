@@ -18,7 +18,7 @@ for (const theme of themes) {
       `/iframe.html?id=icons-library--gallery&viewMode=story&globals=theme:${global};a11y.manual:!true`,
     );
     const root = page.locator("#storybook-root");
-    await expect(root.locator("svg")).toHaveCount(84);
+    await expect(root.locator("svg")).toHaveCount(93);
     await expect
       .poll(
         async () =>
@@ -28,7 +28,7 @@ for (const theme of themes) {
     await settleStyles(page);
     for (const size of [24, 36, 48]) {
       const section = page.getByRole("region", { name: `${size}px icons` });
-      await expect(section.getByRole("listitem")).toHaveCount(28);
+      await expect(section.getByRole("listitem")).toHaveCount(31);
       for (const item of await section.getByRole("listitem").all()) {
         expect((await renderedPair(item)).ratio).toBeGreaterThanOrEqual(4.5);
         const svg = item.locator("svg");

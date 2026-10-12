@@ -72,7 +72,7 @@ for (const javaScriptEnabled of [true, false]) {
           ).toBeInViewport();
         else
           await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-            destination.href === "/about" ? "About FunkSpace" : "Aperture - 1",
+            destination.href === "/about" ? "About FunkSpace" : "Web Aperture",
           );
         await expect(page.locator("main section")).toHaveCount(
           destination.href === "/about" ? aboutContent.sections.length : 2,

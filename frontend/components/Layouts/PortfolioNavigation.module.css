@@ -104,6 +104,7 @@
 
 /* Share Close's center without reserving a separate row above the details. */
 .details h3 {
+  font-family: var(--font-work-sans, var(--fs-font-family-display));
   display: flex;
   align-items: center;
   min-height: calc(var(--navigation-close-artwork-size) + 4px);

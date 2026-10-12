@@ -14,7 +14,7 @@ describe("portfolio destination contract", () => {
       },
       aperture: {
         focusId: "main-content",
-        label: "More about Aperture - 1",
+        label: "More about Web Aperture",
         href: "/animations/aperture",
       },
       impressum: {

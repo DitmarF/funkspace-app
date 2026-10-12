@@ -10,7 +10,7 @@ const pages = [
     route: "/",
     title: "FunkSpace",
     description: startIntroduction,
-    heading: "Aperture - 1",
+    heading: "Web Aperture",
   },
   {
     route: "/about",

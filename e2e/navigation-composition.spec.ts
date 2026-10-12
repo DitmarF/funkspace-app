@@ -56,6 +56,9 @@ for (const viewport of [
         name: "Navigation and settings",
       });
       await expect(title).toHaveCSS("clip-path", "inset(50%)");
+      await expect(
+        dialog.getByRole("heading", { name: "Navigation", exact: true }),
+      ).toHaveCSS("font-family", /work.?sans/i);
       const closeButton = dialog.getByRole("button", {
         name: "Close",
         exact: true,
@@ -184,6 +187,9 @@ for (const viewport of [
       await page.mouse.move(0, 0);
       await page.screenshot({ path: info.outputPath("navigation.png") });
       await openAppearance(page);
+      await expect(
+        dialog.getByRole("heading", { name: "Accessibility", exact: true }),
+      ).toHaveCSS("font-family", /work.?sans/i);
       await expect(
         dialog.getByRole("heading", { name: "Accessibility", exact: true }),
       ).toHaveCSS("font-size", viewport.width < 768 ? "30px" : "40px");

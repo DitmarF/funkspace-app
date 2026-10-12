@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { readFileSync } from "node:fs";
 import {
   openSettings,
   openAppearance,
@@ -21,12 +22,35 @@ for (const width of [320, 768, 1280]) {
       "Home",
       "About",
       "Animations",
-      "Aperture - 1",
+      "Web Aperture",
       "Games",
       "Privacy",
       "Privacy policy",
       "Legal notice",
     ]);
+    for (const [label, family] of [
+      ["Games", "games"],
+      ["Web Aperture", "s-web"],
+    ]) {
+      const size = width < 768 ? 24 : 36;
+      const row = nav
+        .locator("a, summary")
+        .filter({ hasText: new RegExp(`^${label}$`) });
+      const icon = row.locator(":scope > svg:visible");
+      const raw = readFileSync(
+        `frontend/public/svg/icons/${family}-${size}.svg`,
+        "utf8",
+      );
+      await expect(icon).toHaveAttribute(
+        "viewBox",
+        raw.match(/viewBox="([^"]+)"/)![1],
+      );
+      expect(
+        await icon
+          .locator("path")
+          .evaluateAll((paths) => paths.map((path) => path.getAttribute("d"))),
+      ).toEqual([...raw.matchAll(/ d="([^"]+)"/g)].map((match) => match[1]));
+    }
     await page.screenshot({
       path: testInfo.outputPath(`navigation-${width}.png`),
     });

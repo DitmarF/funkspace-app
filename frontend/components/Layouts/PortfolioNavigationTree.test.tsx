@@ -16,7 +16,7 @@ it("reveals the current page and keeps native manual toggling across rerenders",
   const summary = screen.getByText("Animations", { exact: true });
   const branch = summary.closest("details")!;
   expect(branch).toHaveAttribute("open");
-  expect(screen.getByRole("button", { name: "Aperture - 1" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Web Aperture" })).toBeDisabled();
   expect(view.container.querySelectorAll("details[open]")).toHaveLength(1);
   fireEvent.click(summary);
   view.rerender(<PortfolioNavigationTree />);
@@ -38,7 +38,7 @@ it("reveals every ancestor and resets groups when the route changes", () => {
   ];
   const view = render(<PortfolioNavigationTree items={items} />);
   expect(view.container.querySelectorAll("details[open]")).toHaveLength(2);
-  expect(screen.getByRole("button", { name: "Aperture - 1" })).toBeVisible();
+  expect(screen.getByRole("button", { name: "Web Aperture" })).toBeVisible();
   route.pathname = "/privacy";
   view.rerender(<PortfolioNavigationTree items={items} />);
   expect(screen.getByText("Animations").closest("details")).not.toHaveAttribute(
@@ -76,7 +76,7 @@ it("keeps ready destinations as anchors and future entries noninteractive", () =
     "href",
     "/impressum",
   );
-  expect(screen.getByRole("link", { name: "Aperture - 1" })).toHaveAttribute(
+  expect(screen.getByRole("link", { name: "Web Aperture" })).toHaveAttribute(
     "href",
     "/animations/aperture",
   );
@@ -146,7 +146,7 @@ it("keeps Contact disabled and renders the matching destination artwork", () => 
     "Home",
     "About",
     "Animations",
-    "Aperture - 1",
+    "Web Aperture",
     "Games",
     "Privacy",
     "Privacy policy",
@@ -156,6 +156,7 @@ it("keeps Contact disabled and renders the matching destination artwork", () => 
     ["Home", "home"],
     ["About", "about"],
     ["Animations", "animations"],
+    ["Web Aperture", "s-web"],
     ["Games", "games"],
     ["Privacy", "privacy"],
     ["Privacy policy", "privacy-policy"],

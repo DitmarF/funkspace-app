@@ -63,6 +63,13 @@ This also works for direct visits and without JavaScript. Groups remain native
 disclosures that users can close or reopen; a pathname change resets them to
 reveal the new current page.
 
+The Navigation and Accessibility overlay headings use the existing Work Sans
+font; Appearance and Motion legends retain their existing typography.
+
+The WEB animation's **Web Aperture** row uses the dedicated `s-web` icon. The
+Animations parent retains its category icon; Games uses the updated library
+artwork. See the [icon source register](../Icons/README.md).
+
 At `48rem` and above, header links sit right of the logo and left of the settings
 hex, with `2 × --fs-space-md` between buttons. Below that breakpoint, the logo
 is on the left and the three buttons are stacked vertically on the right, with

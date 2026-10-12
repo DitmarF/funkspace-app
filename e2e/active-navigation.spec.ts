@@ -14,7 +14,7 @@ for (const javaScriptEnabled of [true, false]) {
       ["/?ref=current#about", "Home"],
       ["/about", "About"],
       ["/about?ref=current", "About"],
-      ["/animations/aperture", "Aperture - 1"],
+      ["/animations/aperture", "Web Aperture"],
       ["/privacy", "Privacy policy"],
       ["/impressum", "Legal notice"],
     ]) {
@@ -72,15 +72,15 @@ for (const width of [375, 1280]) {
   }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
-    await page.getByRole("link", { name: "More about Aperture - 1" }).click();
+    await page.getByRole("link", { name: "More about Web Aperture" }).click();
     await expect(page).toHaveURL("/animations/aperture");
     await expect(
-      page.getByRole("heading", { level: 1, name: "Aperture - 1" }),
+      page.getByRole("heading", { level: 1, name: "Web Aperture" }),
     ).toBeVisible();
     await openSettings(page);
     const tree = page.getByRole("navigation", { name: "Primary" });
     const summary = tree.locator("summary").filter({ hasText: "Animations" });
-    const current = tree.getByRole("button", { name: "Aperture - 1" });
+    const current = tree.getByRole("button", { name: "Web Aperture" });
     await expect(summary.locator("..")).toHaveAttribute("open", "");
     await expect(current).toBeVisible();
     await expect(current).toBeDisabled();
@@ -235,7 +235,7 @@ test("hydration preserves a manually closed current-page group", async ({
     await page.goto("/animations/aperture", { waitUntil: "commit" });
     await openFallbackNavigation(page);
     const tree = page.getByRole("navigation", { name: "Primary" });
-    const current = tree.getByRole("button", { name: "Aperture - 1" });
+    const current = tree.getByRole("button", { name: "Web Aperture" });
     const summary = tree.locator("summary").filter({ hasText: "Animations" });
     await expect(current).toBeVisible();
     await summary.click();
