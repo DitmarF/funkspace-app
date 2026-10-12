@@ -7,7 +7,9 @@ export default function NotFound() {
     <PortfolioShell>
       <div className="max-w-prose space-y-fs-lg break-words">
         <h1 className="text-3xl font-bold">Page not found</h1>
-        <p>The page you requested could not be found.</p>
+        <p className="text-portfolio-body">
+          The page you requested could not be found.
+        </p>
         <nav aria-label="Page recovery">
           <ul className="flex flex-wrap gap-fs-md">
             <li className="min-w-0 max-w-full">

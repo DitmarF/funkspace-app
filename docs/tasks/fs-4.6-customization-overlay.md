@@ -1,5 +1,19 @@
 # FS-4.6 — Details-page customization and overlay coordination
 
+## Aperture title size — 2026-10-06
+
+Follow-up: Dimi removes the homepage title's bottom margin. Delete its explicit
+`margin-bottom` declaration in `Start.module.css`; retain the 1.5rem size.
+The detail-page heading already has no bottom margin. Formatting and diff checks
+pass for this CSS-only follow-up; earlier browser/build results precede it.
+
+Dimi requests 1.5rem for the “Aperture - 1” title. Use the existing XL token in
+the homepage Start heading and the equivalent text-2xl class on the detail page.
+Font family/weight, other section headings, controls and scene behavior remain
+unchanged. Two Start tests, types/lint, production build and three scene-action
+browser checks pass, including computed 24px headings on both routes. No fresh
+performance/device claim or commit/push authorization. [Candidate and results](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/aperture-title-2026-10-06/README.md).
+
 ## WEB fade duration follow-up — 2026-10-05
 
 Dimi requests increasing WEB's fade-in duration by 100%: **400ms → 800ms**.

@@ -202,21 +202,18 @@ export default function PortfolioNavigation({
               <>
                 <fieldset className={panel.group}>
                   <legend>Appearance</legend>
-                  <ThemeSwitcher
-                    presentation="secondary"
-                    size="small-to-medium"
-                  />
+                  <ThemeSwitcher presentation="outlined" size="small" />
                 </fieldset>
                 {motion ? (
                   <MotionChoices
                     {...motion}
-                    presentation="secondary"
-                    size="small-to-medium"
+                    presentation="outlined"
+                    size="small"
                   />
                 ) : (
                   <MotionSettings
-                    presentation="secondary"
-                    size="small-to-medium"
+                    presentation="outlined"
+                    size="small"
                     showDescription={false}
                   />
                 )}

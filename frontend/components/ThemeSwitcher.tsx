@@ -63,7 +63,7 @@ export default function ThemeSwitcher({
             border ${
               currentTheme === theme.value
                 ? "bg-fs-action-primary border-fs-action-primary text-fs-content-inverse"
-                : "bg-transparent text-fs-action-primary border-fs-action-primary hover:bg-fs-action-hover hover:text-fs-content-inverse hover:border-fs-action-hover"
+                : "bg-transparent text-fs-action-primary border-fs-action-primary hover:border-fs-action-hover hover:underline decoration-fs-action-hover"
             }`}
         >
           {theme.label}

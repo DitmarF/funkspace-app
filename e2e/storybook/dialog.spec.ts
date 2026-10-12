@@ -305,7 +305,7 @@ for (const theme of themes) {
     expect(evidence.title.fontWeight).toBe("600");
     const fonts = await page.evaluate(() => ({
       title: getComputedStyle(document.documentElement)
-        .getPropertyValue("--font-work-sans")
+        .getPropertyValue("--font-space-grotesk")
         .trim()
         .replace(/["']/g, ""),
       body: getComputedStyle(document.documentElement)

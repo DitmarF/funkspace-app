@@ -12,10 +12,10 @@ export default function AperturePage() {
   return (
     <PortfolioShell sceneCustomization>
       <article className="space-y-fs-lg" aria-labelledby="aperture-title">
-        <h1 id="aperture-title" className="text-3xl font-bold">
+        <h1 id="aperture-title" className="text-2xl font-bold">
           Aperture - 1
         </h1>
-        <p>
+        <p className="text-portfolio-body">
           Explore the WEB particle scene. Customize its density, speed and size
           for this visit.
         </p>

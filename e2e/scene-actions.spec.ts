@@ -15,6 +15,9 @@ for (const route of ["/", "/animations/aperture"]) {
       localStorage.setItem("funkspace.motion.preference.v1", "on"),
     );
     await page.goto(route);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Aperture - 1" }),
+    ).toHaveCSS("font-size", "24px");
     const actions = page.locator("[data-scene-actions]");
     const pause = actions.getByRole("button", { name: "Pause animation" });
     const secondary =
@@ -24,6 +27,8 @@ for (const route of ["/", "/animations/aperture"]) {
     await expect(pause).toBeVisible();
     await expect(secondary).toBeVisible();
     await expect(secondary).toHaveText(route === "/" ? "More" : "Customize");
+    await expect(secondary).toHaveCSS("border-width", "2px");
+    await expect(secondary).toHaveCSS("font-weight", "600");
     await expect(secondary.locator("svg path").first()).toHaveAttribute(
       "d",
       firstPath(route === "/" ? "more" : "playground"),

@@ -17,12 +17,6 @@
   --control-border: var(--control-foreground);
 }
 
-/* Retain the theme chooser's established text-contrast contract on hover. */
-.choices[data-presentation="outlined"]
-  button[aria-pressed="false"]:hover:not(:active):not(:disabled) {
-  --control-foreground: var(--fs-color-action-hover);
-}
-
 /* Secondary choices keep a persistent inverse selection. */
 .choices[data-presentation="secondary"]
   button[aria-pressed="true"]:not(:disabled) {

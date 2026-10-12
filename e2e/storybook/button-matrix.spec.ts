@@ -122,7 +122,20 @@ for (const theme of themes) {
           .getByRole("button", { name: variant, exact: true })
           .first();
         await expect(button).toHaveCSS("font-size", `${fontSize}px`);
-        await expect(button).toHaveCSS("font-weight", weight);
+        const outlined =
+          variant === "outlined" || variant === "accent-outlined";
+        await expect(button).toHaveCSS(
+          "font-weight",
+          outlined ? "600" : weight,
+        );
+        if (outlined) {
+          await expect(button).toHaveCSS("border-width", `${height / 24}px`);
+          const disabled = section
+            .getByRole("button", { name: variant, exact: true })
+            .nth(1);
+          await expect(disabled).toHaveCSS("font-weight", "600");
+          await expect(disabled).toHaveCSS("border-width", `${height / 24}px`);
+        }
         // Long labels may grow; the Figma dimension is an accessible minimum.
         expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(
           height,

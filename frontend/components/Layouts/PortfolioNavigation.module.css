@@ -97,7 +97,7 @@
 
 .details h3,
 .group legend {
-  font-family: var(--font-work-sans, var(--fs-font-family-display));
+  font-family: var(--font-space-grotesk, var(--fs-font-family-base));
   font-size: var(--fs-font-size-xl);
   font-weight: var(--fs-font-weight-semibold);
 }
@@ -135,12 +135,6 @@
   --control-foreground: var(--fs-color-content-inverse);
   --control-background: var(--fs-color-content-primary);
   --control-border: var(--control-foreground);
-}
-
-/* These small labels need the normal-text hover token, without overriding active. */
-.choices[data-presentation="outlined"]
-  button[aria-pressed="false"]:hover:not(:active):not(:disabled) {
-  --control-foreground: var(--fs-color-action-hover);
 }
 
 /* Secondary choices keep a persistent inverse selection. */

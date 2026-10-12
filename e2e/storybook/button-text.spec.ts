@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { renderedPair } from "../helpers/foundation";
 
 for (const story of [
   "focus-padding-with-sticky-header",
@@ -36,7 +37,8 @@ for (const theme of ["light", "dark", "muted", "highContrast"]) {
     await expect(reset).toBeVisible();
     await expect(reset).toBeDisabled();
     for (const control of await root.locator("button, a").all()) {
-      await expect(control).toHaveCSS("font-weight", "500");
+      const isLink = await control.evaluate((node) => node.tagName === "A");
+      await expect(control).toHaveCSS("font-weight", isLink ? "600" : "500");
       const source = (await control.textContent())!.trim();
       expect(await control.innerText()).toBe(
         source[0].toLowerCase() + source.slice(1),
@@ -51,6 +53,13 @@ for (const theme of ["light", "dark", "muted", "highContrast"]) {
     );
     await overlay.focus();
     await expect(overlay).toBeFocused();
+    for (const choice of await root
+      .locator('button[aria-pressed="false"]')
+      .all()) {
+      await choice.hover();
+      expect((await renderedPair(choice)).ratio).toBeGreaterThanOrEqual(4.5);
+      await expect(choice).toHaveCSS("text-decoration-line", "underline");
+    }
     expect(
       (await new AxeBuilder({ page }).include("#storybook-root").analyze())
         .violations,

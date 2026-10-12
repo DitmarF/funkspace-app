@@ -1,5 +1,9 @@
 # Storybook color reference
 
+**2026-10-06 amendment:** The reference now shows one `action-hover` role.
+The [single-hover decision](fs-1.2-token-and-contrast-foundations.md#single-action-hover-amendment--2026-10-06)
+supersedes the historical two-role description below.
+
 ## Task metadata
 
 - **Stage:** Requested design-system reference work before the next FS task.

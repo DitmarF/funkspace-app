@@ -15,12 +15,12 @@ export default function ImpressumPage() {
     <PortfolioShell>
       <article className="max-w-prose space-y-fs-lg break-words">
         <h1 className="text-3xl font-bold">Legal notice</h1>
-        <p className="text-sm leading-6">{draftNotice}</p>
+        <p className="text-portfolio-body">{draftNotice}</p>
         <section aria-labelledby="operator-heading" className="space-y-fs-md">
           <h2 id="operator-heading" className="text-2xl font-bold">
             Operator information
           </h2>
-          <p className="text-base leading-7">
+          <p className="text-portfolio-body">
             The operator’s legal name and postal address have not yet been
             supplied. This page is incomplete.
           </p>

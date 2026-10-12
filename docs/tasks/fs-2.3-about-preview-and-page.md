@@ -2,10 +2,10 @@
 
 ## Task metadata
 
-- **Status:** Complete — Dimi explicitly accepted the bounded FS-2.3 delivery and authorized commit/push on 2026-09-20. Final publication copy remains a separate follow-up.
+- **Status:** Complete — Dimi accepted the bounded FS-2.3 delivery on 2026-09-20; supplied replacement preview and detailed copy for integration on 2026-10-05. See the current content amendment below; original implementation evidence remains historical.
 - **Task group:** [EPIC 2](../features/funkspace-minimum-usable.md#fs-23--build-about-preview-and-about-page)
 - **Owner:** Sites implementation; Dimi editorial acceptance; Codex integrated FS-2.6 review.
-- **Last updated:** 2026-09-20
+- **Last updated:** 2026-10-06
 - **Related documentation:** [Workflow](../development/ai-workflow.md), [FS-2.1](fs-2.1-page-structure-and-navigation.md), [FS-2.2](fs-2.2-static-start-and-logo.md), [FS-0.5](fs-0.5-product-and-technical-decisions.md).
 
 ## Requested outcome
@@ -19,7 +19,181 @@ Build a content-driven homepage About preview and a directly accessible `/about`
 - [x] Navigation, direct load, refresh, Back and cross-page Contact work with and without JavaScript.
 - [x] Narrow/enlarged-text content remains readable without clipping or nested article scrolling.
 - [x] Relevant types, lint, tests, builds and self-review have recorded evidence.
-- [ ] Final short and long About copy replaces Lorem Ipsum before publication — deferred from task closure by Dimi's explicit completion decision below; no final-copy approval is inferred.
+- [x] Final short and long About copy replaces Lorem Ipsum — Dimi supplied both texts and explicitly requested integration on 2026-10-05. This authorizes the copy, not public deployment.
+
+## Supplied About copy — 2026-10-05
+
+### Reading layout amendment
+
+**Mobile heading follow-up (2026-10-06):** Dimi sets `#about-heading` to medium
+500 below 48rem. This supersedes only the 400 heading weight in the mobile
+amendment below; mobile body remains 400 and tablet/desktop heading remains 700.
+Use the existing medium token and update the responsive browser expectation.
+Two focused tests, types/lint, both builds and six production About browser
+checks pass; mobile capture visually inspected. Exact 500/700 heading weights
+are checked on both sides of the existing breakpoint. [Candidate and validation](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/about-heading-medium-2026-10-06/README.md).
+
+**Mobile About typography (2026-10-06):** Dimi requests smaller, normal-weight
+homepage About text on mobile while retaining the tablet/desktop appearance.
+Below the existing 48rem breakpoint, use a 2rem heading and the LG 1.25rem body
+token, both regular 400. At 48rem and above, preserve the 2.5rem/bold heading and
+XL 1.5rem/medium body. Keep paragraph line-height, layout gaps, content, More
+button, Contact heading and detailed About page unchanged. This supersedes the
+all-viewport XL/medium and 2.5rem heading rules for the mobile preview only.
+Validation: [mobile typography packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/about-mobile-type-2026-10-06/README.md).
+Two focused tests, types/lint, application/Storybook builds and all six production
+About browser checks pass. Exact metrics are checked at 375, 767, 768 and 1280px;
+existing all-theme accessibility, enlarged-text and JavaScript-off journeys pass.
+Mobile and desktop captures were visually inspected. Performance results and
+unavailable physical-device coverage are kept separate in the packet.
+
+**Shared outlined treatment (2026-10-06):** The later
+[Standard-button amendment](fs-1.3-standard-button-family.md#outlined-border-and-weight-amendment--2026-10-06)
+replaces the local More overrides described below. Both More links now inherit
+small outlined 2px/600 directly; all Standard outlined consumers, including
+Customize, share the same size-scaled treatment.
+
+**Both homepage More buttons (2026-10-06):** Dimi clarifies that the 2px border
+and 600 weight apply to both About and Aperture More links. Extend the scoped
+StandardControl-variable override to the StartScene More link. The detailed-page
+Customize button and other shared controls retain 1.5px/500; icon positions,
+link destinations, scene runtime and focus behavior are unchanged.
+Validation: 35 focused tests, types/lint, production build and nine browser cases
+pass (six About plus three scene actions). The initial extra Customize-border
+assertion expected computed 1.5px, which Chrome rounds to 1px at DPR 1; check its
+unchanged `--standard-stroke: 1.5px` instead, retaining exact 2px/600 checks on
+More and 500 on Customize. Application code required no correction. Initial and
+final evidence: [both More buttons packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/home-more-buttons-2026-10-06/README.md).
+
+**About More button refinement (2026-10-06):** Dimi requests a 2px border and
+600 font weight. Scope the existing StandardControl CSS variables to the homepage
+About link, using the semibold token. Other buttons retain their existing styles;
+native href, accessible name, icon, alignment and focus remain unchanged.
+Two focused SSR tests, types/lint, production build and six About browser checks
+pass, including exact border/weight, responsive alignment, enlarged text,
+JavaScript-off and all-theme accessibility. [Candidate and results](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/about-more-button-2026-10-06/README.md).
+
+**Title/section-gap refinement (2026-10-06):** Dimi sets homepage About/Contact
+titles to 2.5rem (40px), superseding the 3rem trial. At the existing 48rem
+tablet/desktop breakpoint, set `--section-gap: calc(var(--fs-space-3xl) * 3)`
+(12rem/192px), replacing the 1.5 multiplier. Mobile remains 4rem/64px. The same
+variable continues to govern inter-section gap and final bottom padding.
+Update the existing browser assertions; preserve the XL/medium preview copy.
+Validation: eight focused tests, types/lint, production build and all six About
+browser checks pass, including 40px headings, 64px/192px responsive gaps,
+JavaScript-off, 200% text and all-theme accessibility. No fresh performance or
+physical-device claim. [Exact candidate and results](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/about-title-spacing-2026-10-06/README.md).
+
+**Full-width preview amendment (2026-10-06):** Dimi supplied
+`/Users/dimi/Desktop/Screenshot 2026-10-06 at 14.42.41.png` and requested its
+structure with XL/medium text. The homepage preview now spans the available
+section width; heading, paragraphs and More share the left edge. Use existing
+XL 1.5rem (24px), medium 500 and 2rem line-height, with a 4rem gap after the
+heading and 3rem between paragraphs/button, matching the supplied composition.
+This supersedes the centered/narrow preview and its earlier responsive body
+sizes. Detailed About and other page typography stay unchanged. Scoped CSS
+retains wrapping at narrow/enlarged text sizes. Evidence and checks:
+[full-width preview packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/about-full-width-2026-10-06/README.md).
+Eight focused tests, validation types, lint and the production build pass. All
+six production About checks pass, including exact XL/medium metrics and alignment,
+JavaScript on/off, 320px/landscape/desktop at 200% text and four-theme accessibility.
+Desktop/mobile captures were visually inspected. No new Lighthouse, Storybook
+build, physical-device or other-browser result is claimed for this scoped change.
+
+**Later alignment/heading correction (2026-10-05):** Dimi's supplied screenshot
+`/Users/dimi/Desktop/Screenshot 2026-10-05 at 22.45.25.png` marks the preview text's
+left edge as the More button's alignment. Keep the text block centered but align
+the button to that edge, superseding the centered-button choice below. Double
+only the homepage About/Contact headings from 1.5rem to 3rem (24px to 48px at the
+default root size); preserve Space Grotesk, the trailing icon and article headings.
+The existing responsive assertion now checks left-edge parity and both 48px
+headings. Evidence: [alignment correction packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/about-alignment-2026-10-05/README.md).
+The first browser run exposed horizontal overflow at 320px/200% text with the
+larger headings. Constrain the existing homepage grid column with
+`minmax(0, 1fr)` so it can shrink and let content wrap; retain the original
+no-overflow assertion, heading sizes, section gaps and centered copy block.
+Final validation: eight focused tests, types/lint, production build and all six
+About browser checks pass, including JavaScript-off and 200% text reflow. The
+desktop preview was visually inspected against the supplied alignment marker.
+No new Lighthouse, Storybook build, cross-browser or physical-device result is
+claimed for this bounded correction; earlier measurements remain historical.
+
+Dimi requests a short “more” link with its icon on the right; Space Grotesk for
+all headings; a centered preview text/button block with the heading left at the
+section edge; larger body copy; responsive About article top margin; and greater
+homepage section spacing. Preserve the supplied copy and meaningful accessible
+link name “More about FunkSpace.” Use the existing outlined ButtonLink/More icon.
+
+The 48rem breakpoint retains the existing tablet convention. Main portfolio prose
+uses 1.1rem/1.75rem on mobile and the existing 1.25rem/2rem tokens on larger screens.
+The About article has 2rem/4rem top margin. Homepage section gaps and final bottom
+spacing are 4rem/6rem, an implementation choice for Dimi’s unspecified “bigger”
+spacing request. Only the preview content block is centered; text stays left-aligned.
+Headings H1–H6, dialog titles and navigation/settings section headings use the
+existing Space Grotesk font. Buttons and identity/aperture artwork retain their
+own typography. Legal-page draft notices remain present and unchanged in wording.
+
+The change extends the current uncommitted copy delivery; no previous work is
+discarded. Validation and exact incremental evidence are in the
+[reading-layout packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/about-reading-layout-2026-10-05/README.md).
+
+Validation: 13 focused SSR/shell/dialog/navigation tests, validation types, lint,
+production and Storybook builds pass. All 80 selected browser cases pass after a
+test-only correction: 51 About/navigation/customization cases, 13 static-route
+cases and 16 Storybook dialog cases. The first combined production run had eight
+failures in the newly added font check because computed font lists contain spaces
+after commas while the font variable does not. Actual computed headings used
+Space Grotesk; normalize quote/whitespace formatting and retain the exact font
+prefix assertion. All 13 affected route cases then pass. No application correction
+or assertion removal was needed. Initial results remain in the packet.
+
+New assertions cover the trailing icon, centered text block/button with an
+unchanged heading edge, 375/768/1280px body metrics, section gaps and About margins.
+Existing checks retain keyboard/focus, native history, JavaScript-off, enlarged
+text, all-theme accessibility, modal scrolling and scene behavior. Mobile preview
+and desktop article captures were visually inspected. The earlier copy delivery
+and its wording remain intact. Physical devices and other browser engines were
+not rerun; technical validation is separate from Dimi’s visual acceptance.
+
+Final-build Lighthouse uses three desktop/devtools samples each on Home and
+About after functional jobs finish: Home LCP 3095.772–3120.319ms, About
+451.398–457.030ms; CLS 0 for all six samples. Existing LCP ≤5000ms and CLS ≤0.1
+assertions pass. Homepage scores 0.81/0.82/0.81 retain the existing 0.9 warning;
+About scores 1.0 in all samples. These are local samples, not field p75 or FS-4.7
+physical-device certification. No source/runtime performance threshold changed.
+
+### Content integration
+
+Dimi supplied the two-paragraph homepage preview and complete “About FunkSpace”
+narrative in this session, explicitly requesting integration. Preserve the wording,
+paragraph order and Louis Sullivan attribution. The Markdown heading levels are
+adapted to the actual page hierarchy: one H1 and five H2 subsections, including
+“An evolving project.” The quotation uses a blockquote and separate attribution.
+
+The existing declarative `aboutContent` object remains the content source. Both
+consumers remain server-renderable; the native More link, shell and typography
+are reused. Remove the About-only draft notice and Latin language markers;
+metadata uses the first supplied preview sentence. Rename the draft preview story
+to Default. No CMS, service, dependency, biography claim or contact method is added.
+
+Base: `e561d97447c7eb3676d9df6b249248b68a464e76`, branch
+`feature/funkspace-minimum-usable`; starting tree clean. Scope includes content,
+the two consumers, preview story, existing content/shell/route tests, this record
+and the feature-plan copy status. Historical draft/acceptance paragraphs below
+describe the September delivery and are superseded for current About copy only.
+
+Validation and the exact candidate are recorded in the
+[local content evidence packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/about-copy-2026-10-05/README.md).
+Fresh validation: seven focused SSR/shell tests, validation types, repository
+lint, the flag-On production build and Storybook build pass. Chrome
+154.0.8037.95 passes all 18 About/static-route browser checks without retries or
+skips, including JavaScript on/off, native history/contact navigation, metadata,
+all supplied paragraphs, 320px/landscape/desktop reflow at 200% text and
+accessibility across four themes. Mobile preview and desktop article captures
+were visually inspected. No full-suite, Lighthouse, flag-Off build, other browser
+engine or physical-device result is claimed for this content-only amendment.
+No commit, push, deployment, legal acceptance or EPIC 4 completion is authorized
+by this content request.
 
 ## Context and repository evidence
 

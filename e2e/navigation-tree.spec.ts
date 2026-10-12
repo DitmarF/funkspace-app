@@ -4,6 +4,7 @@ import {
   openSettings,
   openAppearance,
   openFallbackNavigation,
+  renderedPair,
 } from "./helpers/foundation";
 
 for (const width of [320, 768, 1280]) {
@@ -119,7 +120,21 @@ test("disclosures support keyboard use, independent branches, themes and ready d
     });
     await expect(about).toHaveCSS("color", hoverColor);
     await expect(about).toHaveCSS("border-width", "0px");
+    await expect(about.locator("span").last()).toHaveCSS(
+      "text-decoration-line",
+      "none",
+    );
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.setViewportSize({ width: 375, height: 900 });
+    await about.hover();
+    expect((await renderedPair(about)).ratio).toBeGreaterThanOrEqual(4.5);
+    await expect(about.locator("svg:visible")).toHaveCSS("color", hoverColor);
+    await expect(about.locator("span").last()).toHaveCSS(
+      "text-decoration-line",
+      "none",
+    );
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.setViewportSize({ width: 1280, height: 720 });
   }
   await nav.getByRole("link", { name: "About", exact: true }).click();
   await expect(page).toHaveURL("/about");

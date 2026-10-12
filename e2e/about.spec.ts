@@ -9,6 +9,85 @@ import {
   themes,
 } from "./helpers/foundation";
 
+test("full-width preview typography and reading spacing respond to the viewport", async ({
+  page,
+}, info) => {
+  for (const width of [375, 767, 768, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/#about");
+    const preview = page.locator("#about");
+    const copy = preview.locator("p").first();
+    await expect(copy).toHaveCSS("font-size", width < 768 ? "20px" : "24px");
+    await expect(copy).toHaveCSS("line-height", "32px");
+    await expect(copy).toHaveCSS("font-weight", width < 768 ? "400" : "500");
+    const geometry = await preview.evaluate((section) => {
+      const block = section.querySelector("p")!.parentElement!;
+      const outer = section.getBoundingClientRect();
+      const inner = block.getBoundingClientRect();
+      const heading = section.querySelector("h2")!.getBoundingClientRect();
+      return {
+        center: inner.x + inner.width / 2,
+        outerCenter: outer.x + outer.width / 2,
+        copyLeft: inner.x,
+        copyRight: inner.right,
+        expectedRight:
+          outer.right - parseFloat(getComputedStyle(section).paddingRight),
+        copyGap: getComputedStyle(block).rowGap,
+        headingGap: inner.top - heading.bottom,
+        headingLeft: heading.x,
+        expectedLeft:
+          outer.x + parseFloat(getComputedStyle(section).paddingLeft),
+        gap: getComputedStyle(section.parentElement!).rowGap,
+      };
+    });
+    expect(geometry.center).toBeCloseTo(geometry.outerCenter, 0);
+    expect(geometry.headingLeft).toBeCloseTo(geometry.expectedLeft, 0);
+    expect(geometry.copyLeft).toBeCloseTo(geometry.headingLeft, 0);
+    expect(geometry.copyRight).toBeCloseTo(geometry.expectedRight, 0);
+    expect(geometry.copyGap).toBe("48px");
+    expect(geometry.headingGap).toBeCloseTo(64, 0);
+    expect(geometry.gap).toBe(width < 768 ? "64px" : "192px");
+    const more = preview.getByRole("link", { name: "More about FunkSpace" });
+    await expect(more).toHaveText("more");
+    await expect(more).toHaveCSS("border-width", "2px");
+    await expect(more).toHaveCSS("font-weight", "600");
+    const moreBounds = await more.boundingBox();
+    const copyBounds = await copy.boundingBox();
+    expect(moreBounds!.x).toBeCloseTo(copyBounds!.x, 0);
+    await expect(page.locator("#about-heading")).toHaveCSS(
+      "font-size",
+      width < 768 ? "32px" : "40px",
+    );
+    await expect(page.locator("#about-heading")).toHaveCSS(
+      "font-weight",
+      width < 768 ? "500" : "700",
+    );
+    await expect(page.locator("#contact-heading")).toHaveCSS(
+      "font-size",
+      "40px",
+    );
+    const positions = await more.evaluate((link) => ({
+      icon: link.querySelector("svg")!.getBoundingClientRect().x,
+      label: link.querySelector("span")!.getBoundingClientRect().right,
+    }));
+    expect(positions.icon).toBeGreaterThan(positions.label);
+    if (width === 375 || width === 1280) {
+      await preview.screenshot({
+        path: info.outputPath(`about-preview-${width}.png`),
+      });
+    }
+    await page.goto("/about");
+    await expect(page.locator("article")).toHaveCSS(
+      "margin-top",
+      width < 768 ? "32px" : "64px",
+    );
+    await expect(page.locator("article > p").first()).toHaveCSS(
+      "font-size",
+      width < 768 ? "17.6px" : "20px",
+    );
+  }
+});
+
 for (const javaScriptEnabled of [true, false]) {
   test.describe(`About, JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
     test.use({ javaScriptEnabled });
@@ -22,7 +101,10 @@ for (const javaScriptEnabled of [true, false]) {
         if (message.type() === "error") errors.push(message.text());
       });
       const home = await page.goto("/");
-      expect(await home!.text()).toContain(aboutContent.preview);
+      const homeHtml = await home!.text();
+      for (const paragraph of aboutContent.preview) {
+        expect(homeHtml).toContain(paragraph);
+      }
       const preview = page.getByRole("region", { name: "About", exact: true });
       await expect(preview.getByRole("heading", { level: 2 })).toHaveText(
         "About",
@@ -42,11 +124,25 @@ for (const javaScriptEnabled of [true, false]) {
       const response = await page.goto("/about");
       expect(response?.status()).toBe(200);
       const html = await response!.text();
-      for (const paragraph of aboutContent.paragraphs) {
+      for (const paragraph of [
+        ...aboutContent.paragraphs,
+        ...aboutContent.sections.flatMap((section) => section.paragraphs),
+      ]) {
         expect(html).toContain(paragraph);
         await expect(page.getByText(paragraph)).toBeVisible();
       }
-      await expect(page.getByText(aboutContent.draftNotice)).toBeVisible();
+      await expect(page.getByText(/Draft content|Lorem ipsum/)).toHaveCount(0);
+      await expect(page.locator('article [lang="la"]')).toHaveCount(0);
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+        "content",
+        aboutContent.description,
+      );
+      await expect(page.locator("article h2")).toHaveText(
+        aboutContent.sections.map((section) => section.heading),
+      );
+      await expect(page.locator("article blockquote")).toHaveText(
+        "“Form ever follows function.”",
+      );
       await page.reload();
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(
         "About FunkSpace",
@@ -120,7 +216,7 @@ for (const javaScriptEnabled of [true, false]) {
           const last =
             route === "/"
               ? page.getByRole("link", { name: "More about FunkSpace" })
-              : page.getByText(aboutContent.paragraphs[2]);
+              : page.getByText(aboutContent.sections[4].paragraphs[1]);
           await last.scrollIntoViewIfNeeded();
           await expect(last).toBeInViewport();
           if (route === "/") {

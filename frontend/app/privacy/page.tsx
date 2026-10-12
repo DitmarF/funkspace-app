@@ -15,18 +15,18 @@ export default function PrivacyPage() {
     <PortfolioShell>
       <article className="max-w-prose space-y-fs-lg break-words">
         <h1 className="text-3xl font-bold">Privacy</h1>
-        <p className="text-sm leading-6">{draftNotice}</p>
+        <p className="text-portfolio-body">{draftNotice}</p>
         <section aria-labelledby="appearance-heading" className="space-y-fs-md">
           <h2 id="appearance-heading" className="text-2xl font-bold">
             Appearance preferences
           </h2>
-          <p className="text-base leading-7">
+          <p className="text-portfolio-body">
             With JavaScript enabled, this site saves your appearance preference
             in your browser’s local storage under the key “theme”. If no valid
             preference has been saved, it stores “system”, which follows your
             device’s light or dark setting. Choosing a theme updates this value.
           </p>
-          <p className="text-base leading-7">
+          <p className="text-portfolio-body">
             The site does not set an expiry for this value. You can remove it
             using your browser’s site-data controls. This local storage is not a
             cookie.
@@ -36,7 +36,7 @@ export default function PrivacyPage() {
           <h2 id="fonts-heading" className="text-2xl font-bold">
             Fonts
           </h2>
-          <p className="text-base leading-7">
+          <p className="text-portfolio-body">
             Fonts are self-hosted. Work Sans and Space Grotesk are loaded from
             this site.
           </p>
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
           <h2 id="email-heading" className="text-2xl font-bold">
             Email contact
           </h2>
-          <p className="text-base leading-7">
+          <p className="text-portfolio-body">
             Email links open your mail application. This site has no contact
             form.
           </p>
@@ -57,7 +57,7 @@ export default function PrivacyPage() {
           <h2 id="pending-heading" className="text-2xl font-bold">
             Information still to be completed
           </h2>
-          <p className="text-base leading-7">
+          <p className="text-portfolio-body">
             Information about the operator, hosting and email processing is
             still being completed. This page is not a complete privacy notice.
           </p>

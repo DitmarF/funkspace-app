@@ -15,7 +15,7 @@ const pages = [
   {
     route: "/about",
     title: "About FunkSpace",
-    description: aboutContent.draftNotice,
+    description: aboutContent.description,
     heading: "About FunkSpace",
   },
   {
@@ -139,25 +139,43 @@ for (const javaScriptEnabled of [true, false]) {
         await expect(page.getByRole("heading", { level: 1 })).toHaveText(
           entry.heading,
         );
+        expect(
+          await page
+            .locator("main h1, main h2, main h3, main h4, main h5, main h6")
+            .evaluateAll((headings) =>
+              headings.every((heading) => {
+                const style = getComputedStyle(heading);
+                const family = style
+                  .getPropertyValue("--font-space-grotesk")
+                  .trim()
+                  .replace(/["'\s]/g, "");
+                return (
+                  family.length > 0 &&
+                  style.fontFamily.replace(/["'\s]/g, "").startsWith(family)
+                );
+              }),
+            ),
+        ).toBe(true);
         await expectVisibleBrand(page);
         await expectSemanticsAndSkip(page);
         if (entry.route === "/") {
           await expect(page.locator("#start")).not.toContainText(
             startIntroduction,
           );
-          await expect(page.locator("#about p[lang=la]")).toHaveText(
-            aboutContent.preview,
-          );
+          await expect(page.locator("#about p")).toHaveText([
+            ...aboutContent.preview,
+          ]);
           await expect(
             page.locator("#start [data-scene-aperture]"),
           ).toBeVisible();
         } else if (entry.route === "/about") {
-          await expect(page.locator("article p[lang=la]")).toHaveText([
-            ...aboutContent.paragraphs,
-          ]);
           await expect(
-            page.locator("article p[lang=la]").first(),
-          ).toBeVisible();
+            page.locator("article > p, article > section > p"),
+          ).toHaveText([
+            ...aboutContent.paragraphs,
+            ...aboutContent.sections.flatMap((section) => section.paragraphs),
+          ]);
+          await expect(page.locator("article > p").first()).toBeVisible();
         } else {
           await expect(
             page

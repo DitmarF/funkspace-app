@@ -1,0 +1,9 @@
+.article {
+  margin-top: var(--fs-space-xl);
+}
+
+@media (min-width: 48rem) {
+  .article {
+    margin-top: var(--fs-space-3xl);
+  }
+}

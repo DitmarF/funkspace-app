@@ -41,8 +41,8 @@ const roles: Record<SemanticName, string> = {
   "content-elevation-2": "Second content level",
   "content-disabled": "Unavailable content",
   "action-primary": "Primary action",
-  "action-hover": "Ordinary action hover",
-  "action-hover-large": "Standard hover with large labels (24px+)",
+  "action-hover":
+    "Shared hover accent; small labels retain readable text colors",
   "action-link": "Link accent",
   "action-disabled": "Unavailable action",
   "feedback-success": "Success signal",

@@ -1,5 +1,37 @@
 # Task FS-1.3 — Extend the Standard Button family
 
+**2026-10-06 hover consolidation:** Standard controls now consume the single
+`action-hover` token with the former large-label values. Their appearance stays
+unchanged. The [single-hover decision](fs-1.2-token-and-contrast-foundations.md#single-action-hover-amendment--2026-10-06)
+supersedes the historical `action-hover-large` split below.
+
+## Outlined border and weight amendment — 2026-10-06
+
+Dimi requests every small Standard outlined button to match More (2px border,
+600 weight), with other sizes scaled accordingly. Apply to outlined and
+accent-outlined Button variants and native ButtonLink: small 2px, medium 3px,
+large 4px, retaining the existing 1:1.5:2 size scale. Weight stays semibold 600
+at every size. The responsive small-to-medium preset changes from 2px to 3px
+at its existing 48rem breakpoint. Filled primary/secondary controls, HexButton
+and native demo buttons retain their existing weights/strokes.
+
+StandardControl owns the variant-specific geometry/weight. Remove the two local
+homepage More overrides so both now inherit the shared rule; Customize and all
+other Standard outlined consumers inherit it too. Keep fonts, labels, target
+minima, icons, states, focus, native link/form semantics and pending behavior.
+This supersedes earlier 500-weight and More-only scope for outlined controls.
+Validation and exact candidate: [outlined-button packet](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/outlined-buttons-2026-10-06/README.md).
+
+Validation on the existing uncommitted candidate: 34 focused tests and all 1,850
+unit tests passed; validation types, lint, application and Storybook builds passed.
+Chrome production journeys passed 27/27 and Storybook button/HexButton journeys
+passed 45/45, with no skips or retries. Browser assertions cover outlined 2/3/4px
+strokes and 600 weight across all four themes, disabled states, native interaction,
+focus, contrast, narrow layouts and enlarged text. Inspected the rendered size
+matrix and mobile homepage screenshot. These are local browser results, not
+physical-device or new human visual acceptance. Performance results and retained
+build warnings are recorded separately in the packet. No commit or push.
+
 **Typography amendment — 2026-10-05:** Dimi now requests medium weight (500), a
 lowercase initial letter and optically centered labels for all text buttons.
 [Current implementation and evidence](button-text-typography.md)

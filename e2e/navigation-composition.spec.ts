@@ -247,17 +247,12 @@ for (const viewport of [
           const selectedPair = await renderedPair(selected);
           const unselectedPair = await renderedPair(unselected);
           for (const button of [selected, unselected]) {
-            await expect(button).toHaveCSS(
-              "min-height",
-              viewport.width < 768 ? "48px" : "72px",
-            );
-            await expect(button).toHaveCSS(
-              "font-size",
-              viewport.width < 768 ? "24px" : "36px",
-            );
-            await expect(button).toHaveCSS("font-weight", "500");
+            await expect(button).toHaveCSS("min-height", "48px");
+            await expect(button).toHaveCSS("font-size", "24px");
+            await expect(button).toHaveCSS("font-weight", "600");
+            await expect(button).toHaveCSS("border-width", "2px");
           }
-          // Secondary is filled; persistent selection reverses its foreground/surface.
+          // Outlined choices keep a persistent filled selection.
           expect(selectedPair.foreground).toBe(
             `rgb(${unselectedPair.background.join(", ")})`,
           );
@@ -271,14 +266,15 @@ for (const viewport of [
           const sharedHover = await unselected.evaluate((node) =>
             (
               getComputedStyle(node)
-                .getPropertyValue("--fs-color-action-hover-large")
+                .getPropertyValue("--fs-color-action-hover")
                 .match(/[\d.]+/g) ?? []
             )
               .slice(0, 3)
               .map(Number),
           );
-          expect(hoverPair.background).toEqual(sharedHover);
-          // The verified 24/36px labels use the same approved 3:1 large-text
+          expect(hoverPair.foreground).toBe(`rgb(${sharedHover.join(", ")})`);
+          expect(hoverPair.background).toEqual(unselectedPair.background);
+          // The verified 24px labels use the same approved 3:1 large-text
           // hover pairing as the shared buttons (not the former 16px override).
           expect(hoverPair.ratio).toBeGreaterThanOrEqual(3);
           await selected.hover();

@@ -1,5 +1,47 @@
 # Task FS-1.2 — Token and contrast foundations
 
+## Single action-hover amendment — 2026-10-06
+
+**Navigation follow-up — 2026-10-07:** Dimi removes the tree hover underline.
+Keep the existing color feedback: icons/arrows on mobile, plus large labels on
+tablet/desktop. Small labels retain readable content-primary. Keyboard focus and
+other controls are unchanged. This supersedes the tree underline described below.
+Eight focused tests, types/lint, production/Storybook builds and five production
+navigation-tree browser checks pass, including mobile/desktop no-underline
+assertions, all-theme contrast/accessibility and no-JavaScript navigation.
+[Exact candidate and results](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/tree-hover-2026-10-07/README.md).
+
+Dimi requests one shared hover role. `color-action-hover` now takes the former
+large-label token's light value `#CC673B`; dark `#CC8668`, muted `#66331E` and
+high-contrast `#FFA882` are retained. Remove `color-action-hover-large` entirely,
+migrate live consumers/reference UI, and regenerate CSS/TypeScript through Style
+Dictionary. No compatibility alias, duplicate token source or generated hand edit.
+This supersedes the historic default `#9C4B2B` fix and later two-role split.
+
+The original contrast constraint still applies: light-theme orange cannot carry
+normal-size text against light surfaces at 4.5:1. Standard controls already have
+large labels and keep their existing appearance/3:1 hover target. Mobile tree
+labels keep content-primary, with the unified orange on icons/underlines;
+tablet/desktop 24px labels retain orange. Legacy native ThemeSwitcher labels
+keep their readable text/fill and use orange hover borders/underlines. Remove
+redundant chooser overrides that existed solely for the former split.
+
+Update real-consumer and normal-text fixture checks without lowering contrast
+thresholds. The foundation test's stale Work Sans heading assertion is updated
+to the previously approved Space Grotesk heading. Current candidate, commands,
+results and limits: [single-hover evidence](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/single-hover-2026-10-06/README.md).
+No theme-service, game, motion or runtime changes; prior uncommitted work stays.
+
+Validation: all 1,850 unit tests, validation types, lint, application and Storybook
+builds pass. Production foundation/navigation/theme checks pass 29/29; Storybook
+colors, buttons, HexButton and themes pass 56/56, with no retries or skips.
+Browser checks prove the deleted role is absent from generated CSS/reference UI,
+the remaining light hover resolves to `#CC673B`, mobile labels retain 4.5:1
+contrast and Standard hover states retain their existing 3:1 requirement.
+The semantic-color reference screenshot was visually inspected. Lighthouse and
+coverage limits are recorded in the linked packet; no new physical-device or
+human visual acceptance is inferred.
+
 ## Task metadata
 
 - **Status:** Complete — foundation corrections validated, Sites consumer review passed, and Dimi accepted all corrections on 2026-09-15; [actual decision](#dimi-acceptance--2026-09-15).

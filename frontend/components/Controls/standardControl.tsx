@@ -27,7 +27,8 @@ export function standardControlClassName(
   className: string,
   size: ButtonSize = "small",
 ) {
-  return `${styles.control} ${controlAppearanceClassName(variant)} ${styles[size]} ${className}`.trim();
+  const outlined = variant === "outlined" || variant === "accent-outlined";
+  return `${styles.control} ${controlAppearanceClassName(variant)} ${styles[size]} ${outlined ? styles.outlined : ""} ${className}`.trim();
 }
 
 export function StandardControlContent({

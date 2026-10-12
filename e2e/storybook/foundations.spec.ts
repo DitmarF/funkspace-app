@@ -48,7 +48,9 @@ for (const theme of themes) {
       expect(font).not.toBe("");
       expect(base.fontFamily).toContain(font);
       expect(base.fontSize).toBe("24px");
-      expect(base.fontWeight).toBe("700");
+      const outlined = variant === "outlined" || variant === "accent-outlined";
+      expect(base.fontWeight).toBe(outlined ? "600" : "500");
+
       await button.hover();
       const frames = await transitionPairs(button);
       // Dimi approved Figma's large-text pairing. The 24px minimum is

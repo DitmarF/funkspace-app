@@ -158,7 +158,7 @@ function Example({
           {long &&
             Array.from({ length: 12 }, (_, index) => (
               <section key={index}>
-                <h3 className="font-display font-semibold">
+                <h3 className="font-sans font-semibold">
                   Example section {index + 1}
                 </h3>
                 <p>

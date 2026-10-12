@@ -1,0 +1,13 @@
+.sections {
+  --section-gap: var(--fs-space-3xl);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--section-gap);
+  padding-bottom: var(--section-gap);
+}
+
+@media (min-width: 48rem) {
+  .sections {
+    --section-gap: calc(var(--fs-space-3xl) * 3);
+  }
+}

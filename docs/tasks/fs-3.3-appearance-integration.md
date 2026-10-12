@@ -1,5 +1,22 @@
 # FS-3.3 — Appearance integration and live theme consistency
 
+## Accessibility small outlined choices — 2026-10-07
+
+Dimi requests small outlined Accessibility buttons at all viewport sizes.
+The navigation panel now passes `presentation="outlined"` and `size="small"`
+to ThemeSwitcher and both Motion choices paths. This supersedes the secondary
+and responsive small-to-medium amendments below. Reuse the shared 48px minimum
+height, 24px labels, 600 weight and 2px border; selected choices remain filled
+with `aria-pressed`, and unselected hover uses the shared accent foreground.
+Keep labels, group spacing, keyboard focus, theme/motion authority and native
+fallback behavior. Other consumers and button variants remain unchanged.
+
+Validation: nine focused tests, types/lint, application/Storybook builds and all
+18 production navigation-composition checks pass. Browser assertions cover the
+same 48px/24px/600/2px sizing at mobile/tablet/desktop, selected-state inversion,
+hover foreground, contrast, focus, themes and enlarged/short layouts. No new
+human acceptance is inferred. [Candidate and validation evidence](/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/accessibility-small-outline-2026-10-07/README.md).
+
 ## Status and scope — 2026-09-27
 
 **Owner:** Sites. **Status:** Complete — Dimi explicitly accepted and closed

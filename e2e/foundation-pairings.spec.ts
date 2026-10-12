@@ -16,7 +16,7 @@ for (const theme of themes) {
     await page.mouse.move(0, 0);
     const heading = await renderedPair(page.locator("h1"));
     const body = await renderedPair(page.locator("body"));
-    expect(heading.fontFamily.toLowerCase()).toContain("worksans");
+    expect(heading.fontFamily.toLowerCase()).toContain("spacegrotesk");
     expect(body.fontFamily.toLowerCase()).toContain("spacegrotesk");
 
     // A browser-only contract fixture, not a new production control family.
@@ -33,12 +33,12 @@ for (const theme of themes) {
           #foundation-fixture button, #foundation-fixture input { padding:var(--fs-space-xs) var(--fs-space-md); border:2px solid var(--fs-color-border-strong); }
           #foundation-fixture button:focus-visible, #foundation-fixture input:focus-visible { outline:2px solid var(--fs-color-border-focus); outline-offset:2px; }
           #foundation-fixture .accent { background:var(--fs-color-action-primary); color:var(--fs-color-content-inverse); }
-          #foundation-fixture .accent:hover, #foundation-fixture .accent:active { background:var(--fs-color-action-hover); }
+          #foundation-fixture .accent:hover, #foundation-fixture .accent:active { border-color:var(--fs-color-action-hover); text-decoration:underline; text-decoration-color:var(--fs-color-action-hover); }
           #foundation-fixture .neutral { background:var(--fs-color-surface-elevation-1); color:var(--fs-color-content-primary); }
           #foundation-fixture .neutral:hover { background:var(--fs-color-surface-elevation-2); color:var(--fs-color-content-inverse); }
           #foundation-fixture input { background:var(--fs-color-surface-background); color:var(--fs-color-content-primary); }
           #foundation-fixture .outline { background:transparent; color:var(--fs-color-content-primary); }
-          #foundation-fixture .outline:hover { background:var(--fs-color-action-hover); color:var(--fs-color-content-inverse); }
+          #foundation-fixture .outline:hover { border-color:var(--fs-color-action-hover); text-decoration:underline; text-decoration-color:var(--fs-color-action-hover); }
           #foundation-fixture .display { font-family:var(--font-work-sans, var(--fs-font-family-display)); font-size:var(--fs-font-size-xl); font-weight:var(--fs-font-weight-medium); }
           #foundation-fixture .menu-label { font-family:var(--font-work-sans, var(--fs-font-family-display)); font-size:var(--fs-font-size-md); font-weight:var(--fs-font-weight-semibold); }
         </style>

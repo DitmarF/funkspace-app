@@ -58,6 +58,23 @@
   --standard-stroke: 3px;
 }
 
+.control.outlined {
+  --standard-font-weight: var(--fs-font-weight-semibold);
+}
+
+.outlined.small,
+.outlined.small-to-medium {
+  --standard-stroke: 2px;
+}
+
+.outlined.medium {
+  --standard-stroke: 3px;
+}
+
+.outlined.large {
+  --standard-stroke: 4px;
+}
+
 /* Opt-in settings preset: preserve one button and native focus across resize. */
 @media (min-width: 48rem) {
   .small-to-medium {
@@ -69,6 +86,10 @@
     --standard-font-weight: var(--fs-font-weight-medium);
     --standard-radius: calc(var(--fs-space-sm) * 0.75);
     --standard-stroke: 2px;
+  }
+
+  .outlined.small-to-medium {
+    --standard-stroke: 3px;
   }
 }
 

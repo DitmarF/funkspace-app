@@ -10,7 +10,10 @@ export default function Contact() {
       aria-labelledby="contact-heading"
     >
       <div className="max-w-prose space-y-fs-md break-words">
-        <h2 id="contact-heading" className="text-2xl font-bold">
+        <h2
+          id="contact-heading"
+          className="text-[2.5rem] font-bold leading-none"
+        >
           Contact
         </h2>
         <ButtonLink href={contactHref} className="scroll-mb-fs-2xl">

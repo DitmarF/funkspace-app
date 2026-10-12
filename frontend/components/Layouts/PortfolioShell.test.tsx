@@ -115,7 +115,9 @@ describe("server-rendered portfolio documents", () => {
         destinations[section.id as "start" | "about" | "contact"].href,
       ).toBe(`/#${section.id}`);
     }
-    expect(screen.getByText(aboutContent.preview)).toBeVisible();
+    for (const paragraph of aboutContent.preview) {
+      expect(screen.getByText(paragraph)).toBeVisible();
+    }
     expect(screen.getByRole("link", { name: contactEmail })).toHaveAttribute(
       "href",
       contactHref,

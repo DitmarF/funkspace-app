@@ -16,7 +16,7 @@
 
 .primary:hover:not(:disabled):not([aria-busy="true"]),
 .secondary:hover:not(:disabled):not([aria-busy="true"]) {
-  --control-background: var(--fs-color-action-hover-large);
+  --control-background: var(--fs-color-action-hover);
 }
 
 .secondary {
@@ -38,7 +38,7 @@
 
 .outlined:hover:not(:disabled):not([aria-busy="true"]),
 .accent-outlined:hover:not(:disabled):not([aria-busy="true"]) {
-  --control-foreground: var(--fs-color-action-hover-large);
+  --control-foreground: var(--fs-color-action-hover);
 }
 
 .primary:active:not(:disabled):not([aria-busy="true"]) {

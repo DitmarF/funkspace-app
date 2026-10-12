@@ -40,6 +40,24 @@ for (const theme of themes) {
       const root = page.locator("main");
       await expect(root).toHaveAttribute("data-resolved-theme", theme);
       await settleStyles(page);
+      if (view === "semantic-colors") {
+        await expect(
+          root.locator('[data-color-token="action-hover-large"]'),
+        ).toHaveCount(0);
+        expect(Object.keys(colors[theme].semantic)).not.toContain(
+          "action-hover-large",
+        );
+        expect(
+          await root.evaluate((node) =>
+            getComputedStyle(node)
+              .getPropertyValue("--fs-color-action-hover-large")
+              .trim(),
+          ),
+        ).toBe("");
+        if (theme === "default") {
+          expect(colors.default.semantic["action-hover"]).toBe("#cc673b");
+        }
+      }
       await checkColors(
         root,
         colors[theme][view === "palettes" ? "primitive" : "semantic"],
