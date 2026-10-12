@@ -1,0 +1,47 @@
+.sections {
+  display: grid;
+  gap: var(--fs-space-3xl);
+  padding-bottom: var(--fs-space-3xl);
+}
+
+.guide {
+  display: grid;
+  gap: var(--fs-space-md);
+}
+
+.guide > * {
+  max-width: 65ch;
+}
+
+.guide h2,
+.guide h3,
+.glossary dt {
+  font-family: var(--font-work-sans, var(--fs-font-family-display));
+  font-weight: var(--fs-font-weight-semibold);
+}
+
+.guide h3 {
+  margin-top: var(--fs-space-md);
+}
+
+.glossary {
+  display: grid;
+  gap: var(--fs-space-sm);
+}
+
+.glossary > div {
+  display: grid;
+  gap: var(--fs-space-xs);
+}
+
+@media (min-width: 48rem) {
+  .sections {
+    gap: calc(var(--fs-space-3xl) * 1.5);
+    padding-bottom: calc(var(--fs-space-3xl) * 1.5);
+  }
+
+  .glossary > div {
+    grid-template-columns: 8rem minmax(0, 1fr);
+    gap: var(--fs-space-md);
+  }
+}

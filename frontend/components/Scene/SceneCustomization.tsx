@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useServices } from "@/application/providers/ServiceProvider";
 import {
   DEFAULT_PARTICLE_CONFIG,
@@ -21,17 +21,17 @@ import { usePortfolioOverlays } from "../Layouts/PortfolioOverlayScope";
 import styles from "./SceneCustomization.module.css";
 
 const labels = {
-  count: "Density",
+  count: "Particles",
   speed: "Speed",
   size: "Size",
-  connectionsPerParticle: "Connections per particle",
-  connectionDistance: "Connection distance",
+  connectionsPerParticle: "Links",
+  connectionDistance: "Reach",
 } as const;
 const values = (key: keyof ParticleConfig, value: number) =>
   key === "count"
-    ? `${value} particles`
+    ? String(value)
     : key === "connectionsPerParticle"
-      ? `${value} maximum`
+      ? `${value} max`
       : `${value.toFixed(1)}×`;
 function ParticleRange({
   name,
@@ -45,15 +45,21 @@ function ParticleRange({
   const setting = PARTICLE_SETTINGS.controls[name];
   const help =
     name === "count"
-      ? `Number of particles: ${setting.min}–${setting.max}.`
-      : name === "connectionsPerParticle"
-        ? "Maximum connections at either end of a line. Closest pairs take priority; nearby particles may have fewer."
-        : name === "connectionDistance"
-          ? "Multiplier on the density-based connection distance. At high settings, rendering limits may shorten the range to keep the page responsive."
-          : name === "speed"
-            ? "Multiplier on particle velocity. Speed applies when animation can run; a still does not move."
-            : `Multiplier on particle radius: ${Number((PARTICLE_SETTINGS.particles.radiusCssPx[0] * value).toFixed(2))}–${Number((PARTICLE_SETTINGS.particles.radiusCssPx[1] * value).toFixed(2))} CSS pixels at this size.`;
+      ? `${setting.min}–${setting.max} dots.`
+      : name === "speed"
+        ? "Move dots faster or slower."
+        : name === "size"
+          ? `Dot width: ${PARTICLE_SETTINGS.particles.radiusCssPx.map((radius) => Number((radius * value * 2).toFixed(2))).join("–")} px.`
+          : name === "connectionsPerParticle"
+            ? "Maximum lines per dot."
+            : "Higher values connect dots farther apart.";
   const field = useField({ help });
+  const valueText =
+    name === "count"
+      ? `${value} particles`
+      : name === "connectionsPerParticle"
+        ? `${value} links per particle maximum`
+        : `${value.toFixed(1)} times ${name === "connectionDistance" ? "connection reach" : name}`;
   return (
     <FieldFrame label={labels[name]} help={help} field={field}>
       <output htmlFor={field.id}>{values(name, value)}</output>
@@ -65,7 +71,7 @@ function ParticleRange({
         max={setting.max}
         step={setting.step}
         value={value}
-        aria-valuetext={values(name, value)}
+        aria-valuetext={valueText}
         aria-describedby={field.describedBy}
         onChange={(event) => change(event.currentTarget.valueAsNumber)}
       />
@@ -90,6 +96,7 @@ export default function SceneCustomization({
   const overlays = usePortfolioOverlays();
   const { navigationHandoff } = useServices();
   const trigger = useRef<HTMLButtonElement>(null);
+  const fullFieldHintId = useId();
   const [unavailable, setUnavailable] = useState(false);
   const [error, setError] = useState("");
   const open = overlays?.owner === "customization" && overlays.open;
@@ -117,6 +124,16 @@ export default function SceneCustomization({
     }
   };
   const dismiss = () => close?.("customization");
+  const compactStatus =
+    snapshot.status === "failed" || snapshot.paletteUnavailable
+      ? "Unavailable"
+      : snapshot.locallyPaused
+        ? "Paused"
+        : snapshot.presentation === "complete-static" ||
+            snapshot.reducedMotion ||
+            snapshot.blockers.includes("preference-off")
+          ? "Still artwork"
+          : "Scene paused";
   return (
     <>
       <Button
@@ -160,58 +177,66 @@ export default function SceneCustomization({
           setUnavailable(true);
         }}
       >
-        <Button
-          variant="outlined"
-          onClick={() => {
-            try {
-              scene.configure(DEFAULT_PARTICLE_CONFIG);
-              scene.reset();
-              onOverlayTransparentChange(false);
-              setError("");
-            } catch {
-              setError(
-                "Reset is unavailable. Your motion preference and local Pause are unchanged.",
-              );
-            }
-          }}
-        >
-          Reset animation
-        </Button>
-        <Button
-          variant="outlined"
-          role="switch"
-          aria-checked={overlayTransparent}
-          aria-label="Transparent WEB overlay"
-          onClick={() => onOverlayTransparentChange(!overlayTransparent)}
-        >
-          Transparent WEB overlay: {overlayTransparent ? "On" : "Off"}
-        </Button>
-        <p>
-          Adjust Web Aperture for this visit. Closing keeps your settings;
-          reloading restores defaults. Reset keeps Pause, theme and motion
-          settings. Transparent overlay shows the full particle field when
-          Canvas is ready. The scene stays still while this dialog is open.
+        <div className={styles.toolbar}>
+          <Button
+            variant="outlined"
+            aria-label="Reset animation"
+            onClick={() => {
+              try {
+                scene.configure(DEFAULT_PARTICLE_CONFIG);
+                scene.reset();
+                onOverlayTransparentChange(false);
+                setError("");
+              } catch {
+                setError(
+                  "Reset is unavailable. Your motion preference and local Pause are unchanged.",
+                );
+              }
+            }}
+          >
+            Reset
+          </Button>
+          <div className={styles.toggle}>
+            <Button
+              variant="outlined"
+              role="switch"
+              aria-checked={overlayTransparent}
+              aria-label="Full field"
+              aria-describedby={fullFieldHintId}
+              onClick={() => onOverlayTransparentChange(!overlayTransparent)}
+            >
+              Full field: {overlayTransparent ? "On" : "Off"}
+            </Button>
+            <p id={fullFieldHintId} className={styles.hint}>
+              Show beyond the WEB letters.
+            </p>
+          </div>
+        </div>
+        <p className={styles.status} role="status">
+          <span aria-hidden="true">{compactStatus}</span>
+          <span className="sr-only">
+            {statusMessage}{" "}
+            {snapshot.locallyPaused ? "Your local Pause is retained." : ""}
+          </span>
         </p>
-        <p>
-          {statusMessage}{" "}
-          {snapshot.locallyPaused ? "Your local Pause is retained." : ""}
-        </p>
-        {(
-          [
-            "count",
-            "speed",
-            "size",
-            "connectionsPerParticle",
-            "connectionDistance",
-          ] as const
-        ).map((name) => (
-          <ParticleRange
-            key={name}
-            name={name}
-            value={snapshot.config[name]}
-            change={(value) => apply({ ...snapshot.config, [name]: value })}
-          />
-        ))}
+        <div className={styles.settings}>
+          {(
+            [
+              "count",
+              "speed",
+              "size",
+              "connectionsPerParticle",
+              "connectionDistance",
+            ] as const
+          ).map((name) => (
+            <ParticleRange
+              key={name}
+              name={name}
+              value={snapshot.config[name]}
+              change={(value) => apply({ ...snapshot.config, [name]: value })}
+            />
+          ))}
+        </div>
         <InlineStatus message={error} />
       </Dialog>
     </>

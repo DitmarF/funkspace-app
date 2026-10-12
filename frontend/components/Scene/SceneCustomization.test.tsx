@@ -209,7 +209,7 @@ it.each(["playing", "paused", "reduced", "off", "failed"] as const)(
       screen.getByRole("button", { name: "Customize animation" }),
     );
     f.runtime.resume.mockClear();
-    fireEvent.change(screen.getByRole("slider", { name: "Density" }), {
+    fireEvent.change(screen.getByRole("slider", { name: "Particles" }), {
       target: { value: "100" },
     });
     fireEvent.change(screen.getByRole("slider", { name: "Speed" }), {
@@ -218,20 +218,17 @@ it.each(["playing", "paused", "reduced", "off", "failed"] as const)(
     fireEvent.change(screen.getByRole("slider", { name: "Size" }), {
       target: { value: "2" },
     });
-    fireEvent.change(
-      screen.getByRole("slider", { name: "Connections per particle" }),
-      { target: { value: "1" } },
+    fireEvent.change(screen.getByRole("slider", { name: "Links" }), {
+      target: { value: "1" },
+    });
+    fireEvent.change(screen.getByRole("slider", { name: "Reach" }), {
+      target: { value: "10" },
+    });
+    fireEvent.click(screen.getByRole("switch", { name: "Full field" }));
+    expect(screen.getByRole("switch", { name: "Full field" })).toHaveAttribute(
+      "aria-checked",
+      "true",
     );
-    fireEvent.change(
-      screen.getByRole("slider", { name: "Connection distance" }),
-      { target: { value: "10" } },
-    );
-    fireEvent.click(
-      screen.getByRole("switch", { name: "Transparent WEB overlay" }),
-    );
-    expect(
-      screen.getByRole("switch", { name: "Transparent WEB overlay" }),
-    ).toHaveAttribute("aria-checked", "true");
     expect(f.scene.getSnapshot().config).toEqual({
       ...DEFAULT_PARTICLE_CONFIG,
       count: 100,
@@ -242,9 +239,10 @@ it.each(["playing", "paused", "reduced", "off", "failed"] as const)(
     });
     fireEvent.click(screen.getByRole("button", { name: "Reset animation" }));
     expect(f.scene.getSnapshot().config).toEqual(DEFAULT_PARTICLE_CONFIG);
-    expect(
-      screen.getByRole("switch", { name: "Transparent WEB overlay" }),
-    ).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByRole("switch", { name: "Full field" })).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
     expect(f.scene.getSnapshot().locallyPaused).toBe(wasPaused);
     expect(f.runtime.resume).not.toHaveBeenCalled();
     expect(f.scene.getStill().particles).toEqual(
@@ -262,20 +260,20 @@ it("uses effective Domain values, rejects invalid calls, retains edits on reopen
   await act(async () => {});
   fireEvent.click(screen.getByRole("button", { name: "Customize animation" }));
   act(() => f.scene.configure({ count: -50, speed: 100, size: 100 }));
-  expect(screen.getByRole("slider", { name: "Density" })).toHaveValue("10");
+  expect(screen.getByRole("slider", { name: "Particles" })).toHaveValue("10");
   expect(screen.getByRole("slider", { name: "Speed" })).toHaveValue("2");
   expect(screen.getByRole("slider", { name: "Size" })).toHaveValue("4");
   const before = f.scene.getSnapshot().config;
   act(() => expect(f.scene.configure({ count: NaN })).toEqual(before));
   expect(f.scene.getSnapshot().config).toEqual(before);
   act(() => f.scene.configure({ ...before, count: 21 }));
-  expect(screen.getByRole("slider", { name: "Density" })).toHaveValue("21");
+  expect(screen.getByRole("slider", { name: "Particles" })).toHaveValue("21");
   fireEvent.click(screen.getByRole("button", { name: "Close" }));
   expect(
     screen.getByRole("button", { name: "Customize animation" }),
   ).toHaveFocus();
   fireEvent.click(screen.getByRole("button", { name: "Customize animation" }));
-  expect(screen.getByRole("slider", { name: "Density" })).toHaveValue("21");
+  expect(screen.getByRole("slider", { name: "Particles" })).toHaveValue("21");
   expect(f.binding.prepare).toHaveBeenCalledTimes(1);
   expect(f.runtime.destroy).not.toHaveBeenCalled();
   expect(
@@ -299,6 +297,63 @@ it("failed dialog opening reports inline unavailability and releases coordinatio
   );
   expect(locks).toBe(0);
   expect(screen.queryByRole("dialog")).toBeNull();
+});
+
+it("describes an Off scene as still artwork rather than a temporary dialog pause", async () => {
+  fixture("off");
+  await act(async () => {});
+  fireEvent.click(screen.getByRole("button", { name: "Customize animation" }));
+  expect(screen.getByText("Still artwork")).toBeVisible();
+  expect(screen.queryByText("Scene paused")).not.toBeInTheDocument();
+});
+
+it("pairs compact labels and values with native accessible range semantics", async () => {
+  fixture();
+  await act(async () => {});
+  fireEvent.click(screen.getByRole("button", { name: "Customize animation" }));
+  for (const [label, text] of [
+    ["Particles", `${DEFAULT_PARTICLE_CONFIG.count} particles`],
+    [
+      "Links",
+      `${DEFAULT_PARTICLE_CONFIG.connectionsPerParticle} links per particle maximum`,
+    ],
+    [
+      "Reach",
+      `${DEFAULT_PARTICLE_CONFIG.connectionDistance.toFixed(1)} times connection reach`,
+    ],
+  ]) {
+    const input = screen.getByRole("slider", { name: label });
+    expect(input).toHaveAttribute("aria-valuetext", text);
+    expect(input.parentElement?.querySelector("output")).toHaveAttribute(
+      "for",
+      input.id,
+    );
+    const hint = input.parentElement?.querySelector("p");
+    expect(hint).toBeVisible();
+    expect(input).toHaveAttribute("aria-describedby", hint?.id);
+  }
+  expect(
+    screen.getByRole("button", { name: "Reset animation" }),
+  ).toHaveTextContent(/^Reset$/);
+  expect(screen.getByRole("switch", { name: "Full field" })).toHaveTextContent(
+    "Full field: Off",
+  );
+  expect(
+    screen.queryByText(/Closing keeps your settings/),
+  ).not.toBeInTheDocument();
+});
+
+it("updates the particle width hint from the effective size without confusing radius and diameter", async () => {
+  fixture();
+  await act(async () => {});
+  fireEvent.click(screen.getByRole("button", { name: "Customize animation" }));
+  const size = screen.getByRole("slider", { name: "Size" });
+  expect(size).toHaveAccessibleDescription("Dot width: 0.2–0.6 px.");
+  fireEvent.change(size, { target: { value: "2" } });
+  expect(size).toHaveAccessibleDescription("Dot width: 4–12 px.");
+  expect(
+    screen.getByRole("switch", { name: "Full field" }),
+  ).toHaveAccessibleDescription("Show beyond the WEB letters.");
 });
 
 it("route departure releases without restoring the old Customize invoker", async () => {

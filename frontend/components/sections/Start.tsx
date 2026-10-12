@@ -3,7 +3,11 @@ import PortfolioSection from "../Layouts/PortfolioSection";
 import styles from "./Start.module.css";
 
 /** Portfolio opening with independent static artwork and optional motion. */
-export default function Start() {
+export default function Start({
+  customizable = false,
+}: {
+  customizable?: boolean;
+}) {
   return (
     <PortfolioSection
       variant="cornered"
@@ -14,7 +18,7 @@ export default function Start() {
       <h1 id="start-heading" className={styles.title}>
         Web Aperture
       </h1>
-      <StartScene />
+      <StartScene customizable={customizable} />
     </PortfolioSection>
   );
 }

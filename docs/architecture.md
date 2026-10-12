@@ -335,7 +335,17 @@ unavailable, failed and no-JS paths keep lightweight solid artwork.
 
 Only the details shell enables `PortfolioOverlayScope`: the two concrete owners are navigation and customization. It retains a closing owner until shared Dialog release, keeps the latest queued request, and cancels it on departure/unmount. It delegates every lock/focus operation to existing Dialog/useDialog. Navigation tickets and native href/history behavior stay in the existing handoff. A shared departure disposition prevents either consumer restoring focus to a departed page. The active native navigation disclosure is preserved until idle; customization remains unavailable during that handover or failed navigation enhancement.
 
-The shell's existing scene-presentation signal treats either modal (and pending native handover) as environmental occlusion. It never changes local Pause. If navigation fails before Canvas is ready, the covered details consumer settles to complete independent WEB artwork instead of waiting indefinitely for a frame. Controls and explanations stay inside the dialog; the modal creates no particle graph or Canvas. The customization panel scrolls as a whole so its enlarged heading does not consume the usable area in short viewports. [FS-4.6 evidence and limitations](tasks/fs-4.6-customization-overlay.md).
+The shell's existing scene-presentation signal treats either modal (and pending native handover) as environmental occlusion. It never changes local Pause. If navigation fails before Canvas is ready, the covered details consumer settles to complete independent WEB artwork instead of waiting indefinitely for a frame. The modal creates no particle graph or Canvas. The customization panel scrolls as a whole so its enlarged heading does not consume the usable area in short viewports. [FS-4.6 evidence and limitations](tasks/fs-4.6-customization-overlay.md).
+
+The 2026-10-12 details-page refinement reuses the homepage `Start` section with
+Customize in place of More. `ApertureDetails` shares the route/Storybook composition:
+one cornered scene section and one plain guide. Usage explanations live in that
+guide; the dialog retains five labeled ranges, compact values and associated
+short hints, a Full field switch, Reset, short visual status and accessible
+state/error feedback. Particle width hints derive from the Domain radius range
+and effective size. The guide reuses About's responsive typography utilities. Domain
+settings and the scene/overlay lifecycle are unchanged. See the
+[maintenance record](tasks/maintenance-aperture-details.md).
 
 ### Particle rendering and fallback cost
 

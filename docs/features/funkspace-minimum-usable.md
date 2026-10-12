@@ -92,6 +92,20 @@ The initial-fragment clearance regression was corrected and accepted by Dimi on
 2026-10-12. Commit/push of this maintenance candidate is authorized; FS-4.7/4.8
 review and the recorded validation follow-ups remain separate.
 
+## Web Aperture details presentation amendment — 2026-10-12
+
+The Web Aperture details/customization presentation is refined under
+[this maintenance task](../tasks/maintenance-aperture-details.md): the opening
+matches the homepage with Customize instead of More, a separate short guide
+explains the scene and controls, and the dialog uses concise labels and values.
+Follow-up refinements add short slider hints (including live particle width),
+Canvas/SVG explanations, closer hint spacing and About-matched typography.
+The final review found no actionable issues: 1,897 unit tests and 35 production
+browser checks passed. Dimi authorized documentation, commit and push on
+2026-10-12; FS-4.7/4.8 and broader EPIC acceptance remain separate.
+This supersedes older dialog-instruction placement, preserving the completed
+FS-4.6 scene and overlay contracts.
+
 ## Goal
 
 Deliver an animation-led, mobile-first website with Start and About sections, a legal-link footer, normal scrolling, the existing FunkSpace logo and semantic design foundations, one customizable Canvas scene behind a replaceable SVG aperture, usable navigation/settings, real contact delivery through EPIC 5's new concept, and completed secondary pages. End when the portfolio is ready to host game integration. Do not implement game integration in this milestone.

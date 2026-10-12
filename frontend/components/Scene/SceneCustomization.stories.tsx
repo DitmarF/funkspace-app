@@ -1,21 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import PortfolioShell from "../Layouts/PortfolioShell";
-import StartScene from "./StartScene";
+import ApertureDetails from "../sections/ApertureDetails";
 
 function Details() {
   return (
     <PortfolioShell sceneCustomization>
-      <article className="space-y-fs-lg">
-        <h1 className="text-3xl font-bold">Web Aperture</h1>
-        <StartScene customizable />
-      </article>
+      <ApertureDetails />
     </PortfolioShell>
   );
 }
 const meta = {
   title: "Scene/Customization",
   component: Details,
-  parameters: { layout: "fullscreen" },
+  parameters: {
+    layout: "fullscreen",
+    docs: {
+      description: {
+        component:
+          "The actual Web Aperture details composition: the shared homepage opening with Customize, a plain-language guide, and a compact dialog with five ranges and a Full field switch.",
+      },
+    },
+  },
 } satisfies Meta<typeof Details>;
 export default meta;
 type Story = StoryObj<typeof meta>;

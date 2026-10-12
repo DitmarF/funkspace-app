@@ -104,7 +104,7 @@ test("customization starts with Reset and overlay, retaining the frozen scene be
   );
   await openCustomization(page);
   const content = modal(page).locator(":scope > div:last-child");
-  await expect(content.locator("button").nth(0)).toHaveText("Reset animation");
+  await expect(content.locator("button").nth(0)).toHaveText("Reset");
   await expect(content.locator("button").nth(1)).toHaveAttribute(
     "role",
     "switch",
@@ -320,11 +320,11 @@ test("native ranges show effective values, retain edits, reset and reload withou
   const owner = available ? await canvas(page).elementHandle() : null;
   await openCustomization(page);
   for (const [label, key, expected] of [
-    ["Density", "count", "999"],
+    ["Particles", "count", "999"],
     ["Speed", "speed", "1.9"],
     ["Size", "size", "3.9"],
-    ["Connections per particle", "connectionsPerParticle", "99"],
-    ["Connection distance", "connectionDistance", "9.9"],
+    ["Links", "connectionsPerParticle", "99"],
+    ["Reach", "connectionDistance", "9.9"],
   ] as const) {
     const range = modal(page).getByRole("slider", { name: label });
     const settings = PARTICLE_SETTINGS.controls[key];
@@ -341,7 +341,7 @@ test("native ranges show effective values, retain edits, reset and reload withou
   await expect(custom(page)).toBeFocused();
   await openCustomization(page);
   await expect(
-    modal(page).getByRole("slider", { name: "Density" }),
+    modal(page).getByRole("slider", { name: "Particles" }),
   ).toHaveValue("999");
   await expect(modal(page).getByRole("slider", { name: "Speed" })).toHaveValue(
     "1.9",
@@ -351,7 +351,7 @@ test("native ranges show effective values, retain edits, reset and reload withou
   );
   await modal(page).getByRole("button", { name: "Reset animation" }).click();
   await expect(
-    modal(page).getByRole("slider", { name: "Density" }),
+    modal(page).getByRole("slider", { name: "Particles" }),
   ).toHaveValue(String(DEFAULT_PARTICLE_CONFIG.count));
   await modal(page).getByRole("button", { name: "Close", exact: true }).click();
   if (owner) {
@@ -373,11 +373,11 @@ test("native ranges show effective values, retain edits, reset and reload withou
     ),
   ).toEqual(startupWrites);
   await openCustomization(page);
-  await modal(page).getByRole("slider", { name: "Density" }).fill("100");
+  await modal(page).getByRole("slider", { name: "Particles" }).fill("100");
   await page.reload();
   await openCustomization(page);
   await expect(
-    modal(page).getByRole("slider", { name: "Density" }),
+    modal(page).getByRole("slider", { name: "Particles" }),
   ).toHaveValue(String(DEFAULT_PARTICLE_CONFIG.count));
   await expect(
     page.locator(
@@ -407,7 +407,7 @@ test("overlay transparency retains the paused Canvas, local settings and complet
     : null;
   await openCustomization(page);
   const toggle = modal(page).getByRole("switch", {
-    name: "Transparent WEB overlay",
+    name: "Full field",
   });
   await expect(toggle).not.toBeChecked();
   await toggle.click();
@@ -520,11 +520,11 @@ test("maximum settings keep a bounded graph and responsive navigation", async ({
   await expect(canvas(page)).toBeVisible();
   await openCustomization(page);
   for (const [name, value] of [
-    ["Density", "1000"],
+    ["Particles", "1000"],
     ["Speed", "2"],
     ["Size", "4"],
-    ["Connections per particle", "100"],
-    ["Connection distance", "10"],
+    ["Links", "100"],
+    ["Reach", "10"],
   ])
     await modal(page).getByRole("slider", { name, exact: true }).fill(value);
   await page.keyboard.press("Escape");
@@ -592,14 +592,14 @@ for (const state of ["playing", "paused", "reduced", "off", "failed"]) {
     await stopped(page);
     const before = await frameCount(page);
     for (const [label, value] of [
-      ["Density", "100"],
+      ["Particles", "100"],
       ["Speed", "0.6"],
       ["Size", "2"],
     ])
       await modal(page).getByRole("slider", { name: label }).fill(value);
     await modal(page).getByRole("button", { name: "Reset animation" }).click();
     for (const [label, value] of [
-      ["Density", String(DEFAULT_PARTICLE_CONFIG.count)],
+      ["Particles", String(DEFAULT_PARTICLE_CONFIG.count)],
       ["Speed", String(DEFAULT_PARTICLE_CONFIG.speed)],
       ["Size", String(DEFAULT_PARTICLE_CONFIG.size)],
     ])
@@ -715,7 +715,7 @@ test("native navigation leaves the details scene, restores destination focus and
   await setup(page, "off");
   await page.goto(route);
   await openCustomization(page);
-  await modal(page).getByRole("slider", { name: "Density" }).fill("100");
+  await modal(page).getByRole("slider", { name: "Particles" }).fill("100");
   await page.keyboard.press("Escape");
   await page
     .getByRole("button", { name: "Menu: navigation and settings", exact: true })
@@ -733,7 +733,7 @@ test("native navigation leaves the details scene, restores destination focus and
   await expect(page).toHaveURL(route);
   await openCustomization(page);
   await expect(
-    modal(page).getByRole("slider", { name: "Density" }),
+    modal(page).getByRole("slider", { name: "Particles" }),
   ).toHaveValue(String(DEFAULT_PARTICLE_CONFIG.count));
 });
 

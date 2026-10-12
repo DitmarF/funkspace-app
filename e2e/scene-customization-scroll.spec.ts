@@ -5,8 +5,8 @@ for (const input of ["wheel", "touch"] as const) {
     test.use({
       viewport:
         input === "touch"
-          ? { width: 390, height: 700 }
-          : { width: 1100, height: 700 },
+          ? { width: 390, height: 480 }
+          : { width: 1100, height: 480 },
       hasTouch: input === "touch",
       isMobile: input === "touch",
     });
@@ -29,6 +29,11 @@ for (const input of ["wheel", "touch"] as const) {
         exact: true,
       });
       await expect(dialog).toBeVisible();
+      // The compact panel fits tall screens; use a short viewport to exercise
+      // actual overflow while retaining the wheel/touch and background-lock checks.
+      expect(
+        await dialog.evaluate((node) => node.scrollHeight - node.clientHeight),
+      ).toBeGreaterThan(100);
       const background = await page.evaluate(() => window.scrollY);
       const top = () => dialog.evaluate((node) => node.scrollTop);
       const initial = await top();
@@ -80,7 +85,7 @@ for (const input of ["wheel", "touch"] as const) {
         }
         await expect(
           dialog.getByRole("slider", {
-            name: "Connection distance",
+            name: "Reach",
             exact: true,
           }),
         ).toBeInViewport();
