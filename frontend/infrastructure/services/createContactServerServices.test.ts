@@ -10,6 +10,7 @@ import { POST, OPTIONS, runtime } from "@/app/api/contact/route";
 
 describe("production contact composition release lock", () => {
   it("cannot enable live delivery with CONTACT_ENABLED=true and does not call global fetch", async () => {
+    const log = vi.spyOn(console, "info").mockImplementation(() => {});
     vi.stubEnv("CONTACT_ENABLED", "true");
     vi.stubEnv("CONTACT_ALLOWED_ORIGINS", JSON.stringify([origin]));
     const services = createContactServerServices();
@@ -23,9 +24,18 @@ describe("production contact composition release lock", () => {
       submissionId,
     });
     expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(log).toHaveBeenCalledExactlyOnceWith(
+      JSON.stringify({
+        event: "contact_outcome",
+        httpStatus: 503,
+        outcome: "unavailable",
+        code: "configuration_unavailable",
+      }),
+    );
   });
 
   it("does not trust Host when no approved origin configuration exists", async () => {
+    vi.spyOn(console, "info").mockImplementation(() => {});
     vi.stubEnv("CONTACT_ALLOWED_ORIGINS", undefined);
     const response = await POST(contactRequest());
     expect(response.status).toBe(403);

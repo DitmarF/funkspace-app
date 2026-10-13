@@ -1,9 +1,11 @@
-# Contact server setup — FS-5.2
+# Contact server setup — FS-5.2 / FS-5.3
 
 The accepted [EPIC 5 contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
 and [FS-5.1 closure](../tasks/fs-5.1-contact-contract.md) govern this server slice.
 [FS-5.2 evidence](../tasks/fs-5.2-contact-server.md) owns the candidate/check results.
 This document authorizes no live enabling or deployment.
+The [operating guide](contact-operations.md) owns FS-5.3's exact proposed WAF
+rule, coverage blockers, log review, quota recovery and emergency disable steps.
 
 ## Current implementation
 
@@ -15,6 +17,9 @@ This document authorizes no live enabling or deployment.
   evidence; its public identifier is the normalized visitor submission UUID.
 - `infrastructure/contact/`: server-only configuration, bounded JSON reading,
   request boundary and Resend adapter. The existing browser composition is unchanged.
+- `infrastructure/contact/ContactDiagnostics.ts`: runtime allowlist of categorical
+  HTTP/outcome/code events only. Request content/identifiers and raw errors are
+  excluded; the composition writes one JSON line per application response.
 - `infrastructure/services/createContactServerServices.ts`: server composition.
   Its thin `app/api/contact/route.ts` entry uses Node. Other HTTP methods,
   including OPTIONS, reject with `405`/`Allow: POST`; application JSON is no-store.

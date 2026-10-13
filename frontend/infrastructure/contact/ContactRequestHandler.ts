@@ -9,15 +9,24 @@ import {
   ContactBodyError,
   readBoundedJson,
 } from "./BoundedJson";
+import {
+  recordContactDiagnostic,
+  type ContactDiagnosticWriter,
+} from "./ContactDiagnostics";
 
 export function createContactRequestHandler(
   submit: SubmitContact,
   allowedOrigins: readonly string[],
+  writeDiagnostic: ContactDiagnosticWriter = () => {},
 ): (request: Request) => Promise<Response> {
   return async (request) => {
+    const finish = (result: ContactResult) => {
+      recordContactDiagnostic(result, writeDiagnostic);
+      return respond(result);
+    };
     const reject = (result: ContactResult) => {
       cancelContactBody(request.body);
-      return respond(result);
+      return finish(result);
     };
     if (request.method !== "POST")
       return reject({
@@ -66,16 +75,16 @@ export function createContactRequestHandler(
       const code =
         error instanceof ContactBodyError ? error.code : "malformed_json";
       return code === "request_too_large"
-        ? respond({
+        ? finish({
             httpStatus: 413,
             body: { status: "rejected", code, submissionId: null },
           })
-        : respond({
+        : finish({
             httpStatus: 400,
             body: { status: "rejected", code, submissionId: null },
           });
     }
-    return respond(await submit(input));
+    return finish(await submit(input));
   };
 }
 

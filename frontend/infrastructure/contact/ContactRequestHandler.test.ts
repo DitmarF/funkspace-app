@@ -16,8 +16,9 @@ import {
   type ContactFetch,
 } from "./ResendContactDelivery";
 import { createContactRequestHandler } from "./ContactRequestHandler";
+import type { ContactDiagnosticWriter } from "./ContactDiagnostics";
 
-function fixture(enabled = true) {
+function fixture(enabled = true, writeDiagnostic?: ContactDiagnosticWriter) {
   const deliver = vi
     .fn()
     .mockResolvedValue({ status: "accepted", acceptanceId });
@@ -27,11 +28,128 @@ function fixture(enabled = true) {
     handle: createContactRequestHandler(
       (input) => useCase.execute(input),
       [origin],
+      writeDiagnostic,
     ),
   };
 }
 
 describe("bounded contact HTTP boundary", () => {
+  it("does not derive trust from Host or forwarded headers, but direct clients can forge Origin", async () => {
+    const { handle, deliver } = fixture();
+    const bad = contactRequest();
+    bad.headers.delete("origin");
+    bad.headers.set("host", new URL(origin).host);
+    bad.headers.set("x-forwarded-host", new URL(origin).host);
+    bad.headers.set("x-forwarded-proto", "https");
+    bad.headers.set("referer", origin + "/contact");
+    expect((await handle(bad)).status).toBe(403);
+    expect(deliver).not.toHaveBeenCalled();
+    const forged = contactRequest(); // A direct client can set an approved Origin.
+    forged.headers.set("host", "attacker.example.test");
+    expect((await handle(forged)).status).toBe(202); // Injected fake only.
+    expect(deliver).toHaveBeenCalledOnce();
+  });
+
+  it.each([" ", "\t", "https://spam.example.test"])(
+    "rejects populated trap %j without calling provider fetch",
+    async (website) => {
+      const fetcher = vi.fn<ContactFetch>();
+      const useCase = new ContactUseCase(
+        new ResendContactDelivery(fakeConfiguration, fetcher),
+      );
+      const log = vi.fn<ContactDiagnosticWriter>();
+      const handle = createContactRequestHandler(
+        (input) => useCase.execute(input),
+        [origin],
+        log,
+      );
+      const response = await handle(
+        contactRequest(JSON.stringify({ ...request, website })),
+      );
+      expect(response.status).toBe(400);
+      expect(await response.json()).toEqual({
+        status: "rejected",
+        code: "spam_rejected",
+        submissionId,
+      });
+      expect(fetcher).not.toHaveBeenCalled();
+      expect(log).toHaveBeenCalledExactlyOnceWith({
+        event: "contact_outcome",
+        httpStatus: 400,
+        outcome: "rejected",
+        code: "spam_rejected",
+      });
+    },
+  );
+
+  it("logs exactly one categorical event for each boundary stage, without request data", async () => {
+    const log = vi.fn<ContactDiagnosticWriter>();
+    const { handle, deliver } = fixture(true, log);
+    const hostile = contactRequest(
+      JSON.stringify({
+        ...request,
+        name: "Private name",
+        email: "private@example.test",
+        message: "Private message",
+      }),
+    );
+    hostile.headers.set("origin", "https://private-origin.example.test");
+    hostile.headers.set("authorization", "private credential");
+    hostile.headers.set("x-forwarded-for", "192.0.2.9");
+    const inputs = [
+      hostile,
+      contactRequest(JSON.stringify(request), { "content-type": "text/plain" }),
+      contactRequest("{malformed"),
+      contactRequest(new Uint8Array(32769)),
+      contactRequest(JSON.stringify({ ...request, email: "" })),
+      contactRequest(),
+    ];
+    for (const input of inputs) await handle(input);
+    expect(
+      log.mock.calls.map(([event]) => [event.httpStatus, event.code]),
+    ).toEqual([
+      [403, "origin_rejected"],
+      [415, "unsupported_media_type"],
+      [400, "malformed_json"],
+      [413, "request_too_large"],
+      [422, "validation_failed"],
+      [202, null],
+    ]);
+    for (const [event] of log.mock.calls)
+      expect(Object.keys(event).sort()).toEqual([
+        "code",
+        "event",
+        "httpStatus",
+        "outcome",
+      ]);
+    const serialized = JSON.stringify(log.mock.calls);
+    for (const privateValue of [
+      "Private name",
+      "private@example.test",
+      "Private message",
+      "private-origin",
+      "private credential",
+      "192.0.2.9",
+      submissionId,
+      acceptanceId,
+    ])
+      expect(serialized).not.toContain(privateValue);
+    expect(deliver).toHaveBeenCalledOnce();
+    const disabled = fixture(false, log);
+    expect((await disabled.handle(contactRequest())).status).toBe(503);
+    expect(log.mock.lastCall?.[0].code).toBe("configuration_unavailable");
+    expect(disabled.deliver).not.toHaveBeenCalled();
+  });
+
+  it("does not change acceptance or schedule another attempt when diagnostic writing fails", async () => {
+    const log = vi.fn(() => {
+      throw new Error("Private logging error");
+    });
+    const { handle, deliver } = fixture(true, log);
+    expect((await handle(contactRequest())).status).toBe(202);
+    expect(deliver).toHaveBeenCalledOnce();
+    expect(log).toHaveBeenCalledOnce();
+  });
   it("accepts controlled delivery and returns only frozen, uncached JSON", async () => {
     const { handle, deliver } = fixture();
     const response = await handle(contactRequest());

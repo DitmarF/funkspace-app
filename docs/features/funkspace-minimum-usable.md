@@ -1080,7 +1080,10 @@ composition remains locked off; `/contact`, browser wiring and actual deployed
 protection are later tasks. Dimi separately authorized documentation updates
 and commit/push of all FS-5.2 changes on 2026-10-13; the
 [delivery record](../tasks/fs-5.2-contact-server.md#documentation-finalization-and-authorized-git-delivery--2026-10-13)
-preserves that scope. Review and Dimi acceptance remain pending.
+preserves that scope. Codex then returned technical PASS at `6147688` and Dimi
+explicitly closed FS-5.2; its [closure record](../tasks/fs-5.2-contact-server.md#technical-review-and-dimi-closure--2026-10-13)
+separates that decision from unverified external gates. FS-5.3 now prepares
+local diagnostics and operations under its own request; live delivery stays off.
 
 **Protected scope:** No accounts, message dashboard, attachments, database-backed inbox, unnecessary analytics/CAPTCHA, or fake success. No secrets in source, fixtures, or chat.
 
@@ -1102,7 +1105,7 @@ preserves that scope. Review and Dimi acceptance remain pending.
 
 #### FS-5.2 — Implement validation, contact use case, and mail adapter
 
-**Current status:** Implemented for review from base `5d9ec321b9ec3154b0a2460968ac49b9ceffede3`; Dimi separately authorized documentation finalization and commit/push of all 26 FS-5.2 files on 2026-10-13. The containing Git commit identifies the delivered revision. [FS-5.2 implementation/check and delivery evidence](../tasks/fs-5.2-contact-server.md) records controlled tests, production bundling and the final handoff. Live delivery is locked off. Sites consuming review, independent critical-diff review and Dimi acceptance remain pending; no form, deployment/settings or live sending.
+**Current status:** Complete — read-only Codex technical review PASS at `6147688241fa6737de561840ba149c57ea32abb7`, followed by Dimi's explicit FS-5.2 closure on 2026-10-13. [FS-5.2 evidence and closure](../tasks/fs-5.2-contact-server.md#technical-review-and-dimi-closure--2026-10-13) preserves the controlled checks and delivery handoff. No separate Sites review result is inferred. Live delivery remains locked off; external account/legal/protection/preview gates remain pending.
 
 **Lead:** Codex
 
@@ -1118,7 +1121,7 @@ preserves that scope. Review and Dimi acceptance remain pending.
 
 #### FS-5.3 — Add abuse controls and privacy-conscious operations
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Local preparation complete from base `6147688241fa6737de561840ba149c57ea32abb7`; Dimi separately authorized documentation finalization and commit/push of all 13 FS-5.3 files on 2026-10-13. The containing Git commit identifies the delivered revision. Existing origin/JSON/trap protections are retained, minimal runtime-allowlisted diagnostics added, and the exact WAF rule/coverage register/quota-disable procedures documented. [FS-5.3 evidence and delivery handoff](../tasks/fs-5.3-contact-protection.md) owns actual check results; [operations](../development/contact-operations.md) separates public platform facts from unverified account/preview/alias settings. External configuration and deployed acceptance remain blocked/pending; delivery stays off. No firewall change, paid upgrade, deployment or automatic next task is authorized.
 
 **Lead:** Codex
 

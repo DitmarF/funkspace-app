@@ -2,7 +2,7 @@
 
 ## Plan metadata
 
-- **Status:** FS-5.1 complete — Dimi accepted the consuming contract and closed the task on 2026-10-13, with the presentation amendment below. FS-5.2 implemented for review with delivery locked off; documentation finalization and commit/push separately authorized on 2026-10-13. FS-5.3–FS-5.6 not started.
+- **Status:** FS-5.1 and FS-5.2 complete — Dimi closed FS-5.2 after Codex technical PASS at `6147688` on 2026-10-13. FS-5.3 local preparation complete; documentation finalization and commit/push separately authorized on 2026-10-13. Delivery stays locked off; external protection/coverage remains unverified. FS-5.4–FS-5.6 not started.
 - **Owner:** Codex for contract/server preparation; Sites for FS-5.4; Dimi for product, legal and external approvals.
 - **Parent authority:** [Minimum Usable Experience](funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling) owns milestone status and gates. This linked plan owns EPIC 5 detail; the [FS-5.1 record](../tasks/fs-5.1-contact-contract.md) owns execution evidence.
 - **Last updated / official-document checks:** 2026-10-13.
@@ -154,7 +154,7 @@ Document variable names **without values**:
 
 HTTPS origins for deployed environments; explicitly approved HTTP loopback only for isolated local mocks. Empty/invalid allowlist or any missing/invalid configuration keeps delivery off. Credentials never use `NEXT_PUBLIC_`. Secrets are not recorded in source, artifacts, test fixtures, chat or logs. No environment file or variable value is created by FS-5.1. Later disabled/unconfigured mode renders email-only content and returns unavailable after boundary rejection checks, never simulated acceptance. Recheck configuration per intended Preview/Production scope; don't cache a successful availability check across changed deployments.
 
-Data flow: page-memory draft → Vercel request/function → Resend message/log storage → Gmail correspondence. App adds no message database. Diagnostic allowlist: bounded correlation ID, outcome/code, duration, safe HTTP/provider status and internal acceptance ID. No human field values, body, IP in app logs, credentials or raw provider error. Platform/firewall logs may separately retain network identifiers; Dimi reviews actual retention/access with provider and hosting terms.
+Data flow: page-memory draft → Vercel request/function → Resend message/log storage → Gmail correspondence. App adds no message database. Diagnostic allowlist: bounded correlation ID, outcome/code, duration, safe HTTP/provider status and internal acceptance ID. FS-5.3 implements only categorical HTTP/outcome/code events; optional identifiers/duration/provider details are omitted for minimization. No human field values, body, IP in app logs, credentials or raw provider error. Platform/firewall logs may separately retain network identifiers; Dimi reviews actual retention/access with provider and hosting terms. The [operating guide](../development/contact-operations.md) records actual application exclusions and pending platform review.
 
 Six-month deletion applies to closed ordinary mailbox conversations, not Resend logs or platform backups. Dimi defines conversation end and a routine cleanup schedule; justified retention exceptions require purpose/reason, restricted access and a review/deletion date. No application inbox or deletion automation is implied.
 
@@ -205,12 +205,7 @@ Proposed platform rule only: method POST AND exact path `/api/contact`, five req
 
 ### FS-5.2 — Implement validation, contact use case, and mail adapter
 
-**Current status:** Implemented locally and self-reviewed with controlled checks.
-[FS-5.2 evidence/handoff](../tasks/fs-5.2-contact-server.md) owns the candidate,
-results and separately authorized documentation/Git delivery record; the
-containing commit identifies the delivered revision. Consumer/independent critical-diff review and Dimi
-acceptance remain pending. The server release lock stays closed regardless
-of environment values; no live mail or external setup performed.
+**Current status:** Complete — Codex technical review PASS at `6147688241fa6737de561840ba149c57ea32abb7`, then Dimi explicitly closed the task on 2026-10-13. [FS-5.2 evidence/handoff](../tasks/fs-5.2-contact-server.md#technical-review-and-dimi-closure--2026-10-13) owns the delivered candidate, checks and closure. No separate Sites result is inferred. The server release lock stays closed regardless of environment values; no live mail or external setup performed.
 
 **Lead:** Codex. **Counterpart:** Sites checks consuming types/presentation. **Dimi:** confirms/configures the settled sender, recipient, requirements and approved secrets.
 
@@ -221,6 +216,14 @@ of environment values; no live mail or external setup performed.
 **Complete when:** Valid requests reach the fake/approved adapter, invalid requests cannot send, headers cannot be injected, all declared outcomes are tested, and `202` means verified provider acceptance. Live configuration is not required for controlled tests and is never implied by them.
 
 ### FS-5.3 — Add abuse controls and privacy-conscious operations
+
+**Current status:** Local code/operating preparation complete; documentation
+finalization and commit/push separately authorized on 2026-10-13. The containing
+commit identifies the delivered revision; see
+[FS-5.3 evidence](../tasks/fs-5.3-contact-protection.md) for checks and
+[operations](../development/contact-operations.md) for the exact proposed rule
+and unverified coverage register. No deployed-protection PASS or external
+configuration is claimed; release lock remains closed.
 
 **Lead:** Codex. **Counterpart:** Sites verifies rate-limit/error recovery. **Dimi:** approves actual platform/provider changes and retention/processing implications.
 
@@ -295,4 +298,4 @@ Run Domain/Application/Infrastructure tests explicitly: current coverage configu
 
 ## Implementation handoff
 
-Start the next session with the current [FS-5.2 evidence/handoff](../tasks/fs-5.2-contact-server.md#handoff), its completed [FS-5.1 predecessor](../tasks/fs-5.1-contact-contract.md#handoff) and a fresh branch/HEAD/status check. Confirm the receiving chat can actually read the repository and every intentional change; chats do not automatically share working files. The FS-5.1 read-only consumer review accessed the actual local candidate; a future separate Sites workspace must verify the delivered branch/revision or matching final patch independently. If inaccessible, provide/apply the reviewable artifact before proceeding. Do not reset newer work or transfer secret values. FS-5.1 is accepted and complete; FS-5.2 review and Dimi acceptance remain pending. Request only a separately scoped review/next task. External prerequisites and FS-G2 remain open.
+Start the next session with the current [FS-5.3 evidence/handoff](../tasks/fs-5.3-contact-protection.md#handoff), its completed [FS-5.2 predecessor](../tasks/fs-5.2-contact-server.md#handoff) and a fresh branch/HEAD/status check. Confirm the receiving chat can actually read the repository and every intentional change; chats do not automatically share working files. A separate Sites workspace must verify the delivered branch/revision and intentional FS-5.3 patch independently. If inaccessible, provide/apply the reviewable artifact before proceeding. Do not reset newer work or transfer secret values. FS-5.1/5.2 are complete; FS-5.3 local preparation is separate from pending external configuration and acceptance. Request only a separately scoped review/next task. External prerequisites and FS-G2 remain open.

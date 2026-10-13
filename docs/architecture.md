@@ -270,6 +270,17 @@ separately authorized candidate after account/legal, deployed protection and
 preview gates pass. See [server setup](development/contact-server.md) and
 [FS-5.2 evidence](tasks/fs-5.2-contact-server.md).
 
+FS-5.3 retains the established origin/media/trap rejection path and adds only
+server-boundary diagnostics. `ContactDiagnostics` projects a typed response
+onto runtime-allowlisted HTTP/outcome/code categories; it receives no Request.
+The boundary injects a writer, production composition writes a JSON line, and
+writer failures cannot alter delivery or trigger retries. No identifiers,
+content, credentials or raw errors enter these application events. Platform
+logs are separate and require actual account retention/access review.
+The [operating guide](development/contact-operations.md) records the proposed
+edge WAF rule and pending preview/alias coverage; there is no local production
+counter or claimed deployed protection. Delivery remains locked off.
+
 Browser submission is composed through the existing `createServices` and
 `ServiceProvider` controlled-fixture convention, exposing only the application
 submission boundary. Presentation must not import a concrete browser adapter.

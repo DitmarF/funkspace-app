@@ -2,7 +2,7 @@
 
 ## Task metadata
 
-- **Status:** Implemented for review; Dimi authorized documentation finalization and commit/push on 2026-10-13. Independent critical-diff/consumer review and Dimi acceptance pending.
+- **Status:** Complete — Codex technical review PASS at `6147688241fa6737de561840ba149c57ea32abb7`, then Dimi explicitly closed FS-5.2 on 2026-10-13. Earlier pending-review/delivery entries below are historical; no separate Sites review result is inferred.
 - **Task group or epic:** [EPIC 5](../features/funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling).
 - **Owner/current writer:** Codex; Sites checks consumption; Dimi owns final acceptance/external prerequisites.
 - **Last updated:** 2026-10-13.
@@ -29,8 +29,8 @@ bundling, keep live sending disabled and stop before any next task.
 - [x] Node tests use injected fakes and unexpected-fetch guard; no secret values read or exposed by tooling.
 - [x] Focused tests/coverage, strict types/lint and isolated production build/compiled route checks pass.
 - [x] Architecture/setup/status/evidence updated with a complete accessible candidate handoff.
-- [ ] Sites consuming review and independent critical-diff review — pending, not inferred from self-review.
-- [ ] Dimi candidate acceptance — pending.
+- [x] Codex technical review PASS at the delivered revision; no actionable findings. Separate Sites consuming review result is not recorded; Dimi's explicit closure owns task completion.
+- [x] Dimi candidate acceptance — explicitly closed FS-5.2 and requested FS-5.3 on 2026-10-13.
 
 ## Context and repository evidence
 
@@ -128,7 +128,7 @@ review and device/visual acceptance remain separate.
 - **Validation results:** 177 contact tests PASS across seven Node files; dedicated coverage PASS (97.65% lines, 96.90% branches, 97.42% statements, 85.71% functions). Validator/use case/Resend adapter/configuration have full measured coverage. Closed composition has intentionally unexecuted release/credential branches; no coverage exemption added. Full strict frontend types and focused lint PASS. Final broader suite PASS: 130 files/2,083 tests, including all contact regressions. `pnpm typecheck:validation` also PASS. Local link/anchor, dependency, source/build equality and scope checks PASS; final check evidence is in artifact `checks.txt`.
 - **Build:** Isolated HEAD-plus-runtime-diff `pnpm build` PASS, Next 15.5.24, Node 22.22.0/pnpm 10.30.3; build ID `ERhqTvL3B_545QOlesBCu`. Dynamic `/api/contact` bundles successfully. Ten loopback HTTP checks PASS (valid disabled request, exact/excess byte limits, field error, malformed JSON/UTF-8, origin/media and method rejection); temporary server stopped/reaped. Static client bundles contain no Resend endpoint, API key/configuration name or server adapter reference.
 - **Corrections/limitations:** First strict types found union-spread and test-fixture typing errors, corrected. Initial coverage could not write the sandboxed repo output, resolved with a private temporary report directory. The first build-snapshot preparation hit the host Python tar API mismatch; fixed before the successful isolated build. Self-review tightened trailing-newline UUID/configuration checks and explicitly allowlisted public error fields, with regressions. No exception lowered thresholds or enabled live mail.
-- **Remaining work:** Sites consumer and independent critical-diff review, Dimi acceptance; external account/legal/sender/origin/protection/preview gates. Browser/UI/23-hour page retry cutoff belongs to FS-5.4.
+- **Remaining work:** External account/legal/sender/origin/protection/preview gates. Browser/UI/23-hour page retry cutoff belongs to FS-5.4. The later Codex PASS and Dimi closure below complete FS-5.2 without inventing a separate Sites result.
 
 ### Documentation finalization and authorized Git delivery — 2026-10-13
 
@@ -146,6 +146,19 @@ checks are repeated for the final delivery; no application rebuild is needed
 for this documentation-only refresh. The original candidate artifact remains
 preserved, with a separate final patch/manifest and Git delivery verification.
 
+### Technical review and Dimi closure — 2026-10-13
+
+Read-only Codex review inspected the actual repository at
+`6147688241fa6737de561840ba149c57ea32abb7`, with a clean working tree. It
+returned PASS without actionable FS-5.2 findings: 177 contact tests, frontend
+types, focused lint, formatting and diff checks passed; all ten runtime files
+matched the production-tested snapshot. Official provider schema/errors/
+idempotency documentation was rechecked. No live sending or edits occurred.
+Dimi then explicitly stated “FS-5.2 are done” and authorized FS-5.3 local work.
+FS-5.2 is complete; external/live gates remain separate. This decision creates
+no Sites, visual/device, deployed-protection or mailbox-receipt PASS and grants
+no Git delivery permission for subsequent FS-5.3 changes.
+
 ## Handoff
 
 - **Actual repository / previous task:** `/Users/dimi/Projects/funkspace-app`; accepted FS-5.1 record linked above is accessible and its wire contract unchanged.
@@ -153,5 +166,5 @@ preserved, with a separate final patch/manifest and Git delivery verification.
 - **Accessible candidate:** Original `/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/fs-5.2-2026-10-13/` preserves the tested candidate. Final `/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/fs-5.2-delivery-2026-10-13/` contains the complete 26-file `fs-5.2.patch`, checksum, file manifest, checks and Git delivery evidence. Review the actual delivered repository or matching final artifact; regenerate if changed.
 - **Contract:** Exact accepted five-string JSON POST, limits/normalization and error envelopes, verified acceptance only, fixed deterministic plain-text mail/Reply-To, unchanged provider idempotency key, no retries, eight-second whole-exchange deadline; no public provider ID or raw error.
 - **Receiving-chat access:** Verify branch/HEAD/status and read this record, detailed plan, contract and actual diff before review. A separate Sites workspace must prove matching base and candidate contents; working files are not automatically shared. This chat has actual local access; no other chat's access is inferred.
-- **Review provenance:** Author self-review only for this implementation. No independent PASS, Dimi acceptance, actual account configuration, mailbox receipt or physical-device result is claimed.
-- **Stop boundary:** Documentation finalization and commit/push are separately authorized above. Wait for a separately requested review/next task; no merge, deployment/settings or live sending is authorized by this delivery.
+- **Review provenance:** Author implementation checks followed by the read-only Codex technical PASS and Dimi closure above. No separate Sites review, actual account configuration, mailbox receipt or physical-device result is claimed.
+- **Stop boundary:** FS-5.3 is separately authorized for local work after closure. Earlier Git delivery permission does not extend to it; no merge, deployment/settings or live sending is authorized.

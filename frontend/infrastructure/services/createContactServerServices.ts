@@ -35,6 +35,7 @@ export function createContactServerServices() {
     handle: createContactRequestHandler(
       (input) => useCase.execute(input),
       configuration.allowedOrigins,
+      (event) => console.info(JSON.stringify(event)),
     ),
   };
 }
