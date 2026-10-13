@@ -228,6 +228,31 @@ import { useTheme } from "@/hooks/useTheme";
   - Next.js pages
 - **No**: Business logic, direct infrastructure access
 
+### Contact composition — FS-5.1
+
+The [EPIC 5 plan](features/FunkSpace_EPIC_5_Detailed_Plan.md) freezes a single
+JSON `POST /api/contact` in the existing Next.js deployment. FS-5.1 adds only
+pure request/result types and limits in `domain/contact/ContactContract.ts`.
+Validation, ports, the use case and network behavior remain FS-5.2 work.
+
+The planned server composition root is
+`infrastructure/services/createContactServerServices.ts`, guarded by
+`server-only`, constructing configuration, a Resend HTTPS adapter and the use
+case through Domain ports. The thin Route Handler and server contact page are
+permitted server composition entry points. This bounded decision is documented
+by the FS-5.1 request and accepted by Dimi at task closure on 2026-10-13 after
+the recorded consumer review and presentation amendment. No server composition
+module is implemented here; external configuration and later implementation
+remain separate tasks.
+
+Browser submission is composed through the existing `createServices` and
+`ServiceProvider` controlled-fixture convention, exposing only the application
+submission boundary. Presentation must not import a concrete browser adapter.
+Provider code, credentials and server configuration never enter that client
+graph; the server page exposes only safe availability. There is no Server
+Action, separate backend or global draft store. Draft/key state is page memory
+only. Domain remains framework-free and Application depends on Domain ports.
+
 ## Service Injection
 
 Services are injected via React Context:
