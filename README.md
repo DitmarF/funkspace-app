@@ -43,6 +43,13 @@ pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 - Baseline results, security limitations and the full command sequence: [FS-0.2 task record](docs/tasks/fs-0.2-tooling-baseline.md).
 - Current dependency versions, branch integration, validation and remaining security findings: [dependency maintenance record](docs/tasks/2026-09-12-branch-and-dependabot-review.md#authorized-integration-continuation). This later evidence supersedes the original FS-0.2 dependency inventory where explicitly recorded.
 
+Contact server preparation: [FS-5.2 setup and safety gates](docs/development/contact-server.md).
+The Node-runtime `/api/contact` route is implemented with controlled tests;
+production composition remains locked off. The `/contact` page and live
+delivery are later tasks. Run contact-layer tests explicitly with
+`pnpm exec vitest run --config vitest.contact.config.ts --coverage`, because
+the broad coverage configuration excludes these layers.
+
 ## Project layout
 
 - `frontend/` – Next.js App Router UI, Tailwind themed with CSS variables from

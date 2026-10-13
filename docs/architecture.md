@@ -231,19 +231,44 @@ import { useTheme } from "@/hooks/useTheme";
 ### Contact composition — FS-5.1
 
 The [EPIC 5 plan](features/FunkSpace_EPIC_5_Detailed_Plan.md) freezes a single
-JSON `POST /api/contact` in the existing Next.js deployment. FS-5.1 adds only
-pure request/result types and limits in `domain/contact/ContactContract.ts`.
-Validation, ports, the use case and network behavior remain FS-5.2 work.
+JSON `POST /api/contact` in the existing Next.js deployment. Accepted
+`domain/contact/ContactContract.ts` types/limits are unchanged. FS-5.2 adds
+pure shared validation, `ContactDeliveryPort`, `ContactUseCase` and the typed
+`ContactResult` status/envelope pairing; Application imports only Domain.
 
-The planned server composition root is
+The server composition root is
 `infrastructure/services/createContactServerServices.ts`, guarded by
 `server-only`, constructing configuration, a Resend HTTPS adapter and the use
 case through Domain ports. The thin Route Handler and server contact page are
 permitted server composition entry points. This bounded decision is documented
 by the FS-5.1 request and accepted by Dimi at task closure on 2026-10-13 after
-the recorded consumer review and presentation amendment. No server composition
-module is implemented here; external configuration and later implementation
-remain separate tasks.
+the recorded consumer review and presentation amendment. FS-5.2 implements it
+and the thin Node-runtime Route Handler. Configuration/adapters have the same
+`server-only` marker, handled internally by Next. Vitest's empty server-layer
+alias is test-only and does not change production client-import rejection.
+
+`ContactRequestHandler` consumes a Domain submission function rather than a
+concrete application class. It applies method/exact-origin/media checks, counts
+actual streamed bytes and decodes UTF-8 fatally before delegating unknown JSON
+to the use case. `BoundedJson` has two real consumers: request parsing and
+provider-response reading. Readers release locks and cancel unfinished bodies
+without awaiting an untrusted cancellation callback.
+
+The Resend adapter uses one injected/native fetch, fixed configured identities
+and subject, structured Reply-To, deterministic plain text and
+`contact/<submissionId>`. Its eight-second deadline includes body reading and
+parsing. Ambiguous transport, malformed evidence and idempotency conflicts
+never imply acceptance or confirmed non-delivery. Timers/controllers are
+released on every settled outcome; there is no automatic retry or process-local
+production limiter.
+
+Live delivery is locked off by `CONTACT_DELIVERY_RELEASED = false` in server
+composition, independently of environment values. Credential/identity getters
+are not read while off. Missing/invalid configuration fails closed; origin and
+validation rejections retain their precedence. Removing the lock requires a
+separately authorized candidate after account/legal, deployed protection and
+preview gates pass. See [server setup](development/contact-server.md) and
+[FS-5.2 evidence](tasks/fs-5.2-contact-server.md).
 
 Browser submission is composed through the existing `createServices` and
 `ServiceProvider` controlled-fixture convention, exposing only the application

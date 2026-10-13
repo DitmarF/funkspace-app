@@ -10,6 +10,12 @@ export default defineConfig({
       "@": resolve(__dirname, "frontend"),
       react: resolve(__dirname, "frontend/node_modules/react"),
       "react-dom": resolve(__dirname, "frontend/node_modules/react-dom"),
+      // Test-only equivalent of Next's server-layer alias. Production keeps
+      // Next's client-import rejection; server test files run in Node.
+      "server-only": resolve(
+        __dirname,
+        "frontend/node_modules/next/dist/compiled/server-only/empty.js",
+      ),
     },
   },
   test: {

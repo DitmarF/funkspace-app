@@ -2,7 +2,7 @@
 
 ## Plan metadata
 
-- **Status:** FS-5.1 complete — Dimi accepted the consuming contract and closed the task on 2026-10-13, with the presentation amendment below. FS-5.2–FS-5.6 not started.
+- **Status:** FS-5.1 complete — Dimi accepted the consuming contract and closed the task on 2026-10-13, with the presentation amendment below. FS-5.2 implemented for review with delivery locked off; documentation finalization and commit/push separately authorized on 2026-10-13. FS-5.3–FS-5.6 not started.
 - **Owner:** Codex for contract/server preparation; Sites for FS-5.4; Dimi for product, legal and external approvals.
 - **Parent authority:** [Minimum Usable Experience](funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling) owns milestone status and gates. This linked plan owns EPIC 5 detail; the [FS-5.1 record](../tasks/fs-5.1-contact-contract.md) owns execution evidence.
 - **Last updated / official-document checks:** 2026-10-13.
@@ -43,7 +43,7 @@ No subject/phone/company/budget fields, attachments, consent checkbox, automatic
 
 ## Current repository evidence
 
-- Next.js `15.5.24` App Router; `backend/` remains a reserved stub. No `/contact`, `/api/contact`, validator, contact use case or provider adapter exists at the base.
+- Next.js `15.5.24` App Router; `backend/` remains a reserved stub. At the FS-5.1 base there was no contact server/UI. FS-5.2 now adds shared validation, use case/port, server-only adapter/composition and Node `/api/contact`; [candidate/check evidence](../tasks/fs-5.2-contact-server.md) records the implementation. `/contact` and browser wiring remain absent.
 - `frontend/app/page.tsx` contains Start and AboutPreview only. `portfolioNavigation.ts` supplies the same disabled Contact item to header/tree; `portfolioDestinations.ts` has no Contact destination.
 - `PortfolioShell` and the plain `/about` article provide the shell precedent. Reuse accepted `TextField`, `TextAreaField`, ordinary `Button` and link primitives; [FS-1.5](../tasks/fs-1.5-essential-form-primitives.md) preserves their APIs. Contact does not consume `Button.pending` or `InlineStatus` under Dimi's amendment; those shared primitives remain available to other consumers.
 - `createServices` / `ServiceProvider` own browser composition and controlled fixture injection. No mail credentials or server adapter may enter this graph.
@@ -133,7 +133,12 @@ Preserve `Presentation → Application → Domain ← Infrastructure`. This requ
 | HTTP entry point                   | Proposed `frontend/app/api/contact/route.ts`; thin request/response entry through server composition; Node runtime in existing deployment          |
 | Navigation                         | FS-5.4 adds shared destination, enables header/tree and preserves current-page disabling/focus handoff                                             |
 
-Only the contract file exists after FS-5.1. Other paths are proposals to inspect again before implementation. No port/use case/adapters are invented ahead of their actual consumers.
+FS-5.2 implements the Domain validator/result/delivery port, application use
+case, `infrastructure/contact/` boundaries/adapter, server composition and
+Node Route Handler above. The original server placement proposals are now
+implemented at those paths; UI/browser work stays proposed. See [server setup](../development/contact-server.md)
+for actual modules, the closed release lock and controlled tests. The wire
+contract is unchanged, and no browser service/form exists.
 
 ## Configuration, privacy and operating prerequisites
 
@@ -199,6 +204,13 @@ Proposed platform rule only: method POST AND exact path `/api/contact`, five req
 **Complete when:** The approved contract supports UI work with controlled responses while real-provider configuration proceeds. Missing credentials are a visible delivery blocker, never simulated success. **Gate satisfied:** read-only consumer review recorded; its one pending-announcement finding resolved by Dimi's no-pending-controls/no-InlineStatus amendment; Dimi accepted the contract and explicitly closed FS-5.1. No fresh independent security, visual or device acceptance is inferred.
 
 ### FS-5.2 — Implement validation, contact use case, and mail adapter
+
+**Current status:** Implemented locally and self-reviewed with controlled checks.
+[FS-5.2 evidence/handoff](../tasks/fs-5.2-contact-server.md) owns the candidate,
+results and separately authorized documentation/Git delivery record; the
+containing commit identifies the delivered revision. Consumer/independent critical-diff review and Dimi
+acceptance remain pending. The server release lock stays closed regardless
+of environment values; no live mail or external setup performed.
 
 **Lead:** Codex. **Counterpart:** Sites checks consuming types/presentation. **Dimi:** confirms/configures the settled sender, recipient, requirements and approved secrets.
 
@@ -283,4 +295,4 @@ Run Domain/Application/Infrastructure tests explicitly: current coverage configu
 
 ## Implementation handoff
 
-Start the next session with the completed [FS-5.1 evidence/handoff](../tasks/fs-5.1-contact-contract.md#handoff) and a fresh branch/HEAD/status check. Confirm the receiving chat can actually read the repository and every intentional change; chats do not automatically share working files. The read-only consumer review accessed the actual local candidate; a future separate Sites workspace must verify the delivered branch/revision or matching patch independently. If inaccessible, provide/apply the reviewable artifact before proceeding. Do not reset newer work or transfer secret values. FS-5.1 is accepted and complete; request only a separately scoped next task. External prerequisites and FS-G2 remain open.
+Start the next session with the current [FS-5.2 evidence/handoff](../tasks/fs-5.2-contact-server.md#handoff), its completed [FS-5.1 predecessor](../tasks/fs-5.1-contact-contract.md#handoff) and a fresh branch/HEAD/status check. Confirm the receiving chat can actually read the repository and every intentional change; chats do not automatically share working files. The FS-5.1 read-only consumer review accessed the actual local candidate; a future separate Sites workspace must verify the delivered branch/revision or matching final patch independently. If inaccessible, provide/apply the reviewable artifact before proceeding. Do not reset newer work or transfer secret values. FS-5.1 is accepted and complete; FS-5.2 review and Dimi acceptance remain pending. Request only a separately scoped review/next task. External prerequisites and FS-G2 remain open.
