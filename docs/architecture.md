@@ -281,13 +281,29 @@ The [operating guide](development/contact-operations.md) records the proposed
 edge WAF rule and pending preview/alias coverage; there is no local production
 counter or claimed deployed protection. Delivery remains locked off.
 
-Browser submission is composed through the existing `createServices` and
+FS-5.4 implements browser submission through the existing `createServices` and
 `ServiceProvider` controlled-fixture convention, exposing only the application
 submission boundary. Presentation must not import a concrete browser adapter.
 Provider code, credentials and server configuration never enter that client
 graph; the server page exposes only safe availability. There is no Server
 Action, separate backend or global draft store. Draft/key state is page memory
 only. Domain remains framework-free and Application depends on Domain ports.
+
+`ContactSubmissionPort` is the narrow browser boundary; native fetch, UUIDs and
+conservative elapsed time are implemented by `BrowserContactSubmission`. Wall and
+monotonic intervals count device sleep; clock rollback retires existing retries.
+Wake/focus rechecks expiry, and the whole-exchange deadline checks elapsed time
+before returning a result. Pure
+`ContactBrowserResponse` validates exact transport/envelope/identity pairing.
+`features/contact/ContactForm` owns its page-memory UI/draft state, uses shared
+Domain validation and injected submission behavior, and never imports concrete
+adapters. The server `/contact` page imports permitted server composition only
+to expose safe availability. SSR/prehydration/delivery-off retain visible disabled
+fields, a disabled non-submit button, a clear availability message and email fallback.
+The accepted ordinary-Button/plain-feedback amendment remains; disabled controls,
+synchronous guards, read-only snapshots and focused error/result text model the
+workflow. No new scene, navigation manager, persistence or server behavior exists.
+See [UI checks and phone checklist](development/contact-ui.md).
 
 ## Service Injection
 

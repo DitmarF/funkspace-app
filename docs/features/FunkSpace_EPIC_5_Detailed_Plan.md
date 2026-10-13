@@ -2,11 +2,11 @@
 
 ## Plan metadata
 
-- **Status:** FS-5.1 and FS-5.2 complete — Dimi closed FS-5.2 after Codex technical PASS at `6147688` on 2026-10-13. FS-5.3 local preparation complete; documentation finalization and commit/push separately authorized on 2026-10-13. Delivery stays locked off; external protection/coverage remains unverified. FS-5.4–FS-5.6 not started.
+- **Status:** FS-5.1/5.2 complete; FS-5.3 local preparation has Codex technical PASS at delivered `617f9c8`, with external protection/coverage pending. FS-5.4 has Codex technical PASS with F1 closed by re-review; documentation and commit/push separately authorized. Phone/design acceptance and external prerequisites remain pending; delivery stays locked off. FS-5.5/5.6 not started.
 - **Owner:** Codex for contract/server preparation; Sites for FS-5.4; Dimi for product, legal and external approvals.
 - **Parent authority:** [Minimum Usable Experience](funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling) owns milestone status and gates. This linked plan owns EPIC 5 detail; the [FS-5.1 record](../tasks/fs-5.1-contact-contract.md) owns execution evidence.
 - **Last updated / official-document checks:** 2026-10-13.
-- **Actual local base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `2c545cd7cb3bc074a126fffa61166577f113cc7b`; clean at inspection. Historical planning baseline equals actual HEAD; no reset performed.
+- **Historical FS-5.1 inspected base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `2c545cd7cb3bc074a126fffa61166577f113cc7b`; clean at that inspection, matching the planning baseline. Current revision/diff belong to the latest task handoff; no reset performed.
 - **Target release:** Not scheduled. First real-delivery acceptance requires a separately authorized protected preview. FS-G2, publication and game integration remain separate.
 - **Related decisions:** [FS-0.5](../tasks/fs-0.5-product-and-technical-decisions.md), [architecture](../architecture.md#contact-composition--fs-51), [ADR-001](../decisions/ADR-001-monorepo-strategy.md), [ADR-003](../decisions/ADR-003-interactive-experience-boundary.md).
 
@@ -43,11 +43,11 @@ No subject/phone/company/budget fields, attachments, consent checkbox, automatic
 
 ## Current repository evidence
 
-- Next.js `15.5.24` App Router; `backend/` remains a reserved stub. At the FS-5.1 base there was no contact server/UI. FS-5.2 now adds shared validation, use case/port, server-only adapter/composition and Node `/api/contact`; [candidate/check evidence](../tasks/fs-5.2-contact-server.md) records the implementation. `/contact` and browser wiring remain absent.
-- `frontend/app/page.tsx` contains Start and AboutPreview only. `portfolioNavigation.ts` supplies the same disabled Contact item to header/tree; `portfolioDestinations.ts` has no Contact destination.
+- Next.js `15.5.24` App Router; `backend/` remains a reserved stub. At the FS-5.1 base there was no contact server/UI. FS-5.2 adds shared validation, use case/port, server-only adapter/composition and Node `/api/contact`; [server evidence](../tasks/fs-5.2-contact-server.md) records the implementation. FS-5.4 adds `/contact`, its controlled form and same-origin browser wiring; [UI evidence](../tasks/fs-5.4-contact-page.md) records the candidate. Default delivery-off shows visible disabled fields, an availability message and email fallback under Dimi's follow-up amendment.
+- `frontend/app/page.tsx` contains Start and AboutPreview only. FS-5.4 enables the same Contact item in header/tree through `portfolioNavigation.ts` and the shared `/contact` destination in `portfolioDestinations.ts`; current-page disabling remains.
 - `PortfolioShell` and the plain `/about` article provide the shell precedent. Reuse accepted `TextField`, `TextAreaField`, ordinary `Button` and link primitives; [FS-1.5](../tasks/fs-1.5-essential-form-primitives.md) preserves their APIs. Contact does not consume `Button.pending` or `InlineStatus` under Dimi's amendment; those shared primitives remain available to other consumers.
 - `createServices` / `ServiceProvider` own browser composition and controlled fixture injection. No mail credentials or server adapter may enter this graph.
-- Privacy and Impressum remain explicit drafts. The current privacy page truthfully says there is no contact form, but must be amended when one exists. It describes only `theme`; the existing motion preference key is also required in final copy.
+- Privacy and Impressum remain explicit drafts. FS-5.4 corrects Privacy's stale no-form sentence to the actual contact page/delivery-disabled/no-draft-storage facts. It describes only `theme`; the existing motion preference key and full processing details still require FS-5.5 legal review/final copy.
 - [EPIC 4 closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) is complete. Existing scene acceptance remains intact; FS-G2 still requires EPIC 5.
 
 ## Frozen UI/server contract
@@ -136,9 +136,11 @@ Preserve `Presentation → Application → Domain ← Infrastructure`. This requ
 FS-5.2 implements the Domain validator/result/delivery port, application use
 case, `infrastructure/contact/` boundaries/adapter, server composition and
 Node Route Handler above. The original server placement proposals are now
-implemented at those paths; UI/browser work stays proposed. See [server setup](../development/contact-server.md)
+implemented at those paths. FS-5.4 now implements the UI/browser paths and shared
+Contact navigation destination. See [server setup](../development/contact-server.md)
 for actual modules, the closed release lock and controlled tests. The wire
-contract is unchanged, and no browser service/form exists.
+contract is unchanged; [UI verification](../development/contact-ui.md) covers
+the browser service/form and honest delivery-off presentation.
 
 ## Configuration, privacy and operating prerequisites
 
@@ -152,7 +154,7 @@ Document variable names **without values**:
 | `CONTACT_TO`              | One fixed approved recipient; no comma lists or runtime request override                                  |
 | `CONTACT_ALLOWED_ORIGINS` | JSON array of exact canonical origins, scheme/host/port only; no paths, wildcard or Host-derived defaults |
 
-HTTPS origins for deployed environments; explicitly approved HTTP loopback only for isolated local mocks. Empty/invalid allowlist or any missing/invalid configuration keeps delivery off. Credentials never use `NEXT_PUBLIC_`. Secrets are not recorded in source, artifacts, test fixtures, chat or logs. No environment file or variable value is created by FS-5.1. Later disabled/unconfigured mode renders email-only content and returns unavailable after boundary rejection checks, never simulated acceptance. Recheck configuration per intended Preview/Production scope; don't cache a successful availability check across changed deployments.
+HTTPS origins for deployed environments; explicitly approved HTTP loopback only for isolated local mocks. Empty/invalid allowlist or any missing/invalid configuration keeps delivery off. Credentials never use `NEXT_PUBLIC_`. Secrets are not recorded in source, artifacts, test fixtures, chat or logs. No environment file or variable value is created by FS-5.1. Disabled/unconfigured mode shows visible disabled fields, clear availability text and email fallback under Dimi's FS-5.4 follow-up amendment; the server returns unavailable after boundary rejection checks, never simulated acceptance. Recheck configuration per intended Preview/Production scope; don't cache a successful availability check across changed deployments.
 
 Data flow: page-memory draft → Vercel request/function → Resend message/log storage → Gmail correspondence. App adds no message database. Diagnostic allowlist: bounded correlation ID, outcome/code, duration, safe HTTP/provider status and internal acceptance ID. FS-5.3 implements only categorical HTTP/outcome/code events; optional identifiers/duration/provider details are omitted for minimization. No human field values, body, IP in app logs, credentials or raw provider error. Platform/firewall logs may separately retain network identifiers; Dimi reviews actual retention/access with provider and hosting terms. The [operating guide](../development/contact-operations.md) records actual application exclusions and pending platform review.
 
@@ -174,7 +176,7 @@ These are public-document facts, not proof of this project's settings or legal s
 | [Vercel WAF rate limiting](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting)                                                            | All plans support fixed windows and IP counting. Hobby: one rate-limit rule/project, up to ten-minute window, one million included allowed requests; Pro documents 40 rules and usage pricing. Counters are regional; default limiting action is `429`. |
 | [Vercel deployment protection](https://vercel.com/docs/deployment-protection)                                                                           | Standard Protection is available on all plans and excludes production domains. Protection scope/method and actual reviewer access must be checked per URL; same-origin browser requests retain protection cookies.                                      |
 
-Provider policy marketing is not a legal assessment. Dimi reviews purpose/legal basis, operator identity/address, rights/contact, recipients/transfers, hosting/mailbox terms, DPA and retention with appropriate advice where needed before live enabling. FS-5.5 updates both legal pages, metadata and tests, including `theme` and `funkspace.motion.preference.v1`, their actual write/expiry behavior and no contact draft persistence. Do not turn today's truthful no-form statement into a claim about an implemented form before it exists.
+Provider policy marketing is not a legal assessment. Dimi reviews purpose/legal basis, operator identity/address, rights/contact, recipients/transfers, hosting/mailbox terms, DPA and retention with appropriate advice where needed before live enabling. FS-5.5 updates both legal pages, metadata and tests, including `theme` and `funkspace.motion.preference.v1`, their actual write/expiry behavior and no contact draft persistence. FS-5.4's narrow current-state correction does not finalize legal content or claim live processing acceptance.
 
 ### Account settings and external actions: unverified and pending
 
@@ -234,6 +236,15 @@ configuration is claimed; release lock remains closed.
 **Complete when:** Abusive/oversized requests reject predictably, deployed limits and alias coverage are verified, logging reviewed and residual regional/distributed abuse limits recorded. Local-only preparation cannot certify deployed protection.
 
 ### FS-5.4 — Implement the live contact-form interface
+
+**Current status:** Codex technical review PASS with F1 closed by independent
+re-review; [FS-5.4 evidence/delivery](../tasks/fs-5.4-contact-page.md#f1-re-review-pass-and-authorized-git-delivery--2026-10-13)
+and [UI/phone checks](../development/contact-ui.md) own actual validation and
+pending human acceptance. Dimi separately authorized documentation finalization and
+commit/push; the containing commit identifies delivery. Dimi reconfirmed the accepted no-pending-controls/no-InlineStatus
+amendment during this task. Dimi's follow-up keeps fields visible and disabled with
+clear availability text and email fallback; server/provider
+contracts and external gates are unchanged.
 
 **Lead:** Sites. **Counterpart:** Codex reviews contract parity, architecture and test isolation. **Dimi:** approves wording and keyboard/phone behavior.
 
@@ -298,4 +309,4 @@ Run Domain/Application/Infrastructure tests explicitly: current coverage configu
 
 ## Implementation handoff
 
-Start the next session with the current [FS-5.3 evidence/handoff](../tasks/fs-5.3-contact-protection.md#handoff), its completed [FS-5.2 predecessor](../tasks/fs-5.2-contact-server.md#handoff) and a fresh branch/HEAD/status check. Confirm the receiving chat can actually read the repository and every intentional change; chats do not automatically share working files. A separate Sites workspace must verify the delivered branch/revision and intentional FS-5.3 patch independently. If inaccessible, provide/apply the reviewable artifact before proceeding. Do not reset newer work or transfer secret values. FS-5.1/5.2 are complete; FS-5.3 local preparation is separate from pending external configuration and acceptance. Request only a separately scoped review/next task. External prerequisites and FS-G2 remain open.
+Start the next session with the current [FS-5.4 evidence/handoff](../tasks/fs-5.4-contact-page.md#handoff), its [FS-5.3 predecessor](../tasks/fs-5.3-contact-protection.md#handoff) and a fresh branch/HEAD/status check. Confirm the receiving chat can actually read the repository and every intentional change; chats do not automatically share working files. A separate Sites workspace must verify the delivered branch/revision and FS-5.4 source independently. If inaccessible, provide/apply the final artifact before proceeding. Do not reset newer work or transfer secret values. FS-5.4 has Codex technical PASS with F1 closed; Dimi phone/design/wording/assistive-technology acceptance remains pending. External configuration/live gates and FS-G2 stay open. Request only a separately scoped next task.

@@ -19,6 +19,7 @@ for (const destination of [
   "aperture",
   "privacy",
   "impressum",
+  "contact",
 ] as const) {
   it(`renders ${destination} as a disabled current page without an activation handler`, () => {
     route.pathname = portfolioDestinations[destination].href;
@@ -75,7 +76,7 @@ it("updates the shared state when the route changes and matches exact paths", ()
     "href",
     "/",
   );
-  expect(screen.getByRole("button", { name: "Contact" })).not.toHaveAttribute(
+  expect(screen.getByRole("link", { name: "Contact" })).not.toHaveAttribute(
     "aria-current",
   );
 });

@@ -87,8 +87,11 @@ it("keeps ready destinations as anchors and future entries noninteractive", () =
       '[aria-disabled="true"] a, [aria-disabled="true"][href], button:not(:disabled)',
     ),
   ).toHaveLength(0);
-  expect(screen.getByRole("button", { name: "Contact" })).toBeDisabled();
-  expect(screen.queryByRole("link", { name: "Contact" })).toBeNull();
+  expect(screen.getByRole("link", { name: "Contact" })).toHaveAttribute(
+    "href",
+    "/contact",
+  );
+  expect(screen.queryByRole("button", { name: "Contact" })).toBeNull();
   expect(
     navigation.querySelectorAll('[role="tree"], [role="menu"]'),
   ).toHaveLength(0);
@@ -133,7 +136,7 @@ it("allows further nested groups with native destination anchors", () => {
   expect(view.container.querySelector('a[href="/about"]')).toBeInTheDocument();
 });
 
-it("keeps Contact disabled and renders the matching destination artwork", () => {
+it("enables Contact and renders the matching destination artwork", () => {
   render(<PortfolioNavigationTree />);
   const navigation = screen.getByRole("navigation", { name: "Primary" });
   for (const summary of navigation.querySelectorAll("summary"))
@@ -151,6 +154,7 @@ it("keeps Contact disabled and renders the matching destination artwork", () => 
     "Privacy",
     "Privacy policy",
     "Legal notice",
+    "Contact",
   ]);
   for (const [label, family] of [
     ["Home", "home"],
@@ -161,6 +165,7 @@ it("keeps Contact disabled and renders the matching destination artwork", () => 
     ["Privacy", "privacy"],
     ["Privacy policy", "privacy-policy"],
     ["Legal notice", "legal-notice"],
+    ["Contact", "contact"],
   ]) {
     const row = screen.getByText(label, { exact: true }).closest("a, summary")!;
     for (const size of [24, 36]) {

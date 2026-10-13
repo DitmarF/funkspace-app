@@ -45,8 +45,10 @@ pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 
 Contact server preparation: [FS-5.2 setup and safety gates](docs/development/contact-server.md).
 The Node-runtime `/api/contact` route is implemented with controlled tests;
-production composition remains locked off. The `/contact` page and live
-delivery are later tasks. Run contact-layer tests explicitly with
+production composition remains locked off. The `/contact` page now provides
+visible disabled fields and an email fallback while sending is disabled; [FS-5.4 UI checks](docs/development/contact-ui.md)
+cover the controlled form and browser adapter. Live delivery remains pending.
+Run contact-layer tests explicitly with
 `pnpm exec vitest run --config vitest.contact.config.ts --coverage`, because
 the broad coverage configuration excludes these layers.
 

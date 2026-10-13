@@ -17,6 +17,8 @@ for (const javaScriptEnabled of [true, false]) {
       ["/animations/aperture", "Web Aperture"],
       ["/privacy", "Privacy policy"],
       ["/impressum", "Legal notice"],
+      ["/contact", "Contact"],
+      ["/contact?ref=current", "Contact"],
     ]) {
       test(`${route} has one noninteractive current item in each applicable navigation`, async ({
         page,
@@ -26,7 +28,8 @@ for (const javaScriptEnabled of [true, false]) {
           name: "Main",
           exact: true,
         });
-        const headerCurrent = name === "Home" || name === "About";
+        const headerCurrent =
+          name === "Home" || name === "About" || name === "Contact";
         await expect(header.locator('[aria-current="page"]')).toHaveCount(
           headerCurrent ? 1 : 0,
         );
@@ -58,9 +61,10 @@ for (const javaScriptEnabled of [true, false]) {
         await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
         await expect(page).toHaveURL(route);
         await expect(tree).toBeVisible();
-        await expect(
-          tree.getByRole("button", { name: "Contact" }),
-        ).not.toHaveAttribute("aria-current");
+        if (name !== "Contact")
+          await expect(
+            tree.getByRole("link", { name: "Contact" }),
+          ).not.toHaveAttribute("aria-current");
       });
     }
   });

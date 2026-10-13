@@ -23,6 +23,7 @@ describe("portfolio destination contract", () => {
         href: "/impressum",
       },
       privacy: { focusId: "main-content", label: "Privacy", href: "/privacy" },
+      contact: { focusId: "main-content", label: "Contact", href: "/contact" },
     });
     const hrefs = Object.values(portfolioDestinations).map(({ href }) => href);
     expect(new Set(hrefs).size).toBe(hrefs.length);

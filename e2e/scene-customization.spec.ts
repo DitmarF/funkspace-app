@@ -948,8 +948,8 @@ test("details work without JavaScript: complete solid WEB and native navigation,
   await expect(
     page
       .getByRole("navigation", { name: "Main", exact: true })
-      .getByRole("button", { name: "Contact" }),
-  ).toBeDisabled();
+      .getByRole("link", { name: "Contact" }),
+  ).toHaveAttribute("href", "/contact");
   await expect(canvas(page)).toHaveCount(0);
   await page.locator('footer details[class*="fallback"] > summary').click();
   await page

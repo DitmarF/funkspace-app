@@ -18,6 +18,7 @@ export default defineConfig({
       provider: "v8",
       include: [
         "frontend/domain/contact/ContactValidation.ts",
+        "frontend/domain/contact/ContactBrowserResponse.ts",
         "frontend/application/contact/SubmitContact.ts",
         "frontend/infrastructure/contact/*.ts",
         "frontend/infrastructure/services/createContactServerServices.ts",

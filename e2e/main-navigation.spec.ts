@@ -14,18 +14,18 @@ for (const javaScriptEnabled of [true, false]) {
       contextOptions: { reducedMotion: "reduce" },
     });
     for (const width of [320, 768, 1280]) {
-      test(`layout, native destinations and disabled Contact at ${width}px`, async ({
+      test(`layout, native destinations and Contact link at ${width}px`, async ({
         page,
       }, info) => {
         await page.setViewportSize({ width, height: 720 });
         await page.goto("/");
         const nav = page.getByRole("navigation", { name: "Main", exact: true });
-        const contact = nav.getByRole("button", {
+        const contact = nav.getByRole("link", {
           name: "Contact",
           exact: true,
         });
-        await expect(contact).toBeDisabled();
-        await expect(nav.getByRole("link")).toHaveCount(1);
+        await expect(contact).toHaveAttribute("href", "/contact");
+        await expect(nav.getByRole("link")).toHaveCount(2);
         await expect(
           nav.getByRole("button", { name: "Home", exact: true }),
         ).toBeDisabled();
@@ -94,8 +94,8 @@ for (const javaScriptEnabled of [true, false]) {
         await expect(
           page
             .getByRole("navigation", { name: "Primary" })
-            .getByRole("button", { name: "Contact", exact: true }),
-        ).toBeDisabled();
+            .getByRole("link", { name: "Contact", exact: true }),
+        ).toHaveAttribute("href", "/contact");
         if (javaScriptEnabled) await page.keyboard.press("Escape");
         else
           await page

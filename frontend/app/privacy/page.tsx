@@ -46,8 +46,10 @@ export default function PrivacyPage() {
             Email contact
           </h2>
           <p className="text-portfolio-body">
-            Email links open your mail application. This site has no contact
-            form.
+            Email links open your mail application. A contact page is available;
+            form delivery is currently disabled. No contact draft is saved in
+            your browser’s storage. Hosting and email processing details still
+            require review before form delivery is enabled.
           </p>
           <ButtonLink href={contactHref} className="scroll-mb-fs-2xl">
             {contactEmail}

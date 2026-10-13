@@ -77,7 +77,7 @@ Mobile, no-JS and short viewports with a header taller than half the viewport re
 native scrolling. **SmartStickyHeader** is the long-page Storybook example.
 See the [behavior and validation record](../../../docs/tasks/maintenance-smart-sticky-header.md).
 
-`PortfolioMainNavigation` supplies Home, About and disabled Contact in the
+`PortfolioMainNavigation` supplies Home, About and Contact in the
 shared header. It and `PortfolioNavigationTree` reuse `portfolioMainNavigation`
 data and `PortfolioNavigationRow`, including icon artwork, typography, semantic
 colors, hover/focus styling and native disabled buttons. The compact header
@@ -86,9 +86,9 @@ Header rows use the 24px artwork at every breakpoint; desktop tree rows retain
 their 36px artwork.
 
 The header landmark is named **Main**; the complete tree remains **Primary**.
-Home and About target `/` and `/about` and use the existing provider-owned
-navigation handoff when navigating to another page. Contact has no destination,
-activation handler or keyboard tab stop in either navigation. The other future
+Home, About and Contact target `/`, `/about` and `/contact` and use the existing
+provider-owned navigation handoff when navigating to another page. Contact follows
+the same current-page disabling/focus behavior in both navigations. The other future
 tree entries keep their existing noninteractive Coming soon presentation.
 
 The current page is a native disabled button with `aria-current="page"`, no
@@ -120,7 +120,7 @@ can wrap with enlarged text. The settings hex remains fixed at bottom right.
 Header links participate in the homepage's existing content reveal.
 
 Storybook **Layouts/PortfolioMainNavigation** includes the standalone row and
-**InHeader** composition. The existing tree/shell stories show disabled Contact
-and the shared header too. Main navigation adds **AboutActive**; the tree adds
-**AboutActive** and **ApertureActive**, with route context supplied by Storybook.
+**InHeader** composition. The existing tree/shell stories show the Contact route
+and the shared header too. Main navigation adds **AboutActive** and **ContactActive**;
+the tree adds **AboutActive**, **ContactActive** and **ApertureActive**, with route context supplied by Storybook.
 See the [task record](../../../docs/tasks/maintenance-main-navigation.md).

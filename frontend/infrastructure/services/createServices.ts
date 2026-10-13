@@ -23,12 +23,15 @@ import { bindParticleScene } from "@/infrastructure/particles/ParticleSceneBindi
 import { apertureAssets } from "@/infrastructure/particles/ApertureAssets";
 
 import { createPortfolioNavigationHandoff } from "@/infrastructure/dom/PortfolioNavigationHandoff";
+import { BrowserContactSubmission } from "@/infrastructure/contact/BrowserContactSubmission";
+import type { ContactSubmissionPort } from "@/domain/ports/ContactSubmissionPort";
 
 /**
  * Create all services with their dependencies
  */
 export function createServices(fixture?: {
   decorativeMotionAvailable: boolean;
+  contactSubmission?: ContactSubmissionPort;
 }): OwnedServices {
   // Infrastructure adapters
   const storage = new LocalStorageAdapter();
@@ -50,6 +53,9 @@ export function createServices(fixture?: {
     process.env.NEXT_PUBLIC_ANIMATIONS_ENABLED === "true";
 
   return {
+    contactSubmission:
+      fixture?.contactSubmission ??
+      new BrowserContactSubmission((url, init) => fetch(url, init)),
     bindStickyHeader: (root) =>
       bindStickyHeader(root, motionPolicy, decorativeMotionAvailable),
     apertureAssets,

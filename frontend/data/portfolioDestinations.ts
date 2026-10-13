@@ -26,6 +26,7 @@ export const portfolioDestinations = {
     href: "/impressum",
   },
   privacy: { focusId: "main-content", label: "Privacy", href: "/privacy" },
+  contact: { focusId: "main-content", label: "Contact", href: "/contact" },
 } as const satisfies Record<string, Destination>;
 
 export type PortfolioDestinationKey = keyof typeof portfolioDestinations;

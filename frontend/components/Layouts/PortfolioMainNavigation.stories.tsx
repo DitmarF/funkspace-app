@@ -18,14 +18,15 @@ export const Default: Story = {};
 export const AboutActive: Story = {
   parameters: { nextjs: { navigation: { pathname: "/about" } } },
 };
+export const ContactActive: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/contact" } } },
+};
 export const InHeader: Story = {
   parameters: { layout: "fullscreen", decorativeMotionAvailable: false },
   render: () => (
     <PortfolioShell>
       <h1>Header navigation</h1>
-      <p>
-        Home is the current page. About is available; Contact returns in EPIC 5.
-      </p>
+      <p>Home is the current page. About and Contact are available.</p>
     </PortfolioShell>
   ),
 };

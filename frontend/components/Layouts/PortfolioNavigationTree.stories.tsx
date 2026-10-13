@@ -17,6 +17,9 @@ export const Default: Story = {};
 export const AboutActive: Story = {
   parameters: { nextjs: { navigation: { pathname: "/about" } } },
 };
+export const ContactActive: Story = {
+  parameters: { nextjs: { navigation: { pathname: "/contact" } } },
+};
 export const ApertureActive: Story = {
   parameters: { nextjs: { navigation: { pathname: "/animations/aperture" } } },
 };

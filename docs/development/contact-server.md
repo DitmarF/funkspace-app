@@ -24,8 +24,12 @@ rule, coverage blockers, log review, quota recovery and emergency disable steps.
   Its thin `app/api/contact/route.ts` entry uses Node. Other HTTP methods,
   including OPTIONS, reject with `405`/`Allow: POST`; application JSON is no-store.
 
-No `/contact` page, form, browser submission adapter or navigation enabling is
-added. The accepted no-`Button.pending`/no-`InlineStatus` amendment still applies.
+FS-5.4 now adds the `/contact` page, controlled form/browser submission and shared
+navigation destination; [UI verification](contact-ui.md) records its boundaries.
+Default delivery-off presentation shows disabled fields, an availability message
+and the email fallback; sending remains blocked. The accepted
+no-`Button.pending`/no-`InlineStatus` amendment still applies. Server code and
+provider contracts remain unchanged.
 
 ## Delivery is locked off
 
@@ -74,7 +78,7 @@ Acceptance evidence is an HTTP 200 JSON object containing only a valid UUID `id`
 The adapter uses `contact/<submissionId>` and the unchanged normalized payload.
 It rotates no key, schedules no retry, and stores no draft/deduplication cache.
 Page-memory identity, edits, the browser's 15-second deadline, non-JSON platform
-429 handling and the 23-hour retry cutoff belong to FS-5.4. The five-field request
+429 handling and the 23-hour retry cutoff are implemented in FS-5.4. The five-field request
 does not contain first-attempt age; the server cannot enforce that browser cutoff.
 Provider retention and stable payload/configuration rollout remain required;
 exactly-once delivery is not promised. There is no per-process production limiter.

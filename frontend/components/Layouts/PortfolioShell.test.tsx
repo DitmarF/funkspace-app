@@ -79,7 +79,7 @@ describe("server-rendered portfolio documents", () => {
         ),
       ).toHaveAttribute("href", destinations.privacy.href);
       expect(screen.getAllByRole("link")).toHaveLength(
-        name === "Home" ? 14 : name === "About" ? 12 : 13,
+        name === "Home" ? 16 : name === "About" ? 14 : 15,
       );
       const mainNav = header.getByRole("navigation", { name: "Main" });
       expect(
@@ -89,8 +89,8 @@ describe("server-rendered portfolio documents", () => {
         within(mainNav).getByRole("link", { name: "About" }),
       ).toHaveAttribute("href", "/about");
       expect(
-        within(mainNav).getByRole("button", { name: "Contact" }),
-      ).toBeDisabled();
+        within(mainNav).getByRole("link", { name: "Contact" }),
+      ).toHaveAttribute("href", "/contact");
       for (const destination of [
         destinations.impressum,
         { ...destinations.privacy, label: "Privacy policy" },
