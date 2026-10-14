@@ -2,10 +2,10 @@
 
 ## Task metadata
 
-- **Status:** Codex technical review PASS with F1 closed by independent re-review; documentation finalization and commit/push separately authorized. Dimi phone/design/wording/assistive-technology acceptance and external prerequisites remain pending. Live delivery remains locked off.
+- **Status:** Codex technical review PASS with F1 closed; Dimi phone/accessibility manual acceptance recorded 2026-10-14, followed by authorized documentation/commit/push of the safe preview. Legal/external/live prerequisites remain pending; delivery stays locked off.
 - **Task group or epic:** [EPIC 5](../features/funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling).
-- **Owner/current writer:** Sites implementation, Codex independent technical review/re-review PASS and authorized documentation/Git delivery. Dimi owns pending phone/design/wording acceptance and external approvals.
-- **Last updated:** 2026-10-13.
+- **Owner/current writer:** Sites implementation, Codex technical review and authorized documentation/Git delivery. Dimi reports phone/accessibility acceptance and owns external approvals.
+- **Last updated:** 2026-10-14.
 - **Actual implementation/review base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `617f9c8f3103c58f148d54944d64a51a22282683`; clean on initial inspection. The containing commit identifies the delivered revision; exact local/remote verification belongs to the delivery artifact below. No reset or newer-work overwrite.
 - **Previous-task handoff:** [FS-5.3](fs-5.3-contact-protection.md#handoff) delivered at this base with subsequent read-only local Codex technical PASS; actual repository/candidate access verified here. External protection remains pending.
 - **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [detailed plan](../features/FunkSpace_EPIC_5_Detailed_Plan.md), [UI/phone guide](../development/contact-ui.md), [server setup](../development/contact-server.md), [operations](../development/contact-operations.md).
@@ -28,7 +28,7 @@ Implement FS-5.4 only in the actual repository: plain `/contact`, shared shell/n
 - [x] Narrow/short/landscape, 200% text, themes, keyboard/error focus and static/reduced-motion evidence separated from physical-device acceptance.
 - [x] Documentation, accessible complete diff and Dimi phone checklist supplied.
 - [x] Codex independent local technical review and F1 correction re-review PASS — not inferred from author QA; no deployed protection acceptance.
-- [ ] Dimi physical-phone, assistive-technology and wording acceptance — checklist supplied, not executed by proxy.
+- [x] Dimi phone/accessibility manual acceptance reported 2026-10-14; device/AT/per-action and separate wording/design details remain unspecified.
 
 ### Presentation clarification — explicit user decision
 
@@ -88,7 +88,7 @@ Dedicated Node contact tests/coverage, focused form/navigation components, full 
 
 ### Manual checks
 
-Inspect dependency/client-server boundaries, accepted states/identity rules, complete diff including untracked files, SSR email actionability and controlled viewport/theme screenshots. Dimi's [phone checklist](../development/contact-ui.md#dimis-phone-checklist--pending) remains pending.
+Inspect dependency/client-server boundaries, accepted states/identity rules, complete diff including untracked files, SSR email actionability and controlled viewport/theme screenshots. Dimi's [phone checklist and acceptance](../development/contact-ui.md#dimis-phone-checklist--acceptance-recorded) separate the later user report from technical checks.
 
 ## Completion record
 
@@ -187,12 +187,28 @@ in `delivery.txt` in the final artifact. This authorization does not close phone
 design/wording/assistive-technology acceptance or legal/account/sender/WAF/preview/
 all-alias/live gates, enable delivery, authorize merge/publication or start another task.
 
+## Phone/accessibility acceptance and preview Git authorization — 2026-10-14
+
+Dimi reported successful phone/accessibility manual testing of the safe preview
+and requested documentation, commit and push. The [bounded follow-up record](fs-5.4-manual-preview.md#dimi-manual-acceptance-and-git-authorization--2026-10-14)
+preserves the exact report, candidate at actual base `fd46474a1420d614dbb31c48fb16d9d6779d471e`,
+unspecified device/per-check details and final delivery artifact. This supersedes
+earlier pending-phone statements for the reported manual scope. Legal/account/
+protection/live prerequisites remain pending; delivery is disabled and FS-5.5/5.6
+are not started.
+
 ## Handoff
+
+The bounded [safe manual-preview follow-up](fs-5.4-manual-preview.md) fixes the
+previous Storybook discovery gap and provides phone-accessible simulated states,
+actual browser deadlines and retry expiry. Earlier Storybook builds did not
+discover the contact stories; that limitation is now explicit. F1 technical PASS
+stands, and Dimi's phone/accessibility acceptance is recorded above. No live/FS-5.5 work follows.
 
 - **Actual repository/base/delivery:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, implementation/review base `617f9c8f3103c58f148d54944d64a51a22282683`. The containing commit identifies delivery; final `delivery.txt` records verified local/remote revision. Recheck actual HEAD/status before continuing.
 - **Previous task:** FS-5.3 handoff/local technical PASS at that actual base linked above; external coverage remains pending.
 - **Accessible artifact:** `/Users/dimi/.codex/.chatgpt-projects/g-p-6a8710cd7ee88191854df38f76499083/artifacts/fs-5.4-delivery-2026-10-13/` contains the final complete patch/checksum, manifest, documentation checks and Git delivery verification. Earlier `fs-5.4-f1-2026-10-13/`, `fs-5.4-visible-2026-10-13/` and `fs-5.4-2026-10-13/` retain candidate-specific test/build evidence. `fs-5.4-review-2026-10-13/` retains F1, and `fs-5.4-f1-rereview-2026-10-13/` retains its technical PASS. Regenerate if changed.
 - **Contract usage:** Exact five-string JSON POST through existing composition; shared rules and strict result/UUID grammar; any 429, whole-response 15s deadline, no retries/storage, unchanged manual key/edit retirement/23h cutoff and matching acceptance. Server/provider payload/key/eight-second deadline and release lock unchanged.
 - **Receiving-chat access:** Verify actual branch/HEAD/status and every intentional file/hash or matching artifact before review. A separate Sites workspace must prove the actual same base/diff; chats do not automatically share files. No reset or secret transfer.
-- **Phone/review:** Codex technical PASS/F1 closure recorded above. Dimi phone/design/wording/assistive-technology acceptance and deployed/legal/mailbox verification remain pending; checklist linked above.
+- **Phone/review:** Codex technical PASS/F1 closure and Dimi phone/accessibility manual acceptance recorded above. Device/per-action and separate design/wording details are unspecified; deployed/legal/mailbox verification remains pending.
 - **Stop boundary:** Only FS-5.4 documentation and explicitly authorized commit/push. No publish/deploy, merge, provider/server change, external configuration, live email or automatic next task.

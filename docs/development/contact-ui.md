@@ -64,6 +64,13 @@ no automatic retry is introduced. Conflict recovery does not promise a safe rese
 
 ## Controlled verification
 
+The [safe phone preview](contact-manual-preview.md) supplies manual controls,
+actual browser timeout paths and a 23-hour fixture clock advance. Its
+[task record](../tasks/fs-5.4-manual-preview.md) corrects earlier Storybook evidence:
+contact stories were not discovered by the components-only glob. Discovery and
+the frontend alias are now fixed; index/rendering are verified separately.
+Dimi's phone/accessibility manual acceptance is recorded below.
+
 Eight ContactForm stories use explicit injected ports: accepted, uncertain,
 rate-limited, unavailable, rejected, field errors, internal submitting and delivery
 disabled. Fill the enabled fixtures and submit to inspect outcomes; pending is
@@ -103,10 +110,17 @@ CONTACT_E2E_WORKSPACE=/absolute/path/to/isolated-built-candidate \
 The task handoff includes the actual build snapshot preparation script/evidence.
 Tests must use a matching current candidate, not an arbitrary previously enabled
 deployment. Production build, Storybook and browser evidence are separate from
-physical-device/assistive-technology or legal acceptance. A temporary local QA
-server is stopped after checks; no external publication follows automatically.
+physical-device/assistive-technology or legal acceptance. Automated QA servers
+stop after checks. The requested phone previews remain running until manual
+testing ends; no external publication follows automatically.
 
-## Dimi's phone checklist — pending
+## Dimi's phone checklist — acceptance recorded
+
+On 2026-10-14 Dimi reported “Phone/accessibility works well after manual testing”
+and authorized documentation, commit and push of the controlled preview. See the
+[acceptance and delivery record](../tasks/fs-5.4-manual-preview.md#dimi-manual-acceptance-and-git-authorization--2026-10-14).
+Device/browser/assistive-technology and individual checklist details were not
+supplied; the checklist remains reusable guidance, not invented per-action evidence.
 
 Use an approved, reachable controlled fixture for enabled-form checks; the current
 production candidate displays disabled fields and an email fallback. Localhost on the development computer
@@ -145,5 +159,6 @@ provider mail is required or authorized by this checklist.
 
 Codex technical review is PASS with F1 closed by independent re-review; see the
 [review and delivery record](../tasks/fs-5.4-contact-page.md#f1-re-review-pass-and-authorized-git-delivery--2026-10-13).
-Final phone/design/wording/assistive-technology approval, legal content,
-actual account/WAF/preview prerequisites and live FS-5.6 acceptance remain pending.
+Phone/accessibility acceptance is recorded above. Separate design/wording details
+were not supplied. Legal content, actual account/WAF/protected-preview prerequisites
+and live FS-5.6 acceptance remain pending; FS-5.5/5.6 are not started.

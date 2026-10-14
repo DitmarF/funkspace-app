@@ -5,6 +5,7 @@ import type { ContactSubmissionPort } from "@/domain/ports/ContactSubmissionPort
 import ContactForm from "./ContactForm";
 import ButtonLink from "@/components/Controls/ButtonLink";
 import { contactEmail, contactHref } from "@/data/contactContent";
+import { createManualSubmissionId } from "./manual/ManualContactSubmission";
 
 const modes = [
   "accepted",
@@ -21,7 +22,7 @@ const ports: Readonly<Record<string, ContactSubmissionPort>> =
     modes.map((mode) => [
       mode,
       {
-        createSubmissionId: () => crypto.randomUUID(),
+        createSubmissionId: createManualSubmissionId,
         now: () => performance.now(),
         submit: async (request) => {
           if (mode === "internal_submitting") return new Promise(() => {});

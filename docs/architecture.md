@@ -305,6 +305,14 @@ synchronous guards, read-only snapshots and focused error/result text model the
 workflow. No new scene, navigation manager, persistence or server behavior exists.
 See [UI checks and phone checklist](development/contact-ui.md).
 
+The [FS-5.4 manual preview](development/contact-manual-preview.md) exists only in
+Storybook. Its stable injected port wraps the actual browser adapter with fake
+fetch, page-memory request counts/IDs and a fixture-only retry-clock offset.
+There is no production flag/route/global fetch replacement. Static local serving
+has no API/provider path; fixture imports and controls are checked absent from
+production bundles. Real no-JavaScript/navigation checks use a separate source-
+locked, credential-free, fetch-denied Next preview.
+
 ## Service Injection
 
 Services are injected via React Context:

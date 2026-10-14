@@ -1137,7 +1137,17 @@ local diagnostics and operations under its own request; live delivery stays off.
 
 #### FS-5.4 — Implement the live contact-form interface
 
-**Current status:** Codex technical review PASS with F1 closed by independent re-review of actual implementation/review base `617f9c8f3103c58f148d54944d64a51a22282683` plus the verified FS-5.4 candidate. Dimi separately authorized documentation finalization and commit/push of all 37 files on 2026-10-13; the containing commit identifies delivery. [FS-5.4 evidence/handoff](../tasks/fs-5.4-contact-page.md) owns actual checks, PASS and delivery verification; [UI/phone verification](../development/contact-ui.md) supplies Dimi's pending checklist. `/contact` uses the existing shell/navigation and visible disabled fields, clear availability text and email fallback, including server rendering/no JavaScript. Delivery remains locked off. F1 preserves configuration/cooldown guidance through edits without changing retry identity or submission guards. Ordinary Button/plain focused feedback remains, without InlineStatus or pending-button presentation. Phone/design/wording/assistive-technology acceptance and legal/external/live gates remain pending; no publication, merge or next task authorized.
+**Manual testing follow-up — 2026-10-14:** The [safe preview record](../tasks/fs-5.4-manual-preview.md)
+corrects Storybook contact discovery/alias setup and provides controlled states,
+real browser timeouts and retry expiry for local phone testing. [Instructions and
+local links](../development/contact-manual-preview.md) distinguish simulated form
+checks from the actual disabled page. Dimi subsequently reported successful phone/
+accessibility manual testing and authorized documentation, commit and push; the
+[dated acceptance record](../tasks/fs-5.4-manual-preview.md#dimi-manual-acceptance-and-git-authorization--2026-10-14)
+retains the exact report and unspecified device/per-check details. External gates
+remain pending; FS-5.5/5.6 are not started and no live delivery is enabled.
+
+**Current status:** Codex technical review PASS with F1 closed; original FS-5.4 Git delivery is at `fd46474a1420d614dbb31c48fb16d9d6779d471e`. The subsequent safe-preview follow-up has Dimi's phone/accessibility manual acceptance and documentation/commit/push authorization on 2026-10-14. [FS-5.4 evidence/handoff](../tasks/fs-5.4-contact-page.md) and [manual-preview acceptance/delivery](../tasks/fs-5.4-manual-preview.md) own the exact checks, user report and revision verification; device/per-check and separate design/wording details are unspecified. `/contact` retains the shell/navigation, visible disabled fields, availability text and email fallback, including no JavaScript. Delivery stays locked off. F1 preserves blocked-edit guidance and retry rules; ordinary Button/plain focused feedback remains. Legal/external/live gates are pending; no publication, merge or next task authorized.
 
 **Lead:** Sites
 

@@ -2,10 +2,10 @@
 
 ## Plan metadata
 
-- **Status:** FS-5.1/5.2 complete; FS-5.3 local preparation has Codex technical PASS at delivered `617f9c8`, with external protection/coverage pending. FS-5.4 has Codex technical PASS with F1 closed by re-review; documentation and commit/push separately authorized. Phone/design acceptance and external prerequisites remain pending; delivery stays locked off. FS-5.5/5.6 not started.
+- **Status:** FS-5.1/5.2 complete; FS-5.3 local technical PASS at delivered `617f9c8`, with external protection/coverage pending. FS-5.4 has Codex technical PASS/F1 closure and Dimi phone/accessibility manual acceptance recorded 2026-10-14; safe-preview documentation, commit and push authorized. Device/per-check and separate design/wording details are unspecified. Legal/external/live prerequisites remain pending; delivery stays locked off. FS-5.5/5.6 not started.
 - **Owner:** Codex for contract/server preparation; Sites for FS-5.4; Dimi for product, legal and external approvals.
 - **Parent authority:** [Minimum Usable Experience](funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling) owns milestone status and gates. This linked plan owns EPIC 5 detail; the [FS-5.1 record](../tasks/fs-5.1-contact-contract.md) owns execution evidence.
-- **Last updated / official-document checks:** 2026-10-13.
+- **Last updated:** 2026-10-14. **Official-document checks last performed:** 2026-10-13.
 - **Historical FS-5.1 inspected base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `2c545cd7cb3bc074a126fffa61166577f113cc7b`; clean at that inspection, matching the planning baseline. Current revision/diff belong to the latest task handoff; no reset performed.
 - **Target release:** Not scheduled. First real-delivery acceptance requires a separately authorized protected preview. FS-G2, publication and game integration remain separate.
 - **Related decisions:** [FS-0.5](../tasks/fs-0.5-product-and-technical-decisions.md), [architecture](../architecture.md#contact-composition--fs-51), [ADR-001](../decisions/ADR-001-monorepo-strategy.md), [ADR-003](../decisions/ADR-003-interactive-experience-boundary.md).
@@ -237,10 +237,18 @@ configuration is claimed; release lock remains closed.
 
 ### FS-5.4 — Implement the live contact-form interface
 
+The bounded [safe manual-preview follow-up](../tasks/fs-5.4-manual-preview.md)
+fixes contact Storybook discovery/alias setup and supplies phone-accessible
+controlled outcomes, actual browser deadlines and retry-clock expiry. Dimi then
+[reported successful phone/accessibility manual testing](../tasks/fs-5.4-manual-preview.md#dimi-manual-acceptance-and-git-authorization--2026-10-14)
+and authorized documentation, commit and push. Delivery stays disabled and FS-5.5
+is not started.
+
 **Current status:** Codex technical review PASS with F1 closed by independent
 re-review; [FS-5.4 evidence/delivery](../tasks/fs-5.4-contact-page.md#f1-re-review-pass-and-authorized-git-delivery--2026-10-13)
 and [UI/phone checks](../development/contact-ui.md) own actual validation and
-pending human acceptance. Dimi separately authorized documentation finalization and
+recorded phone/accessibility acceptance. Device/per-check and separate design/
+wording details were not supplied. Dimi separately authorized documentation finalization and
 commit/push; the containing commit identifies delivery. Dimi reconfirmed the accepted no-pending-controls/no-InlineStatus
 amendment during this task. Dimi's follow-up keeps fields visible and disabled with
 clear availability text and email fallback; server/provider

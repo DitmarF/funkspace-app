@@ -6,7 +6,10 @@ const getAbsolutePath = (value: string): string =>
   dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
 
 const config: StorybookConfig = {
-  stories: ["../components/**/*.stories.@(js|jsx|ts|tsx)"],
+  stories: [
+    "../components/**/*.stories.@(js|jsx|ts|tsx)",
+    "../features/contact/**/*.stories.@(js|jsx|ts|tsx)",
+  ],
   addons: [
     getAbsolutePath("@storybook/addon-docs"),
     getAbsolutePath("@storybook/addon-a11y"),
@@ -20,6 +23,13 @@ const config: StorybookConfig = {
   },
   viteFinal: async (config, { configType }) => {
     const mode = configType === "PRODUCTION" ? "production" : "development";
+
+    // Contact stories use the same frontend alias as the actual application.
+    const frontendRoot = fileURLToPath(new URL("../", import.meta.url));
+    config.resolve ??= {};
+    config.resolve.alias = Array.isArray(config.resolve.alias)
+      ? [...config.resolve.alias, { find: "@", replacement: frontendRoot }]
+      : { ...config.resolve.alias, "@": frontendRoot };
 
     config.define = {
       ...(config.define ?? {}),
