@@ -6,7 +6,7 @@ import {
   selectTheme,
   themes,
 } from "./helpers/foundation";
-const email = "diamondfunk13@gmail.com";
+const email = "info@funkspace.de";
 
 // Mock only the serialized safe availability boolean in an otherwise real page.
 // The fresh server stays source-locked off, has no mail key, and denies fetch.

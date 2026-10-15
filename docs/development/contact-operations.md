@@ -5,11 +5,21 @@ The [frozen contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiser
 [FS-5.3 evidence](../tasks/fs-5.3-contact-protection.md) and
 [FS-5.5 technical preparation](../tasks/fs-5.5-contact-operations.md) govern this guide.
 Code and official public documentation were re-audited 2026-10-14 at
-`9ba16f8d0ba7dcc5b24ff57383dc8631701b7185`. The technical subtask is prepared;
-FS-5.5 legal/publication acceptance remains pending.
+`9ba16f8d0ba7dcc5b24ff57383dc8631701b7185`. Dimi accepted the implemented legal
+copy and operating documentation and explicitly closed FS-5.5 on 2026-10-15.
 The [Workspace/DMARC follow-up](#workspace-aliases-and-prepared-dmarc--2026-10-15)
 records later mailbox tests and public DNS checks on 2026-10-15; these are not
 Resend, deployed-form or protection acceptance.
+The later [local legal presentation](../tasks/fs-5.5-legal-presentation.md#current-local-integration--2026-10-15)
+implements reviewable legal/contact copy from base `fe2d074`, after Dimi directed
+completion instead of continuing the extended account audit. Public email links
+now use the tested `info@funkspace.de` alias; the frozen server recipient and
+provider payload are unchanged. The accepted address-free choice and legal
+wording do not certify an exemption or account-specific compliance. The
+[presentation closure](../tasks/fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15)
+records Dimi's acceptance and specific commit/push authorization. The separate
+storage assessment, mailbox-workflow adoption and actual account facts remain
+operating/activation follow-up; no external action is implied.
 External protection is **unverified; live delivery is blocked**. This guide is
 not permission to configure a firewall, change billing/secrets, deploy or send mail.
 
@@ -72,10 +82,15 @@ record the applicable terms and identifiers they retain. Do not claim the entire
 infrastructure stores no identifiers. Message content may also reside in Resend
 and Gmail; six-month closed-mailbox deletion is not platform-log retention.
 
-Actual function region, drains, access roles, export sinks and retention
-configuration remain unaudited. The later Workspace evidence includes a supplied
-domain/project-attachment screenshot and Dimi's reported Hobby plan; neither is
-a WAF/logging account audit. `.vercelignore` is upload exclusion,
+The supplied Production screenshot identifies Ready `main` at
+`31abe42d97563775272d8a99e5021f3b39bc86ab`, created 15 September, and configured
+function region `iad1` (USA). It does not prove all edge/log/storage processing
+locations or deploy the current feature candidate. A last-hour runtime-log view
+shows no matching entries; its Production-only selection is not visible. Drains,
+access roles, export sinks and complete retention configuration remain unverified;
+an empty view is not evidence that logging or exports are off. These unknowns
+remain relevant before activation, not a blocker to local legal-copy preparation.
+`.vercelignore` is upload exclusion,
 not installed WAF or logging evidence. Record sanitized account findings separately
 from these public defaults and from the application's narrow writer.
 
@@ -148,9 +163,10 @@ reports before considering an expressly authorized enforcement change. Future
 Resend sending at `mail.funkspace.de` still needs its own verification/alignment;
 Workspace authentication does not verify that sender or authorize a live form.
 
-The current application recipient/fallback remains the testing Gmail choice.
-Moving it to the verified Workspace alias requires a separately scoped recipient,
-public/legal-copy and retry-payload migration. Account agreements, mailbox
+The current local candidate's public fallback is now `info@funkspace.de` under
+Dimi's legal-presentation completion request. The frozen server recipient remains
+the testing Gmail choice; no provider-recipient or retry-payload migration is
+performed. A later recipient change requires its own scoped decision. Account agreements, mailbox
 retention/forwarding/exports, Resend setup, WAF/preview coverage and legal approval
 remain pending. The source release lock stays false, `CONTACT_ENABLED` stays off,
 and these mailbox tests do not start FS-5.6.
@@ -388,6 +404,14 @@ operator mailbox policy, not an invented statutory obligation or a statement tha
 all Vercel/Resend/Google copies disappear at that deadline. No inbox, retention
 scheduler or deletion automation exists in FunkSpace.
 
+The [mailbox workflow and application guide](contact-mailbox-workflow.md)
+prepares a simple manual procedure for Ditmar Funk: inquiry-state labels and one
+private dated Google Task per closed conversation, plus a separate DMARC label.
+It includes setup/reminder testing, date examples, reopening, exceptions and
+selective permanent deletion. Tasks adds minimal operator metadata, which needs
+account/privacy review and deletion alongside the mail. This is proposed and not
+yet adopted/configured/tested; no mailbox setting or reminder was changed here.
+
 For operator approval/implementation: record the actual conversation-end/closure
 date and resulting six-month cleanup date; define the closure convention and
 review cadence; review ordinary closed threads and remove them by the approved
@@ -395,6 +419,15 @@ deadline. Include relevant Sent/All Mail/Trash copies, forwarding, exports and
 local copies in the approved process. Exceptions record reason, scope, owner and
 review/deletion date; Dimi must justify them rather than assuming a retention duty.
 Those operational choices and actual execution are not verified here.
+
+For remaining hosting facts, Dimi has identified netcup. The
+[read-only hosting checklist](legal-copy-draft.md#read-only-account-checks--how-to-find-the-missing-facts)
+distinguishes netcup domain/package allocation and Vercel DNS routing from actual
+webspace traffic. Later screenshots show a netcup Website virtual host at
+`/funkspace.de/httpdocs` and visible 1 October Apache certificate-name warnings;
+they do not establish visitor traffic. The older Vercel Production revision and
+its displayed function-region setting are recorded above. Actual agreements,
+all processing locations and full platform logging remain unverified.
 
 Gmail Archive is not deletion. Ordinary Delete retains Trash for up to 30 days;
 Delete forever removes it from the account earlier. Dimi must approve how that

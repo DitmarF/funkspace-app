@@ -21,13 +21,15 @@ const pages = [
   {
     route: "/impressum",
     title: "Legal notice | FunkSpace",
-    description: "Draft — operator details are incomplete.",
+    description:
+      "Operator and contact information for FunkSpace, a personal hobby project by Ditmar Funk.",
     heading: "Legal notice",
   },
   {
     route: "/privacy",
     title: "Privacy | FunkSpace",
-    description: "Draft — this privacy information is incomplete.",
+    description:
+      "How FunkSpace handles website requests, appearance preferences and email inquiries, and how to exercise your privacy rights.",
     heading: "Privacy",
   },
 ];
@@ -177,11 +179,15 @@ for (const javaScriptEnabled of [true, false]) {
           ]);
           await expect(page.locator("article > p").first()).toBeVisible();
         } else {
+          const article = page.getByRole("article");
           await expect(
-            page
-              .getByRole("article")
-              .getByText(entry.description, { exact: true }),
+            article.getByText("Thuringia, Germany", { exact: false }),
           ).toBeVisible();
+          await expect(article).toContainText("Ditmar Funk");
+          await expect(
+            article.locator('a[href="mailto:info@funkspace.de"]'),
+          ).toBeVisible();
+          await expect(article.getByText(/Draft —/)).toHaveCount(0);
         }
         const icon = page.locator('link[rel="icon"]');
         await expect(icon).toHaveCount(1);
@@ -234,12 +240,9 @@ for (const javaScriptEnabled of [true, false]) {
         await expect(page).toHaveURL("/impressum");
         const mail = page
           .getByRole("article")
-          .getByRole("link", { name: "diamondfunk13@gmail.com", exact: true });
+          .getByRole("link", { name: "info@funkspace.de", exact: true });
         await expect(mail).toBeVisible();
-        await expect(mail).toHaveAttribute(
-          "href",
-          "mailto:diamondfunk13@gmail.com",
-        );
+        await expect(mail).toHaveAttribute("href", "mailto:info@funkspace.de");
         await mail.click({ trial: true });
         for (const legal of ["Legal notice", "Privacy policy"]) {
           await page
@@ -252,9 +255,10 @@ for (const javaScriptEnabled of [true, false]) {
               name: legal === "Privacy policy" ? "Privacy" : legal,
             }),
           ).toBeVisible();
+          await expect(page.getByRole("article")).toContainText("Ditmar Funk");
           await expect(
             page.getByRole("article").getByText(/Draft —/),
-          ).toBeVisible();
+          ).toHaveCount(0);
         }
       }
     });

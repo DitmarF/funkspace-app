@@ -1,4 +1,4 @@
-// Public contact address supplied by Dimi for FS-2.4 on 2026-09-20.
+// Public Workspace alias supplied and tested by Dimi for FS-5.5, 2026-10-15.
 // This does not configure a form provider, sender or delivery recipient.
-export const contactEmail = "diamondfunk13@gmail.com";
+export const contactEmail = "info@funkspace.de";
 export const contactHref = `mailto:${contactEmail}`;

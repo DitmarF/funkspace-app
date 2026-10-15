@@ -2,7 +2,7 @@
 
 ## Plan metadata
 
-- **Status:** FS-5.1/5.2 complete; FS-5.3 local technical PASS with external protection/coverage pending. FS-5.4 technical PASS/F1 closure and Dimi phone/accessibility acceptance delivered at `9ba16f8`; device/per-check and separate design/wording details remain unspecified. FS-5.5 technical/operating documentation prepared locally; Dimi legal-copy/publication acceptance and account/external/live prerequisites remain pending. Delivery stays locked off; FS-5.6 not started.
+- **Status:** FS-5.1/5.2 complete; FS-5.3 local technical PASS with external protection/coverage pending. FS-5.4 technical PASS/F1 closure and Dimi phone/accessibility acceptance delivered at `9ba16f8`; device/per-check and separate design/wording details remain unspecified. FS-5.5 is complete: Dimi accepted the current legal/contact copy and operating documentation, explicitly closed the task and authorized commit/push on 2026-10-15; validation passes. Account/external/live prerequisites remain separate. Delivery stays locked off; FS-5.6 not started.
 - **Owner:** Codex for contract/server preparation; Sites for FS-5.4; Dimi for product, legal and external approvals.
 - **Parent authority:** [Minimum Usable Experience](funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling) owns milestone status and gates. This linked plan owns EPIC 5 detail; the [FS-5.1 record](../tasks/fs-5.1-contact-contract.md) owns execution evidence.
 - **Last updated:** 2026-10-15. **Official-document checks:** Original FS-5.1 checks 2026-10-13; focused FS-5.5 provider/platform/Google facts rechecked 2026-10-14; Workspace/DNS/Google/Vercel mail-setup follow-up 2026-10-15.
@@ -26,18 +26,18 @@ A visitor can make a general inquiry in English through a plain, accessible `/co
 
 ### Settled choices
 
-| Concern                     | Decision                                                                                                                                   |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Entry / appearance          | Dedicated plain `/contact`, existing `PortfolioShell`; header/tree Contact enabled in FS-5.4                                               |
-| Visible fields              | Optional Name; required Email and Message; no other visible inputs                                                                         |
-| Purpose / language          | General inquiries, collaboration, questions and feedback; English                                                                          |
-| Recipient / public fallback | `diamondfunk13@gmail.com`; reuse `frontend/data/contactContent.ts` for public presentation                                                 |
-| Owned domain                | `funkspace.de`, supplied by Dimi; account/DNS control not independently verified                                                           |
-| Proposed fixed sender       | `FunkSpace <contact@mail.funkspace.de>`, only after sender-domain verification                                                             |
-| Transport / host            | Resend HTTPS API in the existing Next.js/Vercel deployment                                                                                 |
-| Mailbox cleanup             | Closed ordinary inquiries deleted six months after conversation end; justified exceptions documented with reason and review/deletion point |
-| Initial live acceptance     | Separately authorized protected preview and exact controlled message                                                                       |
-| Legal/account gate          | Actual provider/account terms and legal content reviewed before enabling live delivery                                                     |
+| Concern                     | Decision                                                                                                                                                                             |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Entry / appearance          | Dedicated plain `/contact`, existing `PortfolioShell`; header/tree Contact enabled in FS-5.4                                                                                         |
+| Visible fields              | Optional Name; required Email and Message; no other visible inputs                                                                                                                   |
+| Purpose / language          | General inquiries, collaboration, questions and feedback; English                                                                                                                    |
+| Recipient / public fallback | Frozen server recipient: `diamondfunk13@gmail.com`. FS-5.5 public presentation now uses tested `info@funkspace.de` via `frontend/data/contactContent.ts`; no provider payload change |
+| Owned domain                | `funkspace.de`, supplied by Dimi; account/DNS control not independently verified                                                                                                     |
+| Proposed fixed sender       | `FunkSpace <contact@mail.funkspace.de>`, only after sender-domain verification                                                                                                       |
+| Transport / host            | Resend HTTPS API in the existing Next.js/Vercel deployment                                                                                                                           |
+| Mailbox cleanup             | Closed ordinary inquiries deleted six months after conversation end; justified exceptions documented with reason and review/deletion point                                           |
+| Initial live acceptance     | Separately authorized protected preview and exact controlled message                                                                                                                 |
+| Legal/account gate          | Actual provider/account terms and legal content reviewed before enabling live delivery                                                                                               |
 
 No subject/phone/company/budget fields, attachments, consent checkbox, automatic reply, marketing subscription, tracking, webhook or application inbox. No homepage Contact restoration or accepted scene/homepage redesign.
 
@@ -47,7 +47,7 @@ No subject/phone/company/budget fields, attachments, consent checkbox, automatic
 - `frontend/app/page.tsx` contains Start and AboutPreview only. FS-5.4 enables the same Contact item in header/tree through `portfolioNavigation.ts` and the shared `/contact` destination in `portfolioDestinations.ts`; current-page disabling remains.
 - `PortfolioShell` and the plain `/about` article provide the shell precedent. Reuse accepted `TextField`, `TextAreaField`, ordinary `Button` and link primitives; [FS-1.5](../tasks/fs-1.5-essential-form-primitives.md) preserves their APIs. Contact does not consume `Button.pending` or `InlineStatus` under Dimi's amendment; those shared primitives remain available to other consumers.
 - `createServices` / `ServiceProvider` own browser composition and controlled fixture injection. No mail credentials or server adapter may enter this graph.
-- Privacy and Impressum remain explicit drafts. FS-5.4 corrects Privacy's stale no-form sentence to the actual contact page/delivery-disabled/no-draft-storage facts. It describes only `theme`; the existing motion preference key and full processing details still require FS-5.5 legal review/final copy.
+- FS-5.5 replaces Privacy/Impressum draft placeholders in the local review candidate with supplied operator facts and current hosting, Workspace email, both preference keys and disabled-form disclosures. Dimi's provisional address-free choice is retained without asserting an exemption. Dimi accepted the current copy and explicitly closed FS-5.5; see the closure record below.
 - [EPIC 4 closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) is complete. Existing scene acceptance remains intact; FS-G2 still requires EPIC 5.
 
 ## Frozen UI/server contract
@@ -182,7 +182,7 @@ These are public-document facts, not proof of this project's settings or legal s
 | [Vercel WAF rate limiting](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting)                                                            | All plans support fixed windows and IP counting. Hobby: one rate-limit rule/project, up to ten-minute window, one million included allowed requests; Pro documents 40 rules and usage pricing. Counters are regional; default limiting action is `429`. |
 | [Vercel deployment protection](https://vercel.com/docs/deployment-protection)                                                                           | Standard Protection is available on all plans and excludes production domains. Protection scope/method and actual reviewer access must be checked per URL; same-origin browser requests retain protection cookies.                                      |
 
-Provider policy marketing is not a legal assessment. Dimi reviews purpose/legal basis, operator identity/address, rights/contact, recipients/transfers, hosting/mailbox terms, DPA and retention with appropriate advice where needed before live enabling. FS-5.5 technical preparation audits `theme` and `funkspace.motion.preference.v1` and confirms no app-persisted contact draft. Later approved-copy integration updates both legal pages, metadata and affected tests; this technical-only request leaves those draft sources unchanged. No legal or live processing acceptance is inferred.
+Provider policy marketing is not a legal assessment. Dimi reviews purpose/legal basis, operator identity/address, rights/contact, recipients/transfers, hosting/mailbox terms, DPA and retention with appropriate advice where needed before live enabling. FS-5.5 audits `theme` and `funkspace.motion.preference.v1` and confirms no app-persisted contact draft. Its later local presentation updates both legal pages, metadata, public email links and affected tests from supplied facts; proposed hosting/inquiry legal reasoning and separate storage/access treatment remain for final approval. Public sources do not certify actual account agreements or transfers. No legal or live processing acceptance is inferred.
 
 ### Account settings and external actions: unverified and pending
 
@@ -285,19 +285,18 @@ Uncertain copy offers retry only before expiry and with unchanged payload; confl
 
 ### FS-5.5 — Finalize legal content and the contact operating guide
 
-**Current status:** Technical subtask prepared at actual `9ba16f8d0ba7dcc5b24ff57383dc8631701b7185`
-plus local Markdown changes. [Task evidence/handoff](../tasks/fs-5.5-contact-operations.md),
-[actual processing/storage facts and Dimi checklist](../development/contact-processing-facts.md)
-and [operating guide](../development/contact-operations.md) separate disabled current
-behavior, implemented gated delivery and public defaults from unverified account
-settings. Privacy/Impressum remain unchanged drafts. Dimi legal-copy/publication
-acceptance, external configuration and FS-5.6 live acceptance remain pending.
-The [Workspace follow-up](../development/contact-operations.md#workspace-aliases-and-prepared-dmarc--2026-10-15)
-records tested aliases and SPF/DKIM, with DMARC prepared but unpublished. Dimi
-separately authorized commit/push of all nine current FS-5.5 Markdown changes on
-2026-10-15; the [Git-delivery record](../tasks/fs-5.5-contact-operations.md#documentation-finalization-and-authorized-git-delivery--2026-10-15)
-identifies scope and revision evidence. This does not close FS-5.5 or authorize
-DMARC publication, deployment or form activation.
+**Current status — 2026-10-15:** Complete — Dimi accepted the current legal
+notice, Privacy/contact copy, public Workspace alias and operating documentation,
+explicitly closed FS-5.5 and authorized commit/push of all current changes.
+[Acceptance and delivery record](../tasks/fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15)
+retains base `fe2d0746c83486ee8d0d145fb00367868ae88f5a`, the containing delivery
+revision, exact checks and operator-approval provenance. Types/lint, 41 component/
+Node tests, both builds, 49 Chromium checks and documentation checks pass.
+The address-free choice is accepted copy, not a certified legal exemption;
+future TLM/storage/account follow-up does not reopen this completed task.
+The frozen server recipient/payload and false release lock remain unchanged.
+DMARC stays unpublished. Actual provider, agreement, protection and protected-
+preview/live acceptance prerequisites remain separate; FS-5.6 has not started.
 
 **Lead:** Dimi. **Counterparts:** Codex supplies technical facts; Sites publishes approved copy.
 
@@ -338,4 +337,4 @@ Run Domain/Application/Infrastructure tests explicitly: current coverage configu
 
 ## Implementation handoff
 
-Start the next session with the current [FS-5.5 technical handoff](../tasks/fs-5.5-contact-operations.md#handoff), the delivered [FS-5.4 manual acceptance](../tasks/fs-5.4-manual-preview.md#handoff), [FS-5.3 predecessor](../tasks/fs-5.3-contact-protection.md#handoff) and a fresh actual branch/HEAD/status check. Confirm repository and intentional-diff access; chats do not automatically share working files. The FS-5.5 documentation parent base is `9ba16f8d0ba7dcc5b24ff57383dc8631701b7185`; its containing commit and dated Git-delivery evidence identify the authorized documentation revision. No reset or secret transfer. FS-5.4 technical PASS/F1 closure and Dimi's reported phone/accessibility acceptance stand; detailed device/per-check and separate design/wording approval were not supplied. FS-5.5 technical preparation does not close legal/publication/account/protection gates or start FS-5.6. FS-G2 and live acceptance remain open; request only separately scoped work.
+Start the next session with the [current FS-5.5 presentation handoff](../tasks/fs-5.5-legal-presentation.md#handoff), preserved [technical evidence](../tasks/fs-5.5-contact-operations.md), delivered [FS-5.4 manual acceptance](../tasks/fs-5.4-manual-preview.md#handoff), [FS-5.3 predecessor](../tasks/fs-5.3-contact-protection.md#handoff) and a fresh actual branch/HEAD/status check. Confirm repository and intentional-diff access; chats do not automatically share working files. The current local integration base is `fe2d0746c83486ee8d0d145fb00367868ae88f5a`; the earlier technical documentation parent remains historical provenance. No reset or secret transfer. FS-5.4 technical PASS/F1 closure and Dimi's reported phone/accessibility acceptance stand; Dimi separately accepted the legal copy and closed FS-5.5. Actual account/protection/live gates and FS-G2 remain open; FS-5.6 has not started.

@@ -158,8 +158,8 @@ test("idle, validation focus and disabled presentation use the actual form witho
   );
   await expect(count(page)).toHaveText("0");
   await expect(
-    page.getByRole("link", { name: "diamondfunk13@gmail.com" }),
-  ).toHaveAttribute("href", "mailto:diamondfunk13@gmail.com");
+    page.getByRole("link", { name: "info@funkspace.de" }),
+  ).toHaveAttribute("href", "mailto:info@funkspace.de");
 });
 
 test("matching acceptance retains the read-only snapshot until explicit reset", async ({

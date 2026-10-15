@@ -278,7 +278,7 @@ test.describe("fresh no-JavaScript reading and long-content fixtures", () => {
           .click();
         await expect(page).toHaveURL("/impressum");
         const email = page.getByRole("link", {
-          name: "diamondfunk13@gmail.com",
+          name: "info@funkspace.de",
           exact: true,
         });
         await email.focus();

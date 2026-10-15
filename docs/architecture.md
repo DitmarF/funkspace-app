@@ -317,8 +317,12 @@ FS-5.5's [processing/storage facts](development/contact-processing-facts.md) and
 [operating guide](development/contact-operations.md) document the current disabled
 journey, implemented gated delivery path, both appearance keys, categorical app
 diagnostics versus platform/provider logs and pending account/legal prerequisites.
-This technical preparation changes no runtime, storage or architecture boundary
-and does not certify legal/publication or live acceptance.
+The later FS-5.5 presentation replaces legal placeholders and uses the tested
+public Workspace alias; Dimi accepted that copy and explicitly closed FS-5.5 on
+2026-10-15. The [closure/handoff](tasks/fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15)
+preserves operator approval separately from legal certification and live
+acceptance. No storage or architecture boundary changes; delivery stays locked
+off and actual external activation prerequisites remain pending.
 
 ## Service Injection
 

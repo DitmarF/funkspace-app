@@ -1,12 +1,27 @@
-# Impressum and Privacy review draft — FS-5.5
+# Impressum and Privacy preparation history — FS-5.5
 
-**Status:** Draft input for Dimi; not approved public legal copy. Prepared
-2026-10-14 against actual repository `/Users/dimi/Projects/funkspace-app`, branch
-`feature/funkspace-minimum-usable`, base
-`9ba16f8d0ba7dcc5b24ff57383dc8631701b7185`, with the intentional FS-5.5 technical
-documentation present. No public pages, configuration or delivery behavior change.
-The source release lock remains false. Codex has not logged into account or
-deployment settings. Technical facts are not legal certification.
+**Current status — 2026-10-15:** Complete — Dimi accepted the current copy and closed FS-5.5. Local legal presentation implemented
+from base `fe2d0746c83486ee8d0d145fb00367868ae88f5a` in the actual repository
+`/Users/dimi/Projects/funkspace-app` on `feature/funkspace-minimum-usable`.
+Dimi's latest direction supersedes the earlier step 4 deferral: finish the legal
+notice and Privacy using the supplied facts, without continuing the extended
+account audit. The current copy is in [Impressum](../../frontend/app/impressum/page.tsx)
+and [Privacy](../../frontend/app/privacy/page.tsx); the
+[presentation record](../tasks/fs-5.5-legal-presentation.md#current-local-integration--2026-10-15)
+owns the accepted copy, checks and explicit closure/Git-delivery record. The earlier
+questionnaire and draft paragraphs below remain preparation history, not the
+current public-page wording or a requirement to repeat every account check.
+
+The candidate uses the supplied name Ditmar Funk, Dimi's provisional address-free
+choice and the tested public `info@funkspace.de` email alias. It does not assert
+an address exemption or legal certification. Dimi accepted the hosting/general-inquiry
+Article 6(1)(f) wording; appearance storage/access has a
+separate unresolved TDDDG assessment, including the automatic default theme write.
+Provider sources do not prove this account's agreements or transfer safeguards.
+These follow-up facts do not reopen FS-5.5 acceptance. Dimi authorized commit/push
+of the current work, without deployment or external activation. The frozen server
+recipient remains the testing Gmail address, delivery stays source-locked off,
+DMARC stays unpublished and FS-5.6 has not started.
 
 **Account-input update:** 2026-10-15. Dimi's account/domain reports are identified
 separately from reviewed screenshots, supplied authentication headers and public
@@ -17,13 +32,34 @@ is not a complete account, agreement or deployed-site audit.
 Sources of repository facts: [processing/storage inventory](contact-processing-facts.md),
 [operating guide](contact-operations.md), [technical handoff](../tasks/fs-5.5-contact-operations.md#handoff)
 and [presentation/input record](../tasks/fs-5.5-legal-presentation.md).
-This document prepares the missing input; it does not close FS-5.5 or start FS-5.6.
+This document retains preparation provenance. Dimi's acceptance and FS-5.5 closure
+are recorded above and in the presentation record; no deployment or FS-5.6 start
+is included.
+
+**Steps 1–3 follow-up, 2026-10-15:** Actual repository base is now
+`fe2d0746c83486ee8d0d145fb00367868ae88f5a` on the same branch. Dimi supplied the
+operator name **Ditmar Funk** and requested an address-free provisional version,
+hosting-fact inspection and a simple mailbox workflow. At that earlier step,
+public-copy integration (step 4), contact-address migration and final legal
+acceptance were deferred; the current local integration above supersedes only
+that implementation deferral.
+
+## Original preparation material — historical
+
+The following questionnaire, account-inspection instructions and quoted draft
+paragraphs retain their original preparation context. Statements below about a
+testing-Gmail public fallback, deferred integration or an unchanged application
+describe that earlier candidate. The current candidate and final-acceptance
+limits are stated at the top of this document and in the presentation record.
+Do not treat these historical questions as a renewed demand for account audits.
 
 ## Confirmed operator and purpose facts
 
 Dimi supplied these facts on 2026-10-14:
 
 - Current operator: an individual, not a declared company or freelancer.
+- Operator name supplied on 2026-10-15: **Ditmar Funk**. Do not infer another name
+  from account/Git metadata or ask for the supplied name again.
 - Location: Germany, Thuringia.
 - Current purpose: presenting only Dimi's own hobby projects.
 - No paid services are offered or wanted now. A possible future freelance/company
@@ -31,8 +67,9 @@ Dimi supplied these facts on 2026-10-14:
 
 These answers narrow the questionnaire below. Do not ask again for current
 country/state, individual status or hobby-only purpose. Company/representative/
-business details are not current assumed requirements. Full legal identity,
-account facts, applicable legal bases and final approved copy remain unresolved.
+business details are not current assumed requirements. Remaining applicable
+identity/address details, account facts, legal bases and final approved copy
+remain unresolved; the operator name itself is now supplied.
 
 ### Address assessment for this hobby project
 
@@ -53,21 +90,30 @@ services. Preserve the accepted pages while assessing their actual purpose.
 
 [TLM legal texts](https://www.tlm.de/die-tlm/rechtsgrundlagen) provide the current
 state-law reference; [TLM contact](https://www.tlm.de/kontakt) offers a route for
-clarifying the specific case if needed. No inquiry was sent. The Impressum
+clarifying the specific case if needed. Codex has sent no inquiry and no TLM
+response has been supplied; Dimi's separate correspondence status is not assumed. The Impressum
 exception and GDPR personal/household exception are separate assessments;
 hosting, browser storage, email and any future form processing still need their
 own review. Do not infer that all privacy duties disappear from a hobby label.
 
+Dimi's current choice is to prepare the address-free version below while the
+TLM question remains open. This is a provisional drafting choice, not a finding
+that an address is unnecessary or that the site is legally complete. A general
+inquiry can describe the unpublished hobby project and say a public URL is not
+available yet; TLM may request more context. No public launch is required to keep
+this local preparation moving, and this task neither sends an inquiry nor
+authorizes publication. Final copy/acceptance remains step 4.
+
 ## Account and email reports — 2026-10-15
 
-| Concern               | Dimi's supplied fact                                                                                                                                                | Remaining verification                                                                                                                                                                                                  |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Test address          | `diamondfunk13@gmail.com` is for testing                                                                                                                            | The inspected candidate still displays it as its public fallback. Its account arrangement is not established by owning Workspace.                                                                                       |
-| Intended public email | `info@funkspace.de` is saved as a Workspace alias and Gmail sending identity; Dimi confirmed receiving and both reply directions                                    | Public/Privacy-contact approval and scoped code/configuration migration remain pending. The application still displays the testing Gmail fallback.                                                                      |
-| Website/domain        | Dimi reports ownership/Vercel Hobby; public NS/mail DNS and a Vercel domain/project-attachment screenshot were checked                                              | Apex/www redirects, actual deployed revision, preview routing and protection remain unverified. The separate hosting provider's traffic role is still unknown to Dimi.                                                  |
-| Extra features        | No analytics, Speed Insights, exported logs, external embeds, advertising, affiliate links, sponsorship or donations reported                                       | No direct platform audit. Ordinary provider request/security processing can still occur.                                                                                                                                |
-| Mail account/access   | Business Starter/sole access reported; verified-primary-domain screenshot, tested `info@funkspace.de` alias and reported/tested incoming `dmarc@funkspace.de` alias | Applicable terms/access controls, forwarding, local clients/downloads/exports, retention settings and actual cleanup remain unaudited. SPF/DKIM passed; DMARC is prepared but unpublished, with no DMARC PASS recorded. |
-| Resend                | Still planned; no account created according to Dimi's follow-up                                                                                                     | No provider signup/accepted account agreement, sender verification, key, quota or live configuration is established. Delivery remains off.                                                                              |
+| Concern               | Dimi's supplied fact                                                                                                                                                     | Remaining verification                                                                                                                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test address          | `diamondfunk13@gmail.com` is for testing                                                                                                                                 | The inspected candidate still displays it as its public fallback. Its account arrangement is not established by owning Workspace.                                                                                       |
+| Intended public email | `info@funkspace.de` is saved as a Workspace alias and Gmail sending identity; Dimi confirmed receiving and both reply directions                                         | Public/Privacy-contact approval and scoped code/configuration migration remain pending. The application still displays the testing Gmail fallback.                                                                      |
+| Website/domain        | Dimi identifies netcup as the registrar/hosting provider; its panel delegates to Vercel NS. Vercel screenshots show apex/wildcard ALIAS targets and managed certificates | netcup's Webhosting 1000 SE allocation is visible, but actual webspace traffic, apex/www redirects, deployed revision, regions/logs/agreements and protection remain unverified.                                        |
+| Extra features        | No analytics, Speed Insights, exported logs, external embeds, advertising, affiliate links, sponsorship or donations reported                                            | No direct platform audit. Ordinary provider request/security processing can still occur.                                                                                                                                |
+| Mail account/access   | Business Starter/sole access reported; verified-primary-domain screenshot, tested `info@funkspace.de` alias and reported/tested incoming `dmarc@funkspace.de` alias      | Applicable terms/access controls, forwarding, local clients/downloads/exports, retention settings and actual cleanup remain unaudited. SPF/DKIM passed; DMARC is prepared but unpublished, with no DMARC PASS recorded. |
+| Resend                | Still planned; no account created according to Dimi's follow-up                                                                                                          | No provider signup/accepted account agreement, sender verification, key, quota or live configuration is established. Delivery remains off.                                                                              |
 
 Domain ownership identifies a public address, not the provider processing web
 requests. If Vercel serves the domain, it remains part of the hosting flow even
@@ -81,6 +127,55 @@ accounts. DMARC publication remains explicitly unauthorized and unperformed.
 A public HTTP read of apex and www on 2026-10-15 could not retrieve either site
 through the web tool (unavailable/cache-miss results). That does not establish an
 offline site, hosting identity, deployed revision or protection coverage.
+
+### What the 13:10 / 13:12 hosting screenshots establish
+
+The provider name **netcup** was supplied by Dimi, not guessed from the panel.
+The netcup screenshot shows `funkspace.de` assigned to **Webhosting 1000 SE**
+with external nameservers `ns1.vercel-dns.com` and `ns2.vercel-dns.com`. The
+Vercel screenshot shows apex/wildcard ALIAS records pointing toward Vercel,
+third-party registration and automatically renewed Vercel certificates. This is
+evidence for netcup domain administration, Vercel authoritative DNS and intended
+Vercel website routing, alongside the earlier Google mail evidence.
+
+An allocated hosting package or certificate does not establish which service
+actually handles a particular request. The complete visitor-processing chain,
+webspace use, current revision, redirects/proxies, region, logging and agreements
+remain to be checked. Keep netcup's registration role separate from any still
+unverified web-hosting or mail-processing role; do not claim netcup is unused or
+handles all visitors based on these screenshots.
+
+### Read-only account checks — how to find the missing facts
+
+Collect sanitized summaries or cropped settings views, not environment values,
+credentials, customer numbers, raw request logs or private contract details. All
+checks here are inspection only; do not save configuration, accept a contract,
+change DNS or deploy as part of gathering facts.
+
+| Check                  | Where to look                                                                                                                                 | Record                                                                                                                                                                           |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vercel domain mapping  | Project `funkspace-app-frontend` → **Settings → Domains**                                                                                     | Listed apex/www/other domains, assigned environment and redirects; this is the next useful screen                                                                                |
+| Deployed code          | Project → **Deployments** → select the existing deployment attached to that domain                                                            | URL, environment, Git branch/commit and status; inspect only, do not redeploy/promote                                                                                            |
+| Function location      | Project → **Settings → Functions → Function Regions**; inspect the existing deployment's function/resources detail if present                 | Actual selected region(s), and any per-function override; no default region is assumed for this account                                                                          |
+| Logging and exports    | Project → **Logs**; inspect **Observability**, **Drains** and **Integrations** entries if available                                           | Visible retention/plan settings, who can access logs, whether any exports/integrations exist and their destinations; no raw log rows are needed                                  |
+| Vercel agreement       | Applicable account/contract documents or a support clarification                                                                              | Which terms, processor/controller roles and any DPA apply to this Hobby account; the public Pro/Enterprise DPA alone does not settle Hobby                                       |
+| netcup webspace use    | CCP → **Produkte/Products** → magnifying glass beside Webhosting 1000 SE → select `funkspace.de` → **Hosting-Einstellungen/Hosting Settings** | Hosting type, document root, forwarding/proxy/installed-app use; inspect both apex/www and any relevant subdomain/default-host setup without changing it                         |
+| netcup visitor records | In that WCP domain's **Logs** and hosting/statistics settings                                                                                 | Whether current FunkSpace requests are recorded, date range, configured rotation/statistics and any old FunkSpace files/backups; an empty log alone does not prove no processing |
+| netcup agreement       | CCP → **Stammdaten/Master Data → Auftragsverarbeitung/Order Processing**                                                                      | Existing AVV status and applicable contract/entity if relevant to actual use; view rather than generate/sign a new contract during inspection                                    |
+
+Official navigation: [Vercel domain settings](https://vercel.com/docs/domains/working-with-domains/add-a-domain),
+[deployment details](https://vercel.com/docs/deployments),
+[function regions](https://vercel.com/docs/functions/configuring-functions/region),
+[runtime logs](https://vercel.com/docs/logs/runtime),
+[Drains](https://vercel.com/docs/drains),
+[netcup hosting settings](https://www.netcup.com/de/helpcenter/dokumentation/webhosting/hosting-einstellungen-verwalten),
+[netcup WCP/logs](https://www.netcup.com/en/helpcenter/documentation/web-hosting/interface),
+[netcup AVV location](https://www.netcup.com/de/helpcenter/dokumentation/general/avv).
+
+Public provider retention descriptions are not evidence of the actual account's
+settings or use. The Vercel Hobby agreement question remains open; no plan upgrade
+or new agreement is selected. Check Workspace forwarding/client/export and
+agreement facts separately as listed below; tested alias routing does not settle them.
 
 ### Hobby plan and future Resend processing
 
@@ -125,22 +220,14 @@ month-after-conversation-end policy. No retention setting has been inspected or
 changed. [Edition comparison](https://knowledge.workspace.google.com/admin/gmail/compare-gmail-features-across-google-workspace-editions),
 [auto-deletion rules](https://knowledge.workspace.google.com/admin/gmail/advanced/manage-email-storage-with-auto-delete-settings).
 
-A small manual workflow is sufficient technically for the proposed hobby-volume
-policy without choosing a paid retention upgrade. Proposed for Dimi's operational
-approval, not an assertion of an already implemented process:
-
-1. Identify the FunkSpace inquiry and record when the conversation is finished.
-   Reassess closure if it reopens.
-2. Record its six-calendar-month deletion due date and arrange a review/reminder
-   that allows deletion by that deadline; creating reminders is not part of this
-   task.
-3. Review any justified exception, with reason, scope and next review/deletion
-   date. Otherwise remove the relevant mailbox/Sent/archived copies by the due
-   date and handle Trash so it does not silently add another 30 days. Confirm
-   forwarding, local clients and exports rather than assuming sole access means
-   no other copies.
-4. Keep the mailbox procedure separate from Resend/Vercel/Google backend retention.
-   Neither archive nor the existence of a Workspace subscription proves cleanup.
+A [dedicated manual guide](contact-mailbox-workflow.md) now prepares the procedure:
+three inquiry-state labels, a separate DMARC label and one private dated Google
+Task per closed conversation. It gives exact setup, closure, six-calendar-month
+date calculation, reopening, exception and selective permanent-deletion steps.
+Tasks adds limited operator metadata; review that use and delete linked tasks
+alongside the inquiry. No labels/tasks/reminders or cleanup settings have been
+applied or tested. Adoption and actual execution remain for Dimi; this is neither
+an application scheduler nor a claim that mailbox cleanup already occurs.
 
 Generic age-based settings or filters are not adopted by this draft. Any later
 automation must preserve the conversation-closure rule and other unrelated mail;
@@ -160,9 +247,10 @@ this hobby site requires a postal address remains open as described above.
 
 The general questionnaire below remains a reference. Country/purpose, Vercel
 Hobby, Business Starter, sole operator access, reported absence of extra features,
-test-only Gmail, tested Workspace aliases and planned Resend are answered above;
+test-only Gmail, tested Workspace aliases, netcup provider identity, supplied
+operator name and planned Resend are answered above;
 do not request those again.
-Remaining items include final legal identity/contact as applicable, actual
+Remaining items include applicable address/identity and final public-contact approval, actual
 web-hosting roles, account agreements/regions/protection, approved public-contact
 migration, later DMARC publication/verification and the closure/cleanup/copies procedure.
 
@@ -170,8 +258,8 @@ migration, later DMARC publication/verification and the closure/cleanup/copies p
 
 | Item                                   | Exact information needed                                                                                                                                                                                                                                                                                                                                             |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Operator                               | Individual, freelancer/sole trader or company/other entity? Full legal name; public business/trading name if different. For an entity: legal form and authorized representative(s).                                                                                                                                                                                  |
-| Address/jurisdiction                   | Actual publishable postal/service address: street, number, postal code, city and country. Country of establishment/residence; German federal state if applicable, to identify the relevant authority. Do not infer these from the domain or project nickname.                                                                                                        |
+| Operator                               | Supplied: Ditmar Funk, individual in Germany/Thuringia. Do not ask for that name/status again. Confirm only other applicable identity details if the situation changes; no current company/freelancer identity is inferred.                                                                                                                                          |
+| Address/jurisdiction                   | Dimi requests an address-free provisional draft while applicability is unresolved. No street address is requested for this preparation. Revisit the applicable notice requirements and final copy before treating the text as legally accepted.                                                                                                                      |
 | Website purpose                        | Strictly personal hobby, professional/job portfolio, freelance/service promotion or other business? Any paid offers, consumer contracts or transactions? Any journalistic/editorial news content, regulated professional services or audiovisual media service? These determine conditional notice requirements.                                                     |
 | Public contact                         | `info@funkspace.de` is prepared and tested. Approve its public/Privacy-rights use and the matching application migration; the current candidate keeps the test Gmail fallback. Supply an applicable DPO/representative's public contact only if relevant.                                                                                                            |
 | Conditional legal details              | If applicable: register name/court and number; VAT identification number or economic identification number; professional chamber, statutory title, awarding country, applicable professional rules and access link; licensing/supervisory authority. For an entity in liquidation, disclose that status if applicable. No ordinary personal tax number is requested. |
@@ -229,23 +317,25 @@ especially because `theme` is written automatically on missing/invalid startup.
 If review finds a behavior change necessary, record a separate scoped decision;
 this copy-preparation task changes no consent or storage behavior.
 
-## Impressum skeleton — operator input required
+## Address-free Impressum — provisional review draft
 
-The brackets below are draft prompts, never deployable placeholders. Remove
-conditional items that do not apply after verifying applicability.
+Dimi supplied the name and chose this interim version for review on 2026-10-15.
+The tested intended contact alias is shown below; actual public-contact migration
+and complete-copy approval remain step 4. No public page is changed by this draft.
 
 > **Legal notice**
 >
-> Operator: [full legal name; entity legal form and representative if applicable]
+> Operator: Ditmar Funk
 >
-> Address: [serviceable address, if required or voluntarily approved]
->
-> Email: info@funkspace.de [tested alias; public/legal-copy approval pending]
->
-> Additional details: [applicable operator-supplied information]
+> Email: info@funkspace.de
 
-Privacy controller/contact uses the actual responsible operator, not merely the
-FunkSpace brand. Fill its identity/contact, approved legal bases and rights/
+The address is intentionally omitted at Dimi's request. This is not an approved
+exemption statement, final legal acceptance or deployment authorization. Any
+conditional legal information is resolved against the actual hobby-only purpose;
+no company, VAT, register or professional details are invented.
+
+Privacy controller/contact uses the supplied operator name Ditmar Funk, not
+merely the FunkSpace brand. Complete approved contact, legal bases and rights/
 complaint information after the facts above are supplied. Where GDPR applies,
 rights depend on their statutory conditions; avoid asserting that every right is
 unconditional or that consent withdrawal applies to processing not based on
@@ -433,20 +523,24 @@ for faithful shortening. Final legal acceptance remains explicit.
 
 ## What is already settled
 
-Keep English, general inquiries, optional Name/required Email and Message, the
-current test candidate/fallback, proposed Resend/Vercel flow and selected six-month
-ordinary-mail policy. `info@funkspace.de` is now a tested Workspace alias for the
-intended public contact; `dmarc@funkspace.de` is a tested receiving alias for
-future aggregate reports. The DMARC TXT is prepared and unpublished. This draft
-records that evidence without migrating the candidate or approving legal copy.
+Keep English, general inquiries, optional Name/required Email and Message,
+the frozen testing-Gmail server recipient, proposed Resend/Vercel flow and selected
+six-month ordinary-mail policy. `info@funkspace.de` is the tested Workspace alias
+now used in local public presentation; `dmarc@funkspace.de` is a tested receiving
+alias for future aggregate reports. The DMARC TXT is prepared and unpublished.
+The current local integration changes presentation, not provider configuration
+or payload, and does not record final legal acceptance.
 Keep provider acceptance distinct from receipt, draft state in memory,
 delivery disabled and external protection pending. No decision here changes the
 wire contract or selects new services, a paid upgrade or external settings.
 
 ## Review and receiving handoff
 
-Supply the questionnaire facts, resolve account/legal gaps, then approve the
-complete Impressum/Privacy text. Sites can integrate that approved copy and run
-the presentation checks. This draft alone does not authorize deployment or mail.
-Receiving chats must verify actual source access, base/branch, status and
-intentional changes; working files are not automatically shared between chats.
+Review the current implemented Impressum/Privacy candidate and the presentation
+record above. Remaining address, proposed legal-basis/storage treatment and
+account/transfer uncertainties are explicit; completing this local candidate
+does not depend on an exhaustive account audit. Dimi's final legal/publication
+acceptance remains pending. Receiving chats must verify actual source access,
+base/branch, status and intentional changes; working files are not automatically
+shared. No deployment, external setting, commit/push or live-mail authorization
+is inferred.

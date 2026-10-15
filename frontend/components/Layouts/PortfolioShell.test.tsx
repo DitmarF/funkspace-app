@@ -8,6 +8,9 @@ import ImpressumPage from "@/app/impressum/page";
 import { aboutContent } from "@/data/aboutContent";
 import { ServiceProvider } from "@/application/providers/ServiceProvider";
 import { portfolioDestinations as destinations } from "@/data/portfolioDestinations";
+import { contactEmail, contactHref } from "@/data/contactContent";
+import { metadata as privacyMetadata } from "@/app/privacy/page";
+import { metadata as legalMetadata } from "@/app/impressum/page";
 
 afterEach(() => document.body.replaceChildren());
 
@@ -78,9 +81,15 @@ describe("server-rendered portfolio documents", () => {
           },
         ),
       ).toHaveAttribute("href", destinations.privacy.href);
-      expect(screen.getAllByRole("link")).toHaveLength(
-        name === "Home" ? 16 : name === "About" ? 14 : 15,
-      );
+      const links = screen.getAllByRole("link");
+      if (name === "Privacy" || name === "Legal notice") {
+        // Legal provider/rights references may grow without changing shell navigation.
+        expect(links.filter((link) => !link.closest("article"))).toHaveLength(
+          14,
+        );
+      } else {
+        expect(links).toHaveLength(name === "Home" ? 16 : 14);
+      }
       const mainNav = header.getByRole("navigation", { name: "Main" });
       expect(
         within(mainNav).getByRole("link", { name: "Home" }),
@@ -118,6 +127,65 @@ describe("server-rendered portfolio documents", () => {
       );
     });
   }
+
+  for (const [name, Page, metadata] of [
+    ["Privacy", PrivacyPage, privacyMetadata],
+    ["Legal notice", ImpressumPage, legalMetadata],
+  ] as const) {
+    it(`${name} supplies the operator and tested Workspace fallback without draft placeholders`, () => {
+      document.body.innerHTML = renderToStaticMarkup(
+        <ServiceProvider>
+          <Page />
+        </ServiceProvider>,
+      );
+      const article = screen.getByRole("article");
+      expect(article).toHaveTextContent("Ditmar Funk");
+      expect(article).toHaveTextContent("Thuringia, Germany");
+      expect(article).not.toHaveTextContent(
+        /Draft —|information is incomplete|not yet been supplied/,
+      );
+      expect(
+        within(article).getByRole("link", { name: contactEmail }),
+      ).toHaveAttribute("href", contactHref);
+      expect(contactEmail).toBe("info@funkspace.de");
+      expect(metadata.description).not.toMatch(/draft|incomplete/i);
+      expect(article.querySelector("form, input, textarea")).toBeNull();
+    });
+  }
+
+  it("explains disabled delivery, memory-only drafts, both preference keys and the selected mailbox policy", () => {
+    document.body.innerHTML = renderToStaticMarkup(
+      <ServiceProvider>
+        <PrivacyPage />
+      </ServiceProvider>,
+    );
+    const article = screen.getByRole("article");
+    for (const text of [
+      "Form delivery is currently disabled",
+      "No form content is sent to Resend",
+      "page memory only",
+      "Google Workspace",
+      "six calendar months after the conversation ends",
+      "Cleanup is manual",
+      "provider backups",
+      "Your rights",
+    ])
+      expect(article).toHaveTextContent(text);
+    expect(within(article).getByText("theme", { exact: true }).tagName).toBe(
+      "CODE",
+    );
+    expect(
+      within(article).getByText("funkspace.motion.preference.v1", {
+        exact: true,
+      }).tagName,
+    ).toBe("CODE");
+    expect(article).toHaveTextContent("When it is missing or invalid");
+    expect(article).toHaveTextContent("without creating this key");
+    expect(article).toHaveTextContent("FunkSpace sets no expiry");
+    expect(
+      within(article).getByRole("link", { name: /TLfDI/ }),
+    ).toHaveAttribute("href", "https://tlfdi.de/kontakt/");
+  });
 
   it("renders cornered Start and plain About without Contact or dead Contact links", () => {
     document.body.innerHTML = renderToStaticMarkup(

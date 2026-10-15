@@ -2,7 +2,7 @@
 
 ## Task metadata
 
-- **Status:** Prepared — technical subtask only; FS-5.5 legal/publication acceptance pending
+- **Status:** Complete — technical/operating work and legal presentation accepted; Dimi explicitly closed FS-5.5 and authorized commit/push on 2026-10-15
 - **Task group or epic:** [EPIC 5](../features/FunkSpace_EPIC_5_Detailed_Plan.md)
 - **Owner:** Codex technical preparation; Dimi factual/legal-copy approval; Sites later integrates approved copy
 - **Last updated:** 2026-10-15
@@ -10,7 +10,24 @@
 - **Preceding handoff:** [FS-5.4 phone/accessibility acceptance and preview delivery](fs-5.4-manual-preview.md#handoff), delivered at this base; F1 technical PASS and Dimi's reported manual acceptance retained. [FS-5.3](fs-5.3-contact-protection.md#handoff) has local PASS but no external protection evidence.
 - **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [processing facts/checklist](../development/contact-processing-facts.md), [operations](../development/contact-operations.md), [server setup](../development/contact-server.md)
 
-## Requested outcome
+## Current legal integration follow-up — 2026-10-15
+
+The [presentation record](fs-5.5-legal-presentation.md#current-local-integration--2026-10-15)
+owns the latest local implementation from base `fe2d0746c83486ee8d0d145fb00367868ae88f5a`.
+Dimi directed completion from supplied facts instead of continuing the extended
+account audit. Legal pages, metadata and the concise contact notice are now
+accepted by Dimi; public email presentation uses the tested `info@funkspace.de`
+alias. The frozen server recipient remains the supplied testing Gmail address,
+the delivery release lock remains false and DMARC remains unpublished. Earlier
+documentation-only scope/results below are preserved history, not claims that
+the new presentation is unchanged or already validated. Current automated checks pass
+in the presentation artifact. Dimi has accepted the copy and closed FS-5.5; the
+[presentation closure](fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15)
+records the newly authorized commit/push and delivered-revision receipt. Actual
+account/protection checks before activation and FS-5.6 remain separate; no external
+settings, deployment or live-send action is included.
+
+## Original requested outcome and technical preparation history
 
 Prepare FS-5.5 technical/operating documentation only from actual implementation
 and public provider/platform facts. Re-audit appearance storage and memory-only
@@ -26,7 +43,7 @@ public legal-copy edits, publication, commit/push or automatic next task.
 - [x] `theme` and `funkspace.motion.preference.v1` defaults/writes/lifetime/removal/failure/tab behavior re-audited; app does not persist contact drafts/keys.
 - [x] Environment names only, secure scopes, sender verification, failure/quota, rotation, stable retry payload, disabling, fallback and rollback documented.
 - [x] Concise Dimi checklist prepared without invented identity/address/legal basis/retention obligation/agreements or legal certification.
-- [ ] FS-5.5 legal-copy approval/publication acceptance — outside this technical-only request and pending.
+- [x] Subsequent Dimi acceptance and FS-5.5 closure recorded in the presentation handoff. The original technical request did not infer that approval; the later explicit closure supplies it.
 
 ## Context and repository evidence
 
@@ -171,6 +188,10 @@ release lock remains false and the testing-Gmail public fallback is unchanged.
 FS-5.5 legal/publication acceptance, external prerequisites and FS-5.6 remain pending.
 
 ## Handoff
+
+This is the earlier technical/Git-delivery handoff. The current local legal
+integration and pending candidate checks are owned by the presentation record
+linked at the top; its base is `fe2d074`, not the earlier technical-audit parent.
 
 Actual repository/branch and parent base are above; after authorized Git delivery,
 the containing commit identifies the FS-5.5 documentation revision.

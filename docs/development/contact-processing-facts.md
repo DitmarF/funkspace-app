@@ -6,10 +6,32 @@ documentation was rechecked that day. Account/deployment settings were not acces
 The [Workspace/DMARC follow-up](contact-operations.md#workspace-aliases-and-prepared-dmarc--2026-10-15)
 adds 2026-10-15 screenshot/header evidence, operator-reported mailbox tests and
 read-only public DNS checks. It does not change runtime or public contact details.
-This is factual input for Dimi, not approved legal copy or legal certification.
+This is technical evidence, not legal certification; the later implemented copy
+was accepted by Dimi when closing FS-5.5 on 2026-10-15.
 The [task evidence](../tasks/fs-5.5-contact-operations.md), [operating guide](contact-operations.md)
 and [frozen contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
-govern scope. Public Privacy/Impressum pages are unchanged drafts.
+govern scope. The later local legal integration described below supersedes the
+earlier draft-page status without changing delivery behavior.
+
+In the later steps 1–3 follow-up at `fe2d074`, Dimi supplied the operator name
+**Ditmar Funk**, requested an address-free provisional review draft and identified
+netcup. [Hosting inspection instructions](legal-copy-draft.md#read-only-account-checks--how-to-find-the-missing-facts)
+and a [proposed manual mailbox guide](contact-mailbox-workflow.md) now prepare
+the remaining facts/procedure. No public-copy integration, account changes or
+workflow adoption was inferred from those preparation documents.
+
+**Current local candidate — 2026-10-15:** Dimi subsequently requested completion
+of the legal notice and Privacy from supplied facts, ending the extended account
+audit. [Presentation evidence](../tasks/fs-5.5-legal-presentation.md#current-local-integration--2026-10-15)
+records the replaced page/metadata placeholders, supplied Ditmar Funk identity,
+provisional address-free choice and public-email-only migration to
+`info@funkspace.de`. The frozen server recipient remains
+`diamondfunk13@gmail.com`; the source release lock remains false. Dimi accepted
+the current copy and explicitly closed FS-5.5; see the
+[closure record](../tasks/fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15).
+The address-free choice and hosting/inquiry rationale are operator decisions; the
+separate storage/TDDDG and account questions remain follow-up. No agreement,
+transfer-safeguard or infrastructure-wide retention certification is claimed.
 
 ## Current behavior versus the implemented delivery path
 
@@ -18,12 +40,13 @@ environment configuration cannot unlock it. It does not read the mail credential
 identities or construct a Resend adapter while disabled. `/contact` renders Name,
 Email and Message plus an ordinary Send button, all disabled before hydration,
 without JavaScript and while unavailable. The public fallback is
-`diamondfunk13@gmail.com`; its mailto link opens the visitor's mail application.
+`info@funkspace.de`; its mailto link opens the visitor's mail application.
 FunkSpace does not send that fallback message itself. These are actual source
-facts; the intended Vercel project's URL/revision/configuration is unverified.
+facts. The supplied Production screenshot identifies an older deployed revision;
+it does not show this local candidate as deployed.
 
 If the visitor sends an email from that mail application, their mail provider
-processes it and the recipient Gmail mailbox can receive it independently of
+processes it and the recipient Workspace Gmail mailbox can receive it independently of
 FunkSpace form availability. Ordinary page visits can still generate hosting logs.
 The safe form-availability boolean is configuration-derived, not a live provider/
 quota/verification health check.
@@ -161,7 +184,8 @@ The later Workspace follow-up confirms the `info@funkspace.de` alias/sending
 identity, Dimi's successful receiving/reply loop, and receipt at the
 `dmarc@funkspace.de` report alias. Outbound SPF/DKIM passed for `funkspace.de`.
 The prepared DMARC record is unpublished; no FunkSpace DMARC PASS is established.
-The current app still exposes the testing Gmail fallback, not the Workspace alias.
+The current local candidate now exposes the Workspace alias for public email;
+the gated provider adapter's frozen selected recipient is unchanged.
 Gmail mailbox processing/storage location, account terms, forwarding/export,
 access controls and retention settings have not been audited. Business Starter
 and sole access are Dimi's reports; the mailbox tests do not verify a Google
@@ -170,6 +194,11 @@ All Mail; Delete moves it to Trash, recoverable up to 30 days unless Delete fore
 is used. Google documents asynchronous deletion/backup retention and exceptions.
 The operator's six-month mailbox policy is distinct from all providers' retention
 and does not remove correspondents' copies.
+The proposed cleanup guide uses private Google Tasks metadata linked to closed
+inquiries, if adopted. That is operator-side account processing for later review,
+not an implemented form feature or current claim of automatic deletion. No
+visitor content should be copied into task titles/details, and linked tasks must
+be deleted alongside inquiry cleanup.
 [Gmail archive](https://support.google.com/mail/answer/6576?hl=en),
 [Gmail delete](https://support.google.com/mail/answer/7401?co=GENIE.Platform%3DDesktop&hl=en),
 [Google retention](https://policies.google.com/technologies/retention?hl=en).
@@ -185,9 +214,17 @@ the [operating guide](contact-operations.md#application-diagnostics-and-separate
 records public capabilities/defaults and required actual account checks.
 [Diagnostic projection](../../frontend/infrastructure/contact/ContactDiagnostics.ts).
 
-The dated Workspace tests concern mail aliases. A supplied Vercel screenshot
-shows domain/project attachment, but no installed WAF, export, complete
-web-deployment alias inventory or protection evidence has been supplied. The
+The dated Workspace tests concern mail aliases. Later supplied Vercel screenshots
+show Ready Production from `main` at
+`31abe42d97563775272d8a99e5021f3b39bc86ab`, created 15 September, with
+`funkspace.de` and `funkspace-app-frontend.vercel.app` attached. The displayed
+configured function region is `iad1` (USA); it is not evidence that all edge,
+storage or log processing occurs there. The last-hour runtime-log view has no
+matching entries, but its Production-only selection is not visible; this does
+not prove logging or exports disabled. netcup shows a Website virtual host at
+`/funkspace.de/httpdocs`; the visible 1 October Apache certificate warnings do
+not establish visitor traffic. No installed WAF, export, complete web-deployment
+alias inventory or protection evidence has been supplied. The
 five/IP/ten-minute fixed-window POST rule remains a proposal;
 regional/distributed-abuse and shared-network limits remain. Public Preview
 environment support is not proof of any reachable URL's protection. All actual
@@ -195,15 +232,20 @@ coverage rows are pending; no deployed security acceptance is claimed.
 
 ## Dimi legal-copy approval checklist
 
-- [ ] Supply/approve actual operator legal identity, postal address and required contact details; no placeholder replacement is authorized here.
-- [ ] Decide/approve the purpose, applicable legal basis and rights/contact language; technical facts do not select them or justify a consent checkbox automatically.
-- [ ] Verify actual Vercel/Resend/Gmail account types, terms/agreements, roles, locations/transfers/subprocessors, logging access/retention/drains and protection cookies; review sampled abuse-processing facts.
-- [ ] Approve both appearance keys' precise defaults/write/lifetime/removal behavior and their applicable legal treatment; avoid unsupported consent/exemption conclusions.
-- [ ] Describe app-memory-only drafts accurately, including limits concerning browser autofill/restoration, protected-preview cookies and the separate email fallback.
-- [ ] Apply the selected six-month-after-conversation-end policy for closed ordinary mailbox inquiries, with documented justified exceptions. Decide closure-date recording, cleanup cadence, Trash/Sent/archive/export handling and exception review/deletion dates; see the operating procedure.
-- [ ] Approve disabled-current versus later-enabled contact wording and acceptance-versus-receipt language against verified configuration; do not present the future processing chain as currently live.
-- [ ] Approve final Privacy/Impressum text and metadata for publication separately. Current Privacy omits the motion key and complete hosting/email facts; Impressum still lacks operator identity/address. FS-5.5 legal/publication acceptance and FS-5.6 live acceptance remain pending.
+Dimi accepted the implemented copy and explicitly closed FS-5.5 on 2026-10-15.
+Unchecked items below are external/operating follow-up for any later activation,
+not open FS-5.5 acceptance. They are not marked verified by the closure request.
 
-Source public drafts: [Privacy](../../frontend/app/privacy/page.tsx),
+- [x] Supplied Ditmar Funk identity, tested public `info@funkspace.de` alias and chosen address-free notice accepted as current copy, without claiming an address exemption.
+- [x] Current purpose, hosting/general-inquiry legal-rationale wording, rights and contact copy accepted by the operator; no independent legal assessment is certified.
+- [x] Both appearance keys' exact defaults/write/lifetime/removal and app-memory-only draft disclosures integrated and accepted. Their separate storage/access legal assessment remains follow-up.
+- [x] Selected six-calendar-month-after-conversation-end policy and justified-exception wording accepted. This does not claim that labels, reminders or cleanup controls are configured.
+- [x] Disabled-current versus later-enabled form wording, provider-acceptance distinction, Privacy/Impressum text, metadata and concise contact notice accepted. No deployment or form activation authorized.
+- [ ] Before later activation, verify actual Vercel/Resend/Gmail agreements, roles, locations/transfers/subprocessors, logging/retention/exports and protection coverage; do not infer account facts from public policies.
+- [ ] Follow up address applicability/TLM response and the separate appearance-storage/TDDDG assessment; update copy/behavior if needed. FS-5.5 is not reopened by retaining those limits.
+- [ ] Apply the mailbox workflow and verify reminders/closure tracking/selective cleanup, including controlled copies and documented exception review. The guide remains proposed until actually adopted.
+
+Accepted source copy: [Privacy](../../frontend/app/privacy/page.tsx),
 [Impressum](../../frontend/app/impressum/page.tsx). Dimi owns factual/legal-copy
-approval; Sites integrates only approved copy in the existing page structure.
+approval. The latest local integration uses the supplied facts in the existing
+page structure without treating unknown account/legal assessments as verified.

@@ -31,11 +31,13 @@ export default function ContactPage() {
         </p>
         <ButtonLink href={contactHref}>{contactEmail}</ButtonLink>
         <p className="text-portfolio-body">
-          Read the{" "}
+          Your email address and message are used to handle your inquiry and
+          reply. A name is optional. Form delivery is currently disabled; you
+          can use the email link instead. Read the{" "}
           <Link href="/privacy" className="text-fs-content-primary underline">
             Privacy information
           </Link>{" "}
-          before sharing personal information.
+          for details about email processing, storage and your rights.
         </p>
       </article>
     </PortfolioShell>

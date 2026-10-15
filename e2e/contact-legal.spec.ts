@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { selectTheme, themes } from "./helpers/foundation";
 
-const email = "diamondfunk13@gmail.com";
+const email = "info@funkspace.de";
 
 for (const javaScriptEnabled of [true, false]) {
   test.describe(`Contact/legal, JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
@@ -21,9 +21,24 @@ for (const javaScriptEnabled of [true, false]) {
         expect(response?.status()).toBe(200);
         if (route !== "/about") {
           expect(await response!.text()).toContain(email);
+          const article = page.getByRole("article");
+          await expect(article).toContainText("Ditmar Funk");
           await expect(
-            page.getByRole("article").getByText(/Draft —/),
-          ).toBeVisible();
+            article.getByText(/Draft —|Information still to be completed/),
+          ).toHaveCount(0);
+          if (route === "/privacy") {
+            for (const text of [
+              "Google Workspace",
+              "funkspace.motion.preference.v1",
+              "six calendar months",
+              "Form delivery is currently disabled",
+              "page memory only",
+            ])
+              await expect(article).toContainText(text);
+            await expect(
+              article.getByRole("link", { name: /TLfDI/ }),
+            ).toHaveAttribute("href", "https://tlfdi.de/kontakt/");
+          }
           await expect(page.getByRole("heading", { level: 1 })).toHaveText(
             route === "/privacy" ? "Privacy" : "Legal notice",
           );
@@ -128,7 +143,7 @@ for (const javaScriptEnabled of [true, false]) {
   });
 }
 
-test("legal drafts retain accessible headings and contrast in supported themes", async ({
+test("legal information retains accessible headings and contrast in supported themes", async ({
   page,
 }) => {
   for (const route of ["/impressum", "/privacy"]) {

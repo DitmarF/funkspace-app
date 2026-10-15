@@ -1164,7 +1164,19 @@ FS-5.5 preparation is recorded below. External gates remain pending.
 
 #### FS-5.5 — Finalize legal content and the contact operating guide
 
-**Current status:** Technical/operating documentation prepared from actual `9ba16f8d0ba7dcc5b24ff57383dc8631701b7185`; [FS-5.5 evidence/handoff](../tasks/fs-5.5-contact-operations.md), [processing/storage facts and Dimi checklist](../development/contact-processing-facts.md) and [operations](../development/contact-operations.md) own the inspected code/public facts and bounded Workspace test evidence. Dimi separately authorized commit/push of all nine current FS-5.5 Markdown changes on 2026-10-15; the [Git-delivery record](../tasks/fs-5.5-contact-operations.md#documentation-finalization-and-authorized-git-delivery--2026-10-15) owns scope/revision evidence. Privacy/Impressum and runtime remain unchanged. DMARC stays prepared/unpublished and delivery stays off. Dimi legal-copy/publication acceptance, external prerequisites and FS-5.6 live acceptance remain pending; no merge, deployment, DNS/firewall, account or live-form action is authorized by this documentation delivery.
+**Current status — 2026-10-15:** Complete — Dimi accepted the current legal
+notice, Privacy/contact copy, public `info@funkspace.de` alias and operating
+documentation, explicitly closed FS-5.5 and authorized commit/push of all current
+changes. The [closure and delivery record](../tasks/fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15)
+retains base `fe2d0746c83486ee8d0d145fb00367868ae88f5a`, the containing delivery
+revision and validation: types/lint, 41 component/Node tests, both builds,
+49 Chromium checks and documentation checks PASS. The chosen address-free
+notice is an operator content decision, not legal certification; later TLM,
+storage/access and actual-account follow-up remains separate. The frozen server
+recipient stays `diamondfunk13@gmail.com`; live delivery stays source-locked off.
+DMARC remains unpublished. External activation prerequisites and EPIC 5/FS-G2
+remain open; FS-5.6 has not started. No merge, deployment, external settings or
+live send is included in the authorized Git delivery.
 
 **Lead:** Dimi
 
