@@ -104,6 +104,11 @@ controlled server; browser interception alone cannot prevent server egress.
 
 ## External prerequisites remain pending
 
+The [FS-5.5 processing/storage facts and Dimi checklist](contact-processing-facts.md)
+and [operating procedures](contact-operations.md) are prepared from actual source
+and rechecked public documentation. They do not inspect/configure accounts or
+complete legal/publication/live acceptance; the release lock remains unchanged.
+
 Removing the release lock requires Dimi's separate action/candidate authorization,
 actual account terms/DPA/legal review, sender-domain verification and securely
 scoped configuration. FS-5.3 must verify platform protection/capacity and all

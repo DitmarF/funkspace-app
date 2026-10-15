@@ -2,10 +2,10 @@
 
 ## Plan metadata
 
-- **Status:** FS-5.1/5.2 complete; FS-5.3 local technical PASS at delivered `617f9c8`, with external protection/coverage pending. FS-5.4 has Codex technical PASS/F1 closure and Dimi phone/accessibility manual acceptance recorded 2026-10-14; safe-preview documentation, commit and push authorized. Device/per-check and separate design/wording details are unspecified. Legal/external/live prerequisites remain pending; delivery stays locked off. FS-5.5/5.6 not started.
+- **Status:** FS-5.1/5.2 complete; FS-5.3 local technical PASS with external protection/coverage pending. FS-5.4 technical PASS/F1 closure and Dimi phone/accessibility acceptance delivered at `9ba16f8`; device/per-check and separate design/wording details remain unspecified. FS-5.5 technical/operating documentation prepared locally; Dimi legal-copy/publication acceptance and account/external/live prerequisites remain pending. Delivery stays locked off; FS-5.6 not started.
 - **Owner:** Codex for contract/server preparation; Sites for FS-5.4; Dimi for product, legal and external approvals.
 - **Parent authority:** [Minimum Usable Experience](funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling) owns milestone status and gates. This linked plan owns EPIC 5 detail; the [FS-5.1 record](../tasks/fs-5.1-contact-contract.md) owns execution evidence.
-- **Last updated:** 2026-10-14. **Official-document checks last performed:** 2026-10-13.
+- **Last updated:** 2026-10-15. **Official-document checks:** Original FS-5.1 checks 2026-10-13; focused FS-5.5 provider/platform/Google facts rechecked 2026-10-14; Workspace/DNS/Google/Vercel mail-setup follow-up 2026-10-15.
 - **Historical FS-5.1 inspected base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `2c545cd7cb3bc074a126fffa61166577f113cc7b`; clean at that inspection, matching the planning baseline. Current revision/diff belong to the latest task handoff; no reset performed.
 - **Target release:** Not scheduled. First real-delivery acceptance requires a separately authorized protected preview. FS-G2, publication and game integration remain separate.
 - **Related decisions:** [FS-0.5](../tasks/fs-0.5-product-and-technical-decisions.md), [architecture](../architecture.md#contact-composition--fs-51), [ADR-001](../decisions/ADR-001-monorepo-strategy.md), [ADR-003](../decisions/ADR-003-interactive-experience-boundary.md).
@@ -162,6 +162,12 @@ Six-month deletion applies to closed ordinary mailbox conversations, not Resend 
 
 ### Official documentation facts verified 2026-10-13
 
+The focused [FS-5.5 facts/storage review](../development/contact-processing-facts.md)
+and [operating guide](../development/contact-operations.md) recheck relevant public
+sources on 2026-10-14, including Resend body logs/storage/retention/DPA, Vercel
+variable/log/protection terminology and Gmail deletion. These add qualified facts
+without claiming the original whole table or actual account settings were newly verified.
+
 These are public-document facts, not proof of this project's settings or legal suitability:
 
 | Source                                                                                                                                                  | Verified fact / implication                                                                                                                                                                                                                             |
@@ -176,7 +182,7 @@ These are public-document facts, not proof of this project's settings or legal s
 | [Vercel WAF rate limiting](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting)                                                            | All plans support fixed windows and IP counting. Hobby: one rate-limit rule/project, up to ten-minute window, one million included allowed requests; Pro documents 40 rules and usage pricing. Counters are regional; default limiting action is `429`. |
 | [Vercel deployment protection](https://vercel.com/docs/deployment-protection)                                                                           | Standard Protection is available on all plans and excludes production domains. Protection scope/method and actual reviewer access must be checked per URL; same-origin browser requests retain protection cookies.                                      |
 
-Provider policy marketing is not a legal assessment. Dimi reviews purpose/legal basis, operator identity/address, rights/contact, recipients/transfers, hosting/mailbox terms, DPA and retention with appropriate advice where needed before live enabling. FS-5.5 updates both legal pages, metadata and tests, including `theme` and `funkspace.motion.preference.v1`, their actual write/expiry behavior and no contact draft persistence. FS-5.4's narrow current-state correction does not finalize legal content or claim live processing acceptance.
+Provider policy marketing is not a legal assessment. Dimi reviews purpose/legal basis, operator identity/address, rights/contact, recipients/transfers, hosting/mailbox terms, DPA and retention with appropriate advice where needed before live enabling. FS-5.5 technical preparation audits `theme` and `funkspace.motion.preference.v1` and confirms no app-persisted contact draft. Later approved-copy integration updates both legal pages, metadata and affected tests; this technical-only request leaves those draft sources unchanged. No legal or live processing acceptance is inferred.
 
 ### Account settings and external actions: unverified and pending
 
@@ -241,8 +247,9 @@ The bounded [safe manual-preview follow-up](../tasks/fs-5.4-manual-preview.md)
 fixes contact Storybook discovery/alias setup and supplies phone-accessible
 controlled outcomes, actual browser deadlines and retry-clock expiry. Dimi then
 [reported successful phone/accessibility manual testing](../tasks/fs-5.4-manual-preview.md#dimi-manual-acceptance-and-git-authorization--2026-10-14)
-and authorized documentation, commit and push. Delivery stays disabled and FS-5.5
-is not started.
+and authorized documentation, commit and push. That preview delivery kept sending
+disabled and did not start legal work; subsequent FS-5.5 technical preparation is
+recorded below.
 
 **Current status:** Codex technical review PASS with F1 closed by independent
 re-review; [FS-5.4 evidence/delivery](../tasks/fs-5.4-contact-page.md#f1-re-review-pass-and-authorized-git-delivery--2026-10-13)
@@ -277,6 +284,20 @@ Uncertain copy offers retry only before expiry and with unchanged payload; confl
 **Complete when:** Controlled component tests cover every state, input/retry/duplicate behavior and narrow/short viewport recovery. Production never reports acceptance from a timer/mock. Dimi confirms wording and phone/keyboard experience.
 
 ### FS-5.5 — Finalize legal content and the contact operating guide
+
+**Current status:** Technical subtask prepared at actual `9ba16f8d0ba7dcc5b24ff57383dc8631701b7185`
+plus local Markdown changes. [Task evidence/handoff](../tasks/fs-5.5-contact-operations.md),
+[actual processing/storage facts and Dimi checklist](../development/contact-processing-facts.md)
+and [operating guide](../development/contact-operations.md) separate disabled current
+behavior, implemented gated delivery and public defaults from unverified account
+settings. Privacy/Impressum remain unchanged drafts. Dimi legal-copy/publication
+acceptance, external configuration and FS-5.6 live acceptance remain pending.
+The [Workspace follow-up](../development/contact-operations.md#workspace-aliases-and-prepared-dmarc--2026-10-15)
+records tested aliases and SPF/DKIM, with DMARC prepared but unpublished. Dimi
+separately authorized commit/push of all nine current FS-5.5 Markdown changes on
+2026-10-15; the [Git-delivery record](../tasks/fs-5.5-contact-operations.md#documentation-finalization-and-authorized-git-delivery--2026-10-15)
+identifies scope and revision evidence. This does not close FS-5.5 or authorize
+DMARC publication, deployment or form activation.
 
 **Lead:** Dimi. **Counterparts:** Codex supplies technical facts; Sites publishes approved copy.
 
@@ -317,4 +338,4 @@ Run Domain/Application/Infrastructure tests explicitly: current coverage configu
 
 ## Implementation handoff
 
-Start the next session with the current [FS-5.4 evidence/handoff](../tasks/fs-5.4-contact-page.md#handoff), its [FS-5.3 predecessor](../tasks/fs-5.3-contact-protection.md#handoff) and a fresh branch/HEAD/status check. Confirm the receiving chat can actually read the repository and every intentional change; chats do not automatically share working files. A separate Sites workspace must verify the delivered branch/revision and FS-5.4 source independently. If inaccessible, provide/apply the final artifact before proceeding. Do not reset newer work or transfer secret values. FS-5.4 has Codex technical PASS with F1 closed; Dimi phone/design/wording/assistive-technology acceptance remains pending. External configuration/live gates and FS-G2 stay open. Request only a separately scoped next task.
+Start the next session with the current [FS-5.5 technical handoff](../tasks/fs-5.5-contact-operations.md#handoff), the delivered [FS-5.4 manual acceptance](../tasks/fs-5.4-manual-preview.md#handoff), [FS-5.3 predecessor](../tasks/fs-5.3-contact-protection.md#handoff) and a fresh actual branch/HEAD/status check. Confirm repository and intentional-diff access; chats do not automatically share working files. The FS-5.5 documentation parent base is `9ba16f8d0ba7dcc5b24ff57383dc8631701b7185`; its containing commit and dated Git-delivery evidence identify the authorized documentation revision. No reset or secret transfer. FS-5.4 technical PASS/F1 closure and Dimi's reported phone/accessibility acceptance stand; detailed device/per-check and separate design/wording approval were not supplied. FS-5.5 technical preparation does not close legal/publication/account/protection gates or start FS-5.6. FS-G2 and live acceptance remain open; request only separately scoped work.

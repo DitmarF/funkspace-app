@@ -313,6 +313,13 @@ has no API/provider path; fixture imports and controls are checked absent from
 production bundles. Real no-JavaScript/navigation checks use a separate source-
 locked, credential-free, fetch-denied Next preview.
 
+FS-5.5's [processing/storage facts](development/contact-processing-facts.md) and
+[operating guide](development/contact-operations.md) document the current disabled
+journey, implemented gated delivery path, both appearance keys, categorical app
+diagnostics versus platform/provider logs and pending account/legal prerequisites.
+This technical preparation changes no runtime, storage or architecture boundary
+and does not certify legal/publication or live acceptance.
+
 ## Service Injection
 
 Services are injected via React Context:

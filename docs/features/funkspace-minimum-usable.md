@@ -1144,8 +1144,9 @@ local links](../development/contact-manual-preview.md) distinguish simulated for
 checks from the actual disabled page. Dimi subsequently reported successful phone/
 accessibility manual testing and authorized documentation, commit and push; the
 [dated acceptance record](../tasks/fs-5.4-manual-preview.md#dimi-manual-acceptance-and-git-authorization--2026-10-14)
-retains the exact report and unspecified device/per-check details. External gates
-remain pending; FS-5.5/5.6 are not started and no live delivery is enabled.
+retains the exact report and unspecified device/per-check details. That preview
+delivery did not start FS-5.5/5.6 or enable sending; the subsequent technical-only
+FS-5.5 preparation is recorded below. External gates remain pending.
 
 **Current status:** Codex technical review PASS with F1 closed; original FS-5.4 Git delivery is at `fd46474a1420d614dbb31c48fb16d9d6779d471e`. The subsequent safe-preview follow-up has Dimi's phone/accessibility manual acceptance and documentation/commit/push authorization on 2026-10-14. [FS-5.4 evidence/handoff](../tasks/fs-5.4-contact-page.md) and [manual-preview acceptance/delivery](../tasks/fs-5.4-manual-preview.md) own the exact checks, user report and revision verification; device/per-check and separate design/wording details are unspecified. `/contact` retains the shell/navigation, visible disabled fields, availability text and email fallback, including no JavaScript. Delivery stays locked off. F1 preserves blocked-edit guidance and retry rules; ordinary Button/plain focused feedback remains. Legal/external/live gates are pending; no publication, merge or next task authorized.
 
@@ -1163,7 +1164,7 @@ remain pending; FS-5.5/5.6 are not started and no live delivery is enabled.
 
 #### FS-5.5 — Finalize legal content and the contact operating guide
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Technical/operating documentation prepared from actual `9ba16f8d0ba7dcc5b24ff57383dc8631701b7185`; [FS-5.5 evidence/handoff](../tasks/fs-5.5-contact-operations.md), [processing/storage facts and Dimi checklist](../development/contact-processing-facts.md) and [operations](../development/contact-operations.md) own the inspected code/public facts and bounded Workspace test evidence. Dimi separately authorized commit/push of all nine current FS-5.5 Markdown changes on 2026-10-15; the [Git-delivery record](../tasks/fs-5.5-contact-operations.md#documentation-finalization-and-authorized-git-delivery--2026-10-15) owns scope/revision evidence. Privacy/Impressum and runtime remain unchanged. DMARC stays prepared/unpublished and delivery stays off. Dimi legal-copy/publication acceptance, external prerequisites and FS-5.6 live acceptance remain pending; no merge, deployment, DNS/firewall, account or live-form action is authorized by this documentation delivery.
 
 **Lead:** Dimi
 
