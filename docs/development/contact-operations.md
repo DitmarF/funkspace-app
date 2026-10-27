@@ -1,4 +1,4 @@
-# Contact abuse protection and operations — FS-5.3 / FS-5.5
+# Contact abuse protection and operations — FS-5.3 / FS-5.5 / FS-5.6
 
 The [frozen contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract),
 [server setup](contact-server.md), [processing/storage facts and legal-copy checklist](contact-processing-facts.md),
@@ -22,6 +22,38 @@ storage assessment, mailbox-workflow adoption and actual account facts remain
 operating/activation follow-up; no external action is implied.
 External protection is **unverified; live delivery is blocked**. This guide is
 not permission to configure a firewall, change billing/secrets, deploy or send mail.
+
+## Setup evidence — 2026-10-27
+
+This dated register supersedes older “not applied/no preview/every row pending”
+claims only for the facts explicitly recorded here. Base is clean
+`ad2e98e1ff433c9d5942692bc722f0198ba12b46`, branch
+`feature/funkspace-minimum-usable`. Local code changes are not deployed.
+
+| Item                | Evidence and limit                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Workspace           | `info@funkspace.de` and `dmarc@funkspace.de` aliases and receiving/reply tests were verified/reported on 15 October; Google SPF/DKIM passed. These are mailbox tests, not form delivery.                                                                                                                                                                                  |
+| Approved identities | Dimi selected `info@funkspace.de` as the fixed recipient on 27 October; proposed fixed sender remains `FunkSpace <contact@mail.funkspace.de>`.                                                                                                                                                                                                                            |
+| Resend domain       | 27 October 12:55 screenshot: `mail.funkspace.de`, Verified, Forge enabled, Ireland (`eu-west-1`); DKIM and both sending records Verified. Receiving was shown off in setup.                                                                                                                                                                                               |
+| Actual DNS          | Vercel screenshot: TXT `resend._domainkey.mail` (public key omitted), CNAME `rsend.mail` to `rsend-euw1.forge.rmta.net.`, CNAME `send.mail` to `send.forge.rmta.net.`; TTL 60. Setup-session read-only queries to both Vercel nameservers confirmed these records and preserved root Google MX. Do not substitute legacy MX/SPF examples for the generated Forge records. |
+| DMARC               | Root monitoring record was prepared on 15 October, deliberately never published. The setup-session public DNS check found no root DMARC TXT. No DMARC action is authorized here.                                                                                                                                                                                          |
+| Key/configuration   | User reports key created/saved. Screenshot shows `RESEND_API_KEY` Secret and `CONTACT_ENABLED` Config, Preview with branch prefix. Full branch, values and actual key permissions were not inspected. Sender/recipient/origins were guided, not verified as deployed. Never reveal a value to establish this evidence.                                                    |
+| Preview             | 27 October 13:26 screenshot: project `funkspace-app-frontend`, Preview Ready/Latest, source `feature/funkspace-minimum-usable` at `ad2e98e`, created 15 October, Node 22.x and region `iad1`. It predates newly saved variables and this candidate.                                                                                                                       |
+| Authentication      | Require Log In on, Legacy Standard Protection in screenshots. The earlier setup-session unauthenticated GET of the branch alias redirected to Vercel SSO. This proves that URL's page gate only, not API/WAF/all-alias coverage.                                                                                                                                          |
+| WAF                 | 13:41 rule screenshot has exact path `/api/contact` AND method POST, fixed window 600 seconds, 5 requests, IP-only key, 429. After the publish step, 13:49 screenshot shows **Contact form rate limit** enabled with 429 selected. Configuration evidence passes; actual enforcement does not yet have a PASS.                                                            |
+
+Selected branch alias:
+[protected Preview](https://funkspace-app-frontend-git-feature-fun-606557-ditmarfs-projects.vercel.app).
+Record the new immutable URL/revision after a separately authorized deployment.
+Keep the exact browser origin approved; no wildcard or Host-derived origin.
+The [FS-5.6 procedure](contact-acceptance.md) names the next bounded checks.
+
+Still unverified: open/click tracking off; actual key scope, plan/quota and
+terms/DPA review; full deployed configuration; WAF Preview/path/alias coverage,
+custom bypasses and platform logging/access/retention. Application diagnostic
+minimization does not imply that the hosting infrastructure stores no IPs.
+Ireland is a sending region, not an EU storage guarantee; see
+[current processing facts](contact-processing-facts.md#fs-56-current-facts--2026-10-27).
 
 ## Local security assumptions
 
@@ -161,9 +193,11 @@ added meanwhile; do not create a second one. After publication/propagation,
 verify DNS and a new Workspace outbound message's DMARC result separately. Review
 reports before considering an expressly authorized enforcement change. Future
 Resend sending at `mail.funkspace.de` still needs its own verification/alignment;
-Workspace authentication does not verify that sender or authorize a live form.
+Workspace authentication does not itself verify that sender or authorize a live form.
+Resend domain verification was subsequently evidenced on 27 October.
 
-The current local candidate's public fallback is now `info@funkspace.de` under
+Historical 15 October position (superseded by the dated 27 October register):
+the public fallback became `info@funkspace.de` under
 Dimi's legal-presentation completion request. The frozen server recipient remains
 the testing Gmail choice; no provider-recipient or retry-payload migration is
 performed. A later recipient change requires its own scoped decision. Account agreements, mailbox
@@ -180,7 +214,7 @@ Names only; no environment values, credential examples or secret-bearing command
 | `CONTACT_ENABLED`            | Keep off until release/legal/protection/preview gates pass; source lock independently blocks delivery                       |
 | `RESEND_API_KEY`             | Secure provider credential, with sending-only access restricted to the selected verified domain where available             |
 | `CONTACT_FROM`               | Fixed approved FunkSpace sender identity, never visitor-controlled                                                          |
-| `CONTACT_TO`                 | One fixed approved recipient, checked against the selected Gmail destination                                                |
+| `CONTACT_TO`                 | One fixed approved recipient, now the tested Workspace alias per the dated amendment                                        |
 | `CONTACT_ALLOWED_ORIGINS`    | Nonempty canonical exact-origin JSON array; no wildcard, Host inference, paths/query/userinfo or unreviewed preview aliases |
 
 Keep configured values in authorized server environment scopes, never under a NEXT_PUBLIC
@@ -211,7 +245,7 @@ and obtain the selected subdomain/region's exact records from Resend. Owned
 SPF/DKIM state and DMARC interaction without disrupting existing mail; capture
 sanitized verification/region evidence, not guessed record values. Confirm sender,
 recipient, account restrictions/quota and sending-only/domain-restricted key access.
-No sender verification has been performed here.
+The dated setup register now records verified domain evidence; actual sender configuration and a live message remain unverified.
 [Domain verification](https://resend.com/docs/dashboard/domains/introduction),
 [DMARC](https://resend.com/docs/dashboard/domains/dmarc),
 [API key permissions](https://resend.com/docs/api-reference/api-keys/create-api-key).
@@ -222,10 +256,12 @@ Resend documents open/click tracking off by default, but verify both actual doma
 settings off before enabling. Public defaults are not account evidence.
 [Tracking](https://resend.com/docs/dashboard/domains/tracking).
 
-## Exact proposed WAF rule — not applied
+## Exact WAF rule — publication evidenced, enforcement pending
 
-Prepare this rule in the intended project's Firewall configuration for later
-action-specific approval. No configuration file in this repository installs it.
+The operator has published the rule in `funkspace-app-frontend`, as recorded
+above. No repository configuration installs it, and no local check proves its
+Preview/alias enforcement. The historical proposed rule name below is descriptive;
+the actual published name is **Contact form rate limit**.
 
 | Setting                       | Required value                                             |
 | ----------------------------- | ---------------------------------------------------------- |
@@ -266,18 +302,18 @@ protection decision; no process counter or unapproved service substitutes for it
 
 ## External prerequisites and coverage register
 
-No current account inspection, selected preview URL, deployment inventory or
-firewall export is available in the repository handoff. **Every row is pending**;
-even an owned domain is not proof of its current attachment or protection.
+The dated setup register supplies selected Preview and published-rule evidence.
+**Enforcement and full inventory remain pending**; screenshots do not establish
+coverage or replace an approved delivery-off deployment test.
 
-| Target                                                           | Required evidence before enabling                                                           | Current outcome                         |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------- |
-| Intended protected preview                                       | Exact URL, commit/build, project/team, authentication method, reviewer access, enforced WAF | Blocked: URL/configuration not verified |
-| Generated deployment URL                                         | Same revision; WAF plus preview protection; authorized same-origin API test                 | Unverified                              |
-| Branch/preview/custom aliases                                    | Complete actual list, project/deployment mapping, enabled environments and WAF              | Unverified                              |
-| Production domain(s), including owned `funkspace.de` if attached | Current attachment/revision; WAF; deliberate release permission                             | Unverified; no release permission       |
-| Default project domain/production deployment URL                 | Reachability, current/historical revision, rule/protection scope                            | Unverified                              |
-| Older deployments/aliases with an enabled contact handler        | Inventory; disable/restrict each reachable enabled version                                  | Unverified                              |
+| Target                                                           | Required evidence before enabling                                                           | Current outcome                                                       |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Intended protected preview                                       | Exact URL, commit/build, project/team, authentication method, reviewer access, enforced WAF | Selected alias known; new candidate/configuration/enforcement pending |
+| Generated deployment URL                                         | Same revision; WAF plus preview protection; authorized same-origin API test                 | Unverified                                                            |
+| Branch/preview/custom aliases                                    | Complete actual list, project/deployment mapping, enabled environments and WAF              | Unverified                                                            |
+| Production domain(s), including owned `funkspace.de` if attached | Current attachment/revision; WAF; deliberate release permission                             | Unverified; no release permission                                     |
+| Default project domain/production deployment URL                 | Reachability, current/historical revision, rule/protection scope                            | Unverified                                                            |
+| Older deployments/aliases with an enabled contact handler        | Inventory; disable/restrict each reachable enabled version                                  | Unverified                                                            |
 
 Dimi/authorized operator records actual plan, spare slot, account use eligibility,
 cost/overage policy, published rule identity/revision/order and exemptions without
@@ -289,7 +325,7 @@ the specific preview and reviewer browser requests; use relative same-origin API
 requests with normal authentication cookies. Keep bypass tokens out of prompts,
 artifacts, fixtures and URLs. Terms/DPA/legal/sender/tracking/scoped credential
 verification from FS-5.1/5.5 remains mandatory. Do not test a deployed endpoint
-until its exact target and credential-free, delivery-off state are authorized.
+until its exact target and delivery-off safeguards below are authorized.
 
 ### Deployment-only check procedure — no PASS recorded
 
@@ -297,14 +333,22 @@ After separately authorized configuration and deployment of a delivery-off
 candidate, enumerate all rows and verify every reachable URL. Record sanitized
 rule/coverage evidence with commit, deployment, date, region and authentication
 mode. No message/name/email is needed in the test body: `{}` with approved Origin
-and JSON media is invalid locally and cannot send. Keep no usable provider key
-on the test deployment as well as the release lock.
+and JSON media is invalid locally and cannot send. Local/routine tests always
+have blank credentials. For the selected external off-only test, the saved
+branch-scoped key may remain only after verifying the deployed literal source
+lock is false, the environment switch is off, and composition cannot construct
+a delivery adapter or read the key. These independent safeguards plus invalid
+input replace the historical requirement to remove that key; its absence must
+not be claimed. If source identity/off state cannot be proved, stop. This local
+task authorizes none of those external requests. The
+[bounded procedure](contact-acceptance.md) controls request counts and evidence.
 
 Within one observed fresh fixed window and one IP/region, make five matching
 requests; they should reach the application and reject invalid shape. The sixth
 must receive HTTP 429 before invocation. Verify rule attribution/function traffic,
-not just an arbitrary 429. If a window boundary intervenes, repeat the controlled
-check rather than claiming five-per-window evidence. Verify recovery after reset,
+not just an arbitrary 429. If a window boundary intervenes, stop without claiming five-per-window
+evidence. A repeated window requires new explicit bounded authorization under
+the acceptance procedure. Verify recovery after reset,
 other methods/paths unaffected by this rule, and query/path variants, aliases,
 reviewer cookies/bypass interactions and regional counts. Stop on missing coverage;
 do not loosen the rule or enable sending. A platform 429 can be HTML/empty without

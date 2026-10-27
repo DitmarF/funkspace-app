@@ -32,6 +32,12 @@ for (const javaScriptEnabled of [true, false]) {
               "funkspace.motion.preference.v1",
               "six calendar months",
               "Form delivery is currently disabled",
+              "If form delivery is enabled after a separate release decision",
+              "through Resend to the Google Workspace inquiry mailbox",
+              "not arrival in the mailbox",
+              "United States",
+              "30 days",
+              "seven days",
               "page memory only",
             ])
               await expect(article).toContainText(text);

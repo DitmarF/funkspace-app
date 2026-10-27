@@ -90,11 +90,18 @@ for (const javaScriptEnabled of [true, false]) {
         .getByRole("link", { name: "Privacy" })
         .click();
       await expect(page).toHaveURL("/privacy");
+      const assets = page.getByRole("region", {
+        name: "Fonts, assets and analytics",
+      });
       await expect(
-        page.getByText(
-          "Fonts are self-hosted. Work Sans and Space Grotesk are loaded from this site.",
-        ),
+        assets.getByRole("heading", {
+          level: 2,
+          name: "Fonts, assets and analytics",
+        }),
       ).toBeVisible();
+      await expect(assets).toContainText(
+        /Work Sans and Space Grotesk fonts and decorative assets are served from this website\./,
+      );
     });
   });
 }

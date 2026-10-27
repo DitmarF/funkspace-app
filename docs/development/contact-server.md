@@ -102,6 +102,17 @@ environment files or usable credentials, with fetch egress blocked. Existing
 preview output stays untouched. Future browser tests need their own similarly
 controlled server; browser interception alone cannot prevent server egress.
 
+## FS-5.6 local integration preparation
+
+The [FS-5.6 record](../tasks/fs-5.6-contact-acceptance.md) extends focused checks
+with `ContactJourney.test.ts`: the actual browser adapter, HTTP handler, use case
+and Resend adapter are joined through injected in-process fakes. It covers
+matching acceptance, deterministic unchanged retry, uncertainty, provider quota
+versus non-JSON edge 429, rejection without delivery and full deadline cleanup.
+The source release lock is unchanged. Routine checks use a credential-free
+snapshot and deny external transport; no routine test calls the real provider.
+The [acceptance procedure](contact-acceptance.md) pins external action limits.
+
 ## External prerequisites remain pending
 
 The [FS-5.5 processing/storage facts and Dimi checklist](contact-processing-facts.md)

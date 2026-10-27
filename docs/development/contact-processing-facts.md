@@ -33,6 +33,25 @@ The address-free choice and hosting/inquiry rationale are operator decisions; th
 separate storage/TDDDG and account questions remain follow-up. No agreement,
 transfer-safeguard or infrastructure-wide retention certification is claimed.
 
+## FS-5.6 current facts — 2026-10-27
+
+The older dated statements below retain FS-5.5 provenance. Current changes are
+explicit: Dimi approved `info@funkspace.de` as the fixed recipient as well as
+fallback; Resend now verifies `mail.funkspace.de` in Ireland, using the actual
+Forge TXT/two-CNAME records. The [setup register](contact-operations.md#setup-evidence--2026-10-27)
+separates screenshot/user-report facts from unverified settings/enforcement.
+The form still cannot send. The new public disclosure describes future enabled
+processing conditionally; Dimi approval of that addition is pending and does not
+reopen accepted FS-5.5 copy.
+
+Official [Resend processing facts](https://resend.com/security/gdpr) rechecked
+2026-10-27: stored customer data includes message content in the US, regardless
+of sending region. Public standard email/log retention is 30 days; backups last
+seven days, and termination deletion has a separate 90-day limit. The published
+DPA applies on signup; this is not evidence that Dimi reviewed his account copy,
+subprocessors or transfer terms. Actual plan/storage/tracking settings remain
+activation prerequisites. No EU-only storage claim or legal certification.
+
 ## Current behavior versus the implemented delivery path
 
 The production composition's `CONTACT_DELIVERY_RELEASED` constant is false;
@@ -92,11 +111,11 @@ the internal provider acceptance ID is neither a public response field nor an
 application diagnostic field. Resend request headers include server authentication;
 credentials never go to the browser, mail text or application diagnostic writer.
 
-The selected recipient is Dimi's supplied Gmail address. The configuration reader
+The current approved recipient is Dimi's tested Workspace alias `info@funkspace.de` (2026-10-27 amendment). The configuration reader
 accepts a single validated configured recipient and a FunkSpace-labelled sender;
 syntax does not prove that the actual account uses the selected address/domain.
 The proposed sender is at `mail.funkspace.de`, under owned `funkspace.de`, after
-verification. Neither ownership nor this document verifies DNS/account setup.
+verification. Resend domain verification is now evidenced in the dated setup register; deployed values and actual account checks remain pending.
 Source: [validation](../../frontend/domain/contact/ContactValidation.ts),
 [configuration](../../frontend/infrastructure/contact/ContactConfiguration.ts),
 [actual provider payload](../../frontend/infrastructure/contact/ResendContactDelivery.ts).

@@ -32,8 +32,14 @@ export default function ContactPage() {
         <ButtonLink href={contactHref}>{contactEmail}</ButtonLink>
         <p className="text-portfolio-body">
           Your email address and message are used to handle your inquiry and
-          reply. A name is optional. Form delivery is currently disabled; you
-          can use the email link instead. Read the{" "}
+          reply. A name is optional.{" "}
+          {!available && (
+            <>
+              Form delivery is currently disabled; you can use the email link
+              instead.{" "}
+            </>
+          )}
+          Read the{" "}
           <Link href="/privacy" className="text-fs-content-primary underline">
             Privacy information
           </Link>{" "}

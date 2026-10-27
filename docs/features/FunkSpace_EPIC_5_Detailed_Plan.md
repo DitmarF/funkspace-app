@@ -2,12 +2,12 @@
 
 ## Plan metadata
 
-- **Status:** FS-5.1/5.2 complete; FS-5.3 local technical PASS with external protection/coverage pending. FS-5.4 technical PASS/F1 closure and Dimi phone/accessibility acceptance delivered at `9ba16f8`; device/per-check and separate design/wording details remain unspecified. FS-5.5 is complete: Dimi accepted the current legal/contact copy and operating documentation, explicitly closed the task and authorized commit/push on 2026-10-15; validation passes. Account/external/live prerequisites remain separate. Delivery stays locked off; FS-5.6 not started.
+- **Status:** FS-5.1/5.2 complete; FS-5.3 local technical PASS with external protection/coverage pending. FS-5.4 technical PASS/F1 closure and Dimi phone/accessibility acceptance delivered at `9ba16f8`; device/per-check and separate design/wording details remain unspecified. FS-5.5 is complete: Dimi accepted the current legal/contact copy and operating documentation, explicitly closed the task and authorized commit/push on 2026-10-15; validation passes. Account/external/live prerequisites remain separate. Delivery stays locked off; FS-5.6 local preparation is complete, with deployed protection and live acceptance pending. See the [FS-5.6 record](../tasks/fs-5.6-contact-acceptance.md).
 - **Owner:** Codex for contract/server preparation; Sites for FS-5.4; Dimi for product, legal and external approvals.
 - **Parent authority:** [Minimum Usable Experience](funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling) owns milestone status and gates. This linked plan owns EPIC 5 detail; the [FS-5.1 record](../tasks/fs-5.1-contact-contract.md) owns execution evidence.
-- **Last updated:** 2026-10-15. **Official-document checks:** Original FS-5.1 checks 2026-10-13; focused FS-5.5 provider/platform/Google facts rechecked 2026-10-14; Workspace/DNS/Google/Vercel mail-setup follow-up 2026-10-15.
+- **Last updated:** 2026-10-27. **Official-document checks:** Original FS-5.1 checks 2026-10-13; focused FS-5.5 provider/platform/Google facts rechecked 2026-10-14; Workspace/DNS/Google/Vercel mail-setup follow-up 2026-10-15.
 - **Historical FS-5.1 inspected base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `2c545cd7cb3bc074a126fffa61166577f113cc7b`; clean at that inspection, matching the planning baseline. Current revision/diff belong to the latest task handoff; no reset performed.
-- **Target release:** Not scheduled. First real-delivery acceptance requires a separately authorized protected preview. FS-G2, publication and game integration remain separate.
+- **Target release:** Dimi targets Thursday 2026-10-29; the date does not waive acceptance gates. First real-delivery acceptance requires a separately authorized protected preview. FS-G2, publication and game integration remain separate.
 - **Related decisions:** [FS-0.5](../tasks/fs-0.5-product-and-technical-decisions.md), [architecture](../architecture.md#contact-composition--fs-51), [ADR-001](../decisions/ADR-001-monorepo-strategy.md), [ADR-003](../decisions/ADR-003-interactive-experience-boundary.md).
 
 ### Source provenance and authorization
@@ -26,20 +26,36 @@ A visitor can make a general inquiry in English through a plain, accessible `/co
 
 ### Settled choices
 
-| Concern                     | Decision                                                                                                                                                                             |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Entry / appearance          | Dedicated plain `/contact`, existing `PortfolioShell`; header/tree Contact enabled in FS-5.4                                                                                         |
-| Visible fields              | Optional Name; required Email and Message; no other visible inputs                                                                                                                   |
-| Purpose / language          | General inquiries, collaboration, questions and feedback; English                                                                                                                    |
-| Recipient / public fallback | Frozen server recipient: `diamondfunk13@gmail.com`. FS-5.5 public presentation now uses tested `info@funkspace.de` via `frontend/data/contactContent.ts`; no provider payload change |
-| Owned domain                | `funkspace.de`, supplied by Dimi; account/DNS control not independently verified                                                                                                     |
-| Proposed fixed sender       | `FunkSpace <contact@mail.funkspace.de>`, only after sender-domain verification                                                                                                       |
-| Transport / host            | Resend HTTPS API in the existing Next.js/Vercel deployment                                                                                                                           |
-| Mailbox cleanup             | Closed ordinary inquiries deleted six months after conversation end; justified exceptions documented with reason and review/deletion point                                           |
-| Initial live acceptance     | Separately authorized protected preview and exact controlled message                                                                                                                 |
-| Legal/account gate          | Actual provider/account terms and legal content reviewed before enabling live delivery                                                                                               |
+| Concern                     | Decision                                                                                                                                                                            |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Entry / appearance          | Dedicated plain `/contact`, existing `PortfolioShell`; header/tree Contact enabled in FS-5.4                                                                                        |
+| Visible fields              | Optional Name; required Email and Message; no other visible inputs                                                                                                                  |
+| Purpose / language          | General inquiries, collaboration, questions and feedback; English                                                                                                                   |
+| Recipient / public fallback | Dimi approved `info@funkspace.de` for both the fixed server recipient and public fallback on 2026-10-27, replacing the earlier Gmail test recipient; configuration remains disabled |
+| Owned domain                | `funkspace.de`; Vercel DNS and Workspace setup evidenced in the operating guide                                                                                                     |
+| Proposed fixed sender       | `FunkSpace <contact@mail.funkspace.de>`; Resend domain verification evidenced 2026-10-27; actual configuration and acceptance still pending                                         |
+| Transport / host            | Resend HTTPS API in the existing Next.js/Vercel deployment                                                                                                                          |
+| Mailbox cleanup             | Closed ordinary inquiries deleted six months after conversation end; justified exceptions documented with reason and review/deletion point                                          |
+| Initial live acceptance     | Separately authorized protected preview and exact controlled message                                                                                                                |
+| Legal/account gate          | Actual provider/account terms and legal content reviewed before enabling live delivery                                                                                              |
 
 No subject/phone/company/budget fields, attachments, consent checkbox, automatic reply, marketing subscription, tracking, webhook or application inbox. No homepage Contact restoration or accepted scene/homepage redesign.
+
+### FS-5.6 recipient and setup amendment — 2026-10-27
+
+Dimi explicitly selected the tested Workspace alias `info@funkspace.de` as the
+fixed contact recipient. This supersedes the historical Gmail test destination;
+the five-field request, public result envelopes and deterministic payload format
+are unchanged. No production form has sent a message, so no live retry migration
+is claimed. Pin this recipient and sender in the later approved candidate and
+keep them stable through its retry window.
+
+The [operating evidence](../development/contact-operations.md#setup-evidence--2026-10-27)
+records Resend verification, the published WAF rule and the older protected
+Preview separately from unverified enforcement/account settings. The
+[controlled acceptance procedure](../development/contact-acceptance.md) is the
+next-step authority for evidence, not permission to execute external actions.
+The source lock stays false; DMARC remains deliberately unpublished.
 
 ## Current repository evidence
 
@@ -186,12 +202,16 @@ Provider policy marketing is not a legal assessment. Dimi reviews purpose/legal 
 
 ### Account settings and external actions: unverified and pending
 
+The dated 27 October setup register above now proves domain verification and
+rule publication. The account-review/enforcement gates below remain pending;
+read their specific evidence qualifications rather than treating all setup as unknown.
+
 | Prerequisite                                                                            | Owner / latest gate                                                                                                                                             |
 | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actual Vercel plan/use eligibility, billing and spare WAF slot                          | Dimi supplies account evidence; Codex verifies at FS-5.3 before enabling                                                                                        |
 | Exact protected preview URL/revision, protection method/scope, reviewer access, aliases | Dimi authorizes deployment/access changes separately; Codex verifies before live acceptance                                                                     |
 | Resend account restrictions/quota/overages, signed DPA, terms and subprocessors         | Dimi reviews actual account; required before sender setup/live enabling                                                                                         |
-| Sender domain `mail.funkspace.de`, selected region, verification status, tracking off   | Dimi approves setup; Codex verifies provider evidence before live enabling                                                                                      |
+| Sender domain `mail.funkspace.de`, selected region, verification status, tracking off   | Domain/region verification evidenced 2026-10-27; tracking and actual sender configuration still pending                                                         |
 | Exact SPF/DKIM/return-path records and DMARC interaction                                | Obtain actual records, inventory existing website/mailbox DNS, prepare a reviewable change, then obtain action-specific approval; no record values guessed here |
 | Fixed recipient/Reply-To behavior, scoped secrets and exact origin allowlist            | Dimi securely configures approved scope; Codex verifies without exposing values                                                                                 |
 | Complete legal/operator content and six-month mailbox policy operation                  | Dimi supplies/approves; Sites publishes at FS-5.5 before enabling                                                                                               |
@@ -296,7 +316,7 @@ The address-free choice is accepted copy, not a certified legal exemption;
 future TLM/storage/account follow-up does not reopen this completed task.
 The frozen server recipient/payload and false release lock remain unchanged.
 DMARC stays unpublished. Actual provider, agreement, protection and protected-
-preview/live acceptance prerequisites remain separate; FS-5.6 has not started.
+preview/live acceptance prerequisites remain separate; FS-5.6 local preparation is recorded below.
 
 **Lead:** Dimi. **Counterparts:** Codex supplies technical facts; Sites publishes approved copy.
 
@@ -307,6 +327,8 @@ preview/live acceptance prerequisites remain separate; FS-5.6 has not started.
 **Complete when:** Published information matches actual configuration, has no placeholders, and the operator can diagnose/disable safely. Public-document checks are not legal certification or Dimi approval.
 
 ### FS-5.6 — Verify end-to-end delivery and failure recovery
+
+**Current status — 2026-10-27:** Local preparation complete; independent review and mocked integration checks are recorded in the [FS-5.6 handoff](../tasks/fs-5.6-contact-acceptance.md). Source lock remains false, DMARC unpublished; deployed protection and live provider/receipt acceptance are pending. No EPIC 5/FS-G2 completion or EPIC 6 start.
 
 **Lead:** Codex. **Counterpart:** Sites fixes UI findings. **Dimi:** specifically authorizes live sending and verifies recipient receipt.
 
@@ -337,4 +359,4 @@ Run Domain/Application/Infrastructure tests explicitly: current coverage configu
 
 ## Implementation handoff
 
-Start the next session with the [current FS-5.5 presentation handoff](../tasks/fs-5.5-legal-presentation.md#handoff), preserved [technical evidence](../tasks/fs-5.5-contact-operations.md), delivered [FS-5.4 manual acceptance](../tasks/fs-5.4-manual-preview.md#handoff), [FS-5.3 predecessor](../tasks/fs-5.3-contact-protection.md#handoff) and a fresh actual branch/HEAD/status check. Confirm repository and intentional-diff access; chats do not automatically share working files. The current local integration base is `fe2d0746c83486ee8d0d145fb00367868ae88f5a`; the earlier technical documentation parent remains historical provenance. No reset or secret transfer. FS-5.4 technical PASS/F1 closure and Dimi's reported phone/accessibility acceptance stand; Dimi separately accepted the legal copy and closed FS-5.5. Actual account/protection/live gates and FS-G2 remain open; FS-5.6 has not started.
+Start the next session with the [current FS-5.6 handoff](../tasks/fs-5.6-contact-acceptance.md#handoff), the preceding [FS-5.5 presentation handoff](../tasks/fs-5.5-legal-presentation.md#handoff), preserved [technical evidence](../tasks/fs-5.5-contact-operations.md), delivered [FS-5.4 manual acceptance](../tasks/fs-5.4-manual-preview.md#handoff), [FS-5.3 predecessor](../tasks/fs-5.3-contact-protection.md#handoff) and a fresh actual branch/HEAD/status check. Confirm repository and intentional-diff access; chats do not automatically share working files. The FS-5.6 local base is `ad2e98e1ff433c9d5942692bc722f0198ba12b46`; the earlier FS-5.5 integration parent `fe2d074` remains historical provenance. No reset or secret transfer. FS-5.4 technical PASS/F1 closure and Dimi's reported phone/accessibility acceptance stand; Dimi separately accepted the legal copy and closed FS-5.5. Actual account/protection/live gates and FS-G2 remain open; use the current [FS-5.6 handoff](../tasks/fs-5.6-contact-acceptance.md) for local preparation.

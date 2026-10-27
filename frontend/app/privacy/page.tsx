@@ -18,7 +18,7 @@ export default function PrivacyPage() {
           FunkSpace is my personal hobby website. This notice explains the data
           used to provide the website, remember appearance choices and answer
           inquiries. Last updated:{" "}
-          <time dateTime="2026-10-15">15 October 2026</time>.
+          <time dateTime="2026-10-27">27 October 2026</time>.
         </p>
         <section aria-labelledby="operator-heading" className="space-y-fs-md">
           <h2 id="operator-heading" className="text-2xl font-bold">
@@ -102,6 +102,32 @@ export default function PrivacyPage() {
             alternative. The prepared form has an optional Name field and
             required Email and Message fields. This notice will be reviewed
             before real form delivery is enabled.
+          </p>
+          <p className="text-portfolio-body">
+            If form delivery is enabled after a separate release decision,
+            submitting will send your optional name, required email address and
+            message from your browser to the website’s Vercel server, then
+            through Resend to the Google Workspace inquiry mailbox. A submission
+            identifier identifies unchanged manual retries. The planned setup
+            uses plain-text email, your validated email address for replies, and
+            no automatic replies or open/click tracking. Provider acceptance
+            confirms acceptance for delivery, not arrival in the mailbox.
+          </p>
+          <p className="text-portfolio-body">
+            Resend’s selected sending region is Ireland. This does not mean
+            EU-only storage: Resend stores message content and delivery records
+            in the United States. Resend publishes standard email and log
+            retention of 30 days and backup retention of seven days, separate
+            from my mailbox cleanup policy. The applicable account terms and
+            storage settings must be verified before form delivery is enabled.
+            See{" "}
+            <a
+              href="https://resend.com/security/gdpr"
+              className="text-fs-content-primary underline"
+            >
+              Resend’s processing and retention information
+            </a>
+            .
           </p>
           <p className="text-portfolio-body">
             Contact drafts and retry identifiers are kept in page memory only;

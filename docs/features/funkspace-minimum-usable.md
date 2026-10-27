@@ -1172,10 +1172,11 @@ retains base `fe2d0746c83486ee8d0d145fb00367868ae88f5a`, the containing delivery
 revision and validation: types/lint, 41 component/Node tests, both builds,
 49 Chromium checks and documentation checks PASS. The chosen address-free
 notice is an operator content decision, not legal certification; later TLM,
-storage/access and actual-account follow-up remains separate. The frozen server
-recipient stays `diamondfunk13@gmail.com`; live delivery stays source-locked off.
+storage/access and actual-account follow-up remains separate. At that closure the server
+recipient stayed Gmail; Dimi subsequently approved `info@funkspace.de` on
+2026-10-27 in the [dated EPIC 5 amendment](FunkSpace_EPIC_5_Detailed_Plan.md#fs-56-recipient-and-setup-amendment--2026-10-27). Live delivery stays source-locked off.
 DMARC remains unpublished. External activation prerequisites and EPIC 5/FS-G2
-remain open; FS-5.6 has not started. No merge, deployment, external settings or
+remain open; FS-5.6 local preparation is now recorded below. No merge, deployment, external settings or
 live send is included in the authorized Git delivery.
 
 **Lead:** Dimi
@@ -1192,7 +1193,7 @@ live send is included in the authorized Git delivery.
 
 #### FS-5.6 — Verify end-to-end delivery and failure recovery
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-27:** Local preparation complete from clean `ad2e98e1ff433c9d5942692bc722f0198ba12b46`. Independent read-only server/security and UI reviews pass for the disabled candidate. The [FS-5.6 evidence/handoff](../tasks/fs-5.6-contact-acceptance.md) records bounded notice preparation, mocked whole-journey tests and isolated checks. The [controlled Preview procedure](../development/contact-acceptance.md) separates delivery-off protection tests from the later maximum-one-message acceptance. Sending stays source-locked off and DMARC unpublished. Deployed WAF/alias enforcement, activation-copy/account review, separately authorized Preview/live test and Dimi mailbox receipt remain pending; FS-5.6, EPIC 5 and FS-G2 are not complete. EPIC 4 remains closed; EPIC 6 has not begun.
 
 **Lead:** Codex
 

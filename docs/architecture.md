@@ -324,6 +324,13 @@ preserves operator approval separately from legal certification and live
 acceptance. No storage or architecture boundary changes; delivery stays locked
 off and actual external activation prerequisites remain pending.
 
+FS-5.6 adds a mocked cross-layer contact journey and availability-consistent
+contact/conditional future-processing disclosures. It adds no runtime service,
+storage, retry mechanism or dependency. The source release lock remains false.
+[FS-5.6 evidence](tasks/fs-5.6-contact-acceptance.md) and the
+[controlled acceptance procedure](development/contact-acceptance.md) distinguish
+local checks, deployed protection, provider acceptance and actual receipt.
+
 ## Service Injection
 
 Services are injected via React Context:
