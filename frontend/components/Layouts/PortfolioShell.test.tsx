@@ -153,7 +153,7 @@ describe("server-rendered portfolio documents", () => {
     });
   }
 
-  it("explains disabled delivery, memory-only drafts, both preference keys and the selected mailbox policy", () => {
+  it("explains availability-dependent delivery, memory-only drafts, both preference keys and the selected mailbox policy", () => {
     document.body.innerHTML = renderToStaticMarkup(
       <ServiceProvider>
         <PrivacyPage />
@@ -161,8 +161,13 @@ describe("server-rendered portfolio documents", () => {
     );
     const article = screen.getByRole("article");
     for (const text of [
-      "Form delivery is currently disabled",
-      "No form content is sent to Resend",
+      "shows whether form submission is available",
+      "When the form is available, submitting sends",
+      "through Resend to the Google Workspace inquiry mailbox",
+      "not arrival in the mailbox",
+      "United States",
+      "30 days",
+      "seven days",
       "page memory only",
       "Google Workspace",
       "six calendar months after the conversation ends",
@@ -171,6 +176,15 @@ describe("server-rendered portfolio documents", () => {
       "Your rights",
     ])
       expect(article).toHaveTextContent(text);
+    const formDisclosure = within(article).getByRole("region", {
+      name: "Contact form and drafts",
+    });
+    expect(
+      within(formDisclosure).getByRole("link", { name: "Contact page" }),
+    ).toHaveAttribute("href", "/contact");
+    expect(formDisclosure).not.toHaveTextContent(
+      /Form delivery is currently disabled|separate release decision|must be verified before form delivery/,
+    );
     expect(within(article).getByText("theme", { exact: true }).tagName).toBe(
       "CODE",
     );

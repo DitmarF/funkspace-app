@@ -40,29 +40,65 @@ explicit: Dimi approved `info@funkspace.de` as the fixed recipient as well as
 fallback; Resend now verifies `mail.funkspace.de` in Ireland, using the actual
 Forge TXT/two-CNAME records. The [setup register](contact-operations.md#setup-evidence--2026-10-27)
 separates screenshot/user-report facts from unverified settings/enforcement.
-The form still cannot send. The new public disclosure describes future enabled
-processing conditionally; Dimi approval of that addition is pending and does not
-reopen accepted FS-5.5 copy.
+Form delivery remains disabled. Dimi has now approved the bounded local source
+and public-copy proposal: the local candidate defaults off under its exact
+configuration gate, and static Privacy wording refers readers to `/contact` for
+availability before describing enabled processing conditionally. The deployed
+`b829447` candidate retains its unconditional source lock. This local approval
+does not reopen accepted FS-5.5 copy or establish live-delivery acceptance.
 
 Official [Resend processing facts](https://resend.com/security/gdpr) rechecked
 2026-10-27: stored customer data includes message content in the US, regardless
 of sending region. Public standard email/log retention is 30 days; backups last
 seven days, and termination deletion has a separate 90-day limit. The published
-DPA applies on signup; this is not evidence that Dimi reviewed his account copy,
-subprocessors or transfer terms. Actual plan/storage/tracking settings remain
-activation prerequisites. No EU-only storage claim or legal certification.
+DPA applies on signup. The later follow-up below records the downloaded-copy
+review, actual Free plan and Dimi’s explicit terms/DPA/US-processing approval.
+Saved storage/tracking values and wider platform coverage retain their stated
+evidence limits. No EU-only storage claim or legal certification.
+
+## Protected Preview follow-up and Dimi approval — 2026-10-27
+
+At clean `b829447`, the [recorded branch test](../tasks/fs-5.6-contact-acceptance.md#protected-preview-and-provider-approval--2026-10-27)
+corroborates five application rejections, one named-rule rate limit and one
+post-reset rejection. This establishes only the observed scope. Key permission,
+domain restriction and Free allowance are now actual UI evidence. Tracking
+shows no configured domain; literal saved booleans were not individually read.
+That observed deployed candidate retains its source lock and off switch.
+The later local change below preserves memory-only drafts and the mailbox policy.
+
+Dimi explicitly approved Resend under its terms/DPA, including disclosed US
+processing. The downloaded signed vendor PDF’s relevant clauses were reviewed;
+they do not materially contradict the prepared disclosure. Its account-term
+applicability, primary US processing/SCC clauses and termination deletion period
+are distinct from active-message/log policy and six-month mailbox cleanup.
+There is no new legal certification or operator identity/address decision.
+Dimi subsequently approved the exact bounded seven-file source/public-copy
+proposal and its local application. He also confirmed `CONTACT_FROM`,
+`CONTACT_TO`, `CONTACT_ALLOWED_ORIGINS` and the full Preview branch; this operator
+confirmation is separate from independent deployed-value verification. The local
+candidate is configuration-gated and default-off; delivery remains disabled.
+The approved Privacy copy describes processing only when the form is available,
+without asserting that sending is already enabled. Deployed `b829447` is unchanged
+and source-locked off. Git delivery, deployment, settings changes, enabling,
+live mail, key revocation and DMARC publication were not authorized by this
+source/copy approval. Actual provider acceptance, receipt and shutdown remain
+pending; FS-5.6/EPIC 5 are not complete.
 
 ## Current behavior versus the implemented delivery path
 
-The production composition's `CONTACT_DELIVERY_RELEASED` constant is false;
-environment configuration cannot unlock it. It does not read the mail credential/
-identities or construct a Resend adapter while disabled. `/contact` renders Name,
+The approved local server composition defaults off and constructs delivery only
+for exact `CONTACT_ENABLED=true` with valid origins, credential and fixed mail
+identities. It does not read credential/identity getters while disabled or when
+origins are invalid, and does not construct a Resend adapter while disabled.
+The deployed `b829447` composition separately retains the literal false source
+lock, independent of environment values. `/contact` renders Name,
 Email and Message plus an ordinary Send button, all disabled before hydration,
 without JavaScript and while unavailable. The public fallback is
 `info@funkspace.de`; its mailto link opens the visitor's mail application.
 FunkSpace does not send that fallback message itself. These are actual source
-facts. The supplied Production screenshot identifies an older deployed revision;
-it does not show this local candidate as deployed.
+facts for the delivery-disabled state. The supplied Production screenshot
+identifies an older deployed revision; no screenshot or local approval makes
+the new local candidate deployed or enabled.
 
 If the visitor sends an email from that mail application, their mail provider
 processes it and the recipient Workspace Gmail mailbox can receive it independently of

@@ -1174,7 +1174,7 @@ revision and validation: types/lint, 41 component/Node tests, both builds,
 notice is an operator content decision, not legal certification; later TLM,
 storage/access and actual-account follow-up remains separate. At that closure the server
 recipient stayed Gmail; Dimi subsequently approved `info@funkspace.de` on
-2026-10-27 in the [dated EPIC 5 amendment](FunkSpace_EPIC_5_Detailed_Plan.md#fs-56-recipient-and-setup-amendment--2026-10-27). Live delivery stays source-locked off.
+2026-10-27 in the [dated EPIC 5 amendment](FunkSpace_EPIC_5_Detailed_Plan.md#fs-56-recipient-and-setup-amendment--2026-10-27). The deployed `b829447` candidate remains source-locked off; the later approved local configuration-gate/Privacy change is recorded under FS-5.6 below.
 DMARC remains unpublished. External activation prerequisites and EPIC 5/FS-G2
 remain open; FS-5.6 local preparation is now recorded below. No merge, deployment, external settings or
 live send is included in the authorized Git delivery.
@@ -1193,7 +1193,7 @@ live send is included in the authorized Git delivery.
 
 #### FS-5.6 — Verify end-to-end delivery and failure recovery
 
-**Current status — 2026-10-27:** Local preparation complete from clean `ad2e98e1ff433c9d5942692bc722f0198ba12b46`. Independent read-only server/security and UI reviews pass for the disabled candidate. The [FS-5.6 evidence/handoff](../tasks/fs-5.6-contact-acceptance.md) records bounded notice preparation, mocked whole-journey tests and isolated checks. The [controlled Preview procedure](../development/contact-acceptance.md) separates delivery-off protection tests from the later maximum-one-message acceptance. Sending stays source-locked off and DMARC unpublished. Deployed WAF/alias enforcement, activation-copy/account review, separately authorized Preview/live test and Dimi mailbox receipt remain pending; FS-5.6, EPIC 5 and FS-G2 are not complete. EPIC 4 remains closed; EPIC 6 has not begun.
+**Current status — 2026-10-27:** Initial local preparation delivered at `b829447`; that deployed candidate remains source-locked off. The [protected-Preview/provider follow-up](../tasks/fs-5.6-contact-acceptance.md#protected-preview-and-provider-approval--2026-10-27) records observed branch limiter/recovery PASS, scoped key/Free allowance and Dimi’s approval of Resend terms/DPA/US processing. Dimi subsequently approved the exact bounded source/Privacy proposal and its local application. The local candidate defaults off through the exact configuration gate and remains disabled; reported nonsecret configuration and the full Preview branch are operator-confirmed, not independently verified deployed values. Original preparation began from clean `ad2e98e1ff433c9d5942692bc722f0198ba12b46`; this follow-up starts from `b829447`. Independent read-only reviews and isolated mocked checks are recorded in the [FS-5.6 evidence/handoff](../tasks/fs-5.6-contact-acceptance.md). The [controlled Preview procedure](../development/contact-acceptance.md) separates delivery-off protection tests from the later maximum-one-message acceptance. Broader deployed WAF/alias coverage, separately authorized enabling/live test, Dimi mailbox receipt and shutdown remain pending. Source/copy approval grants no Git delivery, deployment, settings, enabled-switch, live-mail, revocation or DMARC action; DMARC remains unpublished. FS-5.6, EPIC 5 and FS-G2 are not complete. EPIC 4 remains closed; EPIC 6 has not begun.
 
 **Lead:** Codex
 

@@ -2,7 +2,7 @@
 
 ## Plan metadata
 
-- **Status:** FS-5.1/5.2 complete; FS-5.3 local technical PASS with external protection/coverage pending. FS-5.4 technical PASS/F1 closure and Dimi phone/accessibility acceptance delivered at `9ba16f8`; device/per-check and separate design/wording details remain unspecified. FS-5.5 is complete: Dimi accepted the current legal/contact copy and operating documentation, explicitly closed the task and authorized commit/push on 2026-10-15; validation passes. Account/external/live prerequisites remain separate. Delivery stays locked off; FS-5.6 local preparation is complete, with deployed protection and live acceptance pending. See the [FS-5.6 record](../tasks/fs-5.6-contact-acceptance.md).
+- **Status:** FS-5.1/5.2 complete; FS-5.3 local technical PASS with broader external protection/coverage pending. FS-5.4 technical PASS/F1 closure and Dimi phone/accessibility acceptance delivered at `9ba16f8`; device/per-check and separate design/wording details remain unspecified. FS-5.5 is complete: Dimi accepted its legal/contact copy and operating documentation and explicitly closed the task on 2026-10-15. FS-5.6 initial local preparation was delivered at `b829447`; that deployed candidate remains source-locked off. Dimi approved Resend terms/DPA/US processing and the later exact source/public-copy proposal, now applied locally with a default-off configuration gate and delivery disabled. The observed branch limiter/recovery test passes; reported nonsecret configuration/full branch is operator-confirmed. Broader deployed coverage, separately authorized enabling/live acceptance, receipt and shutdown remain pending. EPIC 5/FS-G2 are not complete. See the [FS-5.6 record](../tasks/fs-5.6-contact-acceptance.md).
 - **Owner:** Codex for contract/server preparation; Sites for FS-5.4; Dimi for product, legal and external approvals.
 - **Parent authority:** [Minimum Usable Experience](funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling) owns milestone status and gates. This linked plan owns EPIC 5 detail; the [FS-5.1 record](../tasks/fs-5.1-contact-contract.md) owns execution evidence.
 - **Last updated:** 2026-10-27. **Official-document checks:** Original FS-5.1 checks 2026-10-13; focused FS-5.5 provider/platform/Google facts rechecked 2026-10-14; Workspace/DNS/Google/Vercel mail-setup follow-up 2026-10-15.
@@ -55,7 +55,20 @@ records Resend verification, the published WAF rule and the older protected
 Preview separately from unverified enforcement/account settings. The
 [controlled acceptance procedure](../development/contact-acceptance.md) is the
 next-step authority for evidence, not permission to execute external actions.
-The source lock stays false; DMARC remains deliberately unpublished.
+The deployed `b829447` source lock stays false; DMARC remains deliberately
+unpublished.
+
+Dimi subsequently approved the exact bounded seven-file source/public-copy
+proposal and its local application. The local candidate removes the temporary
+source lock while retaining exact `CONTACT_ENABLED=true` plus valid configuration
+as the delivery gate; sending remains disabled. Static Privacy wording points
+to `/contact` for availability and describes processing when the form is available.
+The deployed `b829447` candidate retains its literal false source lock. Dimi
+confirmed `CONTACT_FROM`, `CONTACT_TO`, `CONTACT_ALLOWED_ORIGINS` and the full
+Preview branch; independent deployed-value verification remains separate.
+This approval does not authorize Git delivery, deployment, settings changes,
+enabling, live email, key revocation or DMARC publication, and does not complete
+FS-5.6, EPIC 5 or FS-G2.
 
 ## Current repository evidence
 
@@ -202,22 +215,23 @@ Provider policy marketing is not a legal assessment. Dimi reviews purpose/legal 
 
 ### Account settings and external actions: unverified and pending
 
-The dated 27 October setup register above now proves domain verification and
-rule publication. The account-review/enforcement gates below remain pending;
-read their specific evidence qualifications rather than treating all setup as unknown.
+The dated 27 October follow-up now records domain verification, scoped key,
+Free allowance, Dimi’s terms/DPA/US-processing approval and observed branch
+limiter/recovery evidence. The remaining items below retain their specific
+limits; no all-alias or legal certification is implied.
 
-| Prerequisite                                                                            | Owner / latest gate                                                                                                                                             |
-| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Actual Vercel plan/use eligibility, billing and spare WAF slot                          | Dimi supplies account evidence; Codex verifies at FS-5.3 before enabling                                                                                        |
-| Exact protected preview URL/revision, protection method/scope, reviewer access, aliases | Dimi authorizes deployment/access changes separately; Codex verifies before live acceptance                                                                     |
-| Resend account restrictions/quota/overages, signed DPA, terms and subprocessors         | Dimi reviews actual account; required before sender setup/live enabling                                                                                         |
-| Sender domain `mail.funkspace.de`, selected region, verification status, tracking off   | Domain/region verification evidenced 2026-10-27; tracking and actual sender configuration still pending                                                         |
-| Exact SPF/DKIM/return-path records and DMARC interaction                                | Obtain actual records, inventory existing website/mailbox DNS, prepare a reviewable change, then obtain action-specific approval; no record values guessed here |
-| Fixed recipient/Reply-To behavior, scoped secrets and exact origin allowlist            | Dimi securely configures approved scope; Codex verifies without exposing values                                                                                 |
-| Complete legal/operator content and six-month mailbox policy operation                  | Dimi supplies/approves; Sites publishes at FS-5.5 before enabling                                                                                               |
-| Provider acceptance and Gmail receipt of exact controlled message                       | Separate live-send authorization at FS-5.6; Dimi verifies receipt                                                                                               |
+| Prerequisite                                                                            | Owner / latest gate                                                                                                                           |
+| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Actual Vercel plan/use eligibility, billing and spare WAF slot                          | Hobby and published rule observed; wider coverage, eligibility and billing remain within the stated account-review limits                     |
+| Exact protected preview URL/revision, protection method/scope, reviewer access, aliases | Dimi authorizes deployment/access changes separately; Codex verifies before live acceptance                                                   |
+| Resend account restrictions/quota/overages, signed DPA, terms and subprocessors         | Free quota and scoped key observed; downloaded DPA reviewed and Dimi approved terms/DPA/US processing; do not infer independent certification |
+| Sender domain `mail.funkspace.de`, selected region, verification status, tracking off   | Domain/region verified; no configured tracking domain shown, saved flags not retrieved; deployed sender value still needs confirmation        |
+| Exact SPF/DKIM/return-path records and DMARC interaction                                | Actual Forge TXT/two-CNAME and Google MX evidence recorded; DMARC remains unpublished, no further DNS action authorized                       |
+| Fixed recipient/Reply-To behavior, scoped secrets and exact origin allowlist            | Recipient info@ approved; sending/domain-scoped key verified; exact sender/recipient/origin values and full scope still await confirmation    |
+| Complete legal/operator content and six-month mailbox policy operation                  | FS-5.5 accepted and closed; future enabled-state copy approval and documented mailbox operation remain separate                               |
+| Provider acceptance and Gmail receipt of exact controlled message                       | Separate live-send authorization at FS-5.6; Dimi verifies receipt                                                                             |
 
-Proposed platform rule only: method POST AND exact path `/api/contact`, five requests per IP per ten-minute fixed window, default `429`. FS-5.3 verifies availability, remaining rule slots, actual settings and every reachable production/deployment/branch/preview/custom-domain alias. Delivery remains disabled where protection is missing. Exercise limits with sending disabled and confirm bypass/exemption interactions. Regional counters, window boundaries and distributed IPs can exceed an apparent global cap; shared IPs can block legitimate visitors. No Redis or process-local production limiter for this version, no claim of a global send cap. If actual platform availability/coverage fails, keep delivery off and return for a scoped protection decision. No paid upgrade or firewall change is preauthorized.
+Published platform rule with narrow branch-run/reset PASS: method POST AND exact path `/api/contact`, five requests per IP per ten-minute fixed window, default `429`. FS-5.3 verifies availability, remaining rule slots, actual settings and every reachable production/deployment/branch/preview/custom-domain alias. Delivery remains disabled where protection is missing. Exercise limits with sending disabled and confirm bypass/exemption interactions. Regional counters, window boundaries and distributed IPs can exceed an apparent global cap; shared IPs can block legitimate visitors. No Redis or process-local production limiter for this version, no claim of a global send cap. If actual platform availability/coverage fails, keep delivery off and return for a scoped protection decision. No paid upgrade or firewall change is preauthorized.
 
 ## Six-task delivery sequence and acceptance gates
 
@@ -328,7 +342,7 @@ preview/live acceptance prerequisites remain separate; FS-5.6 local preparation 
 
 ### FS-5.6 — Verify end-to-end delivery and failure recovery
 
-**Current status — 2026-10-27:** Local preparation complete; independent review and mocked integration checks are recorded in the [FS-5.6 handoff](../tasks/fs-5.6-contact-acceptance.md). Source lock remains false, DMARC unpublished; deployed protection and live provider/receipt acceptance are pending. No EPIC 5/FS-G2 completion or EPIC 6 start.
+**Current status — 2026-10-27:** Initial local preparation delivered at `b829447`; that deployed candidate remains source-locked off. The [protected-Preview/provider follow-up](../tasks/fs-5.6-contact-acceptance.md#protected-preview-and-provider-approval--2026-10-27) records narrow branch limiter/reset evidence and Dimi’s Resend terms/DPA/US-processing approval. Dimi approved the later exact source/Privacy proposal and its local application; the local candidate defaults off through the exact configuration gate and remains disabled. Nonsecret configuration and the full Preview branch are operator-confirmed, without independent deployed-value verification. Broader deployed coverage, separately authorized enabling and one live acceptance, receipt and shutdown remain pending. No Git/external-action authority or EPIC 5/FS-G2 completion is implied; DMARC stays unpublished and EPIC 6 has not started.
 
 **Lead:** Codex. **Counterpart:** Sites fixes UI findings. **Dimi:** specifically authorizes live sending and verifies recipient receipt.
 
@@ -359,4 +373,4 @@ Run Domain/Application/Infrastructure tests explicitly: current coverage configu
 
 ## Implementation handoff
 
-Start the next session with the [current FS-5.6 handoff](../tasks/fs-5.6-contact-acceptance.md#handoff), the preceding [FS-5.5 presentation handoff](../tasks/fs-5.5-legal-presentation.md#handoff), preserved [technical evidence](../tasks/fs-5.5-contact-operations.md), delivered [FS-5.4 manual acceptance](../tasks/fs-5.4-manual-preview.md#handoff), [FS-5.3 predecessor](../tasks/fs-5.3-contact-protection.md#handoff) and a fresh actual branch/HEAD/status check. Confirm repository and intentional-diff access; chats do not automatically share working files. The FS-5.6 local base is `ad2e98e1ff433c9d5942692bc722f0198ba12b46`; the earlier FS-5.5 integration parent `fe2d074` remains historical provenance. No reset or secret transfer. FS-5.4 technical PASS/F1 closure and Dimi's reported phone/accessibility acceptance stand; Dimi separately accepted the legal copy and closed FS-5.5. Actual account/protection/live gates and FS-G2 remain open; use the current [FS-5.6 handoff](../tasks/fs-5.6-contact-acceptance.md) for local preparation.
+Start the next session with the [current FS-5.6 handoff](../tasks/fs-5.6-contact-acceptance.md#handoff), the preceding [FS-5.5 presentation handoff](../tasks/fs-5.5-legal-presentation.md#handoff), preserved [technical evidence](../tasks/fs-5.5-contact-operations.md), delivered [FS-5.4 manual acceptance](../tasks/fs-5.4-manual-preview.md#handoff), [FS-5.3 predecessor](../tasks/fs-5.3-contact-protection.md#handoff) and a fresh actual branch/HEAD/status check. Confirm repository and intentional-diff access; chats do not automatically share working files. Initial FS-5.6 preparation began at `ad2e98e1ff433c9d5942692bc722f0198ba12b46`; the approved local configuration-gate/Privacy follow-up starts from `b829447`. Deployed `b829447` retains its source lock; the new local candidate is default-off and disabled. The earlier FS-5.5 integration parent `fe2d074` remains historical provenance. No reset or secret transfer. FS-5.4 technical PASS/F1 closure, Dimi's reported phone/accessibility acceptance and FS-5.5 closure stand. Broader deployed protection, separately authorized enabling/live acceptance, receipt, shutdown and FS-G2 remain pending; source/copy approval does not grant Git or external-action authority.

@@ -31,8 +31,8 @@ for (const javaScriptEnabled of [true, false]) {
               "Google Workspace",
               "funkspace.motion.preference.v1",
               "six calendar months",
-              "Form delivery is currently disabled",
-              "If form delivery is enabled after a separate release decision",
+              "shows whether form submission is available",
+              "When the form is available, submitting sends",
               "through Resend to the Google Workspace inquiry mailbox",
               "not arrival in the mailbox",
               "United States",
@@ -41,6 +41,15 @@ for (const javaScriptEnabled of [true, false]) {
               "page memory only",
             ])
               await expect(article).toContainText(text);
+            const formDisclosure = article.getByRole("region", {
+              name: "Contact form and drafts",
+            });
+            await expect(
+              formDisclosure.getByRole("link", { name: "Contact page" }),
+            ).toHaveAttribute("href", "/contact");
+            await expect(formDisclosure).not.toContainText(
+              "Form delivery is currently disabled",
+            );
             await expect(
               article.getByRole("link", { name: /TLfDI/ }),
             ).toHaveAttribute("href", "https://tlfdi.de/kontakt/");

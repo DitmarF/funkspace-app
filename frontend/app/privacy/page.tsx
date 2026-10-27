@@ -1,5 +1,6 @@
 import PortfolioShell from "@/components/Layouts/PortfolioShell";
 import type { Metadata } from "next";
+import Link from "next/link";
 import ButtonLink from "@/components/Controls/ButtonLink";
 import { contactEmail, contactHref } from "@/data/contactContent";
 
@@ -97,30 +98,31 @@ export default function PrivacyPage() {
             Contact form and drafts
           </h2>
           <p className="text-portfolio-body">
-            Form delivery is currently disabled. No form content is sent to
-            Resend, the planned email delivery service. Please use the email
-            alternative. The prepared form has an optional Name field and
-            required Email and Message fields. This notice will be reviewed
-            before real form delivery is enabled.
+            The{" "}
+            <Link href="/contact" className="text-fs-content-primary underline">
+              Contact page
+            </Link>{" "}
+            shows whether form submission is available. The form has an optional
+            Name field and required Email and Message fields. If form submission
+            is disabled, please use the email alternative.
           </p>
           <p className="text-portfolio-body">
-            If form delivery is enabled after a separate release decision,
-            submitting will send your optional name, required email address and
-            message from your browser to the website’s Vercel server, then
-            through Resend to the Google Workspace inquiry mailbox. A submission
-            identifier identifies unchanged manual retries. The planned setup
-            uses plain-text email, your validated email address for replies, and
-            no automatic replies or open/click tracking. Provider acceptance
-            confirms acceptance for delivery, not arrival in the mailbox.
+            When the form is available, submitting sends your optional name,
+            required email address and message from your browser to the
+            website’s Vercel server, then through Resend to the Google Workspace
+            inquiry mailbox. A submission identifier allows an unchanged manual
+            retry to be recognized. This delivery uses plain-text email, your
+            validated email address for replies, and no automatic replies or
+            open/click tracking. Provider acceptance confirms acceptance for
+            delivery, not arrival in the mailbox.
           </p>
           <p className="text-portfolio-body">
             Resend’s selected sending region is Ireland. This does not mean
             EU-only storage: Resend stores message content and delivery records
             in the United States. Resend publishes standard email and log
-            retention of 30 days and backup retention of seven days, separate
-            from my mailbox cleanup policy. The applicable account terms and
-            storage settings must be verified before form delivery is enabled.
-            See{" "}
+            retention of 30 days and backup retention of seven days. Retention
+            depends on the applicable plan and storage settings and is separate
+            from my mailbox cleanup policy. See{" "}
             <a
               href="https://resend.com/security/gdpr"
               className="text-fs-content-primary underline"

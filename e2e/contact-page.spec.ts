@@ -9,7 +9,7 @@ import {
 const email = "info@funkspace.de";
 
 // Mock only the serialized safe availability boolean in an otherwise real page.
-// The fresh server stays source-locked off, has no mail key, and denies fetch.
+// The fresh server is explicitly disabled, has no mail key, and denies provider egress.
 // No test switch/fake adapter is shipped in the application.
 async function controlledPage(page: Page) {
   await page.route(

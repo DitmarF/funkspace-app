@@ -4,15 +4,10 @@ import { readContactConfiguration } from "@/infrastructure/contact/ContactConfig
 import { createContactRequestHandler } from "@/infrastructure/contact/ContactRequestHandler";
 import { ResendContactDelivery } from "@/infrastructure/contact/ResendContactDelivery";
 
-// FS-5.2 is local implementation only. Remove this lock only in an explicitly
-// authorized candidate after protection, account/legal and preview gates pass.
-const CONTACT_DELIVERY_RELEASED = false;
-
 export function createContactServerServices() {
   const configuration = readContactConfiguration({
-    CONTACT_ENABLED: CONTACT_DELIVERY_RELEASED
-      ? process.env.CONTACT_ENABLED
-      : undefined,
+    // Delivery defaults off; only exact true plus valid configuration enables it.
+    CONTACT_ENABLED: process.env.CONTACT_ENABLED,
     CONTACT_ALLOWED_ORIGINS: process.env.CONTACT_ALLOWED_ORIGINS,
     get RESEND_API_KEY() {
       return process.env.RESEND_API_KEY;

@@ -262,13 +262,16 @@ never imply acceptance or confirmed non-delivery. Timers/controllers are
 released on every settled outcome; there is no automatic retry or process-local
 production limiter.
 
-Live delivery is locked off by `CONTACT_DELIVERY_RELEASED = false` in server
-composition, independently of environment values. Credential/identity getters
-are not read while off. Missing/invalid configuration fails closed; origin and
-validation rejections retain their precedence. Removing the lock requires a
-separately authorized candidate after account/legal, deployed protection and
-preview gates pass. See [server setup](development/contact-server.md) and
-[FS-5.2 evidence](tasks/fs-5.2-contact-server.md).
+Current local server composition defaults delivery off and requires exact
+`CONTACT_ENABLED=true` plus valid origins, credential and fixed identities to
+construct delivery. Credential/identity getters are not read while off or when
+origins are invalid. Missing/invalid configuration fails closed; origin and
+validation rejections retain their precedence. Dimi approved applying this
+bounded source change locally during FS-5.6; delivery remains disabled. The
+deployed `b829447` candidate still has `CONTACT_DELIVERY_RELEASED = false` and
+cannot be enabled by environment values. Deployment, enabling and live sending
+need separate specific authorization. See [server setup](development/contact-server.md)
+and the historical [FS-5.2 evidence](tasks/fs-5.2-contact-server.md).
 
 FS-5.3 retains the established origin/media/trap rejection path and adds only
 server-boundary diagnostics. `ContactDiagnostics` projects a typed response
@@ -279,7 +282,8 @@ content, credentials or raw errors enter these application events. Platform
 logs are separate and require actual account retention/access review.
 The [operating guide](development/contact-operations.md) records the proposed
 edge WAF rule and pending preview/alias coverage; there is no local production
-counter or claimed deployed protection. Delivery remains locked off.
+counter or claimed deployed protection at that task's closure. Its source lock
+remained in place until the later approved FS-5.6 local candidate below.
 
 FS-5.4 implements browser submission through the existing `createServices` and
 `ServiceProvider` controlled-fixture convention, exposing only the application
@@ -310,8 +314,8 @@ Storybook. Its stable injected port wraps the actual browser adapter with fake
 fetch, page-memory request counts/IDs and a fixture-only retry-clock offset.
 There is no production flag/route/global fetch replacement. Static local serving
 has no API/provider path; fixture imports and controls are checked absent from
-production bundles. Real no-JavaScript/navigation checks use a separate source-
-locked, credential-free, fetch-denied Next preview.
+production bundles. Real no-JavaScript/navigation checks use a separate explicitly
+disabled, credential-free, fetch-denied Next preview.
 
 FS-5.5's [processing/storage facts](development/contact-processing-facts.md) and
 [operating guide](development/contact-operations.md) document the current disabled
@@ -321,15 +325,30 @@ The later FS-5.5 presentation replaces legal placeholders and uses the tested
 public Workspace alias; Dimi accepted that copy and explicitly closed FS-5.5 on
 2026-10-15. The [closure/handoff](tasks/fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15)
 preserves operator approval separately from legal certification and live
-acceptance. No storage or architecture boundary changes; delivery stays locked
-off and actual external activation prerequisites remain pending.
+acceptance. No storage or architecture boundary changes; at that closure delivery
+stayed source-locked off. External activation prerequisites remain separate.
 
 FS-5.6 adds a mocked cross-layer contact journey and availability-consistent
-contact/conditional future-processing disclosures. It adds no runtime service,
-storage, retry mechanism or dependency. The source release lock remains false.
+contact/conditional processing disclosures. It adds no runtime service, storage,
+retry mechanism or dependency. Initial local preparation delivered at `b829447`
+retained the false source release lock.
 [FS-5.6 evidence](tasks/fs-5.6-contact-acceptance.md) and the
 [controlled acceptance procedure](development/contact-acceptance.md) distinguish
 local checks, deployed protection, provider acceptance and actual receipt.
+
+The later FS-5.6 [protected-Preview follow-up](tasks/fs-5.6-contact-acceptance.md#protected-preview-and-provider-approval--2026-10-27)
+records narrow deployed limiter/recovery evidence and provider approval. Dimi
+subsequently approved the exact bounded source/public-copy proposal, applied
+locally after `b829447`, and confirmed the three nonsecret configuration variables
+and full Preview branch. This is operator evidence, not independent verification
+of a new deployment. The local candidate removes the temporary source lock while
+preserving the exact enabled/configuration gate and uses static, availability-
+dependent Privacy wording. Delivery remains disabled; deployed `b829447` is
+unchanged and source-locked off. Test isolation uses an off switch, blank
+credentials, an environment-free snapshot and verified egress preloader.
+No new port/service/dependency or public contract is introduced. This approval
+does not authorize Git delivery, deployment, settings changes, enabling, live
+mail, key revocation or DMARC publication; acceptance and receipt remain pending.
 
 ## Service Injection
 

@@ -2,13 +2,19 @@
 
 ## Task metadata
 
-- **Status:** Blocked for external acceptance — local preparation complete. This is not overall FS-5.6 completion.
+- **Status:** In progress — delivery-off Preview test and provider approval recorded; the exact seven-file source/Privacy candidate is approved and applied locally, still configuration-gated off. Git/deployment/enabling/live acceptance remain separate. FS-5.6 is not complete.
 - **Task group or epic:** [EPIC 5](../features/funkspace-minimum-usable.md#epic-5--real-contact-delivery-privacy-and-failure-handling).
 - **Owner:** Codex independent integration/security review; Sites owns bounded presentation findings; Dimi owns external action, processing-copy and final mailbox acceptance.
 - **Last updated:** 2026-10-27.
 - **Actual base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `ad2e98e1ff433c9d5942692bc722f0198ba12b46`; clean at inspection. No reset or newer work overwritten.
 - **Previous handoff:** [FS-5.5 closure](fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15), contained in this base. Actual source/intentional changes are accessible locally; chats do not automatically share working files.
 - **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [detailed plan](../features/FunkSpace_EPIC_5_Detailed_Plan.md), [operations](../development/contact-operations.md), [acceptance procedure](../development/contact-acceptance.md).
+
+This record is chronological. The initial preparation and delivered `b829447`
+retain their dated false-source-lock facts. The latest local source/copy approval
+below supersedes earlier pending-copy/unapplied statements for the working tree
+only; it does not alter the existing disabled deployment or extend Git/live
+authorization.
 
 ## Requested outcome
 
@@ -25,15 +31,22 @@ changes or live email. Keep the source release lock false and DMARC unpublished.
 - [x] Prepare mocked whole-journey coverage and concrete external procedure with separate protection/provider/receipt evidence.
 - [x] Record completed focused checks and accessible final candidate artifact; exact results below.
 - [ ] Verify exact deployed candidate/configuration, authentication, WAF and every reachable live-enabled alias/path — external; not performed.
-- [ ] Dimi reviews conditional activation disclosure and actual account/terms/DPA/tracking/settings — pending; prior FS-5.5 acceptance stands.
+- [x] Dimi approved Resend under its terms/DPA, including disclosed US processing, on 2026-10-27. Key permission/domain and Free quota are evidenced.
+- [x] Dimi approved the exact reviewed seven-file source/Privacy candidate and confirmed the three non-secret Preview values/branch scope. These operator confirmations are not independent retrieval of deployed account values.
+- [ ] Verify the new deployment's effective configuration/coverage after separately authorized Git/deployment/enabling. Tracking UI shows no configured domain; literal saved tracking flags were not retrieved. Prior FS-5.5 acceptance stands.
 - [ ] Separately authorize and perform no more than one controlled live submission; verify provider acceptance, Dimi receipt, headers and shutdown separately — not authorized/performed.
 - [ ] Dimi accepts FS-5.6/EPIC 5; only then may FS-G2 be evaluated. EPIC 6 has not started.
 
 ## Context and repository evidence
 
+This section describes the initial preparation at `ad2e98e`; the later
+`b829447` follow-up and local source/copy application below supersede its
+current-at-inspection statements. It is not a claim that the approved working
+tree still contains the temporary source lock.
+
 - **Instructions/plans:** Root AGENTS, architecture contact/composition sections, AI workflow, task/feature templates, authoritative/detailed plans, FS-5.1 contract/amendment, FS-5.2 server, FS-5.3 protection, FS-5.4 UI/F1/manual acceptance, FS-5.5 technical/legal closure and FS-4.8 closure.
 - **Actual source:** Pure validation/types/result parser, use case/ports, configuration/bounded reader/request handler/Resend/browser adapter/diagnostics, server and browser composition, Node route, form, shared navigation, contact/legal pages, storage adapters and focused test configurations/fixtures.
-- **Current behavior:** Literal `CONTACT_DELIVERY_RELEASED = false`; configuration cannot enable sending. Server-rendered disabled fields and `info@funkspace.de` fallback work without JavaScript. No contact draft persistence, queue or automatic retries.
+- **Initial/deployed `b829447` behavior:** Literal `CONTACT_DELIVERY_RELEASED = false`; configuration cannot enable sending. Server-rendered disabled fields and `info@funkspace.de` fallback work without JavaScript. No contact draft persistence, queue or automatic retries. The later approved local candidate uses the explicit configuration gate instead, as recorded below.
 - **Source provenance:** Supplied screenshots and user-reported account actions are evidence with limits, not action permission. [27 October register](../development/contact-operations.md#setup-evidence--2026-10-27) records Resend/DNS/WAF/Preview facts separately from unverified enforcement/settings.
 - **Accepted history:** FS-5.1–5.5 and EPIC 4 closure remain intact. No new phone, visual, assistive-technology, deployed-protection or legal certification is inferred.
 
@@ -44,6 +57,10 @@ changes or live email. Keep the source release lock false and DMARC unpublished.
 - **Open decisions:** Actual activation-copy/account review, exact future deployment revision/immutable URL, complete WAF/protection coverage and action-specific external authorization. Deadline Thursday 29 October does not waive these gates.
 
 ## Scope
+
+The following is the initial `ad2e98e` preparation scope. The later exact
+seven-file local source/copy approval below extends only local application;
+external operations and live acceptance remain separately authorized.
 
 ### In scope
 
@@ -82,6 +99,10 @@ billing changes, DMARC publication, Git commit/push/merge and EPIC 6.
 3. Run isolated checks, inspect final diff and publish only a local handoff.
 
 ## Dependencies and risks
+
+These dependencies/risks record initial preparation at `ad2e98e`. Later
+evidence resolves the observed branch limiter, provider approval and exact
+source/copy decision only; the latest follow-up records their remaining limits.
 
 - **Internal:** Accepted FS-5.1 contract and FS-5.2–5.5 implementations; no dependency/version change.
 - **External:** Existing provider/platform/mailbox accounts only; no new service or paid upgrade selected.
@@ -182,3 +203,107 @@ push may trigger Vercel's existing Preview automation; no deployment result is
 inferred from Git delivery. Explicit deployment/settings changes, deployed
 firewall requests and live email still need their own authorization. FS-5.6,
 EPIC 5 and FS-G2 acceptance remain pending; EPIC 4 stays closed.
+
+## Protected Preview and provider approval — 2026-10-27
+
+### Follow-up starting base and scope — before later local application
+
+This follow-up inspected clean `b8294476bfd3a20e703c14362f4f797663b59dac`
+on `feature/funkspace-minimum-usable`. The earlier local/Git delivery record
+above remains historical evidence. Actual runtime source stays unchanged with
+`CONTACT_DELIVERY_RELEASED = false`. Only documentation is applied by this
+preparation; a separate seven-file activation proposal is staged and tested in an
+isolated snapshot. It has not been applied, committed, pushed or deployed.
+
+The receiving chat must distinguish the current checked-out code, these local
+documentation changes and the separately proposed activation patch. No chat
+automatically shares working files. The new local artifact is
+`artifacts/fs-5.6-preview-test-preparation-2026-10-27` in the ChatGPT project
+workspace; its manifests/patches identify both scopes and exact hashes.
+
+### Verified or reported external evidence
+
+| Evidence                       | Result and limit                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 14:29 deployment screenshot    | `funkspace-app-frontend`, Preview Ready/Latest, branch `feature/funkspace-minimum-usable`, commit `b829447`. Stable branch origin and immutable URL `https://funkspace-app-frontend-jdo52g9dg-ditmarfs-projects.vercel.app` are displayed. No later activation deployment exists in this evidence.                                                                                                                                                                                                                          |
+| Protection and availability    | Dimi reports private-window login requirements on both URLs/page/API checks and confirms `CONTACT_ENABLED=false`. Screenshot shows disabled fields/button, availability notice and `info@funkspace.de` fallback. This is operator-reported authentication coverage, not an independent bypass/path inventory.                                                                                                                                                                                                               |
+| 14:42 bounded invalid-body run | The supplied console script sent six `{}` JSON POSTs from the verified branch origin. Requests 1–5 returned `400/rejected/invalid_shape`; request 6 returned 429. Start recorded as `2026-10-27T13:42:07.731Z`. No valid form submission or provider test was made.                                                                                                                                                                                                                                                         |
+| 14:47 firewall screenshot      | Filter **Contact form rate limit**, **Rate Limited: 1**, matching 14:42 spike, `/api/contact` count 1 and branch-host prefix. Aggregate rule attribution corroborates the sixth 429; individual blocked-request trace was not available in that view.                                                                                                                                                                                                                                                                       |
+| 14:51 runtime screenshot       | Five `contact_outcome` entries at 14:42:08.55, .72, .88, 14:42:09.06 and .22 CET, each `httpStatus:400`, `outcome:rejected`, `code:invalid_shape`. No human fields or identifiers appear in those application events. Screenshot does not establish exhaustive absence of another invocation or independent environment/deployment filters.                                                                                                                                                                                 |
+| 14:53 recovery screenshot      | One additional `{}` request returned `400/rejected/invalid_shape` after more than ten minutes. Seven invalid requests total; no further batch/retry budget is implied. Narrow observed limiter/recovery PASS for this branch Preview/run only. Counter region and other-alias/path coverage were not captured.                                                                                                                                                                                                              |
+| 14:58 domain Configuration     | `mail.funkspace.de` Verified, Forge enabled, Ireland. Enable tracking metrics offers Configure with no configured tracking domain displayed; the earlier new-domain wizard was unsaved. This is UI evidence consistent with unconfigured tracking, not individual saved-boolean verification. Opportunistic TLS is shown; no setting changed.                                                                                                                                                                               |
+| 15:00 key screenshot           | **FunkSpace contact preview**, Sending access, restricted to `mail.funkspace.de`, 0 uses/no activity at that time. Token/creator details are intentionally omitted.                                                                                                                                                                                                                                                                                                                                                         |
+| 15:03 Usage screenshot         | Transactional **Free**, 0/3,000 monthly and 0/100 daily; rate limit 10 requests/second. No upgrade selected or quota reserved.                                                                                                                                                                                                                                                                                                                                                                                              |
+| Downloaded DPA                 | Read-only review of the 19-page signed vendor PDF dated 2025-12-31; company signature visually present. Preamble/section 12 link applicability to the service agreement; section 6 covers primary US processing/SCCs; Exhibit A covers metadata/addresses/content and deletion within 90 days after account termination. Active email/log and backup periods are separate public-policy facts. Source unchanged; hash and clause review retained locally. No legal certification or account acceptance-date proof inferred. |
+| Dimi's provider decision       | “I approve using Resend for the contact form under its terms and DPA, including the disclosed US processing. Let’s continue preparing the protected Preview test.” This supplies provider-choice/terms approval. It does not approve the exact new public copy, source release, settings, Git/deployment or a live send.                                                                                                                                                                                                    |
+
+The earlier yellow runtime warning at 13:59:58.50 concerns `/` and an unexpected
+Server Action identifier, outside the six 14:42 `/api/contact` probes. Its cause
+remains unverified; retain it for the release review without calling it a contact
+failure or silently changing framework settings. No EPIC 6 work starts here.
+
+### Prepared activation proposal — before later local approval
+
+The proposed patch removes the obsolete unconditional source lock only after
+specific approval. Existing exact `CONTACT_ENABLED=true` and complete validated
+configuration remain mandatory; default/missing/false/invalid cases fail closed.
+No wire contract, provider payload, retry, origin, timeout, diagnostics, form or
+navigation behavior changes. Privacy becomes truthful across both availability
+states and points to `/contact` for current availability; Dimi's exact copy
+approval remains pending.
+
+Future browser checks retain the environment-file-free absolute snapshot,
+fresh server, false switch, blank credentials and verified egress preloader.
+The obsolete literal-source-lock assertion is replaced by required preloader
+presence for that future candidate. Mocked configured composition uses an
+explicit synthetic fetch stub; no native provider transport is possible.
+
+### Follow-up validation and handoff
+
+- Proposed-candidate focused checks PASS in `/private/tmp/funkspace-fs56-activation-check-2026-10-27`, using a whitelist launcher, no environment files, blank credentials, `CONTACT_ENABLED=false`, verified loopback-only fetch/HTTP preloader and fresh server. No provider egress attempt recorded.
+  - `pnpm exec vitest run --config vitest.contact.config.ts --coverage`: 294 tests, 11 files; statements 99.15%, branches 98.28%, functions 93.33%, lines 99.69%; thresholds unchanged.
+  - `pnpm exec vitest run frontend/features/contact/ContactForm.test.tsx frontend/features/contact/manual/ManualContactSubmission.test.ts frontend/components/Layouts/PortfolioShell.test.tsx frontend/app/contact/page.test.tsx`: 64 tests, 4 files.
+  - `pnpm typecheck:validation`: PASS.
+  - `pnpm -F frontend exec next lint --max-warnings=0 --file infrastructure/services/createContactServerServices.ts --file infrastructure/services/createContactServerServices.test.ts --file app/privacy/page.tsx --file components/Layouts/PortfolioShell.test.tsx`: PASS; existing Next lint deprecation notice only.
+  - `pnpm build`: PASS for the proposed candidate, with sending off and blank credentials.
+  - `pnpm exec playwright test --config playwright.fs56-activation-check.config.ts e2e/contact-page.spec.ts e2e/contact-legal.spec.ts e2e/static-route-contract.spec.ts e2e/portfolio-navigation.spec.ts`: 42 Chromium cases PASS. Snapshot-only config changes result paths; fresh-server safety is unchanged.
+  - Changed-file Prettier, links/incoming anchors, complete patches and actual protected-source hashes: PASS in the final artifact manifest.
+- Independent proposed-candidate review PASS: server reviewer reviewed UI/privacy/isolation; UI reviewer reviewed server/default-off/fake composition; procedure reviewer checked provenance/approval boundaries. The preloader was inspected and no denied-egress log exists; its mere file presence is not an integrity claim.
+- Storybook was not rebuilt/retested in this follow-up: its form/manual-fixture code is unchanged and the prior 11-case manual-browser result remains historical. No new phone, visual, assistive-technology, account-boolean or legal certification is inferred.
+- Actual documentation: local formatting, links/incoming anchors, scope and protected hashes are checked before applying.
+- Remaining input at preparation: the exact non-secret sender/recipient/origin values and full Preview branch scope were subsequently confirmed by Dimi below. No secret/account value was independently retrieved; the effective future deployment still needs verification.
+- Remaining acceptance: Git delivery, deployment/enabling and at most one named live message require separate authorization; record the new revision/immutable URL and applicable protection/configuration/coverage, then acceptance/receipt and verified shutdown. DMARC stays unpublished; Production stays off.
+
+### Exact source/Privacy approval and local application
+
+Dimi subsequently replied “All things are approved” to the exact reviewed
+seven-file source/Privacy candidate and the last question's three non-secret
+Preview values and branch scope. This accepts the reviewed public copy and
+authorizes applying that local candidate. The operator confirms the selected
+`CONTACT_FROM`, `CONTACT_TO`, exact selected-origin JSON and Preview branch scope;
+this is not independent account-value verification, and credentials remain hidden.
+
+The approved source/Privacy changes are applied locally above `b829447`; the final
+artifact identifies their exact hashes/diff. The temporary unconditional source
+lock is removed in the working tree. The existing exact `CONTACT_ENABLED=true`
+and complete valid configuration gate remains. Default/missing/false enablement
+and invalid origins do not read credentials. Invalid mail configuration also
+fails closed without creating a delivery adapter.
+Local/routine checks use false/blank configuration and verified egress denial.
+Any local running instance must be kept in that safe off state; local source
+approval does not authorize provider egress or live mail.
+
+Before importing source changes, the existing local Next.js server on port 3000
+was identified and stopped. A subsequent listener check found no listener on
+that port. It was not restarted under an unknown environment. No actual local
+environment value or secret was read to make this claim; a stopped instance is
+not evidence of its former configuration or an inventory of every other port.
+
+The observed deployed `b829447` and its stable/immutable URLs are unchanged and
+retain the false source lock. No new commit, push, deployment, external setting,
+`CONTACT_ENABLED=true`, live submission, credential revocation or DMARC
+publication is authorized/performed by this local application. Exact future
+revision/URL/configuration/protection, a separately authorized maximum-one-message
+test, provider acceptance, Dimi's receipt/headers and verified shutdown remain.
+Do not request the already supplied source/copy or provider approval again; FS-5.6,
+EPIC 5 and FS-G2 remain pending.

@@ -31,13 +31,20 @@ and the email fallback; sending remains blocked. The accepted
 no-`Button.pending`/no-`InlineStatus` amendment still applies. Server code and
 provider contracts remain unchanged.
 
-## Delivery is locked off
+## Delivery defaults off
 
-`CONTACT_DELIVERY_RELEASED` is false in server composition. Environment values
-cannot unlock it. Credentials/mail identities are lazy getters and are not read
-while off. Availability is false; valid requests from an allowed configured
-origin return `503/configuration_unavailable`. Missing/unapproved origins reject
-first with `403/origin_rejected`; malformed/invalid input retains its rejection.
+The current approved local candidate enables delivery only when
+`CONTACT_ENABLED` is exactly `true` and all server configuration is valid.
+It remains disabled. Credentials/mail identities are lazy getters and are not
+read while off or when origins are invalid. Valid requests from an allowed
+configured origin return `503/configuration_unavailable` while disabled.
+Missing/unapproved origins reject first with `403/origin_rejected`;
+malformed/invalid input retains its rejection.
+
+The deployed `b829447` candidate is unchanged: its additional
+`CONTACT_DELIVERY_RELEASED = false` lock cannot be unlocked by environment values.
+Dimi approved removing that temporary lock in the local candidate only. This
+does not authorize deployment, changing the enabled switch or live mail.
 
 No environment file or account setting is created or changed. Never put real
 credentials in prompts, documentation, fixtures, logs or review artifacts.
@@ -109,23 +116,38 @@ with `ContactJourney.test.ts`: the actual browser adapter, HTTP handler, use cas
 and Resend adapter are joined through injected in-process fakes. It covers
 matching acceptance, deterministic unchanged retry, uncertainty, provider quota
 versus non-JSON edge 429, rejection without delivery and full deadline cleanup.
-The source release lock is unchanged. Routine checks use a credential-free
+The initial preparation retained the source lock at `b829447`. Routine checks use a credential-free
 snapshot and deny external transport; no routine test calls the real provider.
 The [acceptance procedure](contact-acceptance.md) pins external action limits.
+
+## Protected Preview follow-up — 2026-10-27
+
+The [FS-5.6 follow-up](../tasks/fs-5.6-contact-acceptance.md#protected-preview-and-provider-approval--2026-10-27)
+records observed branch limiting/recovery, scoped key/Free allowance and Dimi’s
+Resend/DPA/US-processing approval. Dimi subsequently approved the exact bounded
+source/public-copy proposal and its application to the local candidate, retaining
+exact enabled/configuration gates and adding default/off, invalid and fully
+mocked configured-composition checks. He confirmed `CONTACT_FROM`, `CONTACT_TO`,
+`CONTACT_ALLOWED_ORIGINS` and the full Preview branch; their deployed values were
+not independently read. The local candidate remains disabled and has not been
+deployed; deployed `b829447` remains source-locked off. No routine check contacts
+a provider. Broader deployed configuration/coverage, separately authorized
+enabling and one live test, receipt and shutdown remain pending.
 
 ## External prerequisites remain pending
 
 The [FS-5.5 processing/storage facts and Dimi checklist](contact-processing-facts.md)
 and [operating procedures](contact-operations.md) are prepared from actual source
-and rechecked public documentation. They do not inspect/configure accounts or
-complete legal/publication/live acceptance; the release lock remains unchanged.
+and rechecked public documentation, with actual operator/account evidence in
+the dated follow-up. Dimi approved the source and Privacy copy; this is not legal
+certification, publication or live acceptance. Local source approval does not
+authorize Git delivery, deployment, settings changes, setting `CONTACT_ENABLED`
+to true, live mail, key revocation or DMARC publication.
 
-Removing the release lock requires Dimi's separate action/candidate authorization,
-actual account terms/DPA/legal review, sender-domain verification and securely
-scoped configuration. FS-5.3 must verify platform protection/capacity and all
-aliases/preview coverage; regional/distributed-abuse limits remain. FS-5.6 requires
-an authorized protected preview/message, with acceptance and receipt recorded
-separately. These instructions authorize no setup changes, deployment or live mail.
+Securely scoped configuration and all reachable live-enabled aliases/preview
+coverage must still be verified; regional/distributed-abuse limits remain.
+FS-5.6 requires a separately authorized protected preview/message, with provider
+acceptance, mailbox receipt and safe shutdown recorded separately.
 
 Official sources rechecked 2026-10-13: [Resend API](https://resend.com/docs/api-reference/emails/send-email),
 [API schema](https://github.com/resend/resend-openapi/blob/main/resend.yaml),

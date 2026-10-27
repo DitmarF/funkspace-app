@@ -1,5 +1,5 @@
 import { defineConfig } from "@playwright/test";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
 import { tmpdir } from "node:os";
 import base from "./playwright.config";
@@ -20,16 +20,11 @@ for (const directory of [workspace, join(workspace, "frontend")]) {
         "Contact E2E snapshot must contain no environment files.",
       );
 }
-if (
-  !readFileSync(
-    join(
-      workspace,
-      "frontend/infrastructure/services/createContactServerServices.ts",
-    ),
-    "utf8",
-  ).includes("const CONTACT_DELIVERY_RELEASED = false")
-)
-  throw new Error("Contact delivery must be source-locked off.");
+const egressPreloader = join(workspace, "deny-contact-egress.cjs");
+if (!existsSync(egressPreloader))
+  throw new Error(
+    "Contact E2E snapshot requires the egress-denying preloader.",
+  );
 
 export default defineConfig({
   ...base,
@@ -64,7 +59,7 @@ export default defineConfig({
       CONTACT_TO: "",
       CONTACT_ALLOWED_ORIGINS: '["http://127.0.0.1:33054"]',
       NEXT_TELEMETRY_DISABLED: "1",
-      NODE_OPTIONS: "--require=" + join(workspace, "deny-contact-egress.cjs"),
+      NODE_OPTIONS: "--require=" + egressPreloader,
     },
   },
 });

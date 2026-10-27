@@ -1,141 +1,165 @@
 # Contact acceptance — FS-5.6
 
-This guide prepares controlled acceptance; it does not authorize deployment,
-settings changes or live email. Delivery stays source-locked off and DMARC stays
-unpublished. [FS-5.6 evidence](../tasks/fs-5.6-contact-acceptance.md) records actual
-checks; [operations](contact-operations.md) owns ongoing procedures. EPIC 4 and
-FS-5.1–5.5 remain closed. FS-G2 waits for actual EPIC 5 acceptance; EPIC 6 has not
-started.
+This guide records bounded evidence and Dimi's approval of the exact local
+source/Privacy changes. The reviewed candidate is applied locally and remains
+configuration-gated off. Git delivery, deployment, external settings,
+`CONTACT_ENABLED=true`, live email and credential revocation remain separately
+authorized actions. The deployed `b829447` Preview is unchanged and source-locked
+off; DMARC remains unpublished.
+[Task evidence](../tasks/fs-5.6-contact-acceptance.md) and
+[operations](contact-operations.md) retain checks and operating procedures.
+FS-5.1–5.5 and EPIC 4 stay closed; FS-G2 waits for actual EPIC 5 acceptance.
+EPIC 6 has not started.
 
-## Candidate and evidence boundaries
+## Current candidate and observed evidence — 27 October 2026
 
-- Local preparation base: `feature/funkspace-minimum-usable` at
-  `ad2e98e1ff433c9d5942692bc722f0198ba12b46`. Pin the final commit and intentional
-  diff/artifact before authorizing a deployment; a moving branch alias alone
-  does not identify a candidate.
-- Intended stable preview origin:
+- Actual preparation base: `feature/funkspace-minimum-usable` at
+  `b8294476bfd3a20e703c14362f4f797663b59dac`; the checkout was clean at inspection.
+  That revision and the existing deployed Preview retain the literal false
+  source lock. Dimi subsequently approved the reviewed seven-file source/Privacy
+  candidate and confirmed the three non-secret Preview values and branch scope.
+  The local working tree now removes the temporary source lock; only exact
+  `CONTACT_ENABLED=true` with valid configuration can create a delivery adapter.
+  Missing/false/invalid configuration remains unavailable. No new commit or
+  deployment is inferred from local application.
+- Selected protected branch origin:
   `https://funkspace-app-frontend-git-feature-fun-606557-ditmarfs-projects.vercel.app`.
-  Record the new immutable deployment URL after separately authorized deployment.
-- The supplied existing Preview screenshot identifies `ad2e98e`, Ready, Legacy
-  Standard Protection and region `iad1`. An unauthenticated GET on 2026-10-27
-  redirects the stable alias to Vercel SSO. Neither verifies a future deployment
-  or protection of every immutable URL/alias.
-- Supplied Resend evidence shows `mail.funkspace.de`, Ireland (`eu-west-1`),
+  The observed off-only Preview identifies `b829447`; its immutable URL is
+  `https://funkspace-app-frontend-jdo52g9dg-ditmarfs-projects.vercel.app`. Record
+  the future candidate’s new immutable URL/revision before any send;
+  a moving alias alone does not identify a candidate. Earlier `ad2e98e`/`iad1`
+  screenshots are historical, not proof of the future deployment's region.
+- One approved off-only run produced five `400/invalid_shape` results followed
+  by one HTTP 429. Five categorical application entries at 14:42:08.55–09.22 CET
+  corroborate those rejections. A rule-filtered firewall view shows one rate
+  limit at 14:42 for `/api/contact` and the branch-host prefix. One further
+  invalid `{}` request after the reset showed recovery: seven invalid requests
+  total, no valid form submission. No additional probe budget remains implied.
+- That is narrow observed enforcement/recovery evidence, not proof of every
+  alias, region or path variant. Individual blocked-request tracing, exhaustive
+  function-log absence and the runtime screenshot's environment/deployment
+  filters were not independently established. Protection must cover `/contact`
+  and `/api/contact`, both the stable alias and immutable live-enabled URLs.
+- Resend evidence shows `mail.funkspace.de` Verified, Ireland (`eu-west-1`),
   Forge enabled, DKIM/two CNAME records Verified, sending on and receiving off.
-  Dimi reports creating a restricted key and saving branch-scoped Preview
-  variables; masked values and truncated branch labels are not verification of
-  their contents. Never retrieve or paste credentials into evidence.
-- Dimi approved `info@funkspace.de` as recipient. The fixed intended sender is
-  `FunkSpace <contact@mail.funkspace.de>`. Domain verification does not prove the
-  deployed values, account permissions, tracking settings or receipt.
-- Dimi's published/enabled WAF screenshot shows exact path `/api/contact`, AND
-  method POST, fixed window 600 seconds, five requests/IP and HTTP 429. Actual
-  Preview/alias enforcement remains unverified. No paid upgrade is selected.
+  The reviewed key is sending/domain restricted and showed zero uses; the Free
+  account view showed 0/3,000 monthly and 0/100 daily usage. These are dated
+  account observations, not reservations or future quota guarantees.
+- Configuration shows no configured tracking domain and offers Configure for
+  tracking setup; the earlier wizard was unsaved. Public defaults are off, but
+  saved open/click flags were not individually exposed. Do not label literal
+  tracking booleans verified false. Opportunistic TLS is shown; it does not
+  guarantee TLS on every mail hop.
+- Dimi explicitly approved using Resend for the form under the reviewed terms
+  and DPA, including disclosed US processing. This records his service decision,
+  not legal certification or authorization to deploy/send. His later “All things
+  are approved” accepts the exact reviewed source/Privacy candidate and confirms
+  the last question's three non-secret Preview values and branch scope. These are
+  operator approvals/reports, not independent account-value verification. The DPA
+  permits US processing and distinguishes
+  agreement-related retention from message/log policy and mailbox cleanup.
 
-## Local preparation
+## Local and delivery-off safeguards
 
-Record actual results in the task evidence before marking local checks complete.
-Use a clean isolated snapshot with no environment files, no usable credentials,
-`CONTACT_ENABLED=false`, literal `CONTACT_DELIVERY_RELEASED = false`, a fresh
-server and a verified egress-denying preloader. Inject provider/browser fakes;
-no routine test may contact Resend. Run the explicit Node contact-layer suite,
-affected component/type/lint checks, production bundling and focused browser
-checks. Test failure presentation, input preservation, edit/retry identity,
-expiry, duplicate submission guards and non-JSON 429 through controlled responses.
-Use the static manual preview for phone scenarios. No-JavaScript email fallback
-and delivery-disabled presentation must work without a provider.
+Routine checks use isolated credential-free snapshots, no environment files,
+`CONTACT_ENABLED=false`, blank credentials, a fresh server and verified egress
+denial. The current deployed candidate also has a false source release lock.
+The approved local candidate instead proves default/off and
+invalid-configuration fail-closed behavior through explicit composition tests. Provider/browser outcomes are injected fakes. The explicit Node
+contact suite, affected component/type/lint, production bundling and focused
+browser checks belong to the task evidence; no routine test may contact Resend.
+Failures, timeouts, duplicate guards, manual retry/expiry, non-JSON 429 and phone
+presentation use controlled responses. Preserve no-JavaScript email fallback.
 
-Keep the frozen [contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md) intact:
-matching 202 is provider acceptance only, eight-second provider/fifteen-second
-browser deadlines, no automatic retries, memory-only drafts and unchanged manual
-retry identity within 23 hours. This preparation does not unlock delivery.
+The saved external Preview key may remain during an expressly authorized off-only
+check only when the deployed source identity, literal false lock, environment off
+and null delivery port are verified. That exception never applies to local tests
+and does not claim key absence. Any extra origin/alias/path/authentication probes
+need listed targets, a bounded request count and explicit authorization. Do not
+repeat the completed seven-request run automatically.
 
-## Phase A — separately authorized delivery-off preview
+The [frozen contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
+remains unchanged: matching 202 means provider acceptance, not mailbox receipt;
+eight-second provider/fifteen-second browser deadlines; no automatic retries;
+unchanged manual retry identity for less than 23 hours; memory-only draft/key.
 
-1. Request authorization naming the exact candidate revision/diff, project
-   `funkspace-app-frontend`, Preview branch, stable origin, deployment action and
-   disabled checks below. The existing Preview is not evidence of the new build.
-2. Verify the deployed source still has the literal false release lock and that
-   composition cannot construct `ResendContactDelivery`: configuration is
-   disabled and the delivery port is null. Verify `CONTACT_ENABLED=false` in the
-   target's approved scope, without exposing the key. Local tests remain
-   credential-free. A key already saved by Dimi may remain scoped to this
-   delivery-off Preview only when those independent source/configuration checks
-   pass; do not describe it as absent or use it to make a provider request.
-3. Record exact configured origins, deployment revision/URL, protection mode,
-   region and reachable aliases. Verify unauthenticated access requires login on
-   the stable and immutable URLs for `/contact` and `/api/contact`; include any
-   POST in the explicitly listed request/variant budget. Verify the intended
-   reviewer can authenticate.
-   Do not use wildcard origins or infer trust from Host. Direct clients can
-   forge Origin. Stop if protection or WAF coverage is missing.
-4. An optional valid synthetic off-state request must be explicitly included in
-   authorization and count against the same WAF window. Expected result is
-   `503/configuration_unavailable`, never 202. It contains only approved test
-   details. Verify form/fallback behavior; do not submit repeatedly.
-5. For each explicitly approved origin/alias, in one fresh observed window and
-   one authenticated browser/IP/region, send **at most six** JSON POSTs with body
-   `{}`. Use the exact permitted Origin and no personal fields. First five should
-   return application `400/invalid_shape`; sixth should be rule-attributed 429
-   before function invocation. No body can pass validation or invoke delivery.
-   Record rule attribution and function traffic, not just an arbitrary 429.
-6. Stop on unexpected status, uncertain window boundaries or earlier counted
-   requests. A repeat window or additional alias needs an explicit bounded
-   authorization; do not silently increase the request budget. After reset,
-   authorize **one** additional invalid `{}` request to show recovery. Regional
-   counters, boundary bursts, shared-network users and distributed quota abuse
-   remain limitations; one region's result proves only that observed scope.
-7. A bounded matrix for other methods/paths, query/normalized path variants,
-   aliases and reviewer-cookie interactions requires its own listed targets and
-   request counts. Perform these with delivery off. Browser failure wording and
-   non-JSON 429 handling use controlled responses, not provider failures.
+## Local approval and remaining single-message authorization record
 
-## Phase B — separately authorized single live acceptance
+Complete the fields relevant to each action before requesting its authorization.
+The exact reviewed source/Privacy patch is approved and applied locally; record
+its patch/hash and the generated commit after authorized Git delivery. Authorize deployment by project, branch,
+source revision, stable origin and exact settings, then record its returned
+immutable URL. The final one-message authorization requires the actual deployed
+revision and URL. Preparation approval does not execute any row.
 
-Phase A does not authorize this phase. Prepare a new explicitly approved candidate
-to remove the source release lock and update Privacy’s current disabled paragraph
-to match enabled processing. Review that exact public copy with Dimi, pin the new
-revision and obtain approval for
-Preview-only enabling. Do not change the lock in local preparation. Verify
-sender/recipient, exact origins, protection and all reachable live-enabled URLs,
-WAF evidence, scoped key, quota, tracking off and required account/terms/DPA and
-processing-copy review before enabling. Account facts still unknown stay pending;
-FS-5.5 closure is not proof of a newly enabled provider's settings.
+| Item                     | Exact proposed scope or remaining input                                                                                                                                                                                                         |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project/environment      | `funkspace-app-frontend`, protected Preview only; branch `feature/funkspace-minimum-usable`; Production stays off                                                                                                                               |
+| Source                   | Exact seven-file source/Privacy candidate approved by Dimi and applied locally; artifact/hash identifies the working diff. New Git revision remains pending; deployed `b829447` stays source-locked off                                         |
+| Deployment               | Record exact new immutable URL plus the stable origin above, successful build/source identity, protection, region and every reachable live-enabled alias                                                                                        |
+| Configuration            | Dimi confirmed `CONTACT_FROM`, `CONTACT_TO`, exact selected-origin JSON and the Preview branch scope. No account values/secrets were independently retrieved; verify the new deployment's effective scope before a send. The switch stays false |
+| Fixed sender             | `FunkSpace <contact@mail.funkspace.de>`; approved/confirmed by Dimi and domain verification evidenced; effective new deployed value remains to verify                                                                                           |
+| Fixed recipient          | `info@funkspace.de`, explicitly selected by Dimi; tested Workspace alias                                                                                                                                                                        |
+| Fixed subject            | `FunkSpace contact message`, generated by the server                                                                                                                                                                                            |
+| Visitor/Reply-To         | `diamondfunk13@gmail.com`, Dimi's controlled visitor address for this proposed test                                                                                                                                                             |
+| Name                     | `FS-5.6 acceptance`                                                                                                                                                                                                                             |
+| Message                  | `FS56-PREVIEW-ACCEPTANCE-01 — One authorized preview test. No reply required.`                                                                                                                                                                  |
+| Remaining service checks | Confirm current quota, intended no-tracking behavior with its disclosed evidence limit, and any outstanding subprocessor/transfer or platform/account review; do not silently mark unexposed settings verified                                  |
+| Firewall                 | Preserve five/IP/600-second fixed-window POST `/api/contact` → 429; verify applicable protection/coverage on the new deployment and enumerate alias limits rather than extending the observed PASS                                              |
+| Request limit            | Maximum **one valid live form submission**, no automatic/manual retry, plus only separately listed delivery-off checks; no unsolicited reply                                                                                                    |
+| Shutdown                 | Approve the off-candidate deployment and retirement/restriction of enabled immutable targets; verify that the preview key is dedicated and explicitly authorize its revocation where needed to cover stale deployments                          |
 
-Proposed single message for later approval: Name “FS-5.6 acceptance”, visitor
-email `diamondfunk13@gmail.com`, Message “FS56-PREVIEW-ACCEPTANCE-01 — One
-authorized preview test. No reply required.” Fixed subject comes from the server;
-recipient is `info@funkspace.de`. Confirm this exact test before execution.
+Local source/copy approval is already recorded; do not request it again. Git
+delivery, external configuration or enabling, deployment, the live submission
+and credential revocation each require specific authorization. They may be approved as a concrete named
+sequence with reviewable source, targets, settings, request counts and shutdown
+actions. A newly generated commit or deployment URL is recorded after its
+authorized creation; no placeholder authorizes sending a live message to an
+unverified deployment.
+Keep DMARC unpublished and do not change provider decisions or upgrade a plan.
 
-Authorization must name the exact deployment URL/revision, approved visitor
-address, fixed sender/recipient, a unique harmless test marker/message and
-**maximum one valid live submission**. Use one deliberate click, and make no
-automatic or manual retry if its outcome is uncertain. Any additional attempt,
-even with the same idempotency key, needs specific authorization.
+## Execute only after exact authorization
 
-Record valid matching public 202/submissionId separately from the provider's
-acceptance identifier using approved, sanitized account evidence. Application
-diagnostics deliberately omit these identifiers; they cannot prove receipt.
-Dimi then confirms the marked message arrived through `info@funkspace.de` in
-Workspace/Gmail. Inspect From and structured Reply-To against the approved test
-address; inspect actual authentication results without inferring a DMARC pass.
-Do not send a reply. Mailbox receipt is separate from provider acceptance.
+1. Pin the approved local source/copy artifact and record the new revision after
+   authorized Git delivery; perform only authorized deployment and
+   Preview settings actions. Reverify source identity, safe configuration scopes,
+   exact origins and protection of the stable and immutable `/contact` and
+   `/api/contact` URLs. Direct clients can forge Origin; it is not bot protection.
+   Stop on missing protection, coverage or unresolved required approval.
+2. From the approved protected Preview, make one deliberate submission using
+   exactly the table's harmless message. Preserve its generated submission ID.
+   A timeout, network failure or ambiguous result may already mean delivery;
+   stop rather than resubmitting. Even a same-key retry needs new authorization.
+3. Record a valid matching public 202/submissionId separately from the provider's
+   acceptance identifier using sanitized approved account evidence. Categorical
+   application logs omit these identifiers and cannot prove receipt. A provider
+   rejection is a test outcome, not permission to send another inquiry.
+4. Dimi confirms the unique marked message arrived through `info@funkspace.de`
+   in Workspace/Gmail. Inspect From and Reply-To against the approved values,
+   and actual authentication results without inferring DMARC success. Do not
+   reply. Record provider acceptance and mailbox receipt as separate facts.
 
 ## Disable, recover and accept
 
-Return the controlled target to delivery off and verify 503/fallback without
-another live message. Vercel variable changes affect subsequent deployments;
-old immutable deployments retain their configuration. Verify all live-enabled
-targets are disabled/restricted, or separately authorize revocation of the
-dedicated test key when needed. Never claim a newly saved false value instantly
-disables previous deployments. Keep production off and DMARC unpublished.
+Execute only the separately approved shutdown: return to a reviewed delivery-off
+candidate and environment switch off; verify the disabled presentation and email
+fallback. Any additional off-state API check needs its own stated request budget
+and verified no-delivery capability; it must return 503 for valid approved-origin
+input. No second live message is needed for shutdown or recovery.
 
-Record the final revision, target, evidence, limits, receipt and verified shutdown.
-Leave acceptance blocked if service access, protection, account/legal approval,
-receipt or shutdown cannot be verified. No additional live test is implied.
-After technical evidence and receipt are available, Dimi's exact final action is:
+Vercel environment edits affect subsequent deployments, not old immutable URLs.
+Inventory every enabled target. A confirmed dedicated preview key can be revoked
+under explicit authorization to remove their remaining mail capability while the
+off deployment propagates. Never revoke a shared key without assessing its users;
+otherwise approve an exact restriction/retirement plan for the remaining targets.
+Do not claim an alias switch or newly saved false value disables old deployments.
+Record actual off-state/retirement or revocation evidence; keep Production off.
 
-> I confirm the single FS-5.6 test message FS56-PREVIEW-ACCEPTANCE-01 arrived in my Workspace inbox through info@funkspace.de. Its From and Reply-To match the approved test. I accept FS-5.6 and the EPIC 5 contact journey at the recorded revision and Preview URL, with the controlled test target returned to disabled state. Production activation and DMARC publication require separate authorization.
+Leave acceptance pending without verified source/target/protection, required
+approval, provider outcome, Dimi's receipt or shutdown. After those facts exist,
+Dimi's final action is:
 
-Attach the actual verified revision, Preview URL and receipt evidence before
-requesting that decision. Do not pre-mark Dimi's action, mailbox receipt or FS-G2.
+> I confirm the single FS-5.6 test message FS56-PREVIEW-ACCEPTANCE-01 arrived in my Workspace inbox through info@funkspace.de. Its From and Reply-To match the approved test. I accept FS-5.6 and the EPIC 5 contact journey at the recorded revision and Preview URL, with the controlled test targets safely disabled. Production activation and DMARC publication require separate authorization.
+
+Attach actual revision, full URLs and evidence before requesting that decision.
+Do not pre-mark Dimi's action, mailbox receipt, EPIC 5 or FS-G2 acceptance.
