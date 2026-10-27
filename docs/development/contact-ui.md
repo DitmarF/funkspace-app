@@ -2,7 +2,10 @@
 
 The [accepted contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract),
 [FS-5.4 evidence](../tasks/fs-5.4-contact-page.md) and
-[external operating gates](contact-operations.md) govern this slice.
+[external operating gates](contact-operations.md) govern this slice. Current
+[server setup](contact-server.md#delivery-defaults-off) and
+[completed live acceptance/shutdown](contact-acceptance.md) supersede the earlier
+FS-5.4 source-lock and pending-task assumptions; this guide authorizes no new send.
 The actual page is `/contact` in the existing PortfolioShell; header/tree links
 share its destination and main-content focus handoff. Home still has Start/About
 only and no `/#contact` destination or decorative contact scene.
@@ -10,7 +13,8 @@ only and no `/#contact` destination or decorative contact scene.
 ## Availability, feedback and state
 
 The server page passes only a safe availability boolean from existing composition.
-The production release lock remains false. Dimi's follow-up amendment keeps Name,
+Delivery now defaults off under exact `CONTACT_ENABLED=true` plus complete valid
+server configuration; there is no unconditional source lock. Dimi's follow-up amendment keeps Name,
 Email and Message visible while sending is disabled, including server rendering,
 no JavaScript and prehydration. These fields and the ordinary Send message button
 are natively disabled, with the plain message “Sending is currently disabled.
@@ -85,18 +89,21 @@ retains existing thresholds and explicitly includes new browser/pure response co
 The unchanged server/contact suites continue to use denied-fetch guards.
 
 Browser tests require `CONTACT_E2E_WORKSPACE`: an absolute isolated built candidate
-without environment files, with source release lock false and `deny-contact-egress.cjs`
-blocking Node fetch. This is a test-only path, not application configuration. The
+without environment files and a verified `deny-contact-egress.cjs` preloader
+blocking external Node transport. Current configuration checks that the preloader
+exists; existence alone does not verify its contents or prove no egress. This is
+a test-only path, not application configuration. The
 config refuses an occupied port and never reuses the user's preview. It starts
-fresh with delivery false and empty mail credentials; actual default /contact
+fresh with `CONTACT_ENABLED=false` and empty mail credentials; actual default /contact
 and an approved-origin API request verify disabled behavior.
 
 Enabled-form E2E mock only the exact `/contact` document's serialized availability
 boolean, asserting one matching marker. SSR/prehydration disabled fields stay identical.
 Separate `/api/contact` response interception exercises the actual browser adapter
 and component. The application has no availability override or fake production
-adapter. Browser interception alone is insufficient; source lock, empty credentials
-and server fetch denial provide independent protection. Protected-preview cookies,
+adapter. Browser interception alone is insufficient; exact off configuration,
+empty credentials, a fresh environment-file-free snapshot and verified server
+egress denial provide independent protection. Protected-preview cookies,
 live provider behavior and WAF coverage are not inferred from these mocks.
 
 Example against a prepared isolated snapshot:
@@ -122,8 +129,8 @@ and authorized documentation, commit and push of the controlled preview. See the
 Device/browser/assistive-technology and individual checklist details were not
 supplied; the checklist remains reusable guidance, not invented per-action evidence.
 
-Use an approved, reachable controlled fixture for enabled-form checks; the current
-production candidate displays disabled fields and an email fallback. Localhost on the development computer
+Use an approved, reachable controlled fixture for enabled-form checks; the delivery-disabled
+candidate displays disabled fields and an email fallback. Localhost on the development computer
 is not automatically reachable on a phone. Record target/candidate, device/OS,
 browser/version, orientation, text settings and result for each check. No live
 provider mail is required or authorized by this checklist.
@@ -160,5 +167,8 @@ provider mail is required or authorized by this checklist.
 Codex technical review is PASS with F1 closed by independent re-review; see the
 [review and delivery record](../tasks/fs-5.4-contact-page.md#f1-re-review-pass-and-authorized-git-delivery--2026-10-13).
 Phone/accessibility acceptance is recorded above. Separate design/wording details
-were not supplied. Legal content, actual account/WAF/protected-preview prerequisites
-and live FS-5.6 acceptance remain pending; FS-5.5/5.6 are not started.
+were not supplied. The later FS-5.5 legal approval and FS-5.6 live acceptance,
+receipt and named-target shutdown are complete in the
+[current acceptance record](contact-acceptance.md). Their recorded limits remain;
+this historical phone checklist supplies no fresh device result or new live-send
+authorization.

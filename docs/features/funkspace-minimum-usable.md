@@ -1218,6 +1218,8 @@ live send is included in the authorized Git delivery.
 
 ### EPIC 6 — Integrated quality gates, controlled rollout, and game handoff
 
+**Planning entry point — 2026-10-27:** Read the [consolidated EPIC 6 planning handoff](../development/epic-6-planning-handoff.md) with the linked source records. It gathers the accepted decisions, exact repository/runtime/deployment identities, safe validation setup, evidence limits and Codex/Sites planning prompts. Planning baseline is `07a75a713242a0b6b4d8fde336856b13a8033e44`; verify newer HEAD/diff and actual access. No EPIC 6 implementation, fresh quality-gate result or rollout is authorized by this packet.
+
 **Goal:** Certify the complete minimum website and preserve a clear, low-risk route back to Wave Survivor EPIC 7.
 
 **Dependencies:** EPIC 4 scene acceptance and EPIC 5 live contact acceptance; all required content supplied.
@@ -1327,6 +1329,8 @@ live send is included in the authorized Git delivery.
 ---
 
 ## Implementation handoff
+
+- **EPIC 6 planning:** Start with the [shared planning packet](../development/epic-6-planning-handoff.md) and actual repository/branch/HEAD/status access. Reuse the completed EPIC 4/5 evidence and existing task IDs; do not treat older pending-task paragraphs as current assignments. The packet contains the source reading order and separate Codex/Sites planning briefs.
 
 - **Completed reference work:** The [Storybook color reference](../tasks/storybook-color-reference.md) presents the current palettes and semantic roles without changing tokens. Implementation and validation are complete; Dimi authorized documentation finalization, commit and push on 2026-09-16. FS-1.3 remains complete. FS-1.4 implementation and validation are now recorded separately.
 

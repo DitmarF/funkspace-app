@@ -3,11 +3,16 @@
 This local fixture uses the actual ContactForm, shell, validation and browser
 adapter. **No email is sent.** Its injected fetch returns controlled Response
 objects in page memory; it never delegates to network fetch. The static server
-has no API/backend. A separate actual Next preview keeps the source release lock
-false, CONTACT_ENABLED=false, empty mail configuration and Node fetch denied.
+has no API/backend. Any separate actual Next preview must use a fresh isolated
+environment-file-free snapshot, `CONTACT_ENABLED=false`, empty mail configuration
+and verified Node egress denial. There is no unconditional source lock now;
+the [current server gate](contact-server.md#delivery-defaults-off) requires exact
+`CONTACT_ENABLED=true` plus complete valid configuration to construct delivery.
 The [accepted contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
 and [phone checklist](contact-ui.md#dimis-phone-checklist--acceptance-recorded) still apply.
-FS-5.5 has not started.
+FS-5.5 and FS-5.6 are complete; the
+[live acceptance and shutdown record](contact-acceptance.md) supplies their later
+evidence. These fixture instructions authorize no new live email.
 
 Dimi reported successful phone/accessibility manual testing on 2026-10-14 and
 authorized documentation, commit and push; the [acceptance record](../tasks/fs-5.4-manual-preview.md#dimi-manual-acceptance-and-git-authorization--2026-10-14)
@@ -85,7 +90,7 @@ above; detailed device/per-action results were not supplied.
 
 ## Rebuild and stop
 
-Running snapshot: `/private/tmp/funkspace-fs54-manual-build-fd46474`.
+Historical snapshot: `/private/tmp/funkspace-fs54-manual-build-fd46474`.
 The [task record](../tasks/fs-5.4-manual-preview.md) links its preparation artifact.
 Build a fresh actual HEAD/diff snapshot without `.env*` files, with denied fetch,
 delivery disabled, empty mail variables and Storybook telemetry disabled. Never
