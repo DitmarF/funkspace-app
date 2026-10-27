@@ -262,15 +262,16 @@ never imply acceptance or confirmed non-delivery. Timers/controllers are
 released on every settled outcome; there is no automatic retry or process-local
 production limiter.
 
-Current local server composition defaults delivery off and requires exact
+Server composition defaults delivery off and requires exact
 `CONTACT_ENABLED=true` plus valid origins, credential and fixed identities to
 construct delivery. Credential/identity getters are not read while off or when
 origins are invalid. Missing/invalid configuration fails closed; origin and
 validation rejections retain their precedence. Dimi approved applying this
-bounded source change locally during FS-5.6; delivery remains disabled. The
-deployed `b829447` candidate still has `CONTACT_DELIVERY_RELEASED = false` and
-cannot be enabled by environment values. Deployment, enabling and live sending
-need separate specific authorization. See [server setup](development/contact-server.md)
+bounded source change during FS-5.6; it was delivered in `36407f6`. The older
+`b829447` retained `CONTACT_DELIVERY_RELEASED = false`; the delivered candidate
+uses the exact configuration gate. The controlled protected-Preview test below
+does not enable Production or authorize further live submissions.
+See [server setup](development/contact-server.md)
 and the historical [FS-5.2 evidence](tasks/fs-5.2-contact-server.md).
 
 FS-5.3 retains the established origin/media/trap rejection path and adds only
@@ -337,18 +338,38 @@ retained the false source release lock.
 local checks, deployed protection, provider acceptance and actual receipt.
 
 The later FS-5.6 [protected-Preview follow-up](tasks/fs-5.6-contact-acceptance.md#protected-preview-and-provider-approval--2026-10-27)
-records narrow deployed limiter/recovery evidence and provider approval. Dimi
-subsequently approved the exact bounded source/public-copy proposal, applied
-locally after `b829447`, and confirmed the three nonsecret configuration variables
-and full Preview branch. This is operator evidence, not independent verification
-of a new deployment. The local candidate removes the temporary source lock while
-preserving the exact enabled/configuration gate and uses static, availability-
-dependent Privacy wording. Delivery remains disabled; deployed `b829447` is
-unchanged and source-locked off. Test isolation uses an off switch, blank
-credentials, an environment-free snapshot and verified egress preloader.
-No new port/service/dependency or public contract is introduced. This approval
-does not authorize Git delivery, deployment, settings changes, enabling, live
-mail, key revocation or DMARC publication; acceptance and receipt remain pending.
+records narrow deployed limiter/recovery evidence, provider approval and the
+bounded source/public-copy change delivered at
+`36407f6a790a8d9787bdc3123041e24e181bdfee`. It removes the temporary source lock
+while preserving exact enabled/configuration gates and conditional
+Privacy wording. Test isolation uses an off switch, blank credentials, an
+environment-free snapshot and verified egress preloader. No port, service,
+dependency or public contract is added.
+
+On 27 October the controlled protected Preview at deployment `6N37XmGQ3`
+produced a matching accepted browser result and a categorical HTTP 202 accepted
+event at 16:10:07.70 CET. Dimi separately confirmed receipt through
+`info@funkspace.de` in Workspace, the sender and working Reply-To, and requested
+closure of EPIC 5. The earlier 16:01:14.02 CET immutable-origin request returned
+`403/origin_rejected` before delivery; the successful form submission used the
+configured stable branch origin. No wildcard or Host exception was introduced,
+and no further live submission is authorized by recording this evidence.
+
+The scoped `CONTACT_ENABLED=false` setting was saved and separately verified.
+The fresh off deployment `BJwbeuR6NUejxG3GDpq3QQHj337q`, host identifier
+`h9uharydb`, was Ready at 16:18 CET on the same `36407f6` source. The stable and
+new immutable Contact pages showed disabled controls, the availability notice
+and email fallback. Dimi explicitly authorized deleting the earlier enabled
+`6N37XmGQ3` deployment, host identifier `4twqcqhug`; Vercel confirmed deletion.
+At 15:31:02 UTC, cookie-free GET checks of that old host's `/contact` and
+`/api/contact` both returned 404 `DEPLOYMENT_NOT_FOUND`. The stable Contact page
+was reloaded and remained disabled with its email fallback. Provider acceptance,
+Dimi's receipt/header confirmation and this bounded shutdown complete FS-5.6,
+EPIC 5 and FS-G2 on 27 October. This is retirement of the recorded test target,
+not a global deployment inventory or universal shutdown claim. Production
+`main` at `31abe42` and DMARC are unchanged; EPIC 6 has not begun.
+Regional/distributed-abuse and wider alias/logging evidence limits remain
+operating/release follow-up, without reopening accepted FS-5.5 or EPIC 4.
 
 ## Service Injection
 

@@ -40,12 +40,13 @@ explicit: Dimi approved `info@funkspace.de` as the fixed recipient as well as
 fallback; Resend now verifies `mail.funkspace.de` in Ireland, using the actual
 Forge TXT/two-CNAME records. The [setup register](contact-operations.md#setup-evidence--2026-10-27)
 separates screenshot/user-report facts from unverified settings/enforcement.
-Form delivery remains disabled. Dimi has now approved the bounded local source
-and public-copy proposal: the local candidate defaults off under its exact
+The delivered source at `36407f6` defaults off under its exact
 configuration gate, and static Privacy wording refers readers to `/contact` for
-availability before describing enabled processing conditionally. The deployed
-`b829447` candidate retains its unconditional source lock. This local approval
-does not reopen accepted FS-5.5 copy or establish live-delivery acceptance.
+availability before describing enabled processing conditionally. Dimi approved
+the bounded source/public-copy proposal, then the controlled protected Preview
+completed provider acceptance and separately confirmed receipt, recorded below.
+Historical `b829447` retained its unconditional source lock. Accepted FS-5.5 copy
+and EPIC 4 closure are unchanged.
 
 Official [Resend processing facts](https://resend.com/security/gdpr) rechecked
 2026-10-27: stored customer data includes message content in the US, regardless
@@ -76,29 +77,61 @@ Dimi subsequently approved the exact bounded seven-file source/public-copy
 proposal and its local application. He also confirmed `CONTACT_FROM`,
 `CONTACT_TO`, `CONTACT_ALLOWED_ORIGINS` and the full Preview branch; this operator
 confirmation is separate from independent deployed-value verification. The local
-candidate is configuration-gated and default-off; delivery remains disabled.
+candidate was configuration-gated and default-off during local preparation.
 The approved Privacy copy describes processing only when the form is available,
-without asserting that sending is already enabled. Deployed `b829447` is unchanged
-and source-locked off. Git delivery, deployment, settings changes, enabling,
-live mail, key revocation and DMARC publication were not authorized by this
-source/copy approval. Actual provider acceptance, receipt and shutdown remain
-pending; FS-5.6/EPIC 5 are not complete.
+without asserting that sending is enabled everywhere. Source/copy approval alone
+did not authorize external actions. Later delivery and controlled acceptance are
+recorded below; Production and DMARC remain separate.
+
+## Controlled form delivery and Dimi confirmation — 2026-10-27
+
+Source `36407f6a790a8d9787bdc3123041e24e181bdfee` was used by the protected
+Preview deployment `6N37XmGQ3`. The configured stable branch origin produced a
+matching accepted browser result and runtime `httpStatus:202`, `outcome:accepted`,
+`code:null` at 16:10:07.70 CET. This verifies provider acceptance through the
+adapter's required acceptance-ID check. Dimi separately confirmed that the
+message arrived through `info@funkspace.de` in Workspace, that its sender was
+correct and Reply-To worked, and requested EPIC 5 closure. No provider ID or
+message content is added to application diagnostics.
+
+The earlier immutable-origin attempt at 16:01:14.02 CET returned
+`403/origin_rejected` before delivery. The subsequent successful request used
+the configured stable branch origin; no wildcard/Host exception or code fix
+was introduced. No further live message was sent by this documentation work.
+The observed regional limiter/reset result and these exact target outcomes do
+not establish all-alias/path/global protection or all provider/account settings.
+
+The scoped `CONTACT_ENABLED=false` setting was saved and separately verified.
+Fresh off deployment `BJwbeuR6NUejxG3GDpq3QQHj337q`, host identifier `h9uharydb`,
+was Ready at 16:18 CET on the same `36407f6` source. Both the stable and new
+immutable Contact pages showed disabled controls, the availability notice and
+email fallback. The prior enabled `6N37XmGQ3` / `4twqcqhug` deployment was then
+deleted with Dimi's explicit authorization and Vercel confirmation. Cookie-free
+GETs to its `/contact` and `/api/contact` both returned 404
+`DEPLOYMENT_NOT_FOUND` at 15:31:02 UTC; no extra POST or provider request was
+used. A reload of the stable Contact page still showed the disabled form and
+email fallback. This recorded shutdown, provider acceptance and Dimi's separate
+receipt/header confirmation complete FS-5.6, EPIC 5 and FS-G2 on 27 October.
+The evidence covers the named test target, not every historical alias or
+deployment. Production `main` at `31abe42` is unchanged, DMARC unpublished and
+EPIC 6 not begun. The preview key was not revoked by these actions.
 
 ## Current behavior versus the implemented delivery path
 
-The approved local server composition defaults off and constructs delivery only
+The delivered server composition defaults off and constructs delivery only
 for exact `CONTACT_ENABLED=true` with valid origins, credential and fixed mail
 identities. It does not read credential/identity getters while disabled or when
 origins are invalid, and does not construct a Resend adapter while disabled.
-The deployed `b829447` composition separately retains the literal false source
+The historical `b829447` composition separately retained the literal false source
 lock, independent of environment values. `/contact` renders Name,
 Email and Message plus an ordinary Send button, all disabled before hydration,
 without JavaScript and while unavailable. The public fallback is
 `info@funkspace.de`; its mailto link opens the visitor's mail application.
 FunkSpace does not send that fallback message itself. These are actual source
-facts for the delivery-disabled state. The supplied Production screenshot
-identifies an older deployed revision; no screenshot or local approval makes
-the new local candidate deployed or enabled.
+facts for the delivery-disabled state. The controlled Preview test above verifies
+the enabled journey for its recorded target only. The supplied Production
+screenshot identifies an older revision; it is not this Preview acceptance or
+permission to activate Production.
 
 If the visitor sends an email from that mail application, their mail provider
 processes it and the recipient Workspace Gmail mailbox can receive it independently of
@@ -106,16 +139,17 @@ FunkSpace form availability. Ordinary page visits can still generate hosting log
 The safe form-availability boolean is configuration-derived, not a live provider/
 quota/verification health check.
 
-The following path is implemented and tested with fakes, but gated off:
+The following path is implemented, tested with fakes and now exercised once
+successfully for the controlled protected Preview:
 
 ```text
 Browser form → same-origin JSON POST /api/contact
-  → Vercel edge protection (actual rule/coverage pending)
+  → Vercel edge protection (observed branch rule; broader coverage limited)
   → Next.js Node route → origin/media/body checks → shared validation/use case
   → server-only Resend HTTPS request → recipient Gmail
 ```
 
-An allowed, valid direct request to this disabled candidate returns configuration
+An allowed, valid direct request to a disabled candidate returns configuration
 unavailable, not acceptance. Earlier method/origin/media/body/validation rejection
 still applies. Edge denial may prevent the function from running at all. No
 Server Action, separate backend, application inbox, webhook, queue, stored draft,
@@ -129,7 +163,7 @@ Source: [composition](../../frontend/infrastructure/services/createContactServer
 
 ## Data inventory
 
-| Data               | Browser and Vercel function                                                         | Resend and recipient mailbox, if later enabled                                                                                      |
+| Data               | Browser and Vercel function                                                         | Resend and recipient mailbox when enabled                                                                                           |
 | ------------------ | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | `name`             | Optional string; trimmed, at most 100 JavaScript string units                       | Plain-text Name line; empty becomes “(not provided)”                                                                                |
 | `email`            | Required trimmed single address; at most 254 units; control/header-injection checks | Structured Reply-To and plain-text Email line, so a human can reply                                                                 |
@@ -150,8 +184,10 @@ credentials never go to the browser, mail text or application diagnostic writer.
 The current approved recipient is Dimi's tested Workspace alias `info@funkspace.de` (2026-10-27 amendment). The configuration reader
 accepts a single validated configured recipient and a FunkSpace-labelled sender;
 syntax does not prove that the actual account uses the selected address/domain.
-The proposed sender is at `mail.funkspace.de`, under owned `funkspace.de`, after
-verification. Resend domain verification is now evidenced in the dated setup register; deployed values and actual account checks remain pending.
+The fixed sender is at verified `mail.funkspace.de`, under owned `funkspace.de`.
+The setup register records domain evidence and Dimi confirmed the actual test
+message's sender and receipt. This does not independently reveal secret values
+or verify future deployment scopes.
 Source: [validation](../../frontend/domain/contact/ContactValidation.ts),
 [configuration](../../frontend/infrastructure/contact/ContactConfiguration.ts),
 [actual provider payload](../../frontend/infrastructure/contact/ResendContactDelivery.ts).
@@ -162,7 +198,8 @@ Public 202 is returned only after the adapter obtains a valid provider acceptanc
 identifier; the browser additionally requires the exact accepted envelope and
 matching submission ID. It means accepted for delivery, not recipient receipt,
 inbox placement, reading or a reply. No webhook/receipt reconciliation exists;
-Dimi must separately confirm Gmail receipt during an authorized FS-5.6 test.
+Dimi separately confirmed Workspace/Gmail receipt for the recorded FS-5.6 test.
+This does not turn a 202 response into receipt evidence for future messages.
 
 The provider exchange deadline is eight seconds, including response reading;
 the browser deadline is fifteen seconds. Lost/malformed responses, timeout,
@@ -221,7 +258,9 @@ customer data is deleted within 90 days after account termination. Early specifi
 message removal requires contacting support. Its standard DPA is pre-signed and
 executed at signup, with an account copy available for download. Normal Emails
 API content is not sent to Anthropic; RunPod samples some emails for trust/safety.
-Actual FunkSpace account/region/plan/agreement settings remain unverified.
+The later dated evidence records Free plan, selected Ireland sending region,
+restricted key and Dimi's approval of the reviewed terms/DPA and US processing.
+Exact storage overrides and individual saved tracking booleans were not read.
 [Resend GDPR facts](https://resend.com/security/gdpr),
 [security](https://resend.com/security), [regions](https://resend.com/docs/dashboard/domains/regions).
 
@@ -229,18 +268,20 @@ Resend's API-log schema includes original request/response bodies; categorical
 application logs do not mean content-free provider logs.
 [Retrieve Log](https://resend.com/docs/api-reference/logs/retrieve-log).
 The [DPA](https://resend.com/legal/dpa) has processing/transfer/retention provisions;
-its three-year compliance-record provision is not message retention. Dimi must
-review applicable [terms](https://resend.com/legal/terms-of-service),
-[privacy policy](https://resend.com/legal/privacy-policy),
-[subprocessors](https://resend.com/legal/subprocessors) and account-specific DPA.
-Published assurances are not this site's legal approval.
+its three-year compliance-record provision is not message retention. Dimi approved
+using Resend under its applicable [terms](https://resend.com/legal/terms-of-service)
+and reviewed DPA, including disclosed US processing. The published
+[privacy policy](https://resend.com/legal/privacy-policy) and
+[subprocessors](https://resend.com/legal/subprocessors) remain supporting
+references. This records his service decision, not legal certification or
+verification of every account retention setting.
 
 The later Workspace follow-up confirms the `info@funkspace.de` alias/sending
 identity, Dimi's successful receiving/reply loop, and receipt at the
 `dmarc@funkspace.de` report alias. Outbound SPF/DKIM passed for `funkspace.de`.
 The prepared DMARC record is unpublished; no FunkSpace DMARC PASS is established.
 The current local candidate now exposes the Workspace alias for public email;
-the gated provider adapter's frozen selected recipient is unchanged.
+the provider adapter uses the separately approved fixed Workspace recipient.
 Gmail mailbox processing/storage location, account terms, forwarding/export,
 access controls and retention settings have not been audited. Business Starter
 and sole access are Dimi's reports; the mailbox tests do not verify a Google
@@ -278,12 +319,11 @@ storage or log processing occurs there. The last-hour runtime-log view has no
 matching entries, but its Production-only selection is not visible; this does
 not prove logging or exports disabled. netcup shows a Website virtual host at
 `/funkspace.de/httpdocs`; the visible 1 October Apache certificate warnings do
-not establish visitor traffic. No installed WAF, export, complete web-deployment
-alias inventory or protection evidence has been supplied. The
-five/IP/ten-minute fixed-window POST rule remains a proposal;
-regional/distributed-abuse and shared-network limits remain. Public Preview
-environment support is not proof of any reachable URL's protection. All actual
-coverage rows are pending; no deployed security acceptance is claimed.
+not establish visitor traffic. These earlier screenshots predate the later WAF
+publication, narrow five/IP/ten-minute branch limiter/reset PASS and controlled
+delivery evidence recorded above. Exports, complete alias/path inventories and
+regional/distributed-abuse/shared-network limits remain operating/release
+follow-up. No exhaustive protection or infrastructure-retention claim is made.
 
 ## Dimi legal-copy approval checklist
 
@@ -295,8 +335,9 @@ not open FS-5.5 acceptance. They are not marked verified by the closure request.
 - [x] Current purpose, hosting/general-inquiry legal-rationale wording, rights and contact copy accepted by the operator; no independent legal assessment is certified.
 - [x] Both appearance keys' exact defaults/write/lifetime/removal and app-memory-only draft disclosures integrated and accepted. Their separate storage/access legal assessment remains follow-up.
 - [x] Selected six-calendar-month-after-conversation-end policy and justified-exception wording accepted. This does not claim that labels, reminders or cleanup controls are configured.
-- [x] Disabled-current versus later-enabled form wording, provider-acceptance distinction, Privacy/Impressum text, metadata and concise contact notice accepted. No deployment or form activation authorized.
-- [ ] Before later activation, verify actual Vercel/Resend/Gmail agreements, roles, locations/transfers/subprocessors, logging/retention/exports and protection coverage; do not infer account facts from public policies.
+- [x] FS-5.5 disabled-current/later-enabled copy and its later availability-neutral Privacy amendment accepted. The controlled Preview subsequently supplied provider acceptance and separate receipt; these dated actions do not authorize Production release.
+- [x] Dimi approved Resend under the reviewed terms/DPA, including disclosed US processing; source/copy approval stands. No repeated approval or reopening of FS-5.5 is needed.
+- [ ] Retain the stated wider Vercel/Resend/Gmail account, platform logging/retention/export and protection-coverage limits as operating/release follow-up; public policies do not verify every setting.
 - [ ] Follow up address applicability/TLM response and the separate appearance-storage/TDDDG assessment; update copy/behavior if needed. FS-5.5 is not reopened by retaining those limits.
 - [ ] Apply the mailbox workflow and verify reminders/closure tracking/selective cleanup, including controlled copies and documented exception review. The guide remains proposed until actually adopted.
 

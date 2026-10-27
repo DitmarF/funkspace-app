@@ -20,16 +20,17 @@ wording do not certify an exemption or account-specific compliance. The
 records Dimi's acceptance and specific commit/push authorization. The separate
 storage assessment, mailbox-workflow adoption and actual account facts remain
 operating/activation follow-up; no external action is implied.
-The selected branch Preview has observed limiter/recovery evidence; protection
-beyond that run remains unverified and live delivery stays blocked. This guide is
-not permission to configure a firewall, change billing/secrets, deploy or send mail.
+The selected branch Preview has observed limiter/recovery and controlled live
+acceptance evidence recorded below. Wider protection retains its stated limits.
+This guide is not permission for additional settings, deployments or messages.
 
 ## Setup evidence — 2026-10-27
 
 This dated register supersedes older “not applied/no preview/every row pending”
-claims only for the facts explicitly recorded here. Base is clean
+claims only for the facts explicitly recorded here. The initial clean base was
 `ad2e98e1ff433c9d5942692bc722f0198ba12b46`, branch
-`feature/funkspace-minimum-usable`. Local code changes are not deployed.
+`feature/funkspace-minimum-usable`. These initial observations predate the later
+delivered and tested `36407f6` candidate below.
 
 | Item                | Evidence and limit                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -61,12 +62,12 @@ Ireland is a sending region, not an EU storage guarantee; see
 ## Protected Preview and provider approval — 2026-10-27
 
 The [FS-5.6 follow-up](../tasks/fs-5.6-contact-acceptance.md#protected-preview-and-provider-approval--2026-10-27)
-owns the exact times, screenshots, provenance and limits. The observed Preview
-is now `b829447`, Ready, on the selected branch. Its immutable URL is
+owns the exact times, screenshots, provenance and limits. The off-only observed
+Preview was `b829447`, Ready, on the selected branch. Its immutable URL was
 `https://funkspace-app-frontend-jdo52g9dg-ditmarfs-projects.vercel.app`.
 Dimi reports login protection for the stable/immutable page and API addresses
-and the switch remains false. That deployed `b829447` retains its source lock;
-the later approved local application below does not change this deployment.
+and the switch was false for that run. That historical `b829447` retained its
+source lock; the later controlled acceptance used `36407f6` instead.
 
 The controlled off-only branch test produced five typed 400 rejections, then
 one 429. The named rule’s aggregate view records one matching rate limit;
@@ -84,9 +85,9 @@ Opportunistic TLS is observed, without asserting TLS on every delivery hop.
 Dimi approved Resend under its terms/DPA, including disclosed US processing.
 The downloaded vendor DPA was reviewed against technical disclosures; it is
 kept outside Git and does not certify legal completeness. His later source/copy
-approval is recorded below; deployment, enabling and the one-message test remain
-separate. The [procedure](contact-acceptance.md)
-specifies pending target/coverage and shutdown evidence. Do not repeat the
+approval is recorded below. Subsequent delivery and controlled acceptance are
+recorded separately; the [procedure](contact-acceptance.md) owns action limits and
+shutdown evidence. Do not repeat the
 provider-choice approval or reopen FS-5.5/EPIC 4.
 
 ### Source and copy approval; local application
@@ -98,13 +99,51 @@ the selected `CONTACT_FROM`, `CONTACT_TO`, exact selected-origin JSON and Previe
 branch scope as operator reports. No secret or actual account value was retrieved
 to independently verify the effective deployment configuration.
 
-The approved candidate is applied locally: the temporary source lock is removed,
+The approved candidate was applied locally and delivered at `36407f6`: the temporary source lock is removed,
 while exact `CONTACT_ENABLED=true` and complete valid configuration remain
-mandatory. Default/missing/false/invalid cases fail closed. The deployed `b829447`
-Preview remains unchanged and source-locked off. Local application is not Git
-delivery, a deployment or permission to enable/send. Git/push, deployment,
-external settings, enabling, live email, credential revocation and DMARC publication
-remain pending specific authorization. There is no provider acceptance or receipt.
+mandatory. Default/missing/false/invalid cases fail closed. The local approval
+alone did not authorize deployment or sending. Later specific actions and the
+controlled result are recorded below; they authorize no extra message or DMARC
+publication.
+
+### Controlled protected-Preview acceptance — 2026-10-27
+
+The accepted candidate is source
+`36407f6a790a8d9787bdc3123041e24e181bdfee`, deployment `6N37XmGQ3`.
+The configured stable origin is
+`https://funkspace-app-frontend-git-feature-fun-606557-ditmarfs-projects.vercel.app`.
+The browser showed matching acceptance and the exact deployed runtime recorded
+`httpStatus:202`, `outcome:accepted`, `code:null` at 16:10:07.70 CET.
+This is provider acceptance through the validated application path, separately
+from Dimi's confirmation that the message arrived through `info@funkspace.de`
+in Workspace. He also confirmed the sender and working Reply-To and requested
+EPIC 5 closure. No internal provider ID, secret or message content is copied into
+these diagnostics.
+
+The earlier 16:01:14.02 CET request from the immutable deployment's origin
+returned `403/origin_rejected`; the handler rejected it before the delivery port.
+The successful attempt used the approved stable origin. That exact-origin
+protection was retained: no wildcard allowlist, Host exception or new code fix
+was needed. No extra live send or replay is implied by documenting the diagnosis.
+
+The scoped `CONTACT_ENABLED=false` setting was saved and separately verified.
+Fresh off deployment `BJwbeuR6NUejxG3GDpq3QQHj337q`, host identifier `h9uharydb`,
+was Ready at 16:18 CET from the same `36407f6` source. The stable alias and new
+immutable Contact page both showed disabled controls, the availability notice
+and email fallback. That off deployment did not itself disable the older URL.
+Dimi explicitly authorized deleting the old test Preview, and Vercel confirmed
+deletion of exact deployment `6N37XmGQ3LDAnWvAwmrmJXFmUizx`, host identifier
+`4twqcqhug`. Recorded at 15:31:02 UTC, cookie-free GET checks of the old host's
+`/contact` and `/api/contact` both returned 404 `DEPLOYMENT_NOT_FOUND`.
+No POST, provider request, new email or key revocation was needed. The stable
+Contact page was reloaded and retained the disabled notice/button and fallback.
+
+With provider acceptance, Dimi's separate receipt/sender/Reply-To confirmation
+and the verified named-target shutdown, FS-5.6, EPIC 5 and FS-G2 are complete on
+27 October. This closes the recorded controlled journey, not a global inventory
+or universal old-alias protection claim. Production `main` at `31abe42` is
+unchanged; DMARC remains unpublished and EPIC 6 has not started. Wider release
+coverage and operating evidence limits remain the follow-up described below.
 
 ## Local security assumptions
 
@@ -123,8 +162,8 @@ assistive-technology exposure, autocomplete off and no required constraint.
 These properties are in the actual form. Dimi reported successful phone/
 accessibility testing of controlled responses; that is not deployed WAF/provider acceptance.
 
-The deployed `b829447` still has its unconditional false source lock. The approved
-local candidate instead uses the existing exact `CONTACT_ENABLED=true` gate and
+Historical `b829447` had its unconditional false source lock. The delivered
+`36407f6` candidate instead uses the existing exact `CONTACT_ENABLED=true` gate and
 complete configuration. Default/missing/false enablement and invalid origins
 do not read credentials. Invalid mail configuration also fails closed without
 constructing a delivery adapter. Approved-origin valid input while off
@@ -263,19 +302,19 @@ and these mailbox tests do not start FS-5.6.
 
 Names only; no environment values, credential examples or secret-bearing commands:
 
-| Server-only environment name | Responsibility                                                                                                                                                               |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CONTACT_ENABLED`            | Keep false until separately authorized enabling; the approved local candidate requires exact true plus valid configuration, while deployed `b829447` retains its source lock |
-| `RESEND_API_KEY`             | Secure provider credential, with sending-only access restricted to the selected verified domain where available                                                              |
-| `CONTACT_FROM`               | Fixed approved FunkSpace sender identity, never visitor-controlled                                                                                                           |
-| `CONTACT_TO`                 | One fixed approved recipient, now the tested Workspace alias per the dated amendment                                                                                         |
-| `CONTACT_ALLOWED_ORIGINS`    | Nonempty canonical exact-origin JSON array; no wildcard, Host inference, paths/query/userinfo or unreviewed preview aliases                                                  |
+| Server-only environment name | Responsibility                                                                                                                                                   |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CONTACT_ENABLED`            | Defaults off; only an authorized target may use exact true plus valid configuration. Return controlled test targets to off under the recorded shutdown procedure |
+| `RESEND_API_KEY`             | Secure provider credential, with sending-only access restricted to the selected verified domain where available                                                  |
+| `CONTACT_FROM`               | Fixed approved FunkSpace sender identity, never visitor-controlled                                                                                               |
+| `CONTACT_TO`                 | One fixed approved recipient, now the tested Workspace alias per the dated amendment                                                                             |
+| `CONTACT_ALLOWED_ORIGINS`    | Nonempty canonical exact-origin JSON array; no wildcard, Host inference, paths/query/userinfo or unreviewed preview aliases                                      |
 
 Keep configured values in authorized server environment scopes, never under a NEXT_PUBLIC
 name or in client composition, prompts, repo files, test fixtures, screenshots or
 raw log exports. The reader checks syntax, not account permission, domain ownership,
 tracking, mailbox existence or legal approval. Disabled configuration prevents
-reading mail credential/identities; deployed `b829447` also retains its source lock.
+reading mail credential/identities. Historical `b829447` also retained its source lock.
 
 For a future authorized protected preview, bind configuration to its exact
 project, environment, branch/deployment revision and origins. Keep Development,
@@ -299,15 +338,19 @@ and obtain the selected subdomain/region's exact records from Resend. Owned
 SPF/DKIM state and DMARC interaction without disrupting existing mail; capture
 sanitized verification/region evidence, not guessed record values. Confirm sender,
 recipient, account restrictions/quota and sending-only/domain-restricted key access.
-The dated setup register now records verified domain evidence; actual sender configuration and a live message remain unverified.
+The dated setup register records verified domain evidence; the controlled test
+above adds successful acceptance, Dimi's recipient receipt and sender/Reply-To
+confirmation. This does not verify every future configuration scope.
 [Domain verification](https://resend.com/docs/dashboard/domains/introduction),
 [DMARC](https://resend.com/docs/dashboard/domains/dmarc),
 [API key permissions](https://resend.com/docs/api-reference/api-keys/create-api-key).
 
 The adapter sends only deterministic plain text with the fixed subject and
 structured validated Reply-To; it requests no tracking or automatic reply.
-Resend documents open/click tracking off by default, but verify both actual domain
-settings off before enabling. Public defaults are not account evidence.
+Resend documents open/click tracking off by default. The observed account view
+showed no configured tracking domain; individual saved flags were not exposed.
+Retain that evidence limit instead of claiming literal booleans were inspected.
+No tracking feature is requested by the implemented plain-text payload.
 [Tracking](https://resend.com/docs/dashboard/domains/tracking).
 
 ## Exact WAF rule — observed branch enforcement, broader coverage pending
@@ -357,17 +400,18 @@ protection decision; no process counter or unapproved service substitutes for it
 ## External prerequisites and coverage register
 
 The dated setup register supplies selected Preview and published-rule evidence.
-**Full inventory and broader coverage remain pending**. The observed branch
-limiter/reset test now has a narrow PASS; the dated follow-up records its limits.
+**Full inventory and broader coverage remain operating/release follow-up**. The
+observed branch limiter/reset test has a narrow PASS, and the selected stable
+origin completed controlled delivery. Neither establishes worldwide protection.
 
-| Target                                                           | Required evidence before enabling                                                           | Current outcome                                                                             |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Intended protected preview                                       | Exact URL, commit/build, project/team, authentication method, reviewer access, enforced WAF | `b829447` branch/run limiter/reset observed PASS; new activation candidate/coverage pending |
-| Generated deployment URL                                         | Same revision; WAF plus preview protection; authorized same-origin API test                 | `b829447` URL identified; login operator-reported; WAF not directly tested                  |
-| Branch/preview/custom aliases                                    | Complete actual list, project/deployment mapping, enabled environments and WAF              | Unverified                                                                                  |
-| Production domain(s), including owned `funkspace.de` if attached | Current attachment/revision; WAF; deliberate release permission                             | Unverified; no release permission                                                           |
-| Default project domain/production deployment URL                 | Reachability, current/historical revision, rule/protection scope                            | Unverified                                                                                  |
-| Older deployments/aliases with an enabled contact handler        | Inventory; disable/restrict each reachable enabled version                                  | Unverified                                                                                  |
+| Target                                                           | Required evidence before enabling                                                           | Current outcome                                                                                                                                                            |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Intended protected preview                                       | Exact URL, commit/build, project/team, authentication method, reviewer access, enforced WAF | `b829447` limiter/reset PASS; `36407f6` / `6N37XmGQ3` accepted and received; replacement `BJwbeuR6NUejxG3GDpq3QQHj337q` UI off, old enabled deployment deleted and checked |
+| Generated deployment URL                                         | Same revision; WAF plus preview protection; authorized same-origin API test                 | Historical `b829447` login operator-reported; live `6N37XmGQ3` immutable-origin request rejected before delivery; exhaustive WAF/path coverage not inferred                |
+| Branch/preview/custom aliases                                    | Complete actual list, project/deployment mapping, enabled environments and WAF              | Unverified                                                                                                                                                                 |
+| Production domain(s), including owned `funkspace.de` if attached | Current attachment/revision; WAF; deliberate release permission                             | Unverified; no release permission                                                                                                                                          |
+| Default project domain/production deployment URL                 | Reachability, current/historical revision, rule/protection scope                            | Unverified                                                                                                                                                                 |
+| Older deployments/aliases with an enabled contact handler        | Inventory; disable/restrict each reachable enabled version                                  | Unverified                                                                                                                                                                 |
 
 Dimi/authorized operator records actual plan, spare slot, account use eligibility,
 cost/overage policy, published rule identity/revision/order and exemptions without
@@ -449,9 +493,10 @@ authorized secure action. Environment edits do not alter already running or old
 deployments: obtain deployment authorization, publish a disabled candidate, verify
 `503/configuration_unavailable` for valid approved-origin requests and verify every
 alias/old deployment. Remove usable mail credentials from disabled test targets
-through authorized configuration. Keep the switch false in the current approved
-local candidate; deployed `b829447` remains source-locked off. Neither local
-source approval nor a saved environment value authorizes enabling or redeployment.
+through authorized configuration. Routine local checks keep the switch false
+and credentials blank; historical `b829447` also had a source lock. Neither a
+saved environment value nor this operating guide authorizes another enabled
+deployment or live message.
 
 During propagation, an authorized operator may need a separately approved edge
 block or credential revocation covering still-enabled versions. This guide does

@@ -26,27 +26,30 @@ rule, coverage blockers, log review, quota recovery and emergency disable steps.
 
 FS-5.4 now adds the `/contact` page, controlled form/browser submission and shared
 navigation destination; [UI verification](contact-ui.md) records its boundaries.
-Default delivery-off presentation shows disabled fields, an availability message
-and the email fallback; sending remains blocked. The accepted
+Delivery-off presentation shows disabled fields, an availability message
+and the email fallback. The accepted
 no-`Button.pending`/no-`InlineStatus` amendment still applies. Server code and
 provider contracts remain unchanged.
 
 ## Delivery defaults off
 
-The current approved local candidate enables delivery only when
+The delivered `36407f6` candidate enables delivery only when
 `CONTACT_ENABLED` is exactly `true` and all server configuration is valid.
-It remains disabled. Credentials/mail identities are lazy getters and are not
+Credentials/mail identities are lazy getters and are not
 read while off or when origins are invalid. Valid requests from an allowed
 configured origin return `503/configuration_unavailable` while disabled.
 Missing/unapproved origins reject first with `403/origin_rejected`;
 malformed/invalid input retains its rejection.
 
-The deployed `b829447` candidate is unchanged: its additional
-`CONTACT_DELIVERY_RELEASED = false` lock cannot be unlocked by environment values.
-Dimi approved removing that temporary lock in the local candidate only. This
-does not authorize deployment, changing the enabled switch or live mail.
+The historical `b829447` candidate had an additional
+`CONTACT_DELIVERY_RELEASED = false` lock that could not be unlocked by environment values.
+Dimi approved removing that temporary lock in the bounded candidate delivered
+at `36407f6`. Protected-Preview enabling and the controlled result are recorded
+below; no new enabling or live-send permission comes from this guide.
 
-No environment file or account setting is created or changed. Never put real
+The server implementation and this guide create or change no environment file
+or account setting; the dated operations evidence records separate operator
+configuration/deployment actions. Never put real
 credentials in prompts, documentation, fixtures, logs or review artifacts.
 
 | Server-only name          | Purpose; no configured values recorded                            |
@@ -75,7 +78,8 @@ duplicate-member handling follows the accepted plan.
 Resend uses a fixed HTTPS endpoint, no redirects/retries, configured fixed
 sender/recipient, fixed subject, structured `reply_to` and deterministic plain text.
 No HTML, timestamp, CC/BCC, automatic reply or tracking feature is requested;
-actual domain tracking settings still require verification before enabling.
+the observed tracking setup and its evidence limits are recorded in the
+[operating guide](contact-operations.md#protected-preview-and-provider-approval--2026-10-27).
 The monotonic eight-second deadline includes bounded response reading/parsing.
 On timeout the controller aborts. Late responses are discarded/cancelled.
 Cancellation is best effort without awaiting an untrusted callback. No field
@@ -128,26 +132,53 @@ Resend/DPA/US-processing approval. Dimi subsequently approved the exact bounded
 source/public-copy proposal and its application to the local candidate, retaining
 exact enabled/configuration gates and adding default/off, invalid and fully
 mocked configured-composition checks. He confirmed `CONTACT_FROM`, `CONTACT_TO`,
-`CONTACT_ALLOWED_ORIGINS` and the full Preview branch; their deployed values were
-not independently read. The local candidate remains disabled and has not been
-deployed; deployed `b829447` remains source-locked off. No routine check contacts
-a provider. Broader deployed configuration/coverage, separately authorized
-enabling and one live test, receipt and shutdown remain pending.
+`CONTACT_ALLOWED_ORIGINS` and the full Preview branch; their secret values were
+not retrieved. The approved candidate was committed/pushed as `36407f6` and
+deployed to the protected Preview. No routine check contacts a provider.
 
-## External prerequisites remain pending
+### Controlled live result — 2026-10-27
+
+Deployment `6N37XmGQ3`, source
+`36407f6a790a8d9787bdc3123041e24e181bdfee`, produced a matching accepted browser
+result and HTTP 202 `contact_outcome` event at 16:10:07.70 CET. These establish
+provider acceptance through the validated adapter path; the public result and
+categorical logs do not expose its internal provider identifier. Dimi separately
+confirmed Workspace receipt through `info@funkspace.de`, the sender and working
+Reply-To, and requested EPIC 5 closure. No unsolicited reply or further live
+submission was performed by Codex.
+
+The earlier immutable-origin attempt at 16:01:14.02 CET returned
+`403/origin_rejected` before the delivery port. The successful request used the
+configured stable branch origin. Exact Origin checks remain intact; no Host
+trust or wildcard alias was introduced. Regional counters and broader alias/path
+coverage retain their recorded limits.
+
+The scoped `CONTACT_ENABLED=false` setting was saved and separately verified.
+Fresh off deployment `BJwbeuR6NUejxG3GDpq3QQHj337q`, host identifier `h9uharydb`,
+was Ready at 16:18 CET using the same `36407f6` source. Both stable and new
+immutable Contact pages displayed disabled controls, the availability notice
+and email fallback; no extra message was required. Dimi explicitly authorized
+deleting the older enabled `6N37XmGQ3` / `4twqcqhug` deployment and Vercel
+confirmed deletion. At 15:31:02 UTC, cookie-free GETs to its `/contact` and
+`/api/contact` each returned 404 `DEPLOYMENT_NOT_FOUND`; no POST or provider
+request was used. The stable Contact page was reloaded and remained disabled.
+Together with Dimi's acceptance and receipt/header confirmation, this closes
+FS-5.6, EPIC 5 and FS-G2 on 27 October for the recorded controlled journey.
+It does not establish a global deployment inventory. Production `main` at
+`31abe42` remains unchanged; DMARC is unpublished and EPIC 6 has not started.
+
+## Remaining operating and release limits
 
 The [FS-5.5 processing/storage facts and Dimi checklist](contact-processing-facts.md)
 and [operating procedures](contact-operations.md) are prepared from actual source
 and rechecked public documentation, with actual operator/account evidence in
-the dated follow-up. Dimi approved the source and Privacy copy; this is not legal
-certification, publication or live acceptance. Local source approval does not
-authorize Git delivery, deployment, settings changes, setting `CONTACT_ENABLED`
-to true, live mail, key revocation or DMARC publication.
-
-Securely scoped configuration and all reachable live-enabled aliases/preview
-coverage must still be verified; regional/distributed-abuse limits remain.
-FS-5.6 requires a separately authorized protected preview/message, with provider
-acceptance, mailbox receipt and safe shutdown recorded separately.
+the dated follow-up. Dimi's provider/source/Privacy approvals stand, and the
+controlled result above supplies acceptance and separately confirmed receipt.
+This is not legal certification, Production release permission or approval for
+additional messages. Wider alias/path coverage, platform logging/retention and
+future Production configuration stay operating/release follow-up. No new gate,
+service, test campaign or reopening of accepted legal choices is implied.
+EPIC 4 remains closed and EPIC 6 has not started.
 
 Official sources rechecked 2026-10-13: [Resend API](https://resend.com/docs/api-reference/emails/send-email),
 [API schema](https://github.com/resend/resend-openapi/blob/main/resend.yaml),
