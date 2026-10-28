@@ -1,3 +1,4 @@
-// Retained metadata description; Dimi removed this copy from visible Start content.
-export const startIntroduction =
-  "FunkSpace is a design-system-first web experience built as a PNPM workspace.";
+import { aboutContent } from "./aboutContent";
+
+// Reuse Dimi's supplied summary for root metadata; do not add visible Start copy.
+export const startIntroduction = aboutContent.description;

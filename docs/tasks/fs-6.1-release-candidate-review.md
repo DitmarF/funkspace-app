@@ -1,10 +1,16 @@
 # FS-6.1 — Release-candidate review
 
-- **Status:** **READY FOR FS-6.2 — technical handoff.** H01–H10 remain unverified; ON Lighthouse has the warning recorded below. This is not human acceptance or release approval.
+- **Status:** **READY FOR FS-6.2 — technical handoff.** Dimi later reported an aggregate checklist PASS; H01–H10 detailed evidence remains incomplete. ON Lighthouse has the warning recorded below. This is not human acceptance or release approval.
 - **Owner:** Codex; Sites supplied focused UI evidence; Dimi owns human acceptance and external-action decisions.
 - **Reviewed:** 28 October 2026, Europe/Berlin.
 - **Outcome:** The original review found production and tooling dependency blockers. Later corrections and current validation are recorded below; outstanding exposure, CI and acceptance limitations remain owned and this report is not release approval.
 - **Deadline:** The user requires a public, tested, usable site by Thursday evening, 29 October 2026, before the Friday 06:00 presentation. Urgency does not make an unresolved finding a PASS.
+
+**TOOL-04 candidate update — 28 October 2026.** Dimi authorized addon 5.0.0; the independently reviewed implementation, new lock/source identity, focused builds/routes/contact/game/performance results, audit warning and remaining limits are recorded in the [FS-6.3 migration checkpoint](fs-6.3-acceptance-findings.md#tool-04-migration--28-october-2026). The same checkpoint records the separate pre-existing TOOL-05 CSS-token data gap. Earlier results below retain their original candidate scope; this update is not fresh full-suite certification or release approval.
+
+## FS-6.3C review reference — 28 October 2026
+
+The later [FS-6.3C review](fs-6.3-acceptance-findings.md#fs-63c-independent-review--28-october-2026) independently reviewed the Sites metadata correction and Codex-owned release-critical changes on HEAD `6ad9c98f4b255b83a00f081c89b4b7acd757921b` plus the recorded working diff. Both separately compiled variants passed 36 affected route/contact checks and the original Lighthouse LCP/CLS limits; the motion-on performance score warning remains. The earlier FS-6.1 readiness decision below retains its original source and scope. **FS-6.3 is not yet ready for FS-6.4** while the named security dispositions, local installed-state, hosted CI and human-evidence gaps remain. This is not release approval.
 
 ## Current candidate reconciliation — 28 October 2026
 
@@ -54,7 +60,7 @@ The later Storybook test-only edit changes `e2e/storybook/main-navigation.spec.t
 
 ### FS-6.2 technical handoff — 28 October 2026
 
-**Current decision: READY FOR FS-6.2** for Dimi to begin the documented human checks on the candidate and labelled controlled fixtures. This is a technical handoff, not a PASS for any H01–H10 row, final FS-6.3 closure or release approval. Original blocked decisions and failures remain historical evidence below. Continue to retain the ON Lighthouse ≥0.90 score warning, the version-reported FTP advisory despite the tested local backport, Storybook peer compatibility, hosted-CI and independent security/deployment disposition for later release review.
+**Decision at the prior FS-6.2 handoff: READY FOR FS-6.2** for Dimi to begin the documented human checks on the candidate and labelled controlled fixtures. This is a technical handoff, not a PASS for any H01–H10 row, final FS-6.3 closure or release approval. Original blocked decisions and failures remain historical evidence below. Continue to retain the ON Lighthouse ≥0.90 score warning, the version-reported FTP advisory despite the tested local backport, Storybook peer compatibility, hosted-CI and independent security/deployment disposition for later release review.
 
 The final complete source-file manifest, working-copy patch and hashes are retained separately as `artifacts/fs-6.3-final-corrections/final-candidate-manifest.json` and `artifacts/fs-6.3-final-corrections/final-working-copy.patch`.
 

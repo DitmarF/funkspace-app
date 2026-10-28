@@ -15,7 +15,7 @@ const config: StorybookConfig = {
     getAbsolutePath("@storybook/addon-docs"),
     getAbsolutePath("@storybook/addon-a11y"),
     getAbsolutePath("@storybook/addon-themes"),
-    fileURLToPath(new URL("./design-token-preset.cjs", import.meta.url)),
+    getAbsolutePath("storybook-design-token"),
     getAbsolutePath("@chromatic-com/storybook"),
   ],
   framework: {

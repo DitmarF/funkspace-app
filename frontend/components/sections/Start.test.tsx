@@ -3,6 +3,7 @@ import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ServiceProvider } from "@/application/providers/ServiceProvider";
 import { AnimationOrchestratorImpl } from "@/application/animations/AnimationOrchestrator";
+import { startIntroduction } from "@/data/startContent";
 import Start from "./Start";
 
 describe("portfolio Start", () => {
@@ -21,9 +22,7 @@ describe("portfolio Start", () => {
     );
     expect(container.querySelectorAll("h1")).toHaveLength(1);
     expect(container.querySelector("h1")?.textContent).toBe("Web Aperture");
-    expect(container.textContent).not.toContain(
-      "FunkSpace is a design-system-first web experience built as a PNPM workspace.",
-    );
+    expect(container.textContent).not.toContain(startIntroduction);
     const logo = container.querySelector("[data-aperture-fallback]")!;
     expect(logo.querySelectorAll("path, polygon")).toHaveLength(1);
     expect(logo.querySelectorAll("circle")).toHaveLength(0);

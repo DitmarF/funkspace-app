@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { startIntroduction } from "../frontend/data/startContent";
 
 for (const viewport of [
   { width: 320, height: 480 },
@@ -43,7 +44,7 @@ for (const viewport of [
           page.locator("#start [data-aperture-fallback] path"),
         ).toBeVisible();
         await expect(page.locator("#start")).not.toContainText(
-          "FunkSpace is a design-system-first web experience built as a PNPM workspace.",
+          startIntroduction,
         );
         await expect(page.getByRole("heading", { level: 1 })).toHaveText(
           "Web Aperture",

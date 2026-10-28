@@ -1,6 +1,5 @@
-// 4.1.0 advertises dist/doc-blocks.d.ts but omits it from the installed package.
-// Declare only the doc-block surface used here, verified against the bundled
-// DesignTokenDocBlock.tsx source map. viewType defaults to "table" at runtime.
+// Version 5 types require viewType although the runtime defaults it to "table".
+// Keep the declaration aligned with the doc-block surface used by these stories.
 declare module "storybook-design-token/doc-blocks" {
   import type { ComponentType } from "react";
 
