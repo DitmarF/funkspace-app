@@ -89,10 +89,14 @@ for (const viewport of [
         expect(new Set(ids).size).toBe(ids.length);
         await page.keyboard.press("Tab");
         await expect(
-          page.getByRole("link", { name: "Skip to main content" }),
+          page
+            .getByRole("banner")
+            .getByRole("link", { name: "FunkSpace", exact: true }),
         ).toBeFocused();
-        await page.keyboard.press("Enter");
-        await expect(page.getByRole("main")).toBeFocused();
+        await expect(
+          page.getByRole("link", { name: "Skip to main content" }),
+        ).toHaveCount(0);
+        expect(new URL(page.url()).hash).toBe("");
         // Axe injects JavaScript; no-JS semantics/navigation are asserted above.
         if (javaScriptEnabled) {
           const result = await new AxeBuilder({ page })

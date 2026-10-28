@@ -3,7 +3,6 @@
 import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useServices } from "@/application/providers/ServiceProvider";
 import {
-  DEFAULT_PARTICLE_CONFIG,
   PARTICLE_SETTINGS,
   type ParticleConfig,
 } from "@/domain/particles/ParticleSettings";
@@ -183,8 +182,7 @@ export default function SceneCustomization({
             aria-label="Reset animation"
             onClick={() => {
               try {
-                scene.configure(DEFAULT_PARTICLE_CONFIG);
-                scene.reset();
+                scene.reset(true);
                 onOverlayTransparentChange(false);
                 setError("");
               } catch {

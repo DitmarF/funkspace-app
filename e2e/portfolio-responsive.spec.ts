@@ -64,9 +64,16 @@ async function expectClearFocus(link: Locator) {
   const result = await link.evaluate((node) => {
     const box = node.getBoundingClientRect();
     const css = getComputedStyle(node);
-    const point = document.elementFromPoint(
-      box.x + box.width / 2,
-      box.y + box.height / 2,
+    // A multiline inline link's bounding center can lie between its text
+    // fragments. Hit-test each painted fragment while retaining full bounds.
+    const fragments = Array.from(node.getClientRects()).filter(
+      (rect) => rect.width > 0 && rect.height > 0,
+    );
+    const points = fragments.map((rect) =>
+      document.elementFromPoint(
+        rect.x + rect.width / 2,
+        rect.y + rect.height / 2,
+      ),
     );
     const trigger = document.querySelector(
       'button[aria-label="Menu: navigation and settings"]',
@@ -87,13 +94,14 @@ async function expectClearFocus(link: Locator) {
       css.outlineStyle !== "none" &&
       parseFloat(css.outlineWidth) > 0 &&
       !overlapsTrigger &&
-      (node === point || node.contains(point));
+      points.length > 0 &&
+      points.every((point) => node === point || node.contains(point));
     return {
       clear,
       label: node.textContent,
       box: box.toJSON(),
       triggerBox: triggerBox?.toJSON(),
-      point: point?.outerHTML,
+      points: points.map((point) => point?.outerHTML),
       outline: css.outlineStyle,
     };
   });
@@ -147,9 +155,15 @@ for (const viewport of viewports) {
           await expectDocumentFlow(page);
 
           await page.keyboard.press("Tab");
-          const skip = page.getByRole("link", { name: "Skip to main content" });
-          await expectClearFocus(skip);
-          await page.keyboard.press("Enter");
+          const identity = page
+            .getByRole("banner")
+            .getByRole("link", { name: "FunkSpace", exact: true });
+          await expectClearFocus(identity);
+          await expect(
+            page.getByRole("link", { name: "Skip to main content" }),
+          ).toHaveCount(0);
+          // The existing route-focus landmark remains programmatically focusable.
+          await page.getByRole("main").focus();
           await expect(page.getByRole("main")).toBeFocused();
           // Walk the real tab sequence, including email/footer links; never activate mailto.
           const focusableCount = await page

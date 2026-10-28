@@ -1,6 +1,6 @@
 .tree {
-  --tree-arrow-size: 16px;
-  --tree-indent: min(var(--fs-space-md), 16px);
+  --tree-arrow-size: 24px;
+  --tree-indent: min(var(--fs-space-lg), 24px);
   min-width: 0;
   width: 100%;
   max-width: 36rem;
@@ -14,7 +14,7 @@
 }
 
 .branch > .list {
-  /* Keep the 2px branch line centered beneath either arrow size. */
+  /* Keep the 2px branch line centered beneath the disclosure arrow. */
   margin-inline-start: calc(var(--tree-arrow-size) / 2 - 1px);
   padding-inline-start: calc(var(--tree-indent) - var(--tree-arrow-size) / 2);
   border-inline-start: 2px solid var(--fs-color-border-subtle);
@@ -23,18 +23,17 @@
 .row {
   --fs-icon-background: var(--fs-color-surface-background);
   display: grid;
-  /* Keep decorative slots compact when text grows beside the fixed rail. */
-  grid-template-columns: var(--tree-arrow-size) 24px minmax(0, 1fr);
+  grid-template-columns: var(--tree-arrow-size) 36px minmax(0, 1fr);
   align-items: center;
-  gap: min(var(--fs-space-xs), 8px);
-  min-height: var(--fs-space-2xl);
+  gap: min(var(--fs-space-sm), 12px);
+  min-height: calc(var(--fs-space-2xl) * 1.5);
   padding: var(--fs-space-xs) 0;
   color: var(--fs-color-content-primary);
   background: transparent;
   border: 0;
   text-align: start;
   font-family: var(--font-work-sans, var(--fs-font-family-display));
-  font-size: var(--fs-font-size-md);
+  font-size: var(--fs-font-size-xl);
   font-weight: var(--fs-font-weight-semibold);
   line-height: var(--fs-line-height-normal);
   text-decoration: none;
@@ -68,9 +67,20 @@
 }
 .compact {
   grid-template-columns: 24px minmax(0, 1fr);
+  gap: min(var(--fs-space-xs), 8px);
+  min-height: var(--fs-space-2xl);
+  font-size: var(--fs-font-size-md);
 }
 .compact > .icon {
   grid-column: 1;
+  width: 24px;
+  height: 24px;
+}
+.compact > .smallIcon {
+  display: block;
+}
+.compact > .largeIcon {
+  display: none;
 }
 .compact > .label {
   grid-column: 2;
@@ -93,11 +103,14 @@
 }
 .icon {
   grid-column: 2;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
+}
+.smallIcon {
+  display: none;
 }
 .largeIcon {
-  display: none;
+  display: block;
 }
 .label {
   grid-column: 3;
@@ -106,7 +119,7 @@
 }
 .pendingLabel {
   display: block;
-  font-size: var(--fs-font-size-sm);
+  font-size: var(--fs-font-size-md);
   font-weight: var(--fs-font-weight-regular);
 }
 
@@ -115,50 +128,10 @@
     color: var(--fs-color-action-hover);
   }
 
-  .tree {
-    --tree-arrow-size: 24px;
-    --tree-indent: min(var(--fs-space-lg), 24px);
-  }
-
-  .row {
-    grid-template-columns: var(--tree-arrow-size) 36px minmax(0, 1fr);
+  .compact {
     gap: min(var(--fs-space-sm), 12px);
     min-height: calc(var(--fs-space-2xl) * 1.5);
     font-size: var(--fs-font-size-xl);
-  }
-
-  .icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .compact {
-    grid-template-columns: 24px minmax(0, 1fr);
-  }
-
-  .compact > .icon {
-    width: 24px;
-    height: 24px;
-  }
-
-  .compact > .smallIcon {
-    display: block;
-  }
-
-  .compact > .largeIcon {
-    display: none;
-  }
-
-  .smallIcon {
-    display: none;
-  }
-
-  .largeIcon {
-    display: block;
-  }
-
-  .pendingLabel {
-    font-size: var(--fs-font-size-md);
   }
 }
 

@@ -82,14 +82,16 @@ shared header. It and `PortfolioNavigationTree` reuse `portfolioMainNavigation`
 data and `PortfolioNavigationRow`, including icon artwork, typography, semantic
 colors, hover/focus styling and native disabled buttons. The compact header
 rows omit the tree's disclosure-arrow gutter; their icons remain on the left.
-Header rows use the 24px artwork at every breakpoint; desktop tree rows retain
-their 36px artwork.
+Header rows use the 24px artwork at every breakpoint. Tree rows use the same
+24px text, 36px artwork and 24px disclosure arrows on phones, tablets and desktops;
+the compact header keeps its existing responsive text and row sizing.
 
 The header landmark is named **Main**; the complete tree remains **Primary**.
 Home, About and Contact target `/`, `/about` and `/contact` and use the existing
 provider-owned navigation handoff when navigating to another page. Contact follows
-the same current-page disabling/focus behavior in both navigations. The other future
-tree entries keep their existing noninteractive Coming soon presentation.
+the same current-page disabling/focus behavior in both navigations. Wave Survivor
+remains a noninteractive Coming soon entry; the second animation and second game
+placeholders were removed at Dimi’s request.
 
 The current page is a native disabled button with `aria-current="page"`, no
 URL and no tab stop in both navigations. Its icon uses the semantic hover color;

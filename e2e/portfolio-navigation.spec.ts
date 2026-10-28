@@ -8,7 +8,7 @@ for (const javaScriptEnabled of [true, false]) {
     test.use({ javaScriptEnabled });
 
     for (const route of ["/", "/about", "/impressum", "/privacy"]) {
-      test(`${route} has unique landmarks, a working skip link and native footer destinations`, async ({
+      test(`${route} has unique landmarks, native initial keyboard focus and native footer destinations`, async ({
         page,
       }) => {
         const errors: string[] = [];
@@ -40,10 +40,14 @@ for (const javaScriptEnabled of [true, false]) {
         }
         await page.keyboard.press("Tab");
         await expect(
-          page.getByRole("link", { name: "Skip to main content" }),
+          page
+            .getByRole("banner")
+            .getByRole("link", { name: "FunkSpace", exact: true }),
         ).toBeFocused();
-        await page.keyboard.press("Enter");
-        await expect(page.getByRole("main")).toBeFocused();
+        await expect(
+          page.getByRole("link", { name: "Skip to main content" }),
+        ).toHaveCount(0);
+        expect(new URL(page.url()).hash).toBe("");
         await page.reload();
         await expect(page.getByRole("main")).toBeVisible();
         expect(errors).toEqual([]);

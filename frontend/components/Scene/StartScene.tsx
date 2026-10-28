@@ -58,7 +58,10 @@ export default function StartScene({
   useEffect(() => {
     if (!host.current) return;
     // Gates are delivered separately; creation can never race the intro/cover.
-    const scene = bindParticleScene(host.current, { optedIn: true });
+    const scene = bindParticleScene(host.current, {
+      optedIn: true,
+      responsiveDefaults: true,
+    });
     handle.current = scene;
     const release = scene.subscribe(setSnapshot);
     return () => {

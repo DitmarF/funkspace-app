@@ -142,12 +142,12 @@ for (const viewport of [
       }
       await expect(
         dialog.getByRole("button", { name: "Home", exact: true }),
-      ).toHaveCSS("font-size", viewport.width < 768 ? "16px" : "24px");
+      ).toHaveCSS("font-size", "24px");
       expect(
         await dialog
           .getByRole("button", { name: "Home", exact: true })
           .evaluate((node) => (node as HTMLElement).offsetHeight),
-      ).toBeGreaterThanOrEqual(viewport.width < 768 ? 48 : 72);
+      ).toBeGreaterThanOrEqual(72);
       expect(await dialog.boundingBox()).toEqual({ x: 0, y: 0, ...viewport });
       await expect(
         dialog.getByRole("button", { name: "Navigation", exact: true }),
@@ -163,13 +163,16 @@ for (const viewport of [
         await expect(
           dialog.getByRole("button", { name, exact: true }),
         ).toBeDisabled();
-      await expect(dialog.getByRole("link")).toHaveCount(1);
+      await expect(dialog.getByRole("link")).toHaveCount(2);
       await expect(
         dialog.getByRole("button", { name: "Home", exact: true }),
       ).toBeDisabled();
       await expect(
         dialog.getByRole("link", { name: "About", exact: true }),
       ).toHaveAttribute("href", "/about");
+      await expect(
+        dialog.getByRole("link", { name: "Contact", exact: true }),
+      ).toHaveAttribute("href", "/contact");
       await dialog.getByText("Privacy", { exact: true }).click();
       await expect(
         dialog.getByRole("link", { name: "Privacy policy" }),
@@ -181,8 +184,14 @@ for (const viewport of [
         await dialog.getByText(group, { exact: true }).click();
       await expect(
         dialog.getByText("Coming soon", { exact: true }),
-      ).toHaveCount(3);
-      await expect(dialog.getByRole("link")).toHaveCount(4);
+      ).toHaveCount(1);
+      await expect(
+        dialog.getByText("Second animation", { exact: true }),
+      ).toHaveCount(0);
+      await expect(
+        dialog.getByText("Second game", { exact: true }),
+      ).toHaveCount(0);
+      await expect(dialog.getByRole("link")).toHaveCount(5);
       await expect(dialog.getByRole("menu")).toHaveCount(0);
       await page.mouse.move(0, 0);
       await page.screenshot({ path: info.outputPath("navigation.png") });

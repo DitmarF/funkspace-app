@@ -367,7 +367,11 @@ export default function ContactForm({ available }: { available: boolean }) {
       {accepted ? (
         <Button onClick={another}>Send another message</Button>
       ) : (
-        <Button type={ready ? "submit" : "button"} disabled={blocked}>
+        <Button
+          variant="secondary"
+          type={ready ? "submit" : "button"}
+          disabled={blocked}
+        >
           {attempt.current ? "Retry same message" : "Send message"}
         </Button>
       )}

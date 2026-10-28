@@ -98,12 +98,6 @@ function ShellContent({ children, animateIdentity = false }: Props) {
       {animateIdentity && (
         <HomeIntroScript available={decorativeMotionAvailable} />
       )}
-      <a
-        href="#main-content"
-        className={`${styles.skipLink} sr-only focus:not-sr-only focus:fixed focus:z-10 focus:p-fs-md bg-fs-surface-background text-fs-action-link focus:outline focus:outline-2 focus:outline-fs-border-focus`}
-      >
-        Skip to main content
-      </a>
       <Container
         as="header"
         width="wide"

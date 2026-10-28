@@ -57,6 +57,8 @@ export type ParticlePresentation = Readonly<{
 
 export type ParticleSceneOptions = Readonly<{
   optedIn?: boolean;
+  /** WEB uses its existing narrow-screen breakpoint for default tuning. */
+  responsiveDefaults?: boolean;
   config?: unknown;
   seed?: unknown;
   presentation?: ParticlePresentation;
@@ -83,7 +85,8 @@ export interface ParticleSceneHandle {
   configure(input: unknown): ParticleConfig;
   pause(): void;
   resume(): void;
-  reset(): void;
+  /** No argument restarts the current scene; true also restores its defaults. */
+  reset(restoreDefaults?: boolean): void;
   destroy(): void;
 }
 

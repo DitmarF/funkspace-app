@@ -16,6 +16,9 @@ import type {
   ParticlePresentation,
 } from "@/domain/ports/ParticleScenePort";
 import type { MotionPolicyConsumer } from "../motion/MotionPolicyService";
+import type { ParticleConfig } from "@/domain/particles/ParticleSettings";
+
+const responsiveKeys = ["speed", "connectionDistance"] as const;
 
 /** No platform clock or DOM: one owned state is borrowed by one prepared runtime. */
 export class ParticleSceneController implements ParticleSceneHandle {
@@ -37,6 +40,8 @@ export class ParticleSceneController implements ParticleSceneHandle {
   private listeners = new Set<(snapshot: ParticleSceneSnapshot) => void>();
   private generation = 0;
   private initialized = false;
+  private defaults: ParticleConfig;
+  private customized = new Set<keyof ParticleConfig>();
 
   constructor(
     private policy: MotionPolicyConsumer,
@@ -45,6 +50,7 @@ export class ParticleSceneController implements ParticleSceneHandle {
     private options: ParticleSceneOptions,
   ) {
     this.state = createParticleScene(null, options.config, options.seed);
+    this.defaults = this.state.config;
     this.presentation = options.presentation ?? {
       introReady: false,
       coverReady: false,
@@ -254,11 +260,33 @@ export class ParticleSceneController implements ParticleSceneHandle {
   }
   configure(input: unknown) {
     if (this.status !== "disposed") {
+      if (input && typeof input === "object") {
+        for (const key of responsiveKeys) {
+          if (
+            key in input &&
+            typeof (input as Partial<ParticleConfig>)[key] === "number" &&
+            Number.isFinite((input as Partial<ParticleConfig>)[key])
+          )
+            this.customized.add(key);
+        }
+      }
       configureParticles(this.state, input);
       this.runtime?.invalidate();
       this.publish();
     }
     return this.state.config;
+  }
+  /** Composition supplies viewport defaults; deliberate slider choices survive. */
+  setDefaults(defaults: ParticleConfig) {
+    if (this.status === "disposed") return;
+    this.defaults = defaults;
+    const untouched: Partial<Record<keyof ParticleConfig, number>> = {};
+    for (const key of responsiveKeys) {
+      if (!this.customized.has(key)) untouched[key] = defaults[key];
+    }
+    configureParticles(this.state, untouched);
+    this.runtime?.invalidate();
+    this.publish();
   }
   pause() {
     if (this.status !== "disposed") {
@@ -272,8 +300,12 @@ export class ParticleSceneController implements ParticleSceneHandle {
       this.reconcile();
     }
   }
-  reset() {
+  reset(restoreDefaults = false) {
     if (this.status === "disposed") return;
+    if (restoreDefaults) {
+      this.customized.clear();
+      configureParticles(this.state, this.defaults);
+    }
     if (this.runtime) this.runtime.reset();
     else resetParticles(this.state);
     this.reconcile();

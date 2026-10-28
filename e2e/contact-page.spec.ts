@@ -420,6 +420,17 @@ test("required associations, keyboard, narrow/short/landscape/200% themes and st
       await expect(page.locator(`[id="${key}"]`)).toBeAttached();
     for (const theme of themes) {
       await selectTheme(page, theme);
+      await page.mouse.move(0, 0);
+      const send = page.getByRole("button", { name: "Send message" });
+      const paint = await send.evaluate((button) => {
+        const sample = document.createElement("span");
+        sample.style.backgroundColor = "var(--fs-color-content-primary)";
+        button.append(sample);
+        const expected = getComputedStyle(sample).backgroundColor;
+        sample.remove();
+        return { actual: getComputedStyle(button).backgroundColor, expected };
+      });
+      expect(paint.actual).toBe(paint.expected);
       for (const scale of ["100%", "200%"]) {
         await page.evaluate(
           (size) =>

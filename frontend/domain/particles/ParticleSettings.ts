@@ -106,3 +106,10 @@ export const DEFAULT_PARTICLE_CONFIG: ParticleConfig = Object.freeze({
     PARTICLE_SETTINGS.controls.connectionsPerParticle.default,
   connectionDistance: PARTICLE_SETTINGS.controls.connectionDistance.default,
 });
+
+/** WEB's narrow-screen tuning; all other authoring defaults stay shared. */
+export const MOBILE_WEB_PARTICLE_CONFIG: ParticleConfig = Object.freeze({
+  ...DEFAULT_PARTICLE_CONFIG,
+  speed: 0.1,
+  connectionDistance: 5,
+});

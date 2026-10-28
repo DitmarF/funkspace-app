@@ -27,7 +27,7 @@ for (const width of [320, 768, 1280]) {
   });
 }
 
-test("tree sizes change without replacing open or focused native disclosures", async ({
+test("tree keeps desktop sizing without replacing open or focused native disclosures", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 375, height: 800 });
@@ -46,18 +46,15 @@ test("tree sizes change without replacing open or focused native disclosures", a
     expect(
       await summary.evaluate((node, previous) => node === previous, original),
     ).toBe(true);
-    await expect(summary).toHaveCSS("font-size", width < 768 ? "16px" : "24px");
-    await expect(summary).toHaveCSS(
-      "min-height",
-      width < 768 ? "48px" : "72px",
-    );
+    await expect(summary).toHaveCSS("font-size", "24px");
+    await expect(summary).toHaveCSS("min-height", "72px");
     const icon = summary.locator(":scope > svg:visible");
     await expect(icon).toHaveCount(1);
-    await expect(icon).toHaveAttribute("width", width < 768 ? "24" : "36");
-    await expect(icon).toHaveCSS("width", width < 768 ? "24px" : "36px");
+    await expect(icon).toHaveAttribute("width", "36");
+    await expect(icon).toHaveCSS("width", "36px");
     await expect(summary.locator("span[aria-hidden] > svg:visible")).toHaveCSS(
       "width",
-      width < 768 ? "16px" : "24px",
+      "24px",
     );
     await expect(summary).toHaveAccessibleName("Animations");
   }

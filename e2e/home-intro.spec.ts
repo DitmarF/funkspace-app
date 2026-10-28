@@ -477,10 +477,16 @@ test("keyboard interaction exits a waiting introduction before focus advances", 
     "visible",
   );
   await expect(
-    page.getByRole("link", { name: "Skip to main content" }),
+    page
+      .getByRole("banner")
+      .getByRole("link", { name: "FunkSpace", exact: true }),
   ).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(page.locator("main")).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(
+    page
+      .getByRole("navigation", { name: "Main", exact: true })
+      .getByRole("link", { name: "About", exact: true }),
+  ).toBeFocused();
 });
 
 test("failed hydration opens content after a bounded deadline", async ({

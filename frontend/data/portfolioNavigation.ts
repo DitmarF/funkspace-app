@@ -62,12 +62,6 @@ export const portfolioNavigation = [
         kind: "link",
         destination: "aperture",
       },
-      {
-        id: "second-animation",
-        label: "Second animation",
-        icon: "animations",
-        kind: "pending",
-      },
     ],
   },
   {
@@ -79,12 +73,6 @@ export const portfolioNavigation = [
       {
         id: "wave-survivor",
         label: "Wave Survivor",
-        icon: "games",
-        kind: "pending",
-      },
-      {
-        id: "second-game",
-        label: "Second game",
         icon: "games",
         kind: "pending",
       },

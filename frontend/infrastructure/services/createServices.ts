@@ -25,6 +25,10 @@ import { apertureAssets } from "@/infrastructure/particles/ApertureAssets";
 import { createPortfolioNavigationHandoff } from "@/infrastructure/dom/PortfolioNavigationHandoff";
 import { BrowserContactSubmission } from "@/infrastructure/contact/BrowserContactSubmission";
 import type { ContactSubmissionPort } from "@/domain/ports/ContactSubmissionPort";
+import {
+  DEFAULT_PARTICLE_CONFIG,
+  MOBILE_WEB_PARTICLE_CONFIG,
+} from "@/domain/particles/ParticleSettings";
 
 /**
  * Create all services with their dependencies
@@ -60,11 +64,37 @@ export function createServices(fixture?: {
       bindStickyHeader(root, motionPolicy, decorativeMotionAvailable),
     apertureAssets,
     bindParticleScene: (target, options) => {
+      // Match WEB's existing CSS fit breakpoint; explicit fixture configs win.
+      const narrow =
+        options.responsiveDefaults && options.config === undefined
+          ? dom.matchMedia("(width < 640px)")
+          : null;
+      const defaults = () =>
+        narrow?.matches ? MOBILE_WEB_PARTICLE_CONFIG : DEFAULT_PARTICLE_CONFIG;
       const controller = new ParticleSceneController(
         motionPolicy,
         decorativeMotionAvailable,
-        () => bindParticleScene(target, themeService),
-        options,
+        () => {
+          const binding = bindParticleScene(target, themeService);
+          const changed = () => controller.setDefaults(defaults());
+          try {
+            narrow?.addEventListener("change", changed);
+          } catch (error) {
+            binding.destroy();
+            throw error;
+          }
+          return {
+            ...binding,
+            destroy() {
+              try {
+                narrow?.removeEventListener("change", changed);
+              } finally {
+                binding.destroy();
+              }
+            },
+          };
+        },
+        narrow ? { ...options, config: defaults() } : options,
       );
       controller.initialize();
       return controller;

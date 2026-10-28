@@ -80,8 +80,13 @@ it("keeps ready destinations as anchors and future entries noninteractive", () =
     "href",
     "/animations/aperture",
   );
-  expect(screen.getAllByText("Coming soon")).toHaveLength(3);
-  expect(navigation.querySelectorAll('[aria-disabled="true"]')).toHaveLength(3);
+  expect(screen.queryByText("Second animation")).not.toBeInTheDocument();
+  expect(screen.queryByText("Second game")).not.toBeInTheDocument();
+  expect(
+    screen.getByText("Wave Survivor").closest('[aria-disabled="true"]'),
+  ).not.toBeNull();
+  expect(screen.getAllByText("Coming soon")).toHaveLength(1);
+  expect(navigation.querySelectorAll('[aria-disabled="true"]')).toHaveLength(1);
   expect(
     navigation.querySelectorAll(
       '[aria-disabled="true"] a, [aria-disabled="true"][href], button:not(:disabled)',

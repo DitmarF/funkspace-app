@@ -77,6 +77,12 @@ Exact focused commands, each launched through the recorded sanitized `run-safe.p
 
 ## Remaining checks and handoff
 
+### Device findings supplied after the initial technical correction
+
+Dimi reports testing on all devices and requests the four bounded UI corrections in [FS-6.3B device UI corrections](fs-6.3b-device-ui-corrections.md): UI-DEVICE-01 mobile WEB tuning; UI-DEVICE-02 mobile tree sizes; UI-DEVICE-03 secondary Contact submit; UI-DEVICE-04 removal of the skip link by explicit product decision. That record owns the correction diff and reruns. Device/browser versions, tested URL/revision and individual outcomes were not supplied; no formal FS-6.2 matrix closure is inferred. The earlier technical findings and original failures above remain visible.
+
+The broader automated rerun additionally records **UI-DEVICE-05 — Significant / Sites, open**: the long Privacy authority link is partly above the viewport when keyboard-focused at 320×568 and 200% text. This reproduces serially; its introduction is unverified and it was not folded into the four requested corrections. The linked device record retains reproduction details and evidence for the next bounded correction.
+
 1. **Codex:** finalize and independently review every changed file, including the security backport, CI launcher/guard and Storybook asset handling. Record exact final source manifest, binary patch and lockfile hashes, new files, original preserved deletion and the existing FS-6.1 report separately. Never assume `/private/tmp` alone is a portable handoff.
 2. **Codex:** capture fresh full and production audits for the corrected lockfile, reconcile each original advisory and affected path, and report the version-retaining FTP backport as a still-reported audit item unless the registry actually says otherwise. Do not suppress an audit finding or claim a default-branch rescan/alert closure.
 3. **Codex:** finish final focused, broad and dedicated contact/theme coverage; lint/types; build and browser regressions for separately compiled animation OFF/ON variants; safe Storybook/contact checks; standalone game checks; serial Lighthouse OFF/ON; server-only/client-bundle and lifecycle review. Preserve failure logs and exact environment/guard/absence-of-egress evidence. Actual hosted CI, merge and production effects remain unverified until later authorized actions.

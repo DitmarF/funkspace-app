@@ -248,7 +248,7 @@ in the source file; the shared Icon owns SVG display/accessibility behavior.
 
 Gallery and Playground now expose **31 families / 93 size variants**. The WEB
 scene's existing **Web Aperture** tree row uses `s-web`; the Animations parent
-and pending second animation keep `animations`. Existing Games consumers use
+uses `animations`. Existing Games consumers use
 the revised artwork. GitHub and LinkedIn are available library icons; this task
 does not add social links or destinations.
 

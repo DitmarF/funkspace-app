@@ -45,8 +45,8 @@ describe("server-rendered portfolio documents", () => {
       expect(screen.getByRole("main")).toHaveAttribute("id", "main-content");
       expect(screen.getByRole("main")).toHaveAttribute("tabindex", "-1");
       expect(
-        screen.getByRole("link", { name: "Skip to main content" }),
-      ).toHaveAttribute("href", "#main-content");
+        screen.queryByRole("link", { name: "Skip to main content" }),
+      ).not.toBeInTheDocument();
 
       const ids = Array.from(
         document.querySelectorAll("[id]"),
@@ -85,10 +85,10 @@ describe("server-rendered portfolio documents", () => {
       if (name === "Privacy" || name === "Legal notice") {
         // Legal provider/rights references may grow without changing shell navigation.
         expect(links.filter((link) => !link.closest("article"))).toHaveLength(
-          14,
+          13,
         );
       } else {
-        expect(links).toHaveLength(name === "Home" ? 16 : 14);
+        expect(links).toHaveLength(name === "Home" ? 15 : 13);
       }
       const mainNav = header.getByRole("navigation", { name: "Main" });
       expect(

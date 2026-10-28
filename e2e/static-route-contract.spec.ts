@@ -57,7 +57,7 @@ async function expectVisibleBrand(page: Page) {
   ).toBe(true);
 }
 
-async function expectSemanticsAndSkip(page: Page) {
+async function expectSemanticsAndInitialFocus(page: Page) {
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   for (const role of ["banner", "main", "contentinfo"] as const)
     await expect(page.getByRole(role)).toHaveCount(1);
@@ -72,12 +72,16 @@ async function expectSemanticsAndSkip(page: Page) {
       expect(level).toBeLessThanOrEqual(headings[index] + 1),
     );
   await page.keyboard.press("Tab");
-  const skip = page.getByRole("link", { name: "Skip to main content" });
-  await expect(skip).toBeFocused();
-  await expect(skip).toBeInViewport();
-  await expect(skip).toHaveCSS("outline-style", "solid");
-  await page.keyboard.press("Enter");
-  await expect(page.locator("#main-content")).toBeFocused();
+  const identity = page
+    .getByRole("banner")
+    .getByRole("link", { name: "FunkSpace", exact: true });
+  await expect(identity).toBeFocused();
+  await expect(identity).toBeInViewport();
+  await expect(identity).toHaveCSS("outline-style", "solid");
+  await expect(
+    page.getByRole("link", { name: "Skip to main content" }),
+  ).toHaveCount(0);
+  expect(new URL(page.url()).hash).toBe("");
 }
 
 for (const javaScriptEnabled of [true, false]) {
@@ -159,7 +163,7 @@ for (const javaScriptEnabled of [true, false]) {
             ),
         ).toBe(true);
         await expectVisibleBrand(page);
-        await expectSemanticsAndSkip(page);
+        await expectSemanticsAndInitialFocus(page);
         if (entry.route === "/") {
           await expect(page.locator("#start")).not.toContainText(
             startIntroduction,
@@ -263,7 +267,7 @@ for (const javaScriptEnabled of [true, false]) {
       }
     });
 
-    test("unknown route returns an actual 404 with readable recovery and a working skip target", async ({
+    test("unknown route returns an actual 404 with readable recovery and native initial focus", async ({
       page,
     }) => {
       const errors: string[] = [];
@@ -298,7 +302,7 @@ for (const javaScriptEnabled of [true, false]) {
         page.getByText("The page you requested could not be found."),
       ).toBeVisible();
       await expectVisibleBrand(page);
-      await expectSemanticsAndSkip(page);
+      await expectSemanticsAndInitialFocus(page);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
         "content",
         /noindex/,

@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import {
   DEFAULT_PARTICLE_CONFIG,
+  MOBILE_WEB_PARTICLE_CONFIG,
   PARTICLE_SETTINGS,
 } from "../frontend/domain/particles/ParticleSettings";
 
@@ -17,6 +18,54 @@ const frameCount = (p: Page) =>
   p.evaluate(
     () => (window as typeof window & { fs46: { frames: number } }).fs46.frames,
   );
+
+for (const width of [390, 639, 640, 768, 1280]) {
+  test(`WEB defaults at ${width}px keep only the requested mobile tuning`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await setup(page, "off");
+    await page.goto(route);
+    await openCustomization(page);
+    const config =
+      width < 640 ? MOBILE_WEB_PARTICLE_CONFIG : DEFAULT_PARTICLE_CONFIG;
+    for (const [label, value] of [
+      ["Particles", config.count],
+      ["Speed", config.speed],
+      ["Size", config.size],
+      ["Links", config.connectionsPerParticle],
+      ["Reach", config.connectionDistance],
+    ] as const) {
+      await expect(
+        modal(page).getByRole("slider", { name: label, exact: true }),
+      ).toHaveValue(String(value));
+    }
+    await stopped(page);
+  });
+}
+
+test("WEB resize keeps custom choices and Reset restores the current device profile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setup(page, "off");
+  await page.goto(route);
+  await openCustomization(page);
+  const speed = modal(page).getByRole("slider", { name: "Speed", exact: true });
+  const reach = modal(page).getByRole("slider", { name: "Reach", exact: true });
+  await speed.fill("0.4");
+  await reach.fill("8");
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await expect(speed).toHaveValue("0.4");
+  await expect(reach).toHaveValue("8");
+  await modal(page).getByRole("button", { name: "Reset animation" }).click();
+  await expect(speed).toHaveValue("0.2");
+  await expect(reach).toHaveValue("6");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(speed).toHaveValue("0.1");
+  await expect(reach).toHaveValue("5");
+  await stopped(page);
+});
 async function setup(p: Page, choice = "on") {
   await p.emulateMedia({ reducedMotion: "no-preference" });
   await p.addInitScript((choice) => {

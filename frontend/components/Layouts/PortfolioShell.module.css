@@ -63,16 +63,6 @@
   }
 }
 
-.skipLink:focus {
-  z-index: 30;
-  top: max(var(--fs-space-xs), var(--shell-safe-top));
-  left: max(var(--fs-space-xs), var(--shell-safe-left));
-  max-width: calc(
-    100% - max(var(--fs-space-xs), var(--shell-safe-left)) -
-      max(var(--fs-space-xs), var(--shell-safe-right))
-  );
-}
-
 .header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
