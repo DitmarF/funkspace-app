@@ -45,9 +45,12 @@ pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 
 Contact server preparation: [FS-5.2 setup and safety gates](docs/development/contact-server.md).
 The Node-runtime `/api/contact` route is implemented with controlled tests;
-production composition remains locked off. The `/contact` page now provides
-visible disabled fields and an email fallback while sending is disabled; [FS-5.4 UI checks](docs/development/contact-ui.md)
-cover the controlled form and browser adapter. Live delivery remains pending.
+delivery defaults off and requires exact `CONTACT_ENABLED=true` and valid
+server configuration to enable it. The `/contact` page provides disabled fields
+and an email fallback while sending is off. [FS-5.6 acceptance](docs/tasks/fs-5.6-contact-acceptance.md)
+records the accepted Preview journey and shutdown; it is not evidence of current
+Production configuration. [FS-5.4 UI checks](docs/development/contact-ui.md)
+cover the controlled form and browser adapter.
 Run contact-layer tests explicitly with
 `pnpm exec vitest run --config vitest.contact.config.ts --coverage`, because
 the broad coverage configuration excludes these layers.
@@ -84,16 +87,26 @@ system preference changes.
 
 ```bash
 pnpm lint           # Next.js lint + prettier --check
-pnpm test           # Vitest in CI mode
+pnpm test           # Node preview-server safety tests, then Vitest
 pnpm test:watch     # Vitest watch mode
-pnpm coverage       # V8: 75% lines/functions/statements, 80% branches; configured exclusions apply
+pnpm coverage       # Node preview-server safety tests, then Vitest/V8 coverage
 pnpm typecheck:validation # frontend + stories + all E2E/fixtures + Playwright configs
 pnpm e2e            # Playwright end-to-end suite (Chromium only)
 ```
 
 Vitest is configured to reuse the frontend React installation and loads
 `vitest.setup.ts` for Testing Library matchers. Coverage thresholds are enforced
-when coverage runs. CI enables coverage by default; `pnpm coverage` also enables it locally.
+when coverage runs: 75% lines/functions/statements and 80% branches, with the
+configured exclusions. CI enables coverage by default; `pnpm coverage` also enables it locally.
+The Node preview-server suite runs separately with `pnpm test:contact-preview-server`;
+it is excluded from Vitest because it uses Node's own test runner, not to skip it.
+
+The CI workflow provisions dependencies and Chromium first, then runs application
+checks in a Linux loopback-only network namespace with delivery off, blank mail
+settings and per-check evidence. The launcher requires `sudo`, `unshare`, `ip` and
+`setpriv` on its runner. Ordinary local commands do not automatically provide that
+isolation; use fresh credential-free snapshots and the contact guidance for local
+browser or server checks. CI artifacts do not replace human or deployed acceptance.
 
 The normal frontend type check excludes stories and root E2E files. CI also runs
 `pnpm typecheck:validation` using `frontend/tsconfig.validation.json`, which includes

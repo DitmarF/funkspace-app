@@ -1,6 +1,6 @@
 import { defineConfig } from "@playwright/test";
 import { existsSync } from "node:fs";
-import { isAbsolute, join } from "node:path";
+import { isAbsolute, join, relative, sep } from "node:path";
 import { tmpdir } from "node:os";
 import base from "./playwright.config";
 
@@ -20,7 +20,19 @@ for (const directory of [workspace, join(workspace, "frontend")]) {
         "Contact E2E snapshot must contain no environment files.",
       );
 }
-const egressPreloader = join(workspace, "deny-contact-egress.cjs");
+// The historical local launcher uses the root path. CI may identify its
+// version-controlled guard explicitly, but it must belong to the candidate.
+const egressPreloader =
+  process.env.CONTACT_EGRESS_PRELOADER ??
+  join(workspace, "deny-contact-egress.cjs");
+const guardRelative = relative(workspace, egressPreloader);
+if (
+  !isAbsolute(egressPreloader) ||
+  guardRelative === ".." ||
+  guardRelative.startsWith(".." + sep) ||
+  isAbsolute(guardRelative)
+)
+  throw new Error("Contact egress preloader must be inside the candidate.");
 if (!existsSync(egressPreloader))
   throw new Error(
     "Contact E2E snapshot requires the egress-denying preloader.",

@@ -15,8 +15,9 @@
   },
   "scripts": {
     "lint": "pnpm check:icons && pnpm check:theme-bootstrap && pnpm --filter frontend exec next lint --max-warnings=0 && prettier --check .",
-    "test": "pnpm check:icons && pnpm check:theme-bootstrap && vitest run",
-    "coverage": "pnpm check:icons && pnpm check:theme-bootstrap && vitest run --coverage",
+    "test": "pnpm check:icons && pnpm check:theme-bootstrap && pnpm test:contact-preview-server && vitest run",
+    "coverage": "pnpm check:icons && pnpm check:theme-bootstrap && pnpm test:contact-preview-server && vitest run --coverage",
+    "test:contact-preview-server": "node --test scripts/serve-contact-preview.test.mjs",
     "test:theme-bootstrap": "pnpm check:theme-bootstrap && vitest run --config vitest.theme-bootstrap.config.ts --coverage",
     "build:theme-bootstrap": "node scripts/build-theme-bootstrap.mjs",
     "check:theme-bootstrap": "node scripts/build-theme-bootstrap.mjs --check",
@@ -54,11 +55,11 @@
     "@typescript-eslint/eslint-plugin": "^8.35.1",
     "@typescript-eslint/parser": "^8.35.1",
     "@vitejs/plugin-react-swc": "^3.11.0",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "4.1.12",
     "cross-env": "^7.0.3",
     "esbuild": "0.28.2",
     "eslint": "^9",
-    "eslint-config-next": "15.5.24",
+    "eslint-config-next": "15.5.28",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.1",
     "jsdom": "^26.1.0",
@@ -66,6 +67,6 @@
     "prettier": "^3.6.2",
     "style-dictionary": "5.5.2",
     "tsx": "4.23.12",
-    "vitest": "4.1.11"
+    "vitest": "4.1.12"
   }
 }

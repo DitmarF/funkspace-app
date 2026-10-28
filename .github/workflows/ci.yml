@@ -11,9 +11,9 @@ permissions:
 
 jobs:
   ci:
-    name: Lint, Types, Unit, E2E, LHCI
+    name: Isolated release checks
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
@@ -28,45 +28,171 @@ jobs:
           package-manager-cache: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4; main's pinned revision
 
+      # Installation/browser provisioning needs the network and is deliberately
+      # separate from credential-free application execution below.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build tokens
-        run: pnpm build:tokens
-
-      - name: Lint & Prettier
-        run: pnpm lint
-
-      - name: Typecheck (frontend)
-        run: |
-          cd frontend
-          pnpm exec tsc --noEmit
-
-      - name: Typecheck (stories, E2E and Playwright configs)
-        run: pnpm typecheck:validation
-
-      - name: Unit tests (Vitest)
-        run: pnpm coverage
-
-      - name: Theme bootstrap behavior, generation and focused coverage
-        run: pnpm test:theme-bootstrap
-
-      - name: Install Playwright browsers
+      - name: Install Playwright Chromium
         run: pnpm setup:browsers
 
-      - name: E2E tests (Playwright)
-        run: pnpm e2e
+      - name: Prepare isolated evidence destination
+        run: echo "FS_CI_EVIDENCE_DIR=$RUNNER_TEMP/funkspace-ci-evidence" >> "$GITHUB_ENV"
 
-      - name: Build frontend
-        run: pnpm build
+      - name: Freshness, types, lint and broad coverage
+        env:
+          FS_CI_LABEL: core
+        run: |
+          bash scripts/run-ci-isolated.sh bash -euc '
+            pnpm check:icons
+            pnpm check:theme-bootstrap
+            pnpm check:scene-apertures
+            pnpm build:tokens
+            git diff --exit-code -- styles/tokens.css common/generated
+            pnpm -F frontend exec tsc --noEmit --incremental false
+            pnpm typecheck:validation
+            pnpm -F @funkspace/common typecheck
+            pnpm lint
+            node scripts/test-basic-ftp-security.mjs
+            pnpm coverage --coverage.reportsDirectory "$FS_CI_PHASE_OUTPUT/coverage"
+          '
 
-      - name: Production theme startup and runtime handoff
-        run: pnpm e2e:theme-bootstrap
+      - name: Theme bootstrap and explicit contact coverage
+        env:
+          FS_CI_LABEL: focused-coverage
+        run: |
+          bash scripts/run-ci-isolated.sh bash -euc '
+            pnpm test:theme-bootstrap --coverage.reportsDirectory "$FS_CI_PHASE_OUTPUT/coverage/theme-bootstrap"
+            pnpm exec vitest run --config vitest.contact.config.ts --coverage --coverage.reportsDirectory "$FS_CI_PHASE_OUTPUT/coverage/contact"
+          '
 
-      - name: Lighthouse CI (flag OFF)
-        run: pnpm lhci:off
+      - name: Standalone game types, tests and builds
+        env:
+          FS_CI_LABEL: standalone-game
+        run: |
+          bash scripts/run-ci-isolated.sh bash -euc '
+            pnpm -F @funkspace/wave-survivor typecheck
+            pnpm -F @funkspace/wave-survivor test
+            pnpm -F @funkspace/wave-survivor build
+            pnpm -F @funkspace/wave-survivor demo:build
+          '
 
-      - name: Lighthouse CI (flag ON)
-        run: pnpm lhci:on
+      - name: Build site with animation disabled
+        env:
+          FS_CI_LABEL: build-off
+          FS_CI_ANIMATIONS: "false"
+        run: bash scripts/run-ci-isolated.sh pnpm build
+
+      - name: Production routes with animation disabled
+        env:
+          FS_CI_LABEL: routes-off
+          FS_CI_ANIMATIONS: "false"
+          FS_CI_SUITE: production
+        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.ci.config.ts
+
+      - name: Theme startup with animation disabled
+        env:
+          FS_CI_LABEL: theme-off
+          FS_CI_ANIMATIONS: "false"
+          FS_CI_ORIGIN: http://localhost:3100
+          FS_CI_SUITE: theme
+        run: |
+          bash scripts/run-ci-isolated.sh bash -euc '
+            pnpm check:theme-bootstrap
+            pnpm exec playwright test --config playwright.ci.config.ts
+          '
+
+      - name: Isolated delivery-off contact route checks
+        env:
+          FS_CI_LABEL: contact-routes
+          FS_CI_ORIGIN: http://127.0.0.1:33054
+        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.contact.config.ts
+
+      - name: Performance with animation disabled
+        env:
+          FS_CI_LABEL: lighthouse-off
+          FS_CI_ANIMATIONS: "false"
+        run: |
+          bash scripts/run-ci-isolated.sh bash -euc '
+            cd "$TMPDIR"
+            node "$FS_CI_WORKSPACE/node_modules/@lhci/cli/src/cli.js" autorun \
+              --config="$FS_CI_WORKSPACE/.lighthouse/lighthouserc.off.json" \
+              --collect.startServerCommand="pnpm --dir \"$FS_CI_WORKSPACE\" -F frontend start -H 127.0.0.1 -p 3000" \
+              --upload.outputDir="$FS_CI_PHASE_OUTPUT/lighthouse-reports/off" \
+              --failOnUploadFailure
+          '
+
+      - name: Build Storybook
+        env:
+          FS_CI_LABEL: storybook-build
+        run: bash scripts/run-ci-isolated.sh pnpm storybook:build
+
+      - name: Static Storybook interaction and accessibility
+        env:
+          FS_CI_LABEL: storybook-browser
+          FS_CI_ORIGIN: http://127.0.0.1:6006
+          FS_CI_SUITE: storybook
+        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.ci.config.ts
+
+      - name: Controlled contact fixtures with reduced motion
+        env:
+          FS_CI_LABEL: contact-fixtures
+          FS_CI_ORIGIN: http://127.0.0.1:33155
+        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.contact-manual.config.ts
+
+      - name: Standalone demo browser checks
+        env:
+          FS_CI_LABEL: game-browser
+          FS_CI_ORIGIN: http://localhost:5173
+          FS_CI_SUITE: demo
+        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.ci.config.ts
+
+      - name: Build site with animation enabled
+        env:
+          FS_CI_LABEL: build-on
+          FS_CI_ANIMATIONS: "true"
+        run: bash scripts/run-ci-isolated.sh pnpm build
+
+      - name: Production routes with animation enabled
+        env:
+          FS_CI_LABEL: routes-on
+          FS_CI_ANIMATIONS: "true"
+          FS_CI_SUITE: production
+        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.ci.config.ts
+
+      - name: Theme startup with animation enabled
+        env:
+          FS_CI_LABEL: theme-on
+          FS_CI_ANIMATIONS: "true"
+          FS_CI_ORIGIN: http://localhost:3100
+          FS_CI_SUITE: theme
+        run: |
+          bash scripts/run-ci-isolated.sh bash -euc '
+            pnpm check:theme-bootstrap
+            pnpm exec playwright test --config playwright.ci.config.ts
+          '
+
+      - name: Performance with animation enabled
+        env:
+          FS_CI_LABEL: lighthouse-on
+          FS_CI_ANIMATIONS: "true"
+        run: |
+          bash scripts/run-ci-isolated.sh bash -euc '
+            cd "$TMPDIR"
+            node "$FS_CI_WORKSPACE/node_modules/@lhci/cli/src/cli.js" autorun \
+              --config="$FS_CI_WORKSPACE/.lighthouse/lighthouserc.on.json" \
+              --collect.startServerCommand="pnpm --dir \"$FS_CI_WORKSPACE\" -F frontend start -H 127.0.0.1 -p 3000" \
+              --upload.outputDir="$FS_CI_PHASE_OUTPUT/lighthouse-reports/on" \
+              --failOnUploadFailure
+          '
+
+      - name: Retain isolated check evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: funkspace-release-checks-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/funkspace-ci-evidence
+          if-no-files-found: warn
+          retention-days: 7
