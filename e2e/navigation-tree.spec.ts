@@ -27,12 +27,13 @@ for (const width of [320, 768, 1280]) {
       "Privacy",
       "Privacy policy",
       "Legal notice",
+      "Contact",
     ]);
     for (const [label, family] of [
       ["Games", "games"],
       ["Web Aperture", "s-web"],
     ]) {
-      const size = width < 768 ? 24 : 36;
+      const size = 36;
       const row = nav
         .locator("a, summary")
         .filter({ hasText: new RegExp(`^${label}$`) });
@@ -81,12 +82,63 @@ for (const width of [320, 768, 1280]) {
       await page.evaluate((size) => {
         document.documentElement.style.fontSize = size;
       }, fontSize);
+      if (width === 320) {
+        for (const row of [
+          nav.getByRole("button", { name: "Home", exact: true }),
+          nav.getByRole("link", { name: "About", exact: true }),
+        ]) {
+          const label = row.locator(":scope > span").last();
+          const labelBox = (await label.boundingBox())!;
+          const iconBox = (await row
+            .locator(":scope > svg:visible")
+            .boundingBox())!;
+          if (fontSize === "100%") {
+            // Keep the accepted side-by-side layout when text is not enlarged.
+            expect(
+              Math.abs(
+                labelBox.y +
+                  labelBox.height / 2 -
+                  iconBox.y -
+                  iconBox.height / 2,
+              ),
+            ).toBeLessThan(1);
+          } else {
+            // These short names should remain whole, not fragment letter by letter.
+            expect(
+              await label.evaluate((node) => {
+                const range = document.createRange();
+                range.selectNodeContents(node.firstChild!);
+                return Array.from(range.getClientRects()).filter(
+                  (rect) => rect.width > 0,
+                ).length;
+              }),
+            ).toBe(1);
+            await expect(row).toHaveCSS("font-size", "48px");
+            await expect(row.locator(":scope > svg:visible")).toHaveCSS(
+              "width",
+              "36px",
+            );
+            const categories = page.getByRole("group", {
+              name: "Settings categories",
+            });
+            for (const control of await categories.getByRole("button").all()) {
+              const box = await control.boundingBox();
+              if (box)
+                // Preserve room for the existing 2px outline and 2px offset.
+                expect(labelBox.x + labelBox.width + 4).toBeLessThanOrEqual(
+                  box.x,
+                );
+            }
+          }
+        }
+      }
       for (const branch of await nav.locator("details[open]").all()) {
         const arrow = branch.locator(":scope > summary svg").nth(1);
         const children = branch.locator(":scope > ul");
         await expect(children).toHaveCSS("border-inline-start-width", "2px");
         const arrowBox = (await arrow.boundingBox())!;
         const listBox = (await children.boundingBox())!;
+        expect(arrowBox.width).toBeCloseTo(24, 1);
         expect(
           Math.abs(listBox.x + 1 - (arrowBox.x + arrowBox.width / 2)),
         ).toBeLessThan(0.5);
@@ -127,7 +179,10 @@ test("disclosures support keyboard use, independent branches, themes and ready d
   await page.keyboard.press("Space");
   await expect(games.locator("..")).toHaveAttribute("open", "");
   await expect(animations.locator("..")).toHaveAttribute("open", "");
-  await expect(nav.locator('[aria-disabled="true"]')).toHaveCount(3);
+  await expect(nav.locator('[aria-disabled="true"]')).toHaveCount(1);
+  await expect(nav.locator('[aria-disabled="true"]')).toContainText(
+    "Wave Survivor",
+  );
   await expect(nav.locator('[aria-disabled="true"] a')).toHaveCount(0);
   for (const row of await nav.locator('[aria-disabled="true"]').all())
     await expect(row.locator("svg:visible")).toHaveCount(1);

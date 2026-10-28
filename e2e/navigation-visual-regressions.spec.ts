@@ -1,5 +1,22 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { openSettings } from "./helpers/foundation";
+
+async function captureArtwork(
+  page: Page,
+  clip: { x: number; y: number; width: number; height: number },
+) {
+  const session = await page.context().newCDPSession(page);
+  try {
+    const image = await session.send("Page.captureScreenshot", {
+      format: "png",
+      clip: { ...clip, scale: 1 },
+      captureBeyondViewport: false,
+    });
+    return Buffer.from(image.data, "base64");
+  } finally {
+    await session.detach();
+  }
+}
 
 for (const width of [320, 375, 768, 1254, 1454, 2365]) {
   test(`navigation spacing stays consistent at ${width}px`, async ({
@@ -68,10 +85,12 @@ for (const route of ["/about", "/privacy", "/impressum"]) {
       );
       for (const reload of [false, true]) {
         let release!: () => void;
+        let heldRequests = 0;
         const held = new Promise<void>((resolve) => {
           release = resolve;
         });
         await page.route("**/_next/static/**/*.js", async (request) => {
+          heldRequests++;
           await held;
           await request.continue();
         });
@@ -81,6 +100,13 @@ for (const route of ["/about", "/privacy", "/impressum"]) {
           const tree = page.locator('footer nav[aria-label="Primary"]');
           await expect(tree).toBeAttached();
           await expect(tree).toBeHidden();
+          await expect.poll(() => heldRequests).toBeGreaterThan(0);
+          await expect(
+            page.getByRole("button", {
+              name: "Menu: navigation and settings",
+              exact: true,
+            }),
+          ).toHaveCount(0);
           // Keep this case idle to verify the unchanged pre/post-hydration paint.
           // Active keyboard continuity is covered in navigation-hydration.spec.ts.
           const fallback = page.locator("footer details").first();
@@ -97,13 +123,11 @@ for (const route of ["/about", "/privacy", "/impressum"]) {
           const viewport = () =>
             page.evaluate(() => ({ width: innerWidth, height: innerHeight }));
           expect(await viewport()).toEqual({ width, height: 720 });
-          // Use Playwright's screenshot queue/viewport ownership rather than a
-          // separate raw CDP session. Keep scripts held and compare the exact
-          // trigger pixels without allowing capture to resize the viewport.
-          const initialArtwork = await page.screenshot({
-            type: "png",
-            clip: initialBox,
-          });
+          // This trigger is SVG-only. Playwright's screenshot waits for all
+          // document fonts, which can wait on the scripts intentionally held
+          // here during reload. Capture the actual pixels without changing
+          // device metrics, then verify the viewport and exact PNG both sides.
+          const initialArtwork = await captureArtwork(page, initialBox);
           expect(await viewport()).toEqual({ width, height: 720 });
           if (route === "/about") {
             const current = tree.getByRole("button", {
@@ -129,10 +153,7 @@ for (const route of ["/about", "/privacy", "/impressum"]) {
           await expect(menu).toBeVisible();
           expect(await viewport()).toEqual({ width, height: 720 });
           expect(await menu.boundingBox()).toEqual(initialBox);
-          const enhancedArtwork = await page.screenshot({
-            type: "png",
-            clip: initialBox,
-          });
+          const enhancedArtwork = await captureArtwork(page, initialBox);
           expect(await viewport()).toEqual({ width, height: 720 });
           expect(enhancedArtwork).toEqual(initialArtwork);
           await info.attach(`identical-trigger-${reload ? "reload" : "load"}`, {

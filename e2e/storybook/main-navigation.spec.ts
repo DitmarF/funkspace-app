@@ -9,13 +9,16 @@ for (const width of [320, 768, 1280]) {
       );
       const nav = page.getByRole("navigation", { name: "Main", exact: true });
       await expect(nav).toBeVisible();
-      await expect(nav.getByRole("button", { name: "Contact" })).toBeDisabled();
       const home = nav.getByRole("button", { name: "Home", exact: true });
       const about = nav.getByRole("link", { name: "About" });
+      const contact = nav.getByRole("link", { name: "Contact", exact: true });
       await expect(home).toBeDisabled();
       await expect(home).toHaveAttribute("aria-current", "page");
       await expect(about).toHaveAttribute("href", "/about");
+      await expect(contact).toHaveAttribute("href", "/contact");
       await about.focus();
+      await page.keyboard.press("Tab");
+      await expect(contact).toBeFocused();
       await page.keyboard.press("Tab");
       await expect(
         page.getByRole("button", {

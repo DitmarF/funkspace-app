@@ -2,7 +2,7 @@
 
 ## Task metadata
 
-- **Status:** Four requested corrections implemented; changed-device human recheck and separate UI-DEVICE-05 remain open.
+- **Status:** Four requested corrections implemented; corrected UI-DEVICE-05 passed ON/OFF automated suites; changed-device human recheck remains open.
 - **Owner:** Sites UI corrections, coordinated in the existing FunkSpace repository.
 - **Base:** `feature/funkspace-minimum-usable`, `dede11b781d42e0c3622757faa3c65b16a04370d`; clean checkout at inspection.
 - **Related records:** [Findings register](fs-6.3-acceptance-findings.md), [portfolio plan](../features/funkspace-minimum-usable.md).
@@ -58,10 +58,18 @@ The original narrow shell test command inherited whole-repository coverage thres
 
 The separately compiled OFF production rerun passes **56/56** static-route, scene/customization and contact cases (`production-ui-off.log`). This verifies the disabled build independently of merely selecting an Off preference in the ON build.
 
-### Separate finding: UI-DEVICE-05 — Significant / Sites, open
+### Separate finding: UI-DEVICE-05 — Significant / Sites
 
 On `/privacy` at 320×568 with 200% root text, keyboard focus on the long TLfDI authority link leaves its first text fragment above the viewport (observed top approximately −50px, total link height 381px). The remaining 20 responsive cases pass; the smallest case fails again with one worker. The four requested runtime corrections do not alter that link, its copy, Privacy layout or shell scrolling rules. No baseline reproduction was run, so its introduction is unverified rather than claimed pre-existing. A possible cause is the unchanged enlarged scroll-padding reservation; that is an inference for the next bounded correction, not a demonstrated diagnosis. Retain `responsive-keyboard-final.log`, `responsive-small-serial.log` and their screenshots; do not weaken the full-visibility assertion.
 
+**Later correction checkpoint:** The following candidate changes the mobile shell's launcher sizing and bounds its scroll-padding reservation continuously across short viewport heights while preserving safe-area clearance. In isolated Chromium, **4/4** focused cases passed: the entire authority link, all painted fragments, focus outline and launcher non-overlap at 320×568, ×577 and ×600 with 200% text, plus normal mobile/tablet launcher sizing. Results are in `artifacts/fs-6.3-final-corrections/privacy-height-boundary-after.log`; the prior ×577/×600 failures remain in `privacy-height-boundary-before.log`. These are scoped automated results, not physical-device acceptance or a completed full responsive rerun. The evolving candidate, exact current source/diff and remaining checks are tracked in the [FS-6.1 correction checkpoint](fs-6.1-release-candidate-review.md#bounded-correction-checkpoint--28-october-2026).
+
+**Subsequent full ON/OFF runs:** The complete corrected production browser suite, including the responsive cases, passed **400/400** with animation ON in 279.62 seconds and **400/400** with animation OFF in 126.47 seconds (`artifacts/fs-6.3-final-corrections/final-production-{on,off}.log`). Theme startup passed **21/21** in each variant. The earlier failures remain recorded above. Dimi reports that the separately prepared delivery-off application and fake Contact fixture load on a physical phone; that confirms connectivity only. It does not supply the device/browser/version, manual Privacy observation or any H01–H10 acceptance result. See the [FS-6.1 follow-up](fs-6.1-release-candidate-review.md#latest-automation-checkpoint--28-october-2026) for OFF/ON Lighthouse measurements and the ON performance warning.
+
+**FS-6.2 handoff:** The corrected candidate is **READY FOR FS-6.2** as a technical handoff. Dimi reports access to the phone preview/fixture and three labelled desktop Chromium contexts for storage denial, failed startup and no JavaScript. Actual human checks, physical-device observations and release acceptance remain open. See the [technical handoff](fs-6.1-release-candidate-review.md#fs-62-technical-handoff--28-october-2026) for source identities and temporary links.
+
+**Storybook navigation follow-up:** A later static Storybook check exposed stale Contact expectations in the header test; after a test-only correction, the exact-port suite passed **37/37** in 19.62 seconds. The initial invalid launcher path and 12/37 stale-expectation failures remain in `final-storybook-nav.log` and `final-storybook-nav-retry.log`; the passing rerun is `final-storybook-nav-corrected.log`. The phone preview's app and fixture runtime source was not changed by this test correction.
+
 ### Remaining evidence
 
-Dimi should recheck the changed mobile artwork, larger tree and secondary Contact button on the intended presentation devices, including portrait/landscape. The existing <640px policy means wide landscape phones use the accepted wider profile. Review keyboard entry after the requested skip-link removal. This record does not close FS-6.2, final FS-6.3, the existing technical/security findings or release acceptance. Lighthouse was not repeated: the earlier macOS profile-socket startup blocker remains; no performance claim is inferred. At the original correction handoff, these UI changes had not been committed, pushed, published or deployed.
+Dimi should recheck the changed mobile artwork, larger tree and secondary Contact button on the intended presentation devices, including portrait/landscape. The existing <640px policy means wide landscape phones use the accepted wider profile. Review keyboard entry after the requested skip-link removal. This record does not close FS-6.2, final FS-6.3, the existing technical/security findings or release acceptance. At the original correction handoff, Lighthouse had not been repeated and these UI changes had not been committed, pushed, published or deployed; later evidence is recorded in the linked checkpoints.

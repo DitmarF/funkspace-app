@@ -108,6 +108,51 @@ async function expectClearFocus(link: Locator) {
   expect(result.clear, JSON.stringify(result)).toBe(true);
 }
 
+test("mobile menu target keeps its normal size at enlarged text while tablet scaling remains intact", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto("/");
+  const menu = page.getByRole("button", {
+    name: "Menu: navigation and settings",
+    exact: true,
+  });
+  await expect(menu).toBeVisible();
+  await expect.poll(async () => (await menu.boundingBox())?.width).toBe(76);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  await expect.poll(async () => (await menu.boundingBox())?.width).toBe(76);
+  expect((await menu.boundingBox())!.height).toBeGreaterThanOrEqual(48);
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await expect.poll(async () => (await menu.boundingBox())?.width).toBe(148);
+});
+
+for (const height of [568, 577, 600]) {
+  test(`keyboard focus keeps the long Privacy authority link clear at 320×${height} and 200% text`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height });
+    await page.goto("/privacy");
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole("main").focus();
+    const authority = page.getByRole("link", {
+      name: /Thüringer Landesbeauftragte für den Datenschutz/,
+    });
+    for (let index = 0; index < 40; index++) {
+      await page.keyboard.press("Tab");
+      if (await authority.evaluate((node) => node === document.activeElement))
+        break;
+    }
+    // Includes the entire bounding box, all painted fragments, focus outline,
+    // viewport bounds and the fixed mobile menu's non-overlap.
+    await expectClearFocus(authority);
+  });
+}
+
 for (const viewport of viewports) {
   for (const textScale of [100, 200]) {
     test(`${viewport.width}×${viewport.height}, ${textScale}% text: routes, themes, scroll and keyboard`, async ({

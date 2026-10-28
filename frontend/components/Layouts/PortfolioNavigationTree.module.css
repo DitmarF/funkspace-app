@@ -1,6 +1,7 @@
 .tree {
   --tree-arrow-size: 24px;
   --tree-indent: min(var(--fs-space-lg), 24px);
+  container-type: inline-size;
   min-width: 0;
   width: 100%;
   max-width: 36rem;
@@ -121,6 +122,14 @@
   display: block;
   font-size: var(--fs-font-size-md);
   font-weight: var(--fs-font-weight-regular);
+}
+
+/* At very narrow content widths, let enlarged labels use the whole row rather
+   than wrapping one or two letters beside the fixed-size arrow and icon. */
+@container (max-width: 190px) {
+  .row:not(.compact) > .label {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (min-width: 48rem) {

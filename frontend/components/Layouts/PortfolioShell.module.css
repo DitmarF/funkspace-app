@@ -140,6 +140,30 @@
   --hex-size: var(--navigation-artwork-size);
 }
 
+/* Keep the fixed mobile rail at its normal artwork size when text grows, so
+   enlarged navigation labels still have room beside the controls. */
+@media (width < 48rem) {
+  .shell {
+    --navigation-artwork-size: min(calc(var(--fs-space-2xl) * 1.5), 72px);
+  }
+
+  /* Keep enough clearance for the capped launcher without reserving so much
+     viewport height that a long focused link is pushed above the screen. */
+  :global(html):has(.shell) {
+    scroll-padding-bottom: min(
+      calc(var(--fs-space-2xl) * 3 + env(safe-area-inset-bottom, 0px)),
+      max(
+        25svh,
+        calc(
+          min(calc(var(--fs-space-2xl) * 1.5), 72px) + 4px +
+            max(var(--fs-space-md), env(safe-area-inset-bottom, 0px)) +
+            min(var(--fs-space-md), 16px)
+        )
+      )
+    );
+  }
+}
+
 /* Decorative artwork need not double with text when vertical room is scarce. */
 @media (max-height: 36rem) {
   .shell {
