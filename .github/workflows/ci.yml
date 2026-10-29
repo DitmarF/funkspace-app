@@ -96,7 +96,11 @@ jobs:
         env:
           FS_CI_LABEL: particle-fixtures-off
           FS_CI_ANIMATIONS: "false"
-        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.particle-fixtures.config.ts
+        run: |
+          bash scripts/run-ci-isolated.sh bash -euc '
+            node --test scripts/ci-fixture-next-offline.test.cjs
+            pnpm exec playwright test --config playwright.particle-fixtures.config.ts
+          '
 
       - name: Theme startup with animation disabled
         env:
@@ -172,7 +176,11 @@ jobs:
         env:
           FS_CI_LABEL: particle-fixtures-on
           FS_CI_ANIMATIONS: "true"
-        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.particle-fixtures.config.ts
+        run: |
+          bash scripts/run-ci-isolated.sh bash -euc '
+            node --test scripts/ci-fixture-next-offline.test.cjs
+            pnpm exec playwright test --config playwright.particle-fixtures.config.ts
+          '
 
       - name: Theme startup with animation enabled
         env:
