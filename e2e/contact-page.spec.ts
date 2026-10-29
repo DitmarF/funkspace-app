@@ -323,7 +323,14 @@ test("controlled acceptance, duplicate guard, preserved snapshot and explicit re
   });
   await controlledPage(page);
   await fill(page);
-  await page.getByRole("button", { name: "Send message" }).click();
+  const send = page.getByRole("button", { name: "Send message" });
+  const appearance = (button: HTMLElement) => {
+    const css = getComputedStyle(button);
+    return [css.color, css.backgroundColor, css.borderColor];
+  };
+  await page.mouse.move(0, 0);
+  const sendAppearance = await send.evaluate(appearance);
+  await send.click();
   await expect(page.getByLabel(/Message/)).toHaveAttribute("readonly", "");
   await page.getByLabel(/Email/).press("Enter");
   await expect.poll(() => bodies.length).toBe(1);
@@ -333,7 +340,10 @@ test("controlled acceptance, duplicate guard, preserved snapshot and explicit re
   await expect(page.getByLabel(/Message/)).toHaveValue(
     "Controlled browser inquiry.",
   );
-  await page.getByRole("button", { name: "Send another message" }).click();
+  const another = page.getByRole("button", { name: "Send another message" });
+  await page.mouse.move(0, 0);
+  expect(await another.evaluate(appearance)).toEqual(sendAppearance);
+  await another.click();
   await expect(page.getByLabel(/Name/)).toBeFocused();
   await expect(page.getByLabel(/Message/)).toHaveValue("");
 });

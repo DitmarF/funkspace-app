@@ -12,8 +12,10 @@ export default function PortfolioFooterNavigation() {
         <li className={styles.socialItem}>
           <a
             href="https://github.com/DitmarF/funkspace-app"
-            aria-label="FunkSpace project on GitHub"
-            title="FunkSpace project on GitHub"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="FunkSpace project on GitHub (opens in a new tab)"
+            title="FunkSpace project on GitHub (opens in a new tab)"
             className={`${rowStyles.row} ${rowStyles.compact} ${styles.social}`}
           >
             <Icon

@@ -38,7 +38,7 @@ validation evidence.
 `PortfolioFooterNavigation` supplies three centered native links: Legal notice
 (`/impressum`), Privacy policy (`/privacy`) and the icon-only FunkSpace project
 link to `https://github.com/DitmarF/funkspace-app`. The GitHub link has an
-accessible name and uses normal same-tab navigation; it makes no external
+accessible name that announces it opens in a new tab; it makes no external
 request until activated. Legal content and publication readiness are unchanged.
 
 The footer reuses compact navigation-row styling with registered 24px legal

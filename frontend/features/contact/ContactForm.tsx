@@ -365,7 +365,9 @@ export default function ContactForm({ available }: { available: boolean }) {
         </p>
       )}
       {accepted ? (
-        <Button onClick={another}>Send another message</Button>
+        <Button variant="secondary" onClick={another}>
+          Send another message
+        </Button>
       ) : (
         <Button
           variant="secondary"

@@ -22,7 +22,7 @@ for (const width of [320, 768, 1280]) {
         exact: true,
       });
       const github = footer.getByRole("link", {
-        name: "FunkSpace project on GitHub",
+        name: "FunkSpace project on GitHub (opens in a new tab)",
       });
       await expect(legal).toHaveAttribute("href", "/impressum");
       await expect(privacy).toHaveAttribute("href", "/privacy");
