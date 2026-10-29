@@ -63,20 +63,31 @@ for (const theme of ["default", "dark", "muted", "dark-high-contrast"]) {
         const external = await icon.screenshot({
           path: info.outputPath(`${name}-${size}-external.png`),
         });
-        await icon.evaluate(
+        const wrapper = await icon.evaluate(
           (svg, { sprite, name, size }) => {
             const source = new DOMParser().parseFromString(
               sprite,
               "image/svg+xml",
             );
-            svg.replaceChildren(
-              ...Array.from(
-                source.getElementById(`${name}-${size}`)!.childNodes,
-              ).map((node) => document.importNode(node, true)),
-            );
+            const group = source.getElementById(`${name}-${size}`)!;
+            // Compare the complete referenced group, including its attributes.
+            svg.replaceChildren(document.importNode(group, true));
+            return {
+              attributes: group.getAttributeNames().sort(),
+              fill: group.getAttribute("fill"),
+              localName: group.localName,
+              namespace: group.namespaceURI,
+            };
           },
           { sprite, name, size },
         );
+        // Do not let a shared transform, clip or paint change hide a mismatch.
+        expect(wrapper).toEqual({
+          attributes: ["data-view-box", "fill", "id"],
+          fill: "none",
+          localName: "g",
+          namespace: "http://www.w3.org/2000/svg",
+        });
         expect(
           await icon.screenshot({
             path: info.outputPath(`${name}-${size}-inline.png`),
