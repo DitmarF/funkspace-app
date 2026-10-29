@@ -1,9 +1,23 @@
 # FS-6.4 — Release preparation and integration packet
 
-- **Status:** IN PREPARATION — local integration prepared; Git delivery and release not authorized by this record. Blockers and unresolved provider/legal facts are below.
+- **Status:** BLOCKED — PR opened; hosted CI correction and release gates remain. The later FS-6.4C section supersedes historical checkpoints below.
 - **Owners:** Codex coordinates, Sites owns bounded content presentation, Dimi owns acceptance and external-action decisions.
 - **Date:** 29 October 2026, Europe/Berlin.
 - **Target:** public, tested and usable by Thursday evening 29 October, before the Friday 06:00 presentation, Europe/Berlin. Deadline does not waive gates.
+
+## FS-6.4C delivery and hosted evidence — 29 October 2026
+
+**Status: BLOCKED — NOT READY FOR RELEASE DECISION.** Dimi authorized the specific commit, feature push and PR creation. The historical pre-delivery statements below describe the earlier checkpoint and are superseded by this section. Merge, Production deployment and live mail remain unauthorized.
+
+[PR #292](https://github.com/DitmarF/funkspace-app/pull/292) targets `main` at `31abe42d97563775272d8a99e5021f3b39bc86ab` from feature head `c42bb71d44521c68270afecee1d8e91d70df702a`, tree `f1f3d7ca8c7505a9fe3cd49cf73e146405998184`. GitHub's synthetic merge `41073b5e89cb2372b75501e460a0962c25b1ebdb` has those base/head parents and the same reviewed tree. The lockfile SHA-256 remains `0e7bc65e308b9a0234992fecf6537875a689b06f7b38bf9181ed21915395ea22`. The PR is mergeable, but its check state is unstable and no PR review is recorded. Full main-to-head review remains required; branch protection does not enforce all release gates.
+
+**Hosted CI blocker CI-03 (Codex):** [Isolated release checks](https://github.com/DitmarF/funkspace-app/actions/runs/40872110074/job/123441515817) failed at `pnpm setup:browsers`: `ubuntu-latest` resolved to Ubuntu 26.04, which Playwright 1.55.1 cannot provision with dependencies. Checkout, Node, pnpm and frozen installation passed; subsequent test/build phases were skipped, and the run has no retained artifacts. CodeQL actions analysis and aggregate CodeQL succeeded. The Vercel status and Preview Comments succeeded; neither replaces release CI.
+
+The proposed bounded local correction pins `.github/workflows/ci.yml` to `ubuntu-24.04`. Playwright 1.55.1's `hostPlatform.js` marks Ubuntu 24.04 supported and `nativeDeps.js` supplies its dependencies. An independent read-only reviewer inspected the proposed change and found no material defect; its unchanged actions, guards, steps and thresholds were checked. The reviewer could not independently access GitHub logs, so the failure diagnosis relies on the primary hosted job evidence. The correction has not run on hosted Linux. It changes the PR inputs and is not part of the approved `c42bb71` delivery: review and explicit authorization for a new commit/push are required before it can update PR #292. Require the complete fresh isolated release workflow, retained artifacts and current-head/base review, including CodeQL and Vercel, on the actual updated candidate. Mac validation cannot establish Linux provisioning or isolation support.
+
+**Preview:** Vercel deployment `dpl_6R4BbnKzHHH2GL55KmeZCGa1oopg` is Ready for `c42bb71`. Its [immutable URL](https://funkspace-app-frontend-qm45gpj8n-ditmarfs-projects.vercel.app/) and [feature alias](https://funkspace-app-frontend-git-feature-fun-606557-ditmarfs-projects.vercel.app/) were associated with that deployment in the provider UI. After Ready, anonymous cookie-free GETs of `/contact` and `/api/contact` at both URLs returned 302 to Vercel authentication. Authenticated pages at both URLs showed disabled Name, Email, Message and send controls, delivery-disabled messages and `mailto:info@funkspace.de` fallback; no submission or email occurred. This establishes observed disabled behavior at the tested endpoints, not the exact setting or all protection paths. Dimi separately confirmed Preview `CONTACT_ENABLED=false`, including branch overrides. A new push creates a new Preview and requires repeating applicable identity, protection and effective mail-off checks.
+
+**Remaining release gates:** obtain a reviewed correction and fresh current-head/base hosted CI and artifact evidence; complete the broad PR diff review; resolve the legal/operator and storage questions and check final public text/provider facts; verify Production delivery-off settings, domains/redirects, actual diagnostic restriction, recovery path and exact release actions. H11 production mail and H12 presentation device remain FS-6.5. Reconcile the final source/Preview and prepare a separate explicit merge/Production decision. The draft release packet below remains a starting point, not authorization.
 
 ## Diagnostic-route correction — 29 October 2026
 
