@@ -78,11 +78,12 @@ export default defineConfig({
         perFile: false,
       },
     },
-    // This suite uses node:test and runs explicitly before the Vitest suites.
+    // These suites use node:test and run explicitly outside Vitest.
     exclude: [
       ...configDefaults.exclude,
       "e2e/**",
       "scripts/serve-contact-preview.test.mjs",
+      "scripts/ci-fixture-next-offline.test.cjs",
     ],
   },
 });

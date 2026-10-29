@@ -162,7 +162,7 @@ test("idle, validation focus and disabled presentation use the actual form witho
   ).toHaveAttribute("href", "mailto:info@funkspace.de");
 });
 
-test("matching acceptance retains the read-only snapshot until explicit reset", async ({
+test("matching acceptance shows confirmation without another send action", async ({
   page,
 }) => {
   await open(page);
@@ -172,24 +172,18 @@ test("matching acceptance retains the read-only snapshot until explicit reset", 
   await expect(
     form(page).getByText(/does not confirm mailbox receipt/),
   ).toBeVisible();
-  await preserved(page);
   await expect(count(page)).toHaveText("1");
   await expect(lastId(page)).toHaveText(uuidV4);
   for (const label of [/Name/, /Email/, /Message/])
-    await expect(form(page).getByLabel(label)).toHaveAttribute("readonly", "");
+    await expect(form(page).getByLabel(label)).toHaveCount(0);
+  await expect(form(page).getByRole("button", { name: /send/i })).toHaveCount(
+    0,
+  );
   await page.evaluate(() =>
     document
       .querySelector<HTMLFormElement>('form[aria-label="Contact inquiry"]')
       ?.requestSubmit(),
   );
-  await expect(count(page)).toHaveText("1");
-  await form(page)
-    .getByRole("button", { name: "Send another message" })
-    .click();
-  await expect(form(page).getByLabel("Name", { exact: true })).toBeFocused();
-  for (const label of [/Name/, /Email/, /Message/])
-    await expect(form(page).getByLabel(label)).toHaveValue("");
-  await expect(form(page).getByText(/accepted for delivery/)).toHaveCount(0);
   await expect(count(page)).toHaveText("1");
 });
 
@@ -313,13 +307,14 @@ test("HTML429 keeps edit guidance and waits for an explicit new-identity submiss
     form(page).getByRole("button", { name: "Send message" }),
   ).toBeEnabled();
   await expect(count(page)).toHaveText("1");
+  await expect(form(page).getByLabel(/Message/)).toHaveValue(
+    "Edited sample inquiry.",
+  );
   await send(page);
   await expect(form(page).getByText(/accepted for delivery/)).toBeFocused();
   await expect(count(page)).toHaveText("2");
   await expect(lastId(page)).not.toHaveText(originalId);
-  await expect(form(page).getByLabel(/Message/)).toHaveValue(
-    "Edited sample inquiry.",
-  );
+  await expect(form(page).getByLabel(/Message/)).toHaveCount(0);
 });
 
 test("response and theme changes retain an unchanged draft and retry identity", async ({

@@ -300,7 +300,7 @@ for (const javaScriptEnabled of [true, false])
     });
   });
 
-test("controlled acceptance, duplicate guard, preserved snapshot and explicit reset", async ({
+test("controlled acceptance shows confirmation and prevents duplicates", async ({
   page,
 }) => {
   const bodies: Record<string, string>[] = [];
@@ -323,29 +323,23 @@ test("controlled acceptance, duplicate guard, preserved snapshot and explicit re
   });
   await controlledPage(page);
   await fill(page);
-  const send = page.getByRole("button", { name: "Send message" });
-  const appearance = (button: HTMLElement) => {
-    const css = getComputedStyle(button);
-    return [css.color, css.backgroundColor, css.borderColor];
-  };
-  await page.mouse.move(0, 0);
-  const sendAppearance = await send.evaluate(appearance);
-  await send.click();
+  await page.getByRole("button", { name: "Send message" }).click();
   await expect(page.getByLabel(/Message/)).toHaveAttribute("readonly", "");
   await page.getByLabel(/Email/).press("Enter");
   await expect.poll(() => bodies.length).toBe(1);
   await expect(page.getByRole("status")).toHaveCount(0);
   release();
   await expect(page.getByText(/accepted for delivery/)).toBeFocused();
-  await expect(page.getByLabel(/Message/)).toHaveValue(
-    "Controlled browser inquiry.",
-  );
-  const another = page.getByRole("button", { name: "Send another message" });
-  await page.mouse.move(0, 0);
-  expect(await another.evaluate(appearance)).toEqual(sendAppearance);
-  await another.click();
-  await expect(page.getByLabel(/Name/)).toBeFocused();
-  await expect(page.getByLabel(/Message/)).toHaveValue("");
+  await expect(
+    page.getByText(/does not confirm mailbox receipt/),
+  ).toBeVisible();
+  for (const label of [/Name/, /Email/, /Message/])
+    await expect(page.getByLabel(label)).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /send/i })).toHaveCount(0);
+  await page
+    .getByRole("form", { name: "Contact inquiry" })
+    .evaluate((form) => (form as HTMLFormElement).requestSubmit());
+  expect(bodies).toHaveLength(1);
 });
 
 test("non-JSON 429, uncertain identity, edits and malformed acceptance preserve input", async ({

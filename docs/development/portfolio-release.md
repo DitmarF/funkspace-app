@@ -10,6 +10,14 @@ The intended canonical target approved by Dimi is `https://funkspace.de/`. The d
 
 Vercel reports pushes to `main` update Production; Git integration also creates deployments for pushed commits. Preview and Production consequences must be reviewed before Git delivery. Project authentication was enabled with `(Legacy) Standard Protection`; that setting alone does not prove all deployment aliases, bypass routes or protection behavior. CI and GitHub protection evidence is in the release record.
 
+The isolated particle-fixture job starts a development server because production
+blocks diagnostic routes. Its server-only preload returns an offline 503 for
+Next's exact development version lookup, allowing Next's unknown-version
+fallback without network access. Other requests still pass through the egress
+guard, and the network namespace remains active. Regression checks verify the
+real Next caller and rejection of other callers; changes to Next's internal
+caller or URL fail the check rather than opening network access.
+
 ## Preparation and recovery gates
 
 1. Verify the exact final feature head, current main and merge-result tree, changes since review and successful hosted PR CI plus retained evidence. CI is a mandatory human release gate even if GitHub rules do not enforce it. Refresh dependency audits and record version-reported warnings, applicable mitigations and provider limits.

@@ -72,8 +72,8 @@ see counts and synthetic IDs, with no draft content logged or stored.
    closes and text stays. Editing retires the attempt. This offset uses the actual
    form's wake check and does not shorten browser deadlines. It does not certify
    real device sleep or clock rollback; those remain separate phone checks.
-8. On acceptance verify read-only text and **Send another message**: clear fields,
-   Name focus and no immediate request. Reload loses draft/key/fixture metadata.
+8. On acceptance verify the confirmation is focused and the fields and send button
+   are no longer displayed; no second request occurs. Reload loses draft/key/fixture metadata.
    **Reset test and clear draft** deliberately clears the entire test session;
    it is not a production control.
 9. Use in-page themes, portrait/short/landscape, enlarged text, reduced motion and
