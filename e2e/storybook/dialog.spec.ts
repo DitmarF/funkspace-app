@@ -429,12 +429,23 @@ test("touch scrolling is contained in the modal on a mobile viewport", async ({
     const content = page.locator("dialog > div:last-child");
     const box = await content.boundingBox();
     expect(box).not.toBeNull();
+    // Wait for the touch gesture's momentum to end before tapping Close.
+    // The first positive scrollTop alone does not mean scrolling has stopped.
+    await content.evaluate((node) => {
+      node.addEventListener(
+        "scrollend",
+        () => node.setAttribute("data-test-scroll-ended", "true"),
+        { once: true },
+      );
+    });
     await swipe(box!.x + box!.width / 2, box!.y + box!.height * 0.8);
     await expect
       .poll(() => content.evaluate((node) => node.scrollTop))
       .toBeGreaterThan(0);
+    await expect(content).toHaveAttribute("data-test-scroll-ended", "true");
     expect(await page.evaluate(() => scrollY)).toBe(locked);
     await page.getByRole("button", { name: "Close", exact: true }).tap();
+    await expect(page.getByRole("dialog")).not.toBeVisible();
     await expect(
       page.getByRole("button", { name: "Menu", exact: true }),
     ).toBeFocused();
