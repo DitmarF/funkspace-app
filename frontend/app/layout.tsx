@@ -6,7 +6,8 @@ import { ThemeBootstrapScript } from "@/application/providers/ThemeBootstrapScri
 import { startIntroduction } from "@/data/startContent";
 
 export const metadata: Metadata = {
-  // FS-2.6 metadata is a review candidate; Dimi kept the titles as proposals.
+  // Public identity and intended canonical address confirmed by Dimi, 2026-10-29.
+  metadataBase: new URL("https://funkspace.de/"),
   title: "FunkSpace",
   description: startIntroduction,
   icons: { icon: { url: "/svg/fs/FunSpace_logo.svg", type: "image/svg+xml" } },

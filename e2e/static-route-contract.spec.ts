@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { startIntroduction } from "../frontend/data/startContent";
 import { aboutContent } from "../frontend/data/aboutContent";
 
-// These assert the review candidate, not Dimi's product approval of metadata.
+// Preserve existing copy; Dimi confirmed the canonical public address on 2026-10-29.
 const pages = [
   {
     route: "/",
@@ -138,10 +138,13 @@ for (const javaScriptEnabled of [true, false]) {
           "content",
           entry.description,
         );
+        await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+        await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+          "href",
+          `https://funkspace.de${entry.route === "/" ? "" : entry.route}`,
+        );
         await expect(
-          page.locator(
-            'link[rel="canonical"], meta[property="og:url"], meta[property="og:image"]',
-          ),
+          page.locator('meta[property="og:url"], meta[property="og:image"]'),
         ).toHaveCount(0);
         await expect(page.getByRole("heading", { level: 1 })).toHaveText(
           entry.heading,
@@ -209,11 +212,37 @@ for (const javaScriptEnabled of [true, false]) {
           expect(new URL(url).pathname).toContain("/_next/static/media/");
         }
         await page.reload();
+        await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+          "href",
+          `https://funkspace.de${entry.route === "/" ? "" : entry.route}`,
+        );
         await expect(page).toHaveTitle(entry.title);
         await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
         await expectVisibleBrand(page);
         expect(errors).toEqual([]);
         expect(badAssets).toEqual([]);
+      });
+    }
+
+    for (const entry of [
+      { route: "/contact", title: "Contact | FunkSpace" },
+      { route: "/animations/aperture", title: "Web Aperture — FunkSpace" },
+    ]) {
+      test(`${entry.route} retains its own public canonical on direct load and refresh`, async ({
+        page,
+      }) => {
+        await page.goto(entry.route);
+        await expect(page).toHaveTitle(entry.title);
+        await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+        await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+          "href",
+          `https://funkspace.de${entry.route}`,
+        );
+        await page.reload();
+        await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+          "href",
+          `https://funkspace.de${entry.route}`,
+        );
       });
     }
 

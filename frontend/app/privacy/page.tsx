@@ -5,6 +5,7 @@ import ButtonLink from "@/components/Controls/ButtonLink";
 import { contactEmail, contactHref } from "@/data/contactContent";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/privacy" },
   title: "Privacy | FunkSpace",
   description:
     "How FunkSpace handles website requests, appearance preferences and email inquiries, and how to exercise your privacy rights.",

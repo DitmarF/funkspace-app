@@ -4,6 +4,7 @@ import ButtonLink from "@/components/Controls/ButtonLink";
 import { contactEmail, contactHref } from "@/data/contactContent";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/impressum" },
   title: "Legal notice | FunkSpace",
   description:
     "Operator and contact information for FunkSpace, a personal hobby project by Ditmar Funk.",

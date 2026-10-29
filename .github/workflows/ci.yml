@@ -28,7 +28,7 @@ jobs:
           package-manager-cache: false
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4; main's pinned revision
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
       # Installation/browser provisioning needs the network and is deliberately
       # separate from credential-free application execution below.
@@ -91,6 +91,12 @@ jobs:
           FS_CI_ANIMATIONS: "false"
           FS_CI_SUITE: production
         run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.ci.config.ts
+
+      - name: Particle fixtures with animation disabled
+        env:
+          FS_CI_LABEL: particle-fixtures-off
+          FS_CI_ANIMATIONS: "false"
+        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.particle-fixtures.config.ts
 
       - name: Theme startup with animation disabled
         env:
@@ -161,6 +167,12 @@ jobs:
           FS_CI_ANIMATIONS: "true"
           FS_CI_SUITE: production
         run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.ci.config.ts
+
+      - name: Particle fixtures with animation enabled
+        env:
+          FS_CI_LABEL: particle-fixtures-on
+          FS_CI_ANIMATIONS: "true"
+        run: bash scripts/run-ci-isolated.sh pnpm exec playwright test --config playwright.particle-fixtures.config.ts
 
       - name: Theme startup with animation enabled
         env:

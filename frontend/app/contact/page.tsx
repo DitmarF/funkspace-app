@@ -9,6 +9,7 @@ import styles from "../about/page.module.css";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
+  alternates: { canonical: "/contact" },
   title: "Contact | FunkSpace",
   description: "General inquiries and email contact for FunkSpace.",
 };

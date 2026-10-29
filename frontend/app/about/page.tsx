@@ -4,6 +4,7 @@ import { aboutContent } from "@/data/aboutContent";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/about" },
   title: "About FunkSpace",
   description: aboutContent.description,
 };

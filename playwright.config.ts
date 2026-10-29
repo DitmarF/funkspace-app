@@ -1,6 +1,9 @@
 /// <reference types="node" />
 import { defineConfig, devices } from "@playwright/test";
 
+export const diagnosticProductionOnlyPattern =
+  "**/diagnostic-route-access.spec.ts";
+
 export default defineConfig({
   testDir: "e2e", // keeps unit vs e2e separate
   testIgnore: [
@@ -8,6 +11,7 @@ export default defineConfig({
     "theme-bootstrap/**",
     "storybook/**",
     "fixtures/**",
+    diagnosticProductionOnlyPattern, // requires a production server
   ], // separate server configurations
   timeout: 30_000,
   expect: { timeout: 5_000 },
