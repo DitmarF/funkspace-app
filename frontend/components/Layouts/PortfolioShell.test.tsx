@@ -114,12 +114,14 @@ describe("server-rendered portfolio documents", () => {
       const footer = within(screen.getByRole("navigation", { name: "Footer" }));
       expect(footer.getAllByRole("link")).toHaveLength(3);
       const github = footer.getByRole("link", {
-        name: "FunkSpace project on GitHub",
+        name: "FunkSpace project on GitHub (opens in a new tab)",
       });
       expect(github).toHaveAttribute(
         "href",
         "https://github.com/DitmarF/funkspace-app",
       );
+      expect(github).toHaveAttribute("target", "_blank");
+      expect(github).toHaveAttribute("rel", "noopener noreferrer");
       expect(github.textContent).toBe("");
       expect(github.querySelector("svg")).toHaveAttribute(
         "aria-hidden",
