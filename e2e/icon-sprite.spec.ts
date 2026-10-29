@@ -1,14 +1,53 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { colors } from "../common/generated/colors";
 
-for (const theme of ["default", "dark", "muted", "dark-high-contrast"]) {
+function cssRgb(hex: string) {
+  const channels = [1, 3, 5].map((offset) =>
+    parseInt(hex.slice(offset, offset + 2), 16),
+  );
+  return `rgb(${channels.join(", ")})`;
+}
+
+async function waitForPaint(page: Page) {
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
+}
+
+for (const theme of [
+  "default",
+  "dark",
+  "muted",
+  "dark-high-contrast",
+] as const) {
   test(`${theme}: external icon symbols preserve the inline artwork pixels and inherited paint`, async ({
     page,
     request,
   }, info) => {
-    await page.goto("/about");
-    await page.evaluate((theme) => {
-      document.documentElement.dataset.theme = theme === "default" ? "" : theme;
+    // Seed the real theme authority before bootstrap and hydration.
+    await page.addInitScript((selectedTheme) => {
+      localStorage.setItem("theme", selectedTheme);
     }, theme);
+    await page.goto("/about");
+    const expectedTheme = {
+      attribute: theme === "default" ? null : theme,
+      background: cssRgb(colors[theme].semantic["surface-background"]),
+      foreground: cssRgb(colors[theme].semantic["content-primary"]),
+    };
+    const readTheme = () =>
+      page.evaluate(() => {
+        const root = document.documentElement;
+        const bodyStyle = getComputedStyle(document.body);
+        return {
+          attribute: root.getAttribute("data-theme"),
+          background: bodyStyle.backgroundColor,
+          foreground: bodyStyle.color,
+        };
+      });
+    await expect.poll(readTheme).toEqual(expectedTheme);
     const response = await request.get("/svg/icons/sprite.svg");
     expect(response.ok()).toBe(true);
     const sprite = await response.text();
@@ -51,18 +90,12 @@ for (const theme of ["default", "dark", "muted", "dark-high-contrast"]) {
           },
           { sprite, name, size },
         );
-        await page.evaluate(
-          () =>
-            new Promise<void>((resolve) =>
-              requestAnimationFrame(() =>
-                requestAnimationFrame(() => resolve()),
-              ),
-            ),
-        );
+        await waitForPaint(page);
         const icon = page.locator("#sprite-proof");
         const external = await icon.screenshot({
           path: info.outputPath(`${name}-${size}-external.png`),
         });
+        expect(await readTheme()).toEqual(expectedTheme);
         const wrapper = await icon.evaluate(
           (svg, { sprite, name, size }) => {
             const source = new DOMParser().parseFromString(
@@ -88,12 +121,14 @@ for (const theme of ["default", "dark", "muted", "dark-high-contrast"]) {
           localName: "g",
           namespace: "http://www.w3.org/2000/svg",
         });
+        await waitForPaint(page);
         expect(
           await icon.screenshot({
             path: info.outputPath(`${name}-${size}-inline.png`),
           }),
           `${name}-${size}`,
         ).toEqual(external);
+        expect(await readTheme()).toEqual(expectedTheme);
       }
     }
   });

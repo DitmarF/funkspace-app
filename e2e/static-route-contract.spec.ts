@@ -340,7 +340,15 @@ for (const javaScriptEnabled of [true, false]) {
       const recovery = page.getByRole("navigation", { name: "Page recovery" });
       await recovery.getByRole("link", { name: "Back to FunkSpace" }).click();
       await expect(page).toHaveURL("/");
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Web Aperture" }),
+      ).toBeVisible();
       await page.goBack();
+      // Back may restore a client-rendered route after the URL has changed.
+      await expect(page).toHaveURL("/missing-fs-2-6-page");
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Page not found" }),
+      ).toBeVisible();
       expect((await page.reload())?.status()).toBe(404);
       await expect(recovery.getByRole("link")).toHaveCount(1);
       await expect(page.locator('a[href="/#contact"]')).toHaveCount(0);
