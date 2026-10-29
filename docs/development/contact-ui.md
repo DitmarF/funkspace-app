@@ -28,10 +28,9 @@ Dimi reconfirmed the accepted presentation amendment during FS-5.4: ordinary
 Button, no Button.pending/InlineStatus/spinner/dedicated pending announcement.
 Submitting remains internal, with a synchronous guard and read-only fields.
 Field errors use shared associations and focus the first invalid field; other
-outcomes focus ordinary result text. Pending/accepted data cannot be edited.
-Confirmed acceptance preserves the snapshot until explicit Send another message;
-that action cancels native click activation before resetting to avoid submitting
-the cleared form during React's reuse of the button.
+outcomes focus ordinary result text. Pending data cannot be edited. After confirmed acceptance, the form shows only
+the focused acceptance message; it does not display the submitted fields or a
+second send action. Reloading or revisiting the page starts a fresh inquiry.
 
 Visible inputs are optional Name and required Email/Message. Shared normalization
 and validation are authoritative; native constraints are input aids. The hidden
@@ -83,7 +82,7 @@ stories include ContactActive. No story sends mail.
 
 Unit coverage includes shared rules/browser response grammar, full browser
 deadline/cancellation/429 behavior, sleep/clock-rollback safety, all form outcomes,
-error focus, duplicate guards, retry identity/edit/wake expiry, reset and unmount.
+error focus, duplicate guards, retry identity/edit/wake expiry, acceptance and unmount.
 Dedicated contact coverage
 retains existing thresholds and explicitly includes new browser/pure response code.
 The unchanged server/contact suites continue to use denied-fetch guards.
@@ -160,9 +159,9 @@ provider mail is required or authorized by this checklist.
    duplication warning and no unchanged retry after 23 hours, including after
    sleep/wake. Clock rollback should close an existing retry window early. No
    automatic sends.
-6. Confirm acceptance says accepted for delivery, not mailbox receipt; retain the
-   read-only snapshot. Activate Send another message and verify empty fields, Name
-   focus and no immediate empty submission. Reload/navigation should discard draft.
+6. Historical acceptance checked the prior read-only snapshot and reset action.
+   The current confirmation-only behavior is described above; it needs fresh
+   device acceptance. Reload/navigation should discard draft.
 
 Codex technical review is PASS with F1 closed by independent re-review; see the
 [review and delivery record](../tasks/fs-5.4-contact-page.md#f1-re-review-pass-and-authorized-git-delivery--2026-10-13).

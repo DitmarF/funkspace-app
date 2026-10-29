@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type FormEvent,
-  type MouseEvent,
-} from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { useServices } from "@/application/providers/ServiceProvider";
 import {
   CONTACT_LIMITS,
@@ -264,21 +257,6 @@ export default function ContactForm({ available }: { available: boolean }) {
     setSubmitting(false);
   };
 
-  const another = (event: MouseEvent<HTMLButtonElement>) => {
-    // React may reuse this DOM button for the next submit control during click.
-    // Cancel the original activation before clearing the accepted snapshot.
-    event.preventDefault();
-    attempt.current = null;
-    setGeneration((old) => old + 1);
-    setValues(empty);
-    setErrors({});
-    setFeedback(null);
-    setExpired(false);
-    setEditedUncertain(false);
-    if (trap.current) trap.current.value = "";
-    focus.current = "name";
-  };
-
   // Keep the same visible, disabled fields in SSR and before hydration.
   return (
     <form
@@ -293,59 +271,63 @@ export default function ContactForm({ available }: { available: boolean }) {
           Sending is currently disabled. Please contact me by email.
         </p>
       )}
-      <TextField
-        ref={name}
-        name="name"
-        label="Name"
-        autoComplete="name"
-        value={values.name}
-        disabled={!ready}
-        readOnly={submitting || accepted}
-        help="Optional. Up to 100 characters."
-        error={fieldCopy("name", errors.name)}
-        onChange={(e) => edit("name", e.target.value)}
-      />
-      <TextField
-        ref={email}
-        name="email"
-        label="Email"
-        type="email"
-        inputMode="email"
-        autoComplete="email"
-        required
-        value={values.email}
-        disabled={!ready}
-        readOnly={submitting || accepted}
-        help="One address where I can reply. Up to 254 characters."
-        error={fieldCopy("email", errors.email)}
-        onChange={(e) => edit("email", e.target.value)}
-      />
-      <TextAreaField
-        ref={message}
-        name="message"
-        label="Message"
-        required
-        rows={6}
-        value={values.message}
-        disabled={!ready}
-        readOnly={submitting || accepted}
-        help="General inquiries. Up to 5,000 characters."
-        error={fieldCopy("message", errors.message)}
-        onChange={(e) => edit("message", e.target.value)}
-      />
-      <input
-        ref={trap}
-        name="website"
-        type="text"
-        defaultValue=""
-        hidden
-        aria-hidden="true"
-        tabIndex={-1}
-        autoComplete="off"
-        disabled={!ready}
-        readOnly={submitting || accepted}
-      />
-      {editedUncertain && (
+      {!accepted && (
+        <>
+          <TextField
+            ref={name}
+            name="name"
+            label="Name"
+            autoComplete="name"
+            value={values.name}
+            disabled={!ready}
+            readOnly={submitting || accepted}
+            help="Optional. Up to 100 characters."
+            error={fieldCopy("name", errors.name)}
+            onChange={(e) => edit("name", e.target.value)}
+          />
+          <TextField
+            ref={email}
+            name="email"
+            label="Email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            required
+            value={values.email}
+            disabled={!ready}
+            readOnly={submitting || accepted}
+            help="One address where I can reply. Up to 254 characters."
+            error={fieldCopy("email", errors.email)}
+            onChange={(e) => edit("email", e.target.value)}
+          />
+          <TextAreaField
+            ref={message}
+            name="message"
+            label="Message"
+            required
+            rows={6}
+            value={values.message}
+            disabled={!ready}
+            readOnly={submitting || accepted}
+            help="General inquiries. Up to 5,000 characters."
+            error={fieldCopy("message", errors.message)}
+            onChange={(e) => edit("message", e.target.value)}
+          />
+          <input
+            ref={trap}
+            name="website"
+            type="text"
+            defaultValue=""
+            hidden
+            aria-hidden="true"
+            tabIndex={-1}
+            autoComplete="off"
+            disabled={!ready}
+            readOnly={submitting || accepted}
+          />
+        </>
+      )}
+      {!accepted && editedUncertain && (
         <p className="text-portfolio-body">
           Editing creates a new message. An earlier attempt may already have
           been sent.
@@ -364,11 +346,7 @@ export default function ContactForm({ available }: { available: boolean }) {
               : ""}
         </p>
       )}
-      {accepted ? (
-        <Button variant="secondary" onClick={another}>
-          Send another message
-        </Button>
-      ) : (
+      {!accepted && (
         <Button
           variant="secondary"
           type={ready ? "submit" : "button"}

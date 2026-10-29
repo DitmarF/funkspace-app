@@ -5,7 +5,6 @@ import {
   screen,
   waitFor,
 } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ContactForm from "./ContactForm";
@@ -392,23 +391,33 @@ describe("plain contact form", () => {
       }
     },
   );
-  it("requires matching valid acceptance and keeps its read-only snapshot until explicit reset", async () => {
+  it("shows only confirmation after acceptance and prevents another submission", async () => {
     accepted();
     render(<ContactForm available />);
     fill();
     submit();
     await screen.findByText(/accepted for delivery/);
     expect(screen.getByText(/does not confirm mailbox receipt/)).toHaveFocus();
-    expect(screen.getByLabelText(/Name/)).toHaveValue(" Visitor ");
-    expect(screen.getByLabelText(/Message/)).toHaveAttribute("readonly");
+    for (const label of [/Name/, /Email/, /Message/])
+      expect(screen.queryByLabelText(label)).toBeNull();
+    expect(screen.queryByRole("button", { name: /send/i })).toBeNull();
     submit();
     expect(fixture.port.submit).toHaveBeenCalledOnce();
-    await userEvent.click(
-      screen.getByRole("button", { name: "Send another message" }),
-    );
-    expect(screen.getByLabelText(/Name/)).toHaveFocus();
-    expect(screen.getByLabelText(/Message/)).toHaveValue("");
-    expect(screen.queryByText(/accepted for delivery/)).toBeNull();
+  });
+  it("shows only confirmation after an edited uncertain attempt is accepted", async () => {
+    render(<ContactForm available />);
+    fill();
+    submit();
+    await screen.findByText(/couldn’t confirm delivery/);
+    fireEvent.change(screen.getByLabelText(/Message/), {
+      target: { value: "A new message" },
+    });
+    expect(screen.getByText(/Editing creates a new message/)).toBeVisible();
+    accepted();
+    submit();
+    await screen.findByText(/accepted for delivery/);
+    expect(screen.queryByText(/Editing creates a new message/)).toBeNull();
+    expect(screen.queryByLabelText(/Message/)).toBeNull();
   });
   it("does not accept a fake adapter's mismatched identifier", async () => {
     fixture.port.submit.mockResolvedValue({
