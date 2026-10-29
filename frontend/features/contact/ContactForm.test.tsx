@@ -397,7 +397,11 @@ describe("plain contact form", () => {
     fill();
     submit();
     await screen.findByText(/accepted for delivery/);
-    expect(screen.getByText(/does not confirm mailbox receipt/)).toHaveFocus();
+    await waitFor(() =>
+      expect(
+        screen.getByText(/does not confirm mailbox receipt/),
+      ).toHaveFocus(),
+    );
     for (const label of [/Name/, /Email/, /Message/])
       expect(screen.queryByLabelText(label)).toBeNull();
     expect(screen.queryByRole("button", { name: /send/i })).toBeNull();
