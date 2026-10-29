@@ -2,6 +2,8 @@
 
 This is the portfolio release checklist, not authorization to publish. Contact configuration, abuse protection, email operations and immutable-target retirement remain governed by [contact operations](contact-operations.md), [contact server](contact-server.md) and [contact acceptance](contact-acceptance.md). Current source, observations and decision packet are in the [FS-6.4 release record](../tasks/fs-6.4-release-preparation.md).
 
+**Current rollout — 29 October 2026:** FS-6.5 is closed. For the final deployed identity, green CI, accepted presentation outcome and recovery limitations, use the [public rollout record](../tasks/fs-6.5-public-rollout.md); the dated preparation observations below are historical. FS-G3 remains separate.
+
 ## Reproducible build and target
 
 On 29 October 2026 the Vercel UI for `DitmarF/funkspace-app` project `DitmarF's projects / funkspace-app-frontend` showed Next.js, root directory `frontend`, files outside root enabled, install override `pnpm install --frozen-lockfile`, build override `pnpm --workspace-root build`, output override disabled and Node `22.x`. The inspected source pins pnpm `10.30.3`; `.nvmrc` specifies Node `22.22.0`. The root build generates tokens, checks common and builds the frontend/game chain. Vercel's major-version selector does not prove its exact patch version; capture actual hosted output. Recheck settings before a release.
@@ -29,4 +31,4 @@ caller or URL fail the check rather than opening network access.
 7. For serious scene, navigation, contact or security failure, first preserve evidence and prevent delivery. Apply the separately authorized recovery procedure: use a verified off/static artifact, deploy/promote or move the specific alias only as approved, then verify public routes, static artwork, focus, contact-off behavior and retained restrictions. Record actual time and impairment. Do not claim provider recovery steps or recovery duration as tested.
 8. Disabling delivery in a new deployment does not disable previously enabled immutable deployments. Identify and individually restrict/retire each such target under the approved [contact operations](contact-operations.md); preserve retry identity and never automatically resend uncertain messages.
 
-Production mail, an authorized controlled live message, mailbox receipt and presentation-device acceptance remain FS-6.5 checks. TOOL-05 is Dimi's accepted Codex follow-up by 2 November. No step here grants commit, push, PR, merge, deployment, settings, DNS or live-mail authorization.
+At the preparation checkpoint, Production mail, an authorized controlled live message, mailbox receipt and presentation-device acceptance remained FS-6.5 checks; their later results are in the rollout record. TOOL-05 is Dimi's accepted Codex follow-up by 2 November. No step here grants commit, push, PR, merge, deployment, settings, DNS or live-mail authorization.
