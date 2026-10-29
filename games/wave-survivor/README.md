@@ -7,6 +7,46 @@ virtual-joystick input, automatic projectile combat, health, enemy defeat,
 four normal waves, between-wave upgrades, one boss, won/lost results, and replay.
 The standalone demo starts idle until its native Start button is activated.
 
+## Try the standalone demo
+
+From the repository root, install the workspace dependencies and start the demo:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm --filter @funkspace/wave-survivor demo
+```
+
+Open [http://localhost:5173](http://localhost:5173). The demo command builds the
+package before starting Vite on localhost and requires port 5173 to be free.
+Select **Start game**, then use WASD or the arrow keys with the game canvas
+focused. On a phone, drag the virtual joystick at the lower left. Attacks are
+automatic; clear four waves, choose upgrades between waves and defeat the boss.
+The demo displays the result and offers replay.
+
+## Current status and integration
+
+The standalone game passed Gate 2, including its current pacing, in September 2026. The dedicated portfolio play route and its accessible game UI remain
+planned EPIC 7 work; the existing portfolio host is not the finished game
+experience. See the [game implementation plan](../../docs/features/wave-survivor-implementation-plan.md)
+and [portfolio handoff](../../docs/tasks/fs-6.6-portfolio-closure-game-handoff.md).
+
+The package root exports `createGame()` and its public controller, mount,
+theme, status, event and result types. A host supplies a Canvas, a sized
+viewport and resolved theme values. The controller supports start, pause,
+resume, restart, upgrade selection, theme updates and destruction. The optional
+`onStatusChange` and `onEvent` callbacks expose discrete UI updates while the
+game owns simulation and rendering. See the [public API](#public-api) for an
+integration example, lifecycle details and cleanup requirements.
+
+For package checks and builds, see [commands](#commands). The game runs
+independently of the portfolio and does not import frontend code.
+
+## Implementation and acceptance history
+
+The sections below preserve the dated development and validation history. Where
+an older checkpoint describes work or approval as pending, the later Gate 2
+decision and current status above supersede that checkpoint.
+
 The current gameplay slice uses seeded randomness to sample fair offscreen
 spawn candidates by perimeter length. Entering enemies receive static
 directional border warnings, become active when their collision circles first
@@ -127,9 +167,10 @@ acceptance. See the [definition and evidence](../../docs/features/wave-survivor.
 for exact configuration, fixture setup, and ideal all-hit duration estimates.
 
 Production entry and static action telegraphs are implemented by WS-6.3/6.4.
-Terminal integration is implemented by WS-6.5. During entry/telegraph validation,
-Dimi evaluates whether the boss offers a distinct positioning challenge on
-PC/phone. Final balance is WS-6.10; manual acceptance and Gate 2 are pending.
+Terminal integration is implemented by WS-6.5. At the entry/telegraph validation
+checkpoint, the planned PC/phone assessment of the positioning challenge,
+final balance, manual acceptance and Gate 2 were pending. Dimi later accepted
+the current pacing and approved Gate 2.
 
 ## WS-6.3 boss entry
 
@@ -211,8 +252,9 @@ previous result references remain frozen. A loop generation guard prevents a
 callback-driven restart/destroy from continuing the old frame.
 
 WS-6.8 newcomer checks were reported PASS by Dimi (2026-09-05). WS-6.9 replay
-automation and Dimi's manual PASS are recorded below; final tuning and Gate 2
-remain pending. See the [terminal rules and evidence](../../docs/features/wave-survivor.md#1010-ws-65-terminal-completion).
+automation and Dimi's manual PASS are recorded below. At this earlier checkpoint,
+final tuning and Gate 2 remained pending; Dimi subsequently accepted the current
+pacing and approved Gate 2. See the [terminal rules and evidence](../../docs/features/wave-survivor.md#1010-ws-65-terminal-completion).
 
 ## WS-6.8 standalone Start → result → Replay
 
@@ -339,8 +381,8 @@ formula as terminal integration. See [input ownership and examples](../../docs/f
 
 WS-6.5 integrates authoritative session inputs with WS-6.7 result construction. The
 scoring rule adds no live-score system, economy, time bonus, or persistence.
-The formula remains a candidate pending Dimi's reward approval, not a
-playtest-approved decision or Gate 2 completion.
+At the earlier score-candidate checkpoint, reward approval and Gate 2 were
+pending; the subsequent Gate 2 decision accepted the current gameplay and pacing.
 
 ## Public API
 
@@ -372,7 +414,8 @@ The frontend loader aliases the package type. WS-6.8 delivers results and the
 standalone result UI; WS-6.9 adds deterministic replay verification. WS-6.5 tests
 terminal sampling and preservation of retained result references across restart.
 Boss entry does not itself complete the run. Dimi reported the WS-6.8 newcomer
-flow PASS; final Gate 2 approval remains pending.
+flow PASS; at that earlier checkpoint final Gate 2 approval was pending and was
+subsequently granted.
 
 ```ts
 import {

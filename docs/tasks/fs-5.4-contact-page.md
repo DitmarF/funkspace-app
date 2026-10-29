@@ -8,7 +8,7 @@
 - **Last updated:** 2026-10-14.
 - **Actual implementation/review base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `617f9c8f3103c58f148d54944d64a51a22282683`; clean on initial inspection. The containing commit identifies the delivered revision; exact local/remote verification belongs to the delivery artifact below. No reset or newer-work overwrite.
 - **Previous-task handoff:** [FS-5.3](fs-5.3-contact-protection.md#handoff) delivered at this base with subsequent read-only local Codex technical PASS; actual repository/candidate access verified here. External protection remains pending.
-- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [detailed plan](../features/FunkSpace_EPIC_5_Detailed_Plan.md), [UI/phone guide](../development/contact-ui.md), [server setup](../development/contact-server.md), [operations](../development/contact-operations.md).
+- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [detailed plan](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md), [UI/phone guide](../development/contact-ui.md), [server setup](../development/contact-server.md), [operations](../development/contact-operations.md).
 
 ## Requested outcome
 

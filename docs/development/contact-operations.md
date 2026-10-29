@@ -1,6 +1,6 @@
 # Contact abuse protection and operations — FS-5.3 / FS-5.5 / FS-5.6
 
-The [frozen contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract),
+The [frozen contract](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract),
 [server setup](contact-server.md), [processing/storage facts and legal-copy checklist](contact-processing-facts.md),
 [FS-5.3 evidence](../tasks/fs-5.3-contact-protection.md) and
 [FS-5.5 technical preparation](../tasks/fs-5.5-contact-operations.md) govern this guide.

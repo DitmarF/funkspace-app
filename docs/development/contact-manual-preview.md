@@ -8,7 +8,7 @@ environment-file-free snapshot, `CONTACT_ENABLED=false`, empty mail configuratio
 and verified Node egress denial. There is no unconditional source lock now;
 the [current server gate](contact-server.md#delivery-defaults-off) requires exact
 `CONTACT_ENABLED=true` plus complete valid configuration to construct delivery.
-The [accepted contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
+The [accepted contract](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
 and [phone checklist](contact-ui.md#dimis-phone-checklist--acceptance-recorded) still apply.
 FS-5.5 and FS-5.6 are complete; the
 [live acceptance and shutdown record](contact-acceptance.md) supplies their later

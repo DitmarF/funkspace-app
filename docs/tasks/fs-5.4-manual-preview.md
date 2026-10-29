@@ -3,7 +3,7 @@
 ## Task metadata
 
 - **Status:** Complete for local preview preparation; Dimi phone/accessibility manual acceptance recorded 2026-10-14; commit/push authorized
-- **Task group or epic:** [EPIC 5](../features/FunkSpace_EPIC_5_Detailed_Plan.md), bounded FS-5.4 follow-up
+- **Task group or epic:** [EPIC 5](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md), bounded FS-5.4 follow-up
 - **Owner:** Sites local workflow; Codex checks; Dimi phone acceptance
 - **Last updated:** 2026-10-14
 - **Related documentation:** [instructions](../../AGENTS.md), [architecture](../architecture.md), [prior evidence](fs-5.4-contact-page.md), [manual guide](../development/contact-manual-preview.md)

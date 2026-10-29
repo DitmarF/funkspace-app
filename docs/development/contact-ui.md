@@ -1,6 +1,6 @@
 # Contact page and controlled form checks — FS-5.4
 
-The [accepted contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract),
+The [accepted contract](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract),
 [FS-5.4 evidence](../tasks/fs-5.4-contact-page.md) and
 [external operating gates](contact-operations.md) govern this slice. Current
 [server setup](contact-server.md#delivery-defaults-off) and

@@ -2,6 +2,8 @@
 
 This document audits the current FunkSpace token system and recommends a hierarchy that can serve the portfolio, standalone games, and future interactive applications. It does not change token sources, generated styles, or consumers.
 
+**Current status:** `common` is an active package exporting generated tokens and pure motion utilities. The CSS-token catalogue in static Storybook has a known gap, [TOOL-05](../tasks/fs-6.3-acceptance-findings.md#tool-05-triage-and-current-gate--28-october-2026), deferred for review by 2 November 2026. The hierarchy and migration sections below are recommendations, not a statement that every proposed layer has been implemented.
+
 Related decisions and boundaries:
 
 - [`ADR-002: Design tokens as the source of truth`](../decisions/ADR-002-design-token-source-of-truth.md)
@@ -26,7 +28,7 @@ The audit covers:
 tokens/fs.tokens.json -----------+
 tokens/fs.motion.tokens.json ----+-> Style Dictionary -+-> styles/tokens.css
 tokens/fs.game.tokens.json ------+                    |      +-> frontend/app/globals.css
-                                                       |      +-> Storybook token docs/themes
+                                                       |      +-> Storybook themes and component styles
                                                        |      +-> Tailwind shared UI mappings
                                                        |
                                                        +-> common/generated/colors.ts
@@ -150,7 +152,7 @@ This began as **Primitive → Semantic → Component**, but it was a conceptual 
 - Default, dark, muted, and dark-high-contrast modes use one selector convention.
 - Frontend and Storybook consume the same generated variables.
 - Motion durations and easing values are centralized.
-- Generated category comments support Storybook token documentation.
+- Generated category comments identify token groups; the separate Storybook CSS catalogue discovery gap remains open under TOOL-05.
 
 ## Current limitations for multiple applications
 
@@ -289,7 +291,7 @@ No migration is performed by this task. A future feature plan should sequence th
 7. Add namespaced Portfolio application tokens and migrate direct primitive usages.
 8. Expand the initial game Application tokens only when the first game's visual requirements are known.
 9. Add Component tokens only for repeated, stable component decisions.
-10. Activate the `common` package and move token ownership only when at least two workspaces consume the artifacts.
+10. `common` is already active and exports generated artifacts; consider moving source ownership only after a separate justified migration.
 11. Remove the inactive Style Dictionary configuration after choosing the canonical implementation.
 
 Each migration step must regenerate CSS, inspect the diff, validate all four current themes, run Storybook checks, and verify accessibility contrast and reduced-motion behavior where relevant.

@@ -17,6 +17,12 @@
   - [`ADR-003: Interactive experience boundary`](../decisions/ADR-003-interactive-experience-boundary.md)
   - [`ADR-004: First game development architecture`](../decisions/ADR-004-game-development-architecture.md)
 
+## Portfolio continuation checkpoint — 29 October 2026
+
+The public portfolio outcome is accepted and FS-6.5 is closed. The [FS-6.6 handoff](../tasks/fs-6.6-portfolio-closure-game-handoff.md) records the deployed identity, standalone evidence and existing loader, theme and lifecycle interfaces. Dimi accepted portfolio FS-G3 and closed FS-6.6 and EPIC 6 on 29 October 2026. EPIC 7 has not started and awaits a separate game-implementation instruction. The accepted game Gate 2 and pacing below are unchanged.
+
+The existing public package already exposes `onEvent`; audit type consolidation and the missing `reducedEffects` input in WS-7.1–WS-7.2 rather than duplicating the event contract. The current host auto-starts and resumes on visibility return; deliberate start, pause-safe resume and portfolio overlays remain EPIC 7 work.
+
 ## 1. Purpose
 
 This document converts the approved Wave Survivor concept into an executable implementation roadmap. It defines the delivery order, epic boundaries, task IDs, expected system changes, dependencies, validation requirements, gate criteria, risks, and handoff rules for human or AI-assisted implementation.

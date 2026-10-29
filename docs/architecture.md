@@ -4,6 +4,21 @@ This document describes the clean architecture principles and layer boundaries f
 
 ## Architecture Overview
 
+FunkSpace is a pnpm monorepo with a public Next.js portfolio, shared design tokens and motion primitives, and a standalone Wave Survivor game package. The [documentation index](README.md) points to setup, operating guides and decision records.
+
+### System at a glance
+
+- **Portfolio:** [`frontend/app/`](../frontend/app/) owns routes and metadata; React presentation uses frontend application services through the root provider. The homepage's optional Canvas scene has a complete static WEB fallback.
+- **Contact:** [`frontend/app/api/contact/route.ts`](../frontend/app/api/contact/route.ts) is a server-side Next.js route. Its server-only composition supplies configuration and provider adapters; credentials remain on the server. [`contact-server.md`](development/contact-server.md) and [`contact-operations.md`](development/contact-operations.md) describe the contract and operation.
+- **Themes and motion:** token JSON in `tokens/` generates CSS for the frontend and framework-neutral values for `common`. ThemeService owns the live theme after bootstrap; MotionPolicyService shares decorative-motion preferences without owning each consumer's clock or Pause state.
+- **Game:** [`games/wave-survivor/`](../games/wave-survivor/) owns an independently runnable TypeScript/Canvas game and public package API. [`frontend/features/games/`](../frontend/features/games/) provides the lazy loader, theme adapter and baseline host. The dedicated portfolio play route remains future work.
+
+The intended dependency direction is Presentation → Application → Domain ← Infrastructure. [`createServices`](../frontend/infrastructure/services/createServices.ts) and the root provider form the browser composition boundary; the contact route uses separate server-only composition. Existing documented presentation-to-infrastructure imports are migration exceptions, not a pattern for new code. The detailed sections below retain the accepted contracts and their dated evidence.
+
+For details, see [dependency direction](#dependency-direction), [contact composition](#contact-composition--fs-51), [shared dialog binding](#shared-dialog-binding), [scene aperture](#trusted-scene-aperture) and [particle fallback](#particle-rendering-and-fallback-cost).
+
+### Layers
+
 FunkSpace follows Clean Architecture principles with clear separation of concerns across four main layers:
 
 1. **Domain Layer** - Pure business logic, entities, and rules
@@ -182,7 +197,7 @@ import { ThemeService } from "@/application/theme/ThemeService";
 import { LocalStorageAdapter } from "@/infrastructure/storage/LocalStorageAdapter";
 
 // Domain importing from Presentation (WRONG)
-import { useTheme } from "@/hooks/useTheme";
+import { useDialog } from "@/hooks/useDialog";
 ```
 
 ## Layer Responsibilities
@@ -230,7 +245,7 @@ import { useTheme } from "@/hooks/useTheme";
 
 ### Contact composition — FS-5.1
 
-The [EPIC 5 plan](features/FunkSpace_EPIC_5_Detailed_Plan.md) freezes a single
+The [EPIC 5 plan](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md) freezes a single
 JSON `POST /api/contact` in the existing Next.js deployment. Accepted
 `domain/contact/ContactContract.ts` types/limits are unchanged. FS-5.2 adds
 pure shared validation, `ContactDeliveryPort`, `ContactUseCase` and the typed
@@ -609,4 +624,4 @@ Some old imports may still work during migration, but new code should use the ne
 - [ ] Add ESLint rules to enforce import boundaries
 - [ ] Consider feature-based organization for larger features
 - [ ] Move design tokens to shared workspace if needed
-- [ ] Add architecture decision records (ADRs) for major decisions
+- Record new significant decisions in the existing [ADRs](decisions/) when needed.

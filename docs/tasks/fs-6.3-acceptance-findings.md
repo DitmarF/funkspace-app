@@ -2,7 +2,8 @@
 
 ## Status and scope
 
-- **Status:** In progress — current correction triage; final FS-6.3 remains open.
+- **Current status — 29 October 2026:** Later candidate acceptance, hosted CI and the [FS-6.6 closure](fs-6.6-portfolio-closure-game-handoff.md) supersede the earlier gate checkpoints within their documented scopes; owned follow-ups remain in the closure record.
+- **Historical checkpoint status:** In progress — current correction triage; final FS-6.3 remains open.
 - **Owner:** Codex coordinates; Sites owns assigned UI/scene corrections; Dimi owns human acceptance and release decisions.
 - **Updated:** 28 October 2026, Europe/Berlin.
 - **Current purpose:** Reconcile the actual FS-6.1 corrections and FS-6.2 human report, record current security/CI evidence and hand off bounded findings. H01–H10 per-case evidence remains incomplete. This record is not FS-G3 or release approval.

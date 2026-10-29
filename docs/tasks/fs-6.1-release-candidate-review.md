@@ -1,6 +1,7 @@
 # FS-6.1 — Release-candidate review
 
-- **Status:** **READY FOR FS-6.2 — technical handoff.** Dimi later reported an aggregate checklist PASS; H01–H10 detailed evidence remains incomplete. ON Lighthouse has the warning recorded below. This is not human acceptance or release approval.
+- **Current status — 29 October 2026:** The later [FS-6.6 closure](fs-6.6-portfolio-closure-game-handoff.md) records Dimi’s FS-G3 acceptance and EPIC 6 closure; later deployed results supersede earlier checkpoint statuses within their recorded scope.
+- **Historical checkpoint status:** **READY FOR FS-6.2 — technical handoff.** Dimi later reported an aggregate checklist PASS; H01–H10 detailed evidence remains incomplete. ON Lighthouse has the warning recorded below. This is not human acceptance or release approval.
 - **Owner:** Codex; Sites supplied focused UI evidence; Dimi owns human acceptance and external-action decisions.
 - **Reviewed:** 28 October 2026, Europe/Berlin.
 - **Outcome:** The original review found production and tooling dependency blockers. Later corrections and current validation are recorded below; outstanding exposure, CI and acceptance limitations remain owned and this report is not release approval.

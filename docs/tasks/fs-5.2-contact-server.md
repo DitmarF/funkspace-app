@@ -8,7 +8,7 @@
 - **Last updated:** 2026-10-13.
 - **Actual implementation base:** `feature/funkspace-minimum-usable`, `5d9ec321b9ec3154b0a2460968ac49b9ceffede3`; clean on initial inspection. The containing Git commit identifies the delivered revision; exact delivery verification is in the artifact below. No reset or overwrite of newer work.
 - **Previous task handoff:** [Accepted FS-5.1](fs-5.1-contact-contract.md#handoff), delivered in the base commit, including the no-pending-controls/no-InlineStatus amendment.
-- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [EPIC 5 plan](../features/FunkSpace_EPIC_5_Detailed_Plan.md), [server setup](../development/contact-server.md).
+- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [EPIC 5 plan](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md), [server setup](../development/contact-server.md).
 
 ## Requested outcome
 
