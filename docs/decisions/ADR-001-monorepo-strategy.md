@@ -6,6 +6,8 @@ Date: 2026-08-20
 
 Accepted
 
+**Current context — 29 October 2026:** This decision records the original package state. `common` is now an active package for generated tokens and pure motion, while `backend` remains a placeholder. See [workspace responsibilities](../architecture/packages.md) for the current boundaries.
+
 ## Context
 
 FunkSpace is intended to support a public portfolio, reusable interface foundations, animations, experiments, and games. These surfaces share design tokens, quality tooling, architectural rules, and release expectations, even when their runtime needs differ.

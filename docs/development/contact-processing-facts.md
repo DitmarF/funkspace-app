@@ -9,7 +9,7 @@ read-only public DNS checks. It does not change runtime or public contact detail
 This is technical evidence, not legal certification; the later implemented copy
 was accepted by Dimi when closing FS-5.5 on 2026-10-15.
 The [task evidence](../tasks/fs-5.5-contact-operations.md), [operating guide](contact-operations.md)
-and [frozen contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
+and [frozen contract](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
 govern scope. The later local legal integration described below supersedes the
 earlier draft-page status without changing delivery behavior.
 

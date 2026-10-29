@@ -11,3 +11,9 @@ frontend/storybook-static
 # Lighthouse CI artifacts
 .lighthouse/reports/
 .lighthouseci/
+
+# Local environment settings and system metadata
+/.env*
+!/.env.example
+!/.env.*.example
+.DS_Store

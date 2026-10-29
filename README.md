@@ -1,173 +1,106 @@
 # FunkSpace
 
-FunkSpace is a design-system-first web experience built as a PNPM workspace. The
-repo houses a Next.js 15 frontend, shared design tokens generated with
-Style Dictionary, Storybook documentation, Playwright end-to-end coverage, and a
-Vitest suite for shared utilities.
+[FunkSpace](https://funkspace.de/) is a personal portfolio and experimentation
+space for accessible interfaces, animation and browser games. Its live portfolio
+combines a responsive WEB animation, theme and motion controls, and a dedicated
+contact page.
 
-The guiding principles for agents and contributors are captured in
-`AGENTS.md`: use strict TypeScript, React function components, Tailwind tokens,
-and optimize for accessibility and performance (respect dark mode and reduced
-motion).
+The repository is a pnpm workspace built with Next.js, React and TypeScript.
+Shared design tokens feed both CSS and framework-neutral TypeScript; Storybook,
+Vitest and Playwright support development and testing.
 
-## Current milestone and entry points
-
-Start with [FunkSpace — Minimum Usable Experience](docs/features/funkspace-minimum-usable.md) for the single intended portfolio plan, current statuses and publication limits. It preserves 44 tasks; final source reconciliation remains pending. The [FS-0.1 baseline](docs/tasks/fs-0.1-inventory-real-starting-point.md) owns reuse/inspection evidence, [FS-0.2](docs/tasks/fs-0.2-tooling-baseline.md) owns tooling/command evidence, and [FS-0.3](docs/tasks/fs-0.3-branch-integration-decision.md) records the approved integration and validated portfolio base. Substantial tasks follow the [AI workflow](docs/development/ai-workflow.md).
-
-The portfolio milestone plans ordinary scrolling, content-driven sections and one bounded Canvas scene with a static alternative. These are future portfolio behavior, not claims about the current homepage. Game continuation remains [Wave Survivor EPIC 7](docs/features/wave-survivor-implementation-plan.md#epic-7--portfolio-play-shell-and-accessible-application-ui), after portfolio acceptance.
+The first game, Wave Survivor, is a standalone TypeScript/Canvas package with its
+own demo. Its dedicated portfolio play route is planned, not yet available.
 
 ## Requirements
 
-- Node.js 22.22.0 for the verified baseline (`.nvmrc`); package minimum 22.13.1.
-- pnpm 10.30.3 (`packageManager` in the root manifest; CI uses this pin).
+- Node.js 22.22.0, the verified version in `.nvmrc` (package minimum: 22.13.1).
+- pnpm 10.30.3, pinned in the root `packageManager` field.
 
 ## Install & run
 
+From the repository root, in a shell compatible with POSIX environment syntax:
+
 ```bash
-pnpm install --frozen-lockfile # installs every active workspace without resolving a new graph
-pnpm build:tokens        # regenerate CSS and TypeScript token artifacts
-pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
+pnpm install --frozen-lockfile
+pnpm build:tokens
+CONTACT_ENABLED=false RESEND_API_KEY= CONTACT_FROM= CONTACT_TO= CONTACT_ALLOWED_ORIGINS= pnpm -F frontend dev
 ```
 
-- Icon artwork: `pnpm build:icons` regenerates the checked SVG sprite; dev/build/Storybook do this automatically. After editing artwork in a running session, regenerate it. `pnpm check:icons` verifies freshness before lint/tests.
-- Storybook: `pnpm storybook` (opens on http://localhost:6006).
-- Production build: `pnpm build` (tokens → common typecheck → icon/aperture/bootstrap generation and checks → game build → Next build).
-- Development uses `frontend/.next-dev`; production build/start use `frontend/.next`. This keeps a local production build from overwriting a running development server's JavaScript. Restart an older dev server once after adopting this configuration. Stop a production server before rebuilding its own output.
-- Phone preview: after a successful `pnpm check:theme-bootstrap && pnpm build`, run `pnpm -F frontend start -H 0.0.0.0 -p 3001`. Keep the terminal running, connect the phone to the same LAN, and open `http://<Mac-LAN-IP>:3001`. `0.0.0.0` is the listening address, not a phone destination; on a Mac with Wi-Fi on `en0`, `ipconfig getifaddr en0` prints the LAN address.
-- Direct frontend builds require generated tokens first; use the root build for the complete prerequisite order.
-- Frontend dev/build generate the tracked inline theme bootstrap before Next starts. When editing its entry or shared imports, also run `pnpm watch:theme-bootstrap` in a second terminal; stop it with Ctrl-C when finished. Next watches the generated module. Ordinary component/Storybook work does not need this watcher.
-- Before regenerating a reviewed checkout, run `pnpm check:theme-bootstrap` to detect stale output. Lint, tests and CI enforce freshness. Recover missing/stale output with `pnpm build:theme-bootstrap`, review its diff, then run types/tests. Do not hand-edit `frontend/generated/theme-bootstrap.ts`.
-- Theme validation: `pnpm test:theme-bootstrap` checks source, shipped code, generator/watch behavior and dedicated 100% startup/DOM-adapter coverage. After `pnpm build` and browser setup, `pnpm e2e:theme-bootstrap` runs the production route on port 3100 with first-paint timing, delayed-framework-script checks at narrow/wide widths, reloads and a negative control. The existing `pnpm e2e` still uses the development server on port 3000.
-- Portfolio production validation: check `pnpm check:theme-bootstrap` before generation, then run `pnpm build` (tokens → common types → game build → Next build) and `pnpm e2e:production`. The production configuration starts `next start` on port 3000 and refuses to reuse another server; stop your local preview first. It inherits the existing Chromium project only, not Safari/Firefox or physical-device coverage. `pnpm e2e` retains its development-server behavior.
-- File flow and evidence: [typed theme bootstrap maintenance](docs/tasks/maintenance-theme-bootstrap.md). TypeScript source becomes generated script text; the small server-rendered wrapper delivers it inline in the HTML head. ThemeService takes over after startup. The [approved first-paint correction](docs/tasks/maintenance-theme-first-paint.md) replaces the earlier queued delivery. Runtime persistence consistency remains deferred to FS-3.3.
-- Baseline results, security limitations and the full command sequence: [FS-0.2 task record](docs/tasks/fs-0.2-tooling-baseline.md).
-- Current dependency versions, branch integration, validation and remaining security findings: [dependency maintenance record](docs/tasks/2026-09-12-branch-and-dependabot-review.md#authorized-integration-continuation). This later evidence supersedes the original FS-0.2 dependency inventory where explicitly recorded.
+Open [http://localhost:3000](http://localhost:3000). The command explicitly
+disables contact delivery and blanks its mail settings for that process; no
+provider credentials are needed to browse locally. Local environment files and
+inherited variables can otherwise change application behavior. See
+[contact server setup](docs/development/contact-server.md) before working on
+contact delivery.
 
-Contact server preparation: [FS-5.2 setup and safety gates](docs/development/contact-server.md).
-The Node-runtime `/api/contact` route is implemented with controlled tests;
-delivery defaults off and requires exact `CONTACT_ENABLED=true` and valid
-server configuration to enable it. The `/contact` page provides disabled fields
-and an email fallback while sending is off. [FS-5.6 acceptance](docs/tasks/fs-5.6-contact-acceptance.md)
-records the accepted Preview journey and shutdown; it is not evidence of current
-Production configuration. [FS-5.4 UI checks](docs/development/contact-ui.md)
-cover the controlled form and browser adapter.
-Run contact-layer tests explicitly with
-`pnpm exec vitest run --config vitest.contact.config.ts --coverage`, because
-the broad coverage configuration excludes these layers.
+Decorative animation is unavailable by default in a fresh setup, so the complete
+static WEB artwork is shown. To enable the local animation feature, add
+`NEXT_PUBLIC_ANIMATIONS_ENABLED=true` to the same command:
+
+```bash
+NEXT_PUBLIC_ANIMATIONS_ENABLED=true CONTACT_ENABLED=false RESEND_API_KEY= CONTACT_FROM= CONTACT_TO= CONTACT_ALLOWED_ORIGINS= pnpm -F frontend dev
+```
+
+Availability is separate from the visitor's System, On, Reduced or Off motion
+selection and local Pause. The application retains static alternatives when
+motion is unavailable or not permitted.
+
+For Storybook, run `pnpm storybook` from the root and open
+[http://localhost:6006](http://localhost:6006). The frontend dev and build
+scripts generate the icon sprite and theme bootstrap automatically. When
+changing theme-bootstrap source, follow the
+[maintenance guide](docs/tasks/maintenance-theme-bootstrap.md) and do not edit
+the generated module by hand.
 
 ## Project layout
 
-- `frontend/` – Next.js App Router UI, Tailwind themed with CSS variables from
-  `styles/tokens.css`, Storybook configuration, and component library (Base,
-  Controls, Modules, Layouts, Templates).
-- `games/wave-survivor/` – accepted standalone TypeScript/Canvas game and demo; portfolio hosting remains separate work.
-- `tokens/` – source of truth for design and motion tokens.
-- `styles/` – generated CSS custom properties for default, dark, muted, and
-  high-contrast themes.
-- `common/generated/` – generated, framework-neutral TypeScript token constants.
-- `common/motion/` – pure easing, interpolation, tween, and timeline utilities.
-- `e2e/` – Playwright tests; configuration lives in `playwright.config.ts`.
-- Colocated `*.test.ts`/`*.test.tsx` – Vitest suites; dedicated game tests also have a separate Node configuration.
-- `backend/` – stub reserved for possible future server capabilities.
-- `common/` – private framework-neutral package exporting generated TypeScript
-  token artifacts and the shared motion core.
-- `scripts/` – automation helpers (e.g. GitHub branch protection script).
+```text
+frontend/              Next.js app, UI, services and server-only contact route
+games/wave-survivor/   Standalone Canvas game and demo
+common/                Shared framework-independent tokens and motion utilities
+tokens/                Design and motion token sources
+styles/                Generated CSS tokens
+e2e/                   Playwright browser tests
+docs/                  Architecture, decisions, guides and task evidence
+backend/               Reserved placeholder; not a separate running service
+```
 
-### Theming
-
-Tokens are transformed into CSS variables for the frontend and TypeScript
-constants for framework-neutral consumers such as games. Frontend components
-continue to consume CSS variables through Tailwind token utilities. The home
-page opts into server components by default; the `ThemeSwitcher` is a small
-client component that respects `system`, `default`, `dark`, `muted`, and
-high-contrast modes by persisting the choice in `localStorage` and reacting to
-system preference changes.
+Read the [architecture overview](docs/architecture.md) for responsibilities
+and dependency boundaries, and the [game plan](docs/features/wave-survivor-implementation-plan.md)
+for the standalone game and its future portfolio integration.
 
 ## Testing & quality
 
 ```bash
-pnpm lint           # Next.js lint + prettier --check
-pnpm test           # Node preview-server safety tests, then Vitest
-pnpm test:watch     # Vitest watch mode
-pnpm coverage       # Node preview-server safety tests, then Vitest/V8 coverage
-pnpm typecheck:validation # frontend + stories + all E2E/fixtures + Playwright configs
-pnpm e2e            # Playwright end-to-end suite (Chromium only)
+pnpm lint
+pnpm test
+pnpm typecheck:validation
+pnpm build
 ```
 
-Vitest is configured to reuse the frontend React installation and loads
-`vitest.setup.ts` for Testing Library matchers. Coverage thresholds are enforced
-when coverage runs: 75% lines/functions/statements and 80% branches, with the
-configured exclusions. CI enables coverage by default; `pnpm coverage` also enables it locally.
-The Node preview-server suite runs separately with `pnpm test:contact-preview-server`;
-it is excluded from Vitest because it uses Node's own test runner, not to skip it.
+`pnpm coverage` adds Vitest coverage; contact layers also have a dedicated
+`pnpm exec vitest run --config vitest.contact.config.ts --coverage` check.
+Browser tests require an explicit Chromium installation via `pnpm setup:browsers`.
+`pnpm e2e` uses the development server and may reuse an existing server outside
+CI, so it is not evidence of a fresh or isolated candidate. Check the server
+identity and use the relevant safe, delivery-off setup before running contact
+or browser checks; do not use an unknown or live preview. The
+[controlled contact fixture guide](docs/development/contact-manual-preview.md)
+describes simulated states without sending mail.
 
-The CI workflow provisions dependencies and Chromium first, then runs application
-checks in a Linux loopback-only network namespace with delivery off, blank mail
-settings and per-check evidence. The launcher requires `sudo`, `unshare`, `ip` and
-`setpriv` on its runner. Ordinary local commands do not automatically provide that
-isolation; use fresh credential-free snapshots and the contact guidance for local
-browser or server checks. CI artifacts do not replace human or deployed acceptance.
+The [CI workflow](.github/workflows/ci.yml) provisions dependencies and Chromium
+then runs application checks in an isolated Linux environment with contact
+delivery off. Local commands do not automatically reproduce that isolation.
 
-The normal frontend type check excludes stories and root E2E files. CI also runs
-`pnpm typecheck:validation` using `frontend/tsconfig.validation.json`, which includes
-them without weakening strictness. Its extra module paths let root-level E2E
-fixtures resolve the frontend's Next.js dependency and the common package's public
-colors export; they do not change application or browser-test runtime resolution.
+## More information
 
-## Playwright browser downloads
-
-Browser installation is explicit; dependency installation no longer downloads browsers.
-CI and E2E use `PLAYWRIGHT_BROWSERS_PATH=0`, so they resolve the same project-local Chromium.
-Playwright is locked to the reviewed 1.55.1 release, which fixes the earlier
-downloader certificate-verification advisory. The root `playwright-core` devDependency
-explicitly supplies axe's peer at that same version; keep it aligned with
-`@playwright/test` when upgrading. This prevents pnpm from installing a newer peer
-whose `Page` type differs from the runner's. Browser installation and both
-Chromium suites passed in the dependency maintenance record:
-
-```bash
-pnpm setup:browsers
-pnpm e2e
-pnpm exec cross-env PLAYWRIGHT_BROWSERS_PATH=0 playwright test --config playwright.demo.config.ts
-```
-
-The default E2E configuration covers Desktop Chromium and excludes the standalone
-game demo. The separate demo suite uses Chromium with its own Vite server. Neither
-configuration establishes WebKit or real-device coverage. Keep ports 3000 and 5173
-free when checking a particular candidate; local configurations may reuse servers.
-
-For a dependency-only setup check, `pnpm install --frozen-lockfile --ignore-scripts`
-skips lifecycle scripts deliberately. This is not proof that browser prerequisites
-are installed. Add `--offline` only when the pnpm store already contains the locked graph.
-
-Lighthouse commands set `NEXT_PUBLIC_ANIMATIONS_ENABLED` **during the build**:
-`pnpm lhci:off`, then `pnpm lhci:on`. Both measure `/` with the desktop preset
-and DevTools throttling, using observed paint timings rather than simulated
-dependency timings. This includes the homepage introduction's elapsed time and
-keeps capture running through its staged reveal. Network emulation explicitly
-uses 150 ms request latency and 9,216 Kbps download/upload, translating the
-desktop preset's 40 ms RTT / 10,240 Kbps with Lighthouse's 3.75 / 0.9 calibration
-factors; CPU remains 1×. Each variant retains three
-runs, the 5,000 ms LCP / 0.1 CLS p75 limits and the 0.9 performance-score warning.
-The LCP budget was explicitly increased by Dimi on 2026-09-27 to retain the
-accepted introduction; this changes acceptance criteria, not runtime speed.
-The enabled homepage uses a 1,000 ms identity-logo introduction, followed by
-the 400 ms menu and 800 ms content fades; the disabled build stays static.
-These are local lab measurements, not field p75 or physical-device acceptance.
-
-## Deployment
-
-Deploy the `frontend` workspace on Vercel. Set the install command to
-`pnpm install --frozen-lockfile` so workspaces are linked correctly, and enable **Include source
-files outside of the Root Directory** to access shared packages. With Root Directory
-`frontend`, the verified Build Command override is `pnpm --workspace-root build`;
-the root build performs tokens, common typecheck, game build and Next build.
-FS-0.3 records the approved settings and deployment at its exact revision. Recheck
-the target and obtain action-specific approval before later deployment/settings changes.
-
-## Further reading
-
-- `CONTRIBUTING.md` – detailed workflow, branch strategy, and CI expectations.
-- `AGENTS.md` – quick reference for coding agents.
-- `frontend/README.md` – Create Next App defaults (superseded by this document
-  but kept for reference).
+- [Documentation index](docs/README.md) — current guides and historical evidence.
+- [Contributing](CONTRIBUTING.md) — workflow and change checks.
+- [Architecture](docs/architecture.md) and [package responsibilities](docs/architecture/packages.md).
+- [Wave Survivor](games/wave-survivor/README.md) — standalone game and demo.
+- [Contact operations](docs/development/contact-operations.md) — configuration,
+  production operation and recovery.
+- [Portfolio plan](docs/features/funkspace-minimum-usable.md) and
+  [release record](docs/tasks/fs-6.5-public-rollout.md) — status and evidence.
+- [AGENTS.md](AGENTS.md) — project instructions for coding agents.

@@ -18,20 +18,18 @@ The configured locations are not all active packages. A pnpm workspace package r
 | Location        | Current state             | Manifest                | Runtime/build responsibility                                                                      |
 | --------------- | ------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
 | Repository root | Active private package    | `package.json`          | Workspace tooling, token generation, tests, E2E, CI commands, and frontend build orchestration    |
-| `frontend/`     | Active private package    | `frontend/package.json` | The complete web application and all current product runtime behavior                             |
+| `frontend/`     | Active private package    | `frontend/package.json` | Portfolio web application, server routes and frontend-owned integration adapters                  |
 | `common/`       | Active private package    | `common/package.json`   | Generated TypeScript tokens and a pure, renderer-neutral motion core                              |
 | `backend/`      | Placeholder directory     | None                    | None                                                                                              |
 | `games/*`       | Active package collection | `wave-survivor`         | Standalone game packages with independent manifests, builds, dependencies, and product boundaries |
 
 `pnpm list -r --depth -1` recognizes the root package, `frontend`,
 `@funkspace/common`, and `@funkspace/wave-survivor`. `backend` remains a
-README-only placeholder. The first game package is buildable TypeScript
-with a deterministic fixed-step runtime and no external runtime dependencies.
-Its current runtime includes seeded fair offscreen spawning, enemy lifecycle and
-direct pursuit, visible-border activation, and despawn cleanup. The renderer
-draws the responsive grey-box arena, directional entry warnings, visible
-enemies, moving player, and fixed virtual joystick from immutable
-logical-coordinate snapshots.
+README-only placeholder. Wave Survivor is an independently runnable TypeScript
+and Canvas game with a deterministic fixed-step runtime and no external runtime
+dependencies. Its accepted standalone run includes four normal waves, upgrades,
+a boss, victory/defeat, results and replay. Its demo is independent of the
+portfolio; the dedicated portfolio play route has not yet been implemented.
 
 The current dependency shape is:
 
@@ -48,11 +46,11 @@ wave-survivor      -> independent TypeScript build
 
 common  [active private package; explicit motion and token exports]
 backend [placeholder; no runtime or deployment]
-games/* [active collection; wave-survivor enemy-entry and pursuit slice]
+games/* [active collection; standalone Wave Survivor package and demo]
 ```
 
 The root production build type-checks `common` before building the frontend.
-Wave Survivor builds independently through its package script. Repository tests
+The frontend build also invokes Wave Survivor’s package build; the game can be built independently through its own package script. Repository tests
 cover the shared core, frontend adapters, and Wave Survivor package. No current
 application code imports from `backend`. The approved frontend integration at
 `frontend/features/games/GameLoader.ts` lazily imports Wave Survivor through its
@@ -111,7 +109,7 @@ While both `package.json#workspaces` and `pnpm-workspace.yaml` declare workspace
 
 ### Current responsibilities
 
-`frontend` is the only active application package. It owns:
+`frontend` is the active Next.js portfolio application package. It owns:
 
 - The Next.js runtime and React application boundary.
 - Next.js App Router pages, layouts, metadata, and public assets.
@@ -124,13 +122,13 @@ While both `package.json#workspaces` and `pnpm-workspace.yaml` declare workspace
 - Browser integrations for DOM, storage, animation, and motion.
 - Frontend unit/component tests; root tooling supplies E2E and quality orchestration.
 
-New portfolio pages, animations, and embedded experiments remain in `frontend` unless an extraction trigger in this document is met. Standalone games belong in a future `games/<game-slug>` package. Interactive work in either location must follow the isolation boundary in [`ADR-003`](../decisions/ADR-003-interactive-experience-boundary.md).
+New portfolio pages, animations, and embedded experiments remain in `frontend` unless an extraction trigger in this document is met. Standalone games belong in a `games/<game-slug>` package; Wave Survivor is the first. Interactive work in either location must follow the isolation boundary in [`ADR-003`](../decisions/ADR-003-interactive-experience-boundary.md).
 
 ### Allowed dependencies
 
 `frontend` may depend on:
 
-- Dependencies declared in `frontend/package.json`. The current runtime dependencies are `@funkspace/common`, Next.js, React, React DOM, and Framer Motion.
+- Dependencies declared in `frontend/package.json`. The current runtime dependencies include `@funkspace/common`, `@funkspace/wave-survivor`, Next.js, React, React DOM, and Framer Motion.
 - Its own modules when imports follow the layer rules in `AGENTS.md` and `docs/architecture.md`.
 - Generated design-token CSS and other intentional root-owned build outputs.
 - Root development tooling through workspace scripts; tooling must not become a browser runtime dependency.
@@ -216,12 +214,11 @@ despawn cleanup, interruption cleanup, and immutable render snapshots. Its
 renderer owns responsive Canvas presentation, draws the themed arena, border,
 directional entry warnings, active enemies, moving player, and fixed joystick
 in `360 × 640` logical coordinates, and observes an independently sized
-viewport boundary. The public entry point exposes `createGame()` and the
-`GameController` lifecycle contract
-(`start`, `pause`, `resume`, `restart`, and `destroy`) plus a
-canvas/viewport/theme mount contract so a portfolio adapter can own an instance
-without accessing game internals. Theme changes cross the same public boundary
-through `setTheme()`. The parent
+viewport boundary. The public entry point exposes `createGame()`, the
+`GameController` lifecycle (`start`, `pause`, `resume`, `restart`, `chooseUpgrade`,
+`setTheme`, and `destroy`), mount and theme contracts, discrete status and event
+types, and result types. An adapter can mount and control an instance without
+accessing game internals. The parent
 [`games/README.md`](../../games/README.md) defines creation and isolation
 requirements.
 
@@ -286,8 +283,11 @@ variables, DOM theme attributes, or frontend services. `GameLoader` lazily
 imports explicit game package entry points, while `GameHost` mounts the canvas,
 passes an independently sized generic viewport boundary, starts the controller,
 pauses or resumes it with document visibility, forwards theme updates, and
-destroys it on unmount. The game renderer owns Canvas presentation and backing
-dimensions. React owns none of the simulation or rendering loop.
+destroys it on unmount. This baseline host auto-starts and resumes on visibility
+return; deliberate Start, manual-pause-safe resume, upgrade/result overlays and
+route cleanup acceptance remain EPIC 7 work. The game renderer owns Canvas
+presentation and backing dimensions. React receives discrete status/events and
+owns none of the simulation or rendering loop.
 
 `GameHost` deliberately provides no game-specific width, height, or aspect
 ratio. A portfolio-page consumer must allocate explicit inline and block space
@@ -305,13 +305,13 @@ Portfolio routes and components depend on a frontend-owned adapter interface, no
 
 ### Is it currently required?
 
-No. The current FunkSpace site builds, tests, runs, and deploys from the root and `frontend` packages. Removing the `backend` directory is outside this task, but agents must not invent a backend dependency or describe it as an active service.
+No separate backend package is currently required. The site builds, tests, runs, and deploys from the root and `frontend` packages. Server-side code already exists inside the Next.js application: `frontend/app/api/contact/route.ts` delegates through server-only composition to validation and provider adapters. That does not make `backend/` an active service. Do not expose server credentials to browser code or invent a backend dependency.
 
 Keeping the placeholder is reasonable only as a visible reservation while server requirements are being evaluated. If no server-owned requirement emerges, a later cleanup task should reconsider whether the directory and workspace entry provide value.
 
 ### Future possibilities
 
-Activate a backend only for behavior that should not or cannot run safely in the browser, for example:
+Consider a separate backend only when existing server-side Next.js capabilities are insufficient for a concrete need, for example:
 
 - Private API credentials or server-side integrations.
 - Persistent accounts, save data, scores, or leaderboards.
@@ -353,7 +353,7 @@ Network relationships do not permit filesystem imports across private implementa
 2. Treat `backend` as an inactive placeholder and keep `common` limited to its pure, explicitly exported foundation responsibilities.
 3. Keep portfolio pages and embedded experiences in `frontend`; place future standalone games in direct `games/<game-slug>` packages.
 4. Keep each game's source isolated and keep the first game's lightweight engine private to that game, as required by [`ADR-004`](../decisions/ADR-004-game-development-architecture.md).
-5. Extend automated package/import-boundary checks when the first game package is activated.
+5. Maintain automated package/import-boundary checks for the active Wave Survivor package as its public contract evolves.
 6. Update root scripts and CI whenever a real package is activated; do not assume recursive commands cover a directory without a manifest.
 
 ### Extraction triggers

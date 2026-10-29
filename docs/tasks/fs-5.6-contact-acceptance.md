@@ -9,7 +9,7 @@
 - **Initial inspected base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `ad2e98e1ff433c9d5942692bc722f0198ba12b46`; clean at inspection. No reset or newer work overwritten.
 - **Closure base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `36407f6a790a8d9787bdc3123041e24e181bdfee`; clean before this documentation-only closure.
 - **Previous handoff:** [FS-5.5 closure](fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15), contained in this base. Actual source/intentional changes are accessible locally; chats do not automatically share working files.
-- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [detailed plan](../features/FunkSpace_EPIC_5_Detailed_Plan.md), [operations](../development/contact-operations.md), [acceptance procedure](../development/contact-acceptance.md).
+- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [detailed plan](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md), [operations](../development/contact-operations.md), [acceptance procedure](../development/contact-acceptance.md).
 
 This record is chronological. The initial preparation and delivered `b829447`
 retain their dated false-source-lock facts. The latest live-acceptance/closure section below owns current status. Earlier

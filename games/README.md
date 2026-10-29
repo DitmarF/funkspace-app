@@ -8,9 +8,11 @@ games/
     package.json
 ```
 
-`wave-survivor` is the first package and currently contains architecture and
-build scaffolding only. This README does not make `games/` itself a package;
-pnpm discovers direct child packages through `games/*`.
+`wave-survivor` is the first package and contains the standalone playable game,
+public lifecycle boundary and demo. Its accepted Gate 2 and pending portfolio
+integration are recorded in the [game plan](../docs/features/wave-survivor-implementation-plan.md).
+This README does not make `games/` itself a package; pnpm discovers direct
+child packages through `games/*`.
 
 ## Purpose
 
@@ -81,8 +83,9 @@ Before adding code:
 1. Copy `docs/templates/feature-plan.md` to `docs/features/<game-slug>.md` and define scope, architecture, controls, accessibility, performance, tests, rollout, and rollback.
 2. Create `games/<game-slug>/package.json` with a unique private package name and explicit scripts and dependencies.
 3. Define the package's public integration contract, if one is needed.
-4. Add targeted root/CI commands; the current root build intentionally builds
-   `common` and `frontend`, while game packages build independently.
+4. Add targeted root/CI commands. The current root build builds `common` and
+   `frontend`; the frontend build invokes the Wave Survivor package build.
+   The game also retains its own standalone build and test commands.
 5. Verify pnpm discovery, type checking, tests, production build, and any deployment configuration for the new package.
 
 Do not add a framework, shared engine, backend dependency, or cross-package source import without the feature plan and applicable ADR review.

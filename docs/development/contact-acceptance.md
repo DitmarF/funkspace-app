@@ -54,7 +54,7 @@ tests, 42 Chromium cases, types, affected lint and production bundling. No routi
 test contacted Resend. Closure documentation needs formatting/link/diff checks,
 not a repeat live test or application build.
 
-The [frozen contract](../features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
+The [frozen contract](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md#frozen-uiserver-contract)
 is unchanged: matching 202 means provider acceptance, not mailbox receipt;
 eight-second provider/fifteen-second browser deadlines; no automatic retries;
 unchanged manual identity for less than 23 hours; page-memory draft/key only.

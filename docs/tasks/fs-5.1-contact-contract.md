@@ -8,7 +8,7 @@
 - **Last updated:** 2026-10-13.
 - **Actual preparation base:** `feature/funkspace-minimum-usable`, `2c545cd7cb3bc074a126fffa61166577f113cc7b`, clean on initial inspection; same as supplied historical baseline. Closure-time `git ls-remote` confirms the remote branch at that base before the authorized commit/push. No reset performed.
 - **Previous handoff:** [FS-4.8/EPIC 4 closure](fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13). EPIC 4 stays complete.
-- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md), [AI workflow](../development/ai-workflow.md), [task template](../templates/task.md), [feature template](../templates/feature-plan.md), [EPIC 5 detail](../features/FunkSpace_EPIC_5_Detailed_Plan.md), [FS-0.5](fs-0.5-product-and-technical-decisions.md), [FS-1.5](fs-1.5-essential-form-primitives.md), [FS-2.4](fs-2.4-contact-footer-and-legal-structure.md).
+- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md), [AI workflow](../development/ai-workflow.md), [task template](../templates/task.md), [feature template](../templates/feature-plan.md), [EPIC 5 detail](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md), [FS-0.5](fs-0.5-product-and-technical-decisions.md), [FS-1.5](fs-1.5-essential-form-primitives.md), [FS-2.4](fs-2.4-contact-footer-and-legal-structure.md).
 
 ## Requested outcome
 

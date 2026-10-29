@@ -8,7 +8,7 @@
 - **Last updated:** 2026-10-13.
 - **Actual implementation base:** `feature/funkspace-minimum-usable`, `6147688241fa6737de561840ba149c57ea32abb7`; clean on initial inspection. The containing Git commit identifies the delivered revision; final artifact `delivery.txt` records the full commit and remote verification after push.
 - **Previous task:** [FS-5.2 handoff](fs-5.2-contact-server.md#handoff), technical PASS at this base; Dimi explicitly closed FS-5.2 and requested this task. Actual repository and intentional changes accessible locally, not inferred from another chat.
-- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [detailed plan](../features/FunkSpace_EPIC_5_Detailed_Plan.md), [server setup](../development/contact-server.md), [operating guide](../development/contact-operations.md).
+- **Related documentation:** [AGENTS](../../AGENTS.md), [architecture](../architecture.md#contact-composition--fs-51), [workflow](../development/ai-workflow.md), [task template](../templates/task.md), [detailed plan](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md), [server setup](../development/contact-server.md), [operating guide](../development/contact-operations.md).
 
 ## Requested outcome
 

@@ -166,7 +166,7 @@ For each row and materially different environment:
 
 ## Later checks
 
-- **H11 — PENDING FS-6.5:** Authorized production mail smoke, separate mailbox receipt and Reply-To confirmation. Not covered by simulated contact acceptance.
-- **H12 — PENDING FS-6.5:** Frozen presentation URL on the actual presentation device and network. Not covered by local preview connectivity.
+- **H11 — PASS, Dimi-reported:** Dimi confirmed Production contact works, the message reached the intended inbox and Reply-To contained the sender’s address. Codex did not independently inspect provider or mailbox records. See [public rollout](fs-6.5-public-rollout.md#h11--production-contact-acceptance).
+- **H12 — PASS, Dimi-reported:** Dimi confirmed that the final public site works on the presentation device and network, accepted the URL and chose to show the form without sending email. Individual actions and exact device/browser versions for this final report were not supplied. See [public rollout](fs-6.5-public-rollout.md#h12--presentation-device-check).
 
 Do not proceed automatically into corrections or release. Record Dimi's observations and hand actual findings to their FS-6.3 owner.

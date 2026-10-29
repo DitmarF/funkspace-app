@@ -3,7 +3,7 @@
 ## Task metadata
 
 - **Status:** Complete — Dimi accepted the current copy and explicitly closed FS-5.5 on 2026-10-15; commit/push authorized
-- **Task group or epic:** [EPIC 5](../features/FunkSpace_EPIC_5_Detailed_Plan.md)
+- **Task group or epic:** [EPIC 5](https://github.com/DitmarF/funkspace-app/blob/07a75a713242a0b6b4d8fde336856b13a8033e44/docs/features/FunkSpace_EPIC_5_Detailed_Plan.md)
 - **Owner:** Sites presentation; Dimi supplies/approves factual legal copy and final legal acceptance
 - **Last updated:** 2026-10-15
 - **Current follow-up repo/branch/base:** `/Users/dimi/Projects/funkspace-app`, `feature/funkspace-minimum-usable`, `fe2d0746c83486ee8d0d145fb00367868ae88f5a`; clean at steps 1–3 inspection, actual source access verified, no reset. Earlier records retain their original `9ba16f8` parent.
