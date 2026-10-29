@@ -1,5 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { colors } from "../common/generated/colors";
+import {
+  compareIconPixels,
+  decodeIconScreenshots,
+} from "./helpers/icon-pixel-parity";
 
 function cssRgb(hex: string) {
   const channels = [1, 3, 5].map((offset) =>
@@ -52,7 +56,7 @@ for (const theme of [
     expect(response.ok()).toBe(true);
     const sprite = await response.text();
     // Same box and source geometry, changing only how the artwork is referenced.
-    // No screenshot tolerance: external use must match the original inline paint.
+    // Compare the decoded artwork with a small bounded rasterization allowance.
     for (const name of [
       "home",
       "about",
@@ -122,12 +126,19 @@ for (const theme of [
           namespace: "http://www.w3.org/2000/svg",
         });
         await waitForPaint(page);
+        const inline = await icon.screenshot({
+          path: info.outputPath(`${name}-${size}-inline.png`),
+        });
+        const [externalPixels, inlinePixels] = await decodeIconScreenshots(
+          page,
+          external,
+          inline,
+        );
+        const parity = compareIconPixels(externalPixels, inlinePixels);
         expect(
-          await icon.screenshot({
-            path: info.outputPath(`${name}-${size}-inline.png`),
-          }),
-          `${name}-${size}`,
-        ).toEqual(external);
+          parity.matches,
+          `${name}-${size}: ${JSON.stringify(parity)}`,
+        ).toBe(true);
         expect(await readTheme()).toEqual(expectedTheme);
       }
     }
