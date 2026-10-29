@@ -1,0 +1,22 @@
+.form {
+  display: grid;
+  gap: var(--fs-space-lg);
+  min-width: 0;
+}
+.form button {
+  justify-self: start;
+  max-width: 100%;
+}
+.result {
+  overflow-wrap: anywhere;
+  scroll-margin-block: var(--fs-space-2xl);
+}
+.result:focus {
+  outline: 2px solid var(--fs-color-border-focus);
+  outline-offset: var(--fs-space-xs);
+}
+@media (forced-colors: active) {
+  .result:focus {
+    outline-color: Highlight;
+  }
+}

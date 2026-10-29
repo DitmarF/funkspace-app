@@ -19,7 +19,14 @@ export function useReducedMotion(): boolean {
     }
 
     // Check initial preference
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let mediaQuery: MediaQueryList;
+    try {
+      mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    } catch {
+      // A missing/blocked browser preference API must not break static content.
+      setReduced(true);
+      return;
+    }
     setReduced(mediaQuery.matches);
 
     // Listen for changes (user can change preference dynamically)

@@ -1,0 +1,24 @@
+.cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+.paint {
+  fill: var(--fs-color-surface-background);
+}
+.silhouette {
+  fill: var(--fs-color-content-primary);
+}
+
+/* Enlarge only the WEB opening; the full cover and scene geometry stay fixed.
+   Share SVG geometry between the live mask and independent solid artwork. */
+@media (width < 640px) {
+  .webOpening {
+    transform-box: view-box;
+    transform-origin: center;
+    transform: scale(1.2);
+  }
+}

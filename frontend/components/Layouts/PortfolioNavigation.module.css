@@ -1,0 +1,311 @@
+.trigger {
+  anchor-name: --portfolio-menu;
+}
+
+.overlay {
+  --navigation-close-artwork-size: var(--fs-space-2xl);
+  --navigation-rail-padding: min(var(--fs-space-xs), 8px);
+  --navigation-rail-offset: calc(
+    var(--fs-space-sm) - var(--navigation-rail-padding)
+  );
+  --navigation-close-space: calc(
+    var(--navigation-close-artwork-size) + 4px + 2 * var(--dialog-gutter)
+  );
+  --navigation-content-start: calc(
+    max(0px, (100vw - 80rem) / 2) +
+      max(var(--shell-gutter), var(--shell-safe-left))
+  );
+  --navigation-close-top: max(
+    var(--shell-safe-top),
+    min(
+      calc(
+        var(--navigation-inline-end) +
+          (var(--navigation-control-size) - var(--navigation-close-space)) / 2
+      ),
+      max(
+        0px,
+        calc(
+          100dvh - var(--navigation-control-size) -
+            var(--navigation-close-space) - 2 *
+            max(var(--navigation-block-gutter), var(--shell-safe-bottom))
+        )
+      )
+    )
+  );
+  --dialog-content-end-space: calc(
+    var(--navigation-inline-end) + var(--navigation-control-size) +
+      min(var(--fs-space-sm), 12px)
+  );
+}
+
+/* Center the smaller Close target on the rail, with no browser measurements. */
+.overlay > :first-child {
+  position: fixed;
+  top: var(--navigation-close-top);
+  right: calc(
+    var(--navigation-inline-end) +
+      (var(--navigation-control-size) - var(--navigation-close-space)) / 2
+  );
+  width: var(--navigation-close-space);
+  z-index: 21;
+  padding: var(--dialog-gutter);
+  border: 0;
+  background: var(--fs-color-surface-background);
+}
+
+.overlay > :first-child button {
+  --hex-size: var(--navigation-close-artwork-size);
+}
+
+/* The dialog owns detail scrolling; the rail remains anchored to its trigger. */
+.overlay > :last-child {
+  margin-top: 0;
+  padding-top: calc(
+    var(--navigation-close-top) + var(--dialog-gutter) - var(--shell-safe-top)
+  );
+  padding-inline-start: calc(
+    var(--navigation-content-start) - var(--shell-safe-left)
+  );
+  flex: none;
+  overflow: visible;
+}
+
+@supports (right: anchor(--portfolio-menu center)) {
+  .overlay > :first-child {
+    position-anchor: --portfolio-menu;
+    right: calc(
+      anchor(--portfolio-menu center) - var(--navigation-close-space) / 2
+    );
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  align-items: start;
+}
+
+.details {
+  min-width: 0;
+  display: grid;
+  gap: var(--fs-space-md);
+  align-content: start;
+}
+
+.details h3,
+.group legend {
+  font-family: var(--font-space-grotesk, var(--fs-font-family-base));
+  font-size: var(--fs-font-size-xl);
+  font-weight: var(--fs-font-weight-semibold);
+}
+
+/* Share Close's center without reserving a separate row above the details. */
+.details h3 {
+  font-family: var(--font-work-sans, var(--fs-font-family-display));
+  display: flex;
+  align-items: center;
+  min-height: calc(var(--navigation-close-artwork-size) + 4px);
+  line-height: var(--fs-line-height-tight);
+}
+
+.details :is(h3, legend) {
+  font-size: calc(var(--fs-font-size-xl) * 1.25);
+}
+
+.group {
+  min-width: 0;
+}
+
+.group legend {
+  margin-bottom: var(--fs-space-md);
+}
+
+.choices {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--fs-space-sm);
+  min-width: 0;
+}
+
+/* Keep text above the existing 4.5:1 project gate; the action color remains
+   the hover border cue rather than becoming low-contrast body text. */
+.choices[data-presentation="outlined"]
+  button:hover:not(:disabled):not([aria-pressed="true"]):not(:active) {
+  --control-foreground: var(--fs-color-content-primary);
+  --control-border: var(--fs-color-action-hover);
+}
+
+.choices button[aria-pressed="true"],
+.choices button[aria-pressed="true"]:hover:not(:disabled) {
+  --control-foreground: var(--fs-color-content-inverse);
+  --control-background: var(--fs-color-content-primary);
+  --control-border: var(--control-foreground);
+}
+
+/* Secondary choices keep a persistent inverse selection. */
+.choices[data-presentation="secondary"]
+  button[aria-pressed="true"]:not(:disabled) {
+  --control-foreground: var(--fs-color-content-primary);
+  --control-background: var(--fs-color-content-inverse);
+  --control-border: var(--control-foreground);
+}
+
+.overlay .rail {
+  position: fixed;
+  width: var(--navigation-control-size);
+  height: var(--navigation-control-size);
+}
+
+.categories {
+  position: absolute;
+  bottom: calc(100% + var(--navigation-rail-offset));
+  left: calc(-1 * var(--navigation-rail-padding));
+  width: calc(100% + 2 * var(--navigation-rail-padding));
+  max-height: calc(
+    100dvh - var(--navigation-close-space) - var(--navigation-close-top) -
+      var(--navigation-control-size) -
+      max(var(--navigation-block-gutter), var(--shell-safe-bottom)) -
+      var(--navigation-rail-padding) - var(--navigation-rail-offset)
+  );
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: var(--fs-space-sm);
+  padding: var(--navigation-rail-padding);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.categories::-webkit-scrollbar {
+  display: none;
+}
+
+.categories > button {
+  --hex-size: var(--navigation-artwork-size);
+}
+
+/* The native disclosure and enhanced Menu share artwork and coordinates.
+   There is no interim text/marker to flash while application JS loads. */
+.fallback > summary {
+  --hex-size: var(--navigation-artwork-size);
+  list-style: none;
+}
+
+.fallback > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Only an explicitly opened native fallback shows its ordinary links. Keep
+   them reachable next to the trigger even when the footer is below the fold. */
+.fallback > nav {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--fs-space-sm));
+  width: min(24rem, calc(100vw - 2 * var(--shell-gutter)));
+  max-height: calc(
+    100dvh - var(--navigation-control-size) -
+      max(var(--navigation-block-gutter), var(--shell-safe-bottom)) -
+      max(var(--shell-gutter), var(--shell-safe-top)) - var(--fs-space-sm)
+  );
+  overflow: auto;
+  padding: var(--fs-space-xs);
+  background: var(--fs-color-surface-background);
+  border: 1px solid var(--fs-color-content-primary);
+}
+
+@media (max-height: 36rem) {
+  .overlay {
+    --navigation-close-artwork-size: min(var(--fs-space-2xl), 48px);
+  }
+}
+
+@media (min-width: 48rem) {
+  .details .group {
+    margin-block-start: var(--fs-space-3xl);
+  }
+
+  .details h3 {
+    font-size: calc(var(--fs-font-size-lg) * 2);
+  }
+
+  .details legend {
+    font-size: calc(var(--fs-font-size-xl) * 1.5);
+  }
+
+  .fallback > nav {
+    top: calc(100% + var(--fs-space-sm));
+    bottom: auto;
+    max-height: calc(
+      100dvh - max(var(--fs-space-xl), var(--shell-safe-top)) -
+        var(--navigation-control-size) - var(--fs-space-sm) -
+        max(var(--shell-gutter), var(--shell-safe-bottom))
+    );
+  }
+
+  .overlay {
+    /* Reserve Close beside the entire details column, including at tablet
+       widths; both move with the centered shell on ultrawide screens. */
+    --navigation-content-start: max(
+      calc(
+        max(0px, (100vw - 80rem) / 2) +
+          max(var(--shell-gutter), var(--shell-safe-left))
+      ),
+      calc(
+        var(--shell-safe-left) + var(--navigation-close-space) +
+          var(--fs-space-sm)
+      )
+    );
+    /* The desktop launcher has a known document offset. Convert it once to
+       viewport coordinates using the existing dialog-owned scroll snapshot. */
+    --navigation-rail-top: max(
+      var(--shell-safe-top),
+      calc(
+        max(var(--fs-space-xl), var(--shell-safe-top)) -
+          var(--navigation-header-scroll-y, var(--dialog-page-scroll-y, 0px))
+      )
+    );
+    --navigation-close-top: calc(
+      var(--navigation-rail-top) +
+        (var(--navigation-control-size) - var(--navigation-close-space)) / 2
+    );
+    /* Native focus scrolling must reveal the row below the fixed Close cover. */
+    scroll-padding-top: calc(
+      var(--navigation-close-top) + var(--navigation-close-space) +
+        var(--fs-space-xs)
+    );
+  }
+
+  .overlay > :first-child {
+    position-anchor: normal;
+    right: auto;
+    left: calc(
+      var(--navigation-content-start) - var(--navigation-close-space) -
+        var(--fs-space-sm)
+    );
+  }
+
+  .categories {
+    top: calc(100% + var(--navigation-rail-offset));
+    bottom: auto;
+    flex-direction: column;
+    max-height: calc(
+      100dvh - var(--navigation-control-size) -
+        max(var(--fs-space-xl), var(--shell-safe-top)) - var(--fs-space-md) -
+        var(--navigation-rail-offset)
+    );
+  }
+
+  .overlay .rail {
+    top: var(--navigation-rail-top);
+  }
+
+  .choices {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}

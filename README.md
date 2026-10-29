@@ -29,11 +29,31 @@ pnpm build:tokens        # regenerate CSS and TypeScript token artifacts
 pnpm -F frontend dev     # start the Next.js app on http://localhost:3000
 ```
 
+- Icon artwork: `pnpm build:icons` regenerates the checked SVG sprite; dev/build/Storybook do this automatically. After editing artwork in a running session, regenerate it. `pnpm check:icons` verifies freshness before lint/tests.
 - Storybook: `pnpm storybook` (opens on http://localhost:6006).
-- Production build: `pnpm build` (tokens → common typecheck → game build → frontend build).
+- Production build: `pnpm build` (tokens → common typecheck → icon/aperture/bootstrap generation and checks → game build → Next build).
+- Development uses `frontend/.next-dev`; production build/start use `frontend/.next`. This keeps a local production build from overwriting a running development server's JavaScript. Restart an older dev server once after adopting this configuration. Stop a production server before rebuilding its own output.
+- Phone preview: after a successful `pnpm check:theme-bootstrap && pnpm build`, run `pnpm -F frontend start -H 0.0.0.0 -p 3001`. Keep the terminal running, connect the phone to the same LAN, and open `http://<Mac-LAN-IP>:3001`. `0.0.0.0` is the listening address, not a phone destination; on a Mac with Wi-Fi on `en0`, `ipconfig getifaddr en0` prints the LAN address.
 - Direct frontend builds require generated tokens first; use the root build for the complete prerequisite order.
+- Frontend dev/build generate the tracked inline theme bootstrap before Next starts. When editing its entry or shared imports, also run `pnpm watch:theme-bootstrap` in a second terminal; stop it with Ctrl-C when finished. Next watches the generated module. Ordinary component/Storybook work does not need this watcher.
+- Before regenerating a reviewed checkout, run `pnpm check:theme-bootstrap` to detect stale output. Lint, tests and CI enforce freshness. Recover missing/stale output with `pnpm build:theme-bootstrap`, review its diff, then run types/tests. Do not hand-edit `frontend/generated/theme-bootstrap.ts`.
+- Theme validation: `pnpm test:theme-bootstrap` checks source, shipped code, generator/watch behavior and dedicated 100% startup/DOM-adapter coverage. After `pnpm build` and browser setup, `pnpm e2e:theme-bootstrap` runs the production route on port 3100 with first-paint timing, delayed-framework-script checks at narrow/wide widths, reloads and a negative control. The existing `pnpm e2e` still uses the development server on port 3000.
+- Portfolio production validation: check `pnpm check:theme-bootstrap` before generation, then run `pnpm build` (tokens → common types → game build → Next build) and `pnpm e2e:production`. The production configuration starts `next start` on port 3000 and refuses to reuse another server; stop your local preview first. It inherits the existing Chromium project only, not Safari/Firefox or physical-device coverage. `pnpm e2e` retains its development-server behavior.
+- File flow and evidence: [typed theme bootstrap maintenance](docs/tasks/maintenance-theme-bootstrap.md). TypeScript source becomes generated script text; the small server-rendered wrapper delivers it inline in the HTML head. ThemeService takes over after startup. The [approved first-paint correction](docs/tasks/maintenance-theme-first-paint.md) replaces the earlier queued delivery. Runtime persistence consistency remains deferred to FS-3.3.
 - Baseline results, security limitations and the full command sequence: [FS-0.2 task record](docs/tasks/fs-0.2-tooling-baseline.md).
 - Current dependency versions, branch integration, validation and remaining security findings: [dependency maintenance record](docs/tasks/2026-09-12-branch-and-dependabot-review.md#authorized-integration-continuation). This later evidence supersedes the original FS-0.2 dependency inventory where explicitly recorded.
+
+Contact server preparation: [FS-5.2 setup and safety gates](docs/development/contact-server.md).
+The Node-runtime `/api/contact` route is implemented with controlled tests;
+delivery defaults off and requires exact `CONTACT_ENABLED=true` and valid
+server configuration to enable it. The `/contact` page provides disabled fields
+and an email fallback while sending is off. [FS-5.6 acceptance](docs/tasks/fs-5.6-contact-acceptance.md)
+records the accepted Preview journey and shutdown; it is not evidence of current
+Production configuration. [FS-5.4 UI checks](docs/development/contact-ui.md)
+cover the controlled form and browser adapter.
+Run contact-layer tests explicitly with
+`pnpm exec vitest run --config vitest.contact.config.ts --coverage`, because
+the broad coverage configuration excludes these layers.
 
 ## Project layout
 
@@ -67,22 +87,42 @@ system preference changes.
 
 ```bash
 pnpm lint           # Next.js lint + prettier --check
-pnpm test           # Vitest in CI mode
+pnpm test           # Node preview-server safety tests, then Vitest
 pnpm test:watch     # Vitest watch mode
-pnpm coverage       # V8: 75% lines/functions/statements, 80% branches; configured exclusions apply
+pnpm coverage       # Node preview-server safety tests, then Vitest/V8 coverage
+pnpm typecheck:validation # frontend + stories + all E2E/fixtures + Playwright configs
 pnpm e2e            # Playwright end-to-end suite (Chromium only)
 ```
 
 Vitest is configured to reuse the frontend React installation and loads
 `vitest.setup.ts` for Testing Library matchers. Coverage thresholds are enforced
-when coverage runs. CI enables coverage by default; `pnpm coverage` also enables it locally.
+when coverage runs: 75% lines/functions/statements and 80% branches, with the
+configured exclusions. CI enables coverage by default; `pnpm coverage` also enables it locally.
+The Node preview-server suite runs separately with `pnpm test:contact-preview-server`;
+it is excluded from Vitest because it uses Node's own test runner, not to skip it.
+
+The CI workflow provisions dependencies and Chromium first, then runs application
+checks in a Linux loopback-only network namespace with delivery off, blank mail
+settings and per-check evidence. The launcher requires `sudo`, `unshare`, `ip` and
+`setpriv` on its runner. Ordinary local commands do not automatically provide that
+isolation; use fresh credential-free snapshots and the contact guidance for local
+browser or server checks. CI artifacts do not replace human or deployed acceptance.
+
+The normal frontend type check excludes stories and root E2E files. CI also runs
+`pnpm typecheck:validation` using `frontend/tsconfig.validation.json`, which includes
+them without weakening strictness. Its extra module paths let root-level E2E
+fixtures resolve the frontend's Next.js dependency and the common package's public
+colors export; they do not change application or browser-test runtime resolution.
 
 ## Playwright browser downloads
 
 Browser installation is explicit; dependency installation no longer downloads browsers.
 CI and E2E use `PLAYWRIGHT_BROWSERS_PATH=0`, so they resolve the same project-local Chromium.
 Playwright is locked to the reviewed 1.55.1 release, which fixes the earlier
-downloader certificate-verification advisory. Browser installation and both
+downloader certificate-verification advisory. The root `playwright-core` devDependency
+explicitly supplies axe's peer at that same version; keep it aligned with
+`@playwright/test` when upgrading. This prevents pnpm from installing a newer peer
+whose `Page` type differs from the runner's. Browser installation and both
 Chromium suites passed in the dependency maintenance record:
 
 ```bash
@@ -101,8 +141,19 @@ skips lifecycle scripts deliberately. This is not proof that browser prerequisit
 are installed. Add `--offline` only when the pnpm store already contains the locked graph.
 
 Lighthouse commands set `NEXT_PUBLIC_ANIMATIONS_ENABLED` **during the build**:
-`pnpm lhci:off`, then `pnpm lhci:on`. Both measure `/`; the current home route has no
-animated logo, so these measurements do not establish an animation-on cost comparison.
+`pnpm lhci:off`, then `pnpm lhci:on`. Both measure `/` with the desktop preset
+and DevTools throttling, using observed paint timings rather than simulated
+dependency timings. This includes the homepage introduction's elapsed time and
+keeps capture running through its staged reveal. Network emulation explicitly
+uses 150 ms request latency and 9,216 Kbps download/upload, translating the
+desktop preset's 40 ms RTT / 10,240 Kbps with Lighthouse's 3.75 / 0.9 calibration
+factors; CPU remains 1×. Each variant retains three
+runs, the 5,000 ms LCP / 0.1 CLS p75 limits and the 0.9 performance-score warning.
+The LCP budget was explicitly increased by Dimi on 2026-09-27 to retain the
+accepted introduction; this changes acceptance criteria, not runtime speed.
+The enabled homepage uses a 1,000 ms identity-logo introduction, followed by
+the 400 ms menu and 800 ms content fades; the disabled build stays static.
+These are local lab measurements, not field p75 or physical-device acceptance.
 
 ## Deployment
 

@@ -10,6 +10,12 @@ export default defineConfig({
       "@": resolve(__dirname, "frontend"),
       react: resolve(__dirname, "frontend/node_modules/react"),
       "react-dom": resolve(__dirname, "frontend/node_modules/react-dom"),
+      // Test-only equivalent of Next's server-layer alias. Production keeps
+      // Next's client-import rejection; server test files run in Node.
+      "server-only": resolve(
+        __dirname,
+        "frontend/node_modules/next/dist/compiled/server-only/empty.js",
+      ),
     },
   },
   test: {
@@ -30,6 +36,7 @@ export default defineConfig({
         "**/*.test.{ts,tsx}",
         "**/node_modules/**",
         "**/.next/**",
+        "**/.next-dev/**",
         // Config files
         "**/*.config.{ts,tsx,js,mjs}",
         "**/next-env.d.ts",
@@ -71,6 +78,11 @@ export default defineConfig({
         perFile: false,
       },
     },
-    exclude: [...configDefaults.exclude, "e2e/**"],
+    // This suite uses node:test and runs explicitly before the Vitest suites.
+    exclude: [
+      ...configDefaults.exclude,
+      "e2e/**",
+      "scripts/serve-contact-preview.test.mjs",
+    ],
   },
 });

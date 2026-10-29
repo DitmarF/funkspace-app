@@ -1,0 +1,269 @@
+"use client";
+
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useId,
+  useRef,
+  useState,
+} from "react";
+import { flushSync } from "react-dom";
+import { useServices } from "@/application/providers/ServiceProvider";
+import type { DialogCloseDisposition } from "@/domain/ports/DialogBindingPort";
+import { portfolioDestinations } from "@/data/portfolioDestinations";
+import Dialog from "../Controls/Dialog";
+import HexButton, { HexNavigationSummary } from "../Controls/HexButton";
+import ThemeSwitcher from "../ThemeSwitcher";
+import PortfolioNavigationTree from "./PortfolioNavigationTree";
+import MotionChoices, { type MotionChoicesProps } from "./MotionChoices";
+import MotionSettings from "./MotionSettings";
+import { usePortfolioOverlays } from "./PortfolioOverlayScope";
+import styles from "./PortfolioShell.module.css";
+import panel from "./PortfolioNavigation.module.css";
+
+export interface PortfolioNavigationProps {
+  /** Optional controlled story/test fixture; production uses the shared authority. */
+  motion?: MotionChoicesProps;
+  onOcclusionChange?: (occluded: boolean) => void;
+}
+
+/** Progressively enhance ordinary footer links with the shared modal. */
+export default function PortfolioNavigation({
+  motion,
+  onOcclusionChange,
+}: PortfolioNavigationProps) {
+  const [ready, setReady] = useState(false);
+  const [localOpen, setLocalOpen] = useState(false);
+  const overlays = usePortfolioOverlays();
+  const open = overlays
+    ? overlays.owner === "navigation" && overlays.open
+    : localOpen;
+  const setOpen = (value: boolean) => {
+    if (!overlays) setLocalOpen(value);
+    else if (value) overlays.request("navigation");
+    else overlays.close("navigation");
+  };
+  const [category, setCategory] = useState<"navigation" | "a11y">("navigation");
+  const detailId = useId();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const disclosureRef = useRef<HTMLDetailsElement>(null);
+  const { navigationHandoff } = useServices();
+  const disposition = useRef<DialogCloseDisposition>("dismiss");
+  const departureDisposition = overlays?.closeDispositionRef;
+  const closeDisposition = useMemo(
+    () => ({
+      get current() {
+        return departureDisposition?.current === "navigation"
+          ? ("navigation" as const)
+          : disposition.current;
+      },
+    }),
+    [departureDisposition],
+  );
+  const ticket = useRef<number | null>(null);
+  const [failed, setFailed] = useState(false);
+  const closeCoordinated = overlays?.close;
+  const releaseCoordinated = overlays?.released;
+  const navigationReady = overlays?.setNavigationReady;
+  useLayoutEffect(() => {
+    navigationReady?.(ready && !failed);
+    // Also acknowledges a canceled opening which never acquired a native lock.
+    // Child Dialog's sync(false) has run before this parent layout effect.
+    if (!open) releaseCoordinated?.("navigation");
+  }, [
+    open,
+    ready,
+    failed,
+    navigationReady,
+    releaseCoordinated,
+    overlays?.owner,
+  ]);
+  // Resolve at use time: a route change may replace the old main before cleanup.
+  const fallback = useMemo(
+    () => ({
+      get current() {
+        return navigationHandoff.fallbackTarget();
+      },
+    }),
+    [navigationHandoff],
+  );
+  useLayoutEffect(() => {
+    const main = navigationHandoff.fallbackTarget();
+    if (main) navigationHandoff.arrived(main);
+    // The two-consumer scope invalidates both owners before either releases.
+    if (closeCoordinated) return;
+    return navigationHandoff.observeDeparture(() => {
+      disposition.current = "navigation";
+      flushSync(() => setLocalOpen(false));
+    });
+  }, [navigationHandoff, closeCoordinated]);
+  const dismiss = () => {
+    navigationHandoff.cancelPreferred();
+    disposition.current = "dismiss";
+    setOpen(false);
+  };
+  useEffect(() => {
+    const disclosure = disclosureRef.current;
+    if (!disclosure) return;
+    return navigationHandoff.whenFallbackIdle(disclosure, () => {
+      // Commit in the same idle notification, before another input can focus
+      // or reopen the native disclosure between the check and replacement.
+      flushSync(() => setReady(true));
+    });
+  }, [navigationHandoff]);
+
+  if (!ready || failed)
+    return (
+      <details
+        ref={disclosureRef}
+        className={`${styles.launcher} ${panel.fallback}`}
+        data-home-menu=""
+        open={failed}
+        // The native open attribute can change through user input before hydration.
+        suppressHydrationWarning
+      >
+        <HexNavigationSummary />
+        <PortfolioNavigationTree />
+      </details>
+    );
+
+  return (
+    <>
+      <div data-home-menu="" className={`${styles.launcher} ${panel.trigger}`}>
+        <HexButton
+          ref={triggerRef}
+          aria-label="Menu: navigation and settings"
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          onClick={() => {
+            navigationHandoff.cancelPreferred();
+            ticket.current = null;
+            disposition.current = "dismiss";
+            setCategory("navigation");
+            onOcclusionChange?.(true);
+            setOpen(true);
+          }}
+        />
+      </div>
+      <Dialog
+        open={open}
+        title="Navigation and settings"
+        hideTitle
+        presentation="fullscreen"
+        className={panel.overlay}
+        onCloseRequest={dismiss}
+        closeDispositionRef={closeDisposition}
+        unmountDisposition="navigation"
+        scrollLock="document-overflow"
+        onReleased={() => {
+          releaseCoordinated?.("navigation");
+          onOcclusionChange?.(false);
+          const id = ticket.current;
+          ticket.current = null;
+          if (id !== null) navigationHandoff.released(id);
+        }}
+        onOpenError={(error) => {
+          navigationReady?.(false);
+          onOcclusionChange?.(false);
+          navigationHandoff.cancel();
+          setOpen(false);
+          setFailed(true);
+          console.error(
+            "[PortfolioNavigation] Dialog unavailable; ordinary links restored",
+            error,
+          );
+        }}
+        returnFocusRef={triggerRef}
+        fallbackFocusRef={fallback}
+      >
+        <div className={panel.layout}>
+          <section
+            id={detailId}
+            aria-labelledby={`${detailId}-title`}
+            className={panel.details}
+          >
+            <h3 id={`${detailId}-title`}>
+              {category === "navigation" ? "Navigation" : "Accessibility"}
+            </h3>
+            {category === "navigation" ? (
+              <PortfolioNavigationTree
+                onNavigate={(key) => {
+                  const next = navigationHandoff.begin(
+                    portfolioDestinations[key],
+                  );
+                  ticket.current = next.id;
+                  disposition.current = "navigation";
+                  if (next.kind === "same-document")
+                    flushSync(() => setOpen(false));
+                }}
+              />
+            ) : (
+              <>
+                <fieldset className={panel.group}>
+                  <legend>Appearance</legend>
+                  <ThemeSwitcher presentation="outlined" size="small" />
+                </fieldset>
+                {motion ? (
+                  <MotionChoices
+                    {...motion}
+                    presentation="outlined"
+                    size="small"
+                  />
+                ) : (
+                  <MotionSettings
+                    presentation="outlined"
+                    size="small"
+                    showDescription={false}
+                  />
+                )}
+              </>
+            )}
+          </section>
+        </div>
+        <div className={`${styles.launcher} ${panel.rail}`}>
+          <div
+            className={panel.categories}
+            role="group"
+            aria-label="Settings categories"
+          >
+            <HexButton
+              icon="navigation"
+              iconSize={48}
+              aria-label="Navigation"
+              title="Navigation"
+              aria-pressed={category === "navigation"}
+              aria-controls={detailId}
+              onClick={() => setCategory("navigation")}
+            />
+            <HexButton
+              icon="languages"
+              aria-label="Languages"
+              title="Languages"
+              disabled
+            />
+            <HexButton
+              icon="a11y"
+              aria-label="Accessibility"
+              title="Accessibility"
+              aria-pressed={category === "a11y"}
+              aria-controls={detailId}
+              onClick={() => setCategory("a11y")}
+            />
+            <HexButton
+              icon="chat-bot"
+              aria-label="Chat-bot"
+              title="Chat-bot"
+              disabled
+            />
+          </div>
+          <HexButton
+            variant="accent-outlined"
+            aria-label="Menu: close navigation and settings"
+            onClick={dismiss}
+          />
+        </div>
+      </Dialog>
+    </>
+  );
+}

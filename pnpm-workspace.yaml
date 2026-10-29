@@ -6,4 +6,39 @@ packages:
 
 # Next 15 pins an older PostCSS; retain its 8.x API with the reviewed security fixes.
 overrides:
-  "next@15.5.24>postcss": "8.5.26"
+  "next@15.5.28>postcss": "8.5.26"
+  # LHCI has no newer release; preserve its used fileSync/dirSync and v4 APIs.
+  "@lhci/cli@0.15.1>tmp": "0.2.7"
+  "external-editor@3.1.0>tmp": "0.2.7"
+  "@lhci/cli@0.15.1>uuid": "11.1.1"
+  # Puppeteer 24 still downloads through vulnerable extract-zip. Keep Lighthouse
+  # 12.6.1's measurement model while using the maintained browser downloader.
+  "lighthouse@12.6.1>puppeteer-core": "25.13.0"
+  # Refresh the auto-installed optional Storybook peer within Webpack 5.
+  "webpack@<5.104.1": "5.111.1"
+  # Security fixes within each owning package's compatible major version.
+  "vite@>=7.0.0 <7.3.7": "7.3.7"
+  "source-map-js@>=1.0.0 <1.2.2": "1.2.2"
+  "sharp@>=0.35.0 <0.35.5": "0.35.5"
+  "proxy-addr@>=2.0.0 <2.0.8": "2.0.8"
+  "compression@>=1.0.0 <1.8.2": "1.8.2"
+  "body-parser@>=1.0.0 <1.20.9": "1.20.9"
+  "brace-expansion@>=1.0.0 <1.1.21": "1.1.21"
+  "brace-expansion@>=2.0.0 <2.1.7": "2.1.7"
+  "brace-expansion@>=5.0.0 <5.0.12": "5.0.12"
+  "ip-address@>=10.0.0 <10.7.4": "10.7.4"
+  "fast-uri@>=3.0.0 <3.1.9": "3.1.9"
+  "postcss-selector-parser@>=6.0.0 <6.1.5": "6.1.5"
+  "qs@>=6.7.0 <6.16.1": "6.16.1"
+
+# The downloader makes proxy/ZIP support optional. Supply its supported peers
+# locally instead of inheriting LHCI's older proxy implementation by accident.
+packageExtensions:
+  "puppeteer-core@25.13.0":
+    dependencies:
+      proxy-agent: "8.0.1"
+      yauzl: "3.4.0"
+
+# Upstream 6.2.1 parser fix backported to the 5.x version required by get-uri.
+patchedDependencies:
+  "basic-ftp@5.3.1": "patches/basic-ftp@5.3.1.patch"

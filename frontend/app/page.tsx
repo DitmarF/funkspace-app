@@ -1,10 +1,20 @@
-import ThemeSwitcher from "@/components/ThemeSwitcher";
+import type { Metadata } from "next";
+import Start from "@/components/sections/Start";
+import AboutPreview from "@/components/sections/AboutPreview";
+import PortfolioShell from "@/components/Layouts/PortfolioShell";
+import styles from "./page.module.css";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center gap-8">
-      <h1 className="text-3xl font-bold text-fs-action-primary">FunkSpace</h1>
-      <ThemeSwitcher />
-    </main>
+    <PortfolioShell animateIdentity>
+      <div className={styles.sections}>
+        <Start />
+        <AboutPreview />
+      </div>
+    </PortfolioShell>
   );
 }

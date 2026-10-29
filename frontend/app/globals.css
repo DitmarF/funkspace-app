@@ -7,6 +7,15 @@
 /* stylelint-enable at-rule-no-unknown */
 
 @layer base {
+  /* Native demo/theme controls follow the shared text-button typography too. */
+  button {
+    font-weight: var(--fs-font-weight-medium);
+  }
+
+  button::first-letter {
+    text-transform: lowercase;
+  }
+
   body {
     background-color: var(--fs-color-surface-background);
     color: var(--fs-color-content-primary);
@@ -14,8 +23,12 @@
   }
 
   h1,
-  h2 {
-    @apply font-display;
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans;
   }
 
   /* Theme variations are handled by data-theme attribute in tokens.css */
@@ -28,6 +41,18 @@
 }
 
 @layer utilities {
+  .text-portfolio-body {
+    font-size: 1.1rem;
+    line-height: 1.75rem;
+  }
+
+  @media (min-width: 48rem) {
+    .text-portfolio-body {
+      font-size: var(--fs-font-size-lg);
+      line-height: var(--fs-space-xl);
+    }
+  }
+
   /* Reduced motion guardrails: disable animations and transitions
    * when user prefers reduced motion.
    * 

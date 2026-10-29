@@ -1,0 +1,256 @@
+.shell {
+  --navigation-artwork-size: calc(var(--fs-space-2xl) * 1.5);
+  --navigation-control-size: calc(var(--navigation-artwork-size) + 4px);
+  --navigation-block-gutter: var(--fs-space-md);
+  --shell-gutter: var(--fs-space-md);
+  --shell-safe-left: env(safe-area-inset-left, 0px);
+  --shell-safe-right: env(safe-area-inset-right, 0px);
+  --shell-safe-top: env(safe-area-inset-top, 0px);
+  --shell-safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* Shared by the launcher and the overlay's centered Close control. */
+  --navigation-inline-end: max(
+    calc(
+      max(0px, (100% - 80rem) / 2) +
+        max(var(--shell-gutter), var(--shell-safe-right)) -
+        (2px + var(--navigation-artwork-size) / 72 * 4.8232)
+    ),
+    var(--shell-safe-right)
+  );
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.frame {
+  padding-left: max(var(--shell-gutter), var(--shell-safe-left));
+  padding-right: max(var(--shell-gutter), var(--shell-safe-right));
+}
+
+/* Only the parser's permitted homepage enhancement opts in. Static/Off,
+   no-JS, secondary pages and failed startup keep the native content visible. */
+.shell[data-home-intro="preparing"] [data-home-content],
+.shell[data-home-intro="waiting"] [data-home-content],
+.shell[data-home-intro="menu"] [data-home-content],
+.shell[data-home-intro="preparing"] [data-home-menu],
+.shell[data-home-intro="waiting"] [data-home-menu] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Keep the measured SVG in place for its visibility observer. The initial
+   mask lifts only once the logo has prepared its draw/fade frame, or fails open. */
+.shell[data-home-intro="preparing"] .identity {
+  opacity: 0;
+}
+
+.shell[data-home-intro="fading"] [data-home-content] {
+  animation: homeContentIn var(--fs-motion-duration-800)
+    var(--fs-motion-easing-ease-out) both;
+}
+
+.shell[data-home-intro="menu"] [data-home-menu] {
+  animation: homeContentIn var(--fs-motion-duration-400)
+    var(--fs-motion-easing-ease-out) both;
+}
+
+@keyframes homeContentIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
+  gap: var(--fs-space-md);
+  align-items: center;
+  padding-top: max(var(--fs-space-lg), var(--shell-safe-top));
+  padding-bottom: var(--fs-space-lg);
+}
+
+.header > nav {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.header > .identity {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.identity {
+  display: block;
+  width: calc(var(--fs-space-2xl) * 3);
+  max-width: 100%;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  padding-top: var(--fs-space-xs);
+  padding-bottom: var(--fs-space-lg);
+  overflow-wrap: anywhere;
+}
+
+/* The document is the scroll owner. Padding makes even already-visible
+   focused links scroll clear of the floating mobile trigger. This selector
+   applies only while a portfolio shell is present, never to a future play page. */
+:global(html):has(.shell) {
+  scroll-padding-bottom: calc(
+    var(--fs-space-2xl) * 3 + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+.shell :where(a, button, [tabindex="-1"]) {
+  scroll-margin-top: var(--fs-space-md);
+  scroll-margin-bottom: var(--fs-space-md);
+}
+
+.identity:focus-visible {
+  outline: 2px solid var(--fs-color-border-focus);
+  outline-offset: var(--fs-space-xs);
+}
+
+/* Safari can mark route/dialog focus as focus-visible after a pointer click.
+   Retain actual focus and native field cues; the next key restores all rings. */
+:global(html[data-portfolio-pointer-focus])
+  .shell
+  :where(a, button, summary, [tabindex="-1"]):focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.launcher {
+  /* Medium artwork: 72-unit viewBox, right path edge 66.1768, stroke 2.
+     Include the native button's 2px border without changing its hit target. */
+  position: fixed;
+  z-index: 20;
+  /* Keep the same compositing/pixel origin across absolute → fixed hydration. */
+  transform: translateZ(0);
+  /* Match Container's centered wide (80rem) shell and responsive gutters. */
+  right: var(--navigation-inline-end);
+  bottom: max(var(--navigation-block-gutter), var(--shell-safe-bottom));
+}
+
+.launcher > button {
+  --hex-size: var(--navigation-artwork-size);
+}
+
+/* Keep the fixed mobile rail at its normal artwork size when text grows, so
+   enlarged navigation labels still have room beside the controls. */
+@media (width < 48rem) {
+  .shell {
+    --navigation-artwork-size: min(calc(var(--fs-space-2xl) * 1.5), 72px);
+  }
+
+  /* Keep enough clearance for the capped launcher without reserving so much
+     viewport height that a long focused link is pushed above the screen. */
+  :global(html):has(.shell) {
+    scroll-padding-bottom: min(
+      calc(var(--fs-space-2xl) * 3 + env(safe-area-inset-bottom, 0px)),
+      max(
+        25svh,
+        calc(
+          min(calc(var(--fs-space-2xl) * 1.5), 72px) + 4px +
+            max(var(--fs-space-md), env(safe-area-inset-bottom, 0px)) +
+            min(var(--fs-space-md), 16px)
+        )
+      )
+    );
+  }
+}
+
+/* Decorative artwork need not double with text when vertical room is scarce. */
+@media (max-height: 36rem) {
+  .shell {
+    --navigation-artwork-size: min(calc(var(--fs-space-2xl) * 1.5), 72px);
+    --navigation-block-gutter: min(var(--fs-space-md), 16px);
+  }
+}
+
+@media (min-width: 48rem) {
+  .shell {
+    --shell-gutter: var(--fs-space-lg);
+  }
+
+  .header {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    padding-top: max(var(--fs-space-xl), var(--shell-safe-top));
+    padding-bottom: var(--fs-space-xl);
+    padding-right: calc(
+      max(var(--shell-gutter), var(--shell-safe-right)) + var(--fs-space-2xl) *
+        1.5 + var(--fs-space-lg)
+    );
+  }
+
+  .launcher {
+    /* The desktop control belongs to the opening header and scrolls with it;
+       it must not float over long article text or keyboard focus. */
+    position: absolute;
+    top: max(var(--fs-space-xl), var(--shell-safe-top));
+    bottom: auto;
+  }
+
+  :global(html):has(.shell) {
+    scroll-padding-bottom: var(--fs-space-md);
+  }
+
+  .shell[data-sticky-header] {
+    --navigation-header-scroll-y: 0px;
+  }
+
+  .shell[data-sticky-header] .header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--fs-color-surface-background);
+  }
+
+  .shell[data-sticky-header] .launcher[data-home-menu] {
+    position: fixed;
+  }
+
+  .shell[data-sticky-header][data-header-motion="true"][data-header-focused="false"]
+    :is(.header, .launcher[data-home-menu]) {
+    transition: transform var(--fs-motion-duration-400)
+      var(--fs-motion-easing-ease-out);
+  }
+
+  .shell[data-sticky-header][data-header-hidden="true"] .header {
+    transform: translateY(-100%);
+  }
+
+  .shell[data-sticky-header][data-header-hidden="true"]
+    .launcher[data-home-menu] {
+    transform: translateY(calc(-1 * var(--portfolio-header-height)));
+  }
+
+  .shell[data-sticky-header]
+    :is(main, footer)
+    :where([id], a, button, [tabindex="-1"]):not(
+      :where(dialog *, [data-home-menu] *)
+    ),
+  .shell[data-sticky-header] main {
+    scroll-margin-top: calc(
+      var(--portfolio-header-height) + var(--fs-space-md)
+    );
+  }
+}
+
+.footer {
+  display: grid;
+  gap: var(--fs-space-lg);
+  padding-top: var(--fs-space-lg);
+  padding-bottom: calc(var(--fs-space-2xl) * 1 + var(--shell-safe-bottom));
+}
+
+@media (min-width: 48rem) {
+  .footer {
+    padding-bottom: max(var(--fs-space-xl), var(--shell-safe-bottom));
+  }
+}

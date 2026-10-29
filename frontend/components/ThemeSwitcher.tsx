@@ -3,12 +3,20 @@
 import { useEffect, useState } from "react";
 import { useServices } from "@/application/providers/ServiceProvider";
 import { THEME_METADATA, type Theme } from "@/domain/theme/Theme";
+import Button, { type ButtonProps } from "./Controls/Button";
+import styles from "./ThemeSwitcher.module.css";
 
-export default function ThemeSwitcher() {
+export default function ThemeSwitcher({
+  presentation = "default",
+  size,
+}: {
+  presentation?: "default" | "outlined" | "secondary";
+  size?: ButtonProps["size"];
+}) {
   const { themeService } = useServices();
 
   // Do not assume an initial theme for button highlight to avoid visual flip.
-  // The page theme itself is applied by the inline script in layout.tsx.
+  // ThemeBootstrapScript applies the initial page appearance before hydration.
   const [currentTheme, setCurrentTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
@@ -21,8 +29,25 @@ export default function ThemeSwitcher() {
     themeService.setTheme(theme);
   };
 
+  if (presentation !== "default")
+    return (
+      <div className={styles.choices} data-presentation={presentation}>
+        {THEME_METADATA.map((theme) => (
+          <Button
+            key={theme.value}
+            variant={presentation}
+            size={size}
+            aria-pressed={currentTheme === theme.value}
+            onClick={() => selectTheme(theme.value)}
+          >
+            {theme.label}
+          </Button>
+        ))}
+      </div>
+    );
+
   return (
-    <div className="flex gap-2 flex-wrap justify-center">
+    <div className="flex gap-fs-xs flex-wrap justify-center">
       {THEME_METADATA.map((theme) => (
         <button
           key={theme.value}
@@ -30,15 +55,15 @@ export default function ThemeSwitcher() {
           aria-pressed={currentTheme === theme.value}
           onClick={() => selectTheme(theme.value)}
           className={`
-            px-4 
-            py-2 
+            px-fs-md
+            py-fs-xs
             rounded-lg 
-            font-medium 
-            transition-colors 
+            font-medium
+            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fs-border-focus
             border ${
               currentTheme === theme.value
-                ? "bg-fs-action-primary border-fs-action-primary text-fs-white"
-                : "bg-transparent text-fs-action-primary border-fs-action-primary hover:bg-fs-action-hover hover:text-fs-white hover:border-fs-action-hover"
+                ? "bg-fs-action-primary border-fs-action-primary text-fs-content-inverse"
+                : "bg-transparent text-fs-action-primary border-fs-action-primary hover:border-fs-action-hover hover:underline decoration-fs-action-hover"
             }`}
         >
           {theme.label}

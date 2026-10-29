@@ -88,7 +88,7 @@ export const colors = {
       "action-hover": "#cc8668",
       "action-link": "#9368cc",
       "action-primary": "#3b94cc",
-      "border-focus": "#3b94cc",
+      "border-focus": "#4abaff",
       "border-strong": "#cccccc",
       "border-subtle": "#808080",
       "content-disabled": "#808080",

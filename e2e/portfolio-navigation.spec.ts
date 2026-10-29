@@ -1,0 +1,111 @@
+import { expect, test } from "@playwright/test";
+import { portfolioDestinations as destinations } from "../frontend/data/portfolioDestinations";
+import { aboutContent } from "../frontend/data/aboutContent";
+import { openSettings, openFallbackNavigation } from "./helpers/foundation";
+
+for (const javaScriptEnabled of [true, false]) {
+  test.describe(`portfolio navigation, JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
+    test.use({ javaScriptEnabled });
+
+    for (const route of ["/", "/about", "/impressum", "/privacy"]) {
+      test(`${route} has unique landmarks, native initial keyboard focus and native footer destinations`, async ({
+        page,
+      }) => {
+        const errors: string[] = [];
+        page.on("pageerror", (error) => errors.push(error.message));
+        page.on("console", (message) => {
+          if (message.type() === "error") errors.push(message.text());
+        });
+        const response = await page.goto(route);
+        expect(response?.status()).toBe(200);
+        await expect(page.getByRole("banner")).toHaveCount(1);
+        await expect(page.getByRole("main")).toHaveCount(1);
+        await expect(page.getByRole("contentinfo")).toHaveCount(1);
+        await expect(page.locator("header")).toHaveCount(1);
+        await expect(page.locator("footer")).toHaveCount(1);
+        await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+        const ids = await page
+          .locator("[id]")
+          .evaluateAll((nodes) => nodes.map((node) => node.id));
+        expect(new Set(ids).size).toBe(ids.length);
+        for (const destination of [
+          destinations.impressum,
+          { ...destinations.privacy, label: "Privacy policy" },
+        ]) {
+          await expect(
+            page
+              .getByRole("navigation", { name: "Footer" })
+              .getByRole("link", { name: destination.label }),
+          ).toHaveAttribute("href", destination.href);
+        }
+        await page.keyboard.press("Tab");
+        await expect(
+          page
+            .getByRole("banner")
+            .getByRole("link", { name: "FunkSpace", exact: true }),
+        ).toBeFocused();
+        await expect(
+          page.getByRole("link", { name: "Skip to main content" }),
+        ).toHaveCount(0);
+        expect(new URL(page.url()).hash).toBe("");
+        await page.reload();
+        await expect(page.getByRole("main")).toBeVisible();
+        expect(errors).toEqual([]);
+      });
+    }
+
+    test("secondary-page links reach Home and the About page, and native Back restores Privacy", async ({
+      page,
+    }) => {
+      await page.goto("/privacy");
+      for (const destination of [
+        { label: "Home", href: destinations.home.href },
+        { label: "About", href: destinations.aboutPage.href },
+      ]) {
+        if (javaScriptEnabled) await openSettings(page);
+        else await openFallbackNavigation(page);
+        const link = page
+          .getByRole("navigation", { name: "Primary" })
+          .getByRole("link", { name: destination.label, exact: true });
+        await expect(link).toHaveAttribute("href", destination.href);
+        await link.click();
+        await expect(page).toHaveURL(destination.href);
+        if (destination.href.includes("#"))
+          await expect(
+            page.locator(destination.href.slice(1)),
+          ).toBeInViewport();
+        else
+          await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+            destination.href === "/about" ? "About FunkSpace" : "Web Aperture",
+          );
+        await expect(page.locator("main section")).toHaveCount(
+          destination.href === "/about" ? aboutContent.sections.length : 2,
+        );
+        await page.goBack();
+        await expect(page).toHaveURL("/privacy");
+      }
+      await page.getByRole("link", { name: "FunkSpace", exact: true }).click();
+      await expect(page).toHaveURL("/");
+      for (const id of ["start", "about"]) {
+        await expect(page.locator(`#${id}`)).toHaveCount(1);
+      }
+      await page
+        .getByRole("contentinfo")
+        .getByRole("link", { name: "Privacy" })
+        .click();
+      await expect(page).toHaveURL("/privacy");
+      const assets = page.getByRole("region", {
+        name: "Fonts, assets and analytics",
+      });
+      await expect(
+        assets.getByRole("heading", {
+          level: 2,
+          name: "Fonts, assets and analytics",
+        }),
+      ).toBeVisible();
+      await expect(assets).toContainText(
+        /Work Sans and Space Grotesk fonts and decorative assets are served from this website\./,
+      );
+    });
+  });
+}

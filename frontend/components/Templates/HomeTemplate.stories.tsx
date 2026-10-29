@@ -58,5 +58,5 @@ export const Minimal: Story = {
     ctaLabel: undefined,
     features: [],
     footer: undefined,
-  } satisfies HomeTemplateProps,
+  } satisfies Partial<HomeTemplateProps>,
 };

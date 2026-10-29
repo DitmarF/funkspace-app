@@ -1,0 +1,30 @@
+.heading {
+  font-size: 2rem;
+  font-weight: var(--fs-font-weight-medium);
+  line-height: 1;
+}
+
+.copy {
+  display: grid;
+  gap: var(--fs-space-2xl);
+  margin-top: var(--fs-space-3xl);
+  overflow-wrap: anywhere;
+}
+
+.copy > p {
+  font-size: var(--fs-font-size-lg);
+  font-weight: var(--fs-font-weight-regular);
+  line-height: var(--fs-space-xl);
+}
+
+@media (min-width: 48rem) {
+  .heading {
+    font-size: 2.5rem;
+    font-weight: var(--fs-font-weight-bold);
+  }
+
+  .copy > p {
+    font-size: var(--fs-font-size-xl);
+    font-weight: var(--fs-font-weight-medium);
+  }
+}

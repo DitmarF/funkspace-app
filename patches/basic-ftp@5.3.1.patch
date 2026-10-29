@@ -1,0 +1,34 @@
+diff --git a/dist/parseListUnix.js b/dist/parseListUnix.js
+--- a/dist/parseListUnix.js
++++ b/dist/parseListUnix.js
+@@ -37,13 +37,14 @@
+  *    this is not allowed for here as does not appear to be shown by FTP servers
+  *    {@code @}   file has extended attributes
+  */
+-const RE_LINE = new RegExp("([bcdelfmpSs-])" // file type
++const RE_LINE = new RegExp("^[\\s\\d]*"
++    + "([bcdelfmpSs-])" // file type
+     + "(((r|-)(w|-)([xsStTL-]))((r|-)(w|-)([xsStTL-]))((r|-)(w|-)([xsStTL-]?)))\\+?" // permissions
+     + "\\s*" // separator TODO why allow it to be omitted??
+     + "(\\d+)" // link count
+     + "\\s+" // separator
+-    + "(?:(\\S+(?:\\s\\S+)*?)\\s+)?" // owner name (optional spaces)
+-    + "(?:(\\S+(?:\\s\\S+)*)\\s+)?" // group name (optional spaces)
++    + "(?:(\\S+(?:\\s\\S+){0,7}?)\\s+)?" // owner name (optional spaces)
++    + "(?:(\\S+(?:\\s\\S+){0,7})\\s+)?" // group name (optional spaces)
+     + "(\\d+(?:,\\s*\\d+)?)" // size or n,m
+     + "\\s+" // separator
+     /**
+diff --git a/dist/parseListDOS.js b/dist/parseListDOS.js
+--- a/dist/parseListDOS.js
++++ b/dist/parseListDOS.js
+@@ -10,7 +10,8 @@
+  *
+  * https://github.com/apache/commons-net/blob/master/src/main/java/org/apache/commons/net/ftp/parser/NTFTPEntryParser.java
+  */
+-const RE_LINE = new RegExp("(\\S+)\\s+(\\S+)\\s+" // MM-dd-yy whitespace hh:mma|kk:mm swallow trailing spaces
++const RE_LINE = new RegExp("^\\s*"
++    + "(\\S+)\\s+(\\S+)\\s+" // MM-dd-yy whitespace hh:mma|kk:mm swallow trailing spaces
+     + "(?:(<DIR>)|([0-9]+))\\s+" // <DIR> or ddddd swallow trailing spaces
+     + "(\\S.*)" // First non-space followed by rest of line (name)
+ );

@@ -1,0 +1,65 @@
+.navigation {
+  container: footer-navigation / inline-size;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fs-space-md) calc(var(--fs-space-md) * 2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list > li {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--fs-space-2xl);
+}
+
+/* With the compact bottom gutter, keep the final target away from the fixed
+   mobile settings button at the right edge. */
+.socialItem {
+  display: flex;
+  justify-content: center;
+  flex-basis: 100%;
+}
+
+.social > svg.socialIcon {
+  width: 36px;
+  height: 36px;
+}
+
+/* em follows this container's text size: enlarged text can make the mobile
+   settings target reach the centered social target. Reserve only its overlap. */
+@media (max-width: 47.999rem) {
+  @container footer-navigation (max-width: 16em) {
+    .socialItem {
+      padding-bottom: max(
+        0px,
+        calc(
+          var(--navigation-control-size) + var(--navigation-block-gutter) -
+            var(--fs-space-2xl) + var(--fs-space-xs)
+        )
+      );
+    }
+  }
+}
+
+@media (min-width: 48rem) {
+  .socialItem {
+    flex-basis: auto;
+  }
+
+  .list {
+    column-gap: var(--fs-space-2xl);
+  }
+}

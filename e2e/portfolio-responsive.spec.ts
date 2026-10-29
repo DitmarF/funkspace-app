@@ -1,0 +1,417 @@
+import { expect, test, type Locator, type Page } from "@playwright/test";
+import { themes, openFallbackNavigation } from "./helpers/foundation";
+
+test.describe.configure({ mode: "parallel" });
+
+const viewports = [
+  { width: 320, height: 568 },
+  { width: 390, height: 844 },
+  { width: 844, height: 390 },
+  { width: 768, height: 1024 },
+  { width: 1280, height: 720 },
+  { width: 1440, height: 900 },
+];
+const routes = ["/", "/about", "/impressum", "/privacy"];
+
+test("document menu clearance is conditional on the portfolio shell", async ({
+  page,
+}) => {
+  await page.setViewportSize(viewports[0]);
+  await page.goto("/");
+  expect(
+    await page
+      .locator("html")
+      .evaluate((node) =>
+        parseFloat(getComputedStyle(node).scrollPaddingBottom),
+      ),
+  ).toBeGreaterThan(0);
+  // Remove only the shell class in this fixture, without creating a play route.
+  await page
+    .locator("main")
+    .evaluate((main) => main.parentElement!.removeAttribute("class"));
+  await expect(page.locator("html")).toHaveCSS("scroll-padding-bottom", "auto");
+});
+
+async function expectDocumentFlow(page: Page) {
+  expect(
+    await page.evaluate(() => {
+      const failures: string[] = [];
+      if (document.documentElement.scrollWidth > innerWidth + 1)
+        failures.push("horizontal document overflow");
+      for (const node of document.querySelectorAll(
+        "html, body, header, main, footer, main article, main section",
+      )) {
+        const css = getComputedStyle(node);
+        if (css.scrollSnapType !== "none")
+          failures.push(`${node.tagName}: snap`);
+        if (
+          ["hidden", "clip", "scroll", "auto"].includes(css.overflowY) &&
+          node.scrollHeight > node.clientHeight + 1 &&
+          node !== document.documentElement
+        )
+          failures.push(`${node.tagName}: nested or clipped content`);
+      }
+      return failures;
+    }),
+  ).toEqual([]);
+  for (const role of ["banner", "main", "contentinfo"] as const)
+    await expect(page.getByRole(role)).toHaveCount(1);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+}
+
+async function expectClearFocus(link: Locator) {
+  await expect(link).toBeFocused();
+  const result = await link.evaluate((node) => {
+    const box = node.getBoundingClientRect();
+    const css = getComputedStyle(node);
+    // A multiline inline link's bounding center can lie between its text
+    // fragments. Hit-test each painted fragment while retaining full bounds.
+    const fragments = Array.from(node.getClientRects()).filter(
+      (rect) => rect.width > 0 && rect.height > 0,
+    );
+    const points = fragments.map((rect) =>
+      document.elementFromPoint(
+        rect.x + rect.width / 2,
+        rect.y + rect.height / 2,
+      ),
+    );
+    const trigger = document.querySelector(
+      'button[aria-label="Menu: navigation and settings"]',
+    );
+    const triggerBox = trigger?.getBoundingClientRect();
+    const overlapsTrigger =
+      trigger !== node &&
+      triggerBox &&
+      box.left < triggerBox.right &&
+      box.right > triggerBox.left &&
+      box.top < triggerBox.bottom &&
+      box.bottom > triggerBox.top;
+    const clear =
+      box.left >= 0 &&
+      box.right <= innerWidth + 1 &&
+      box.top >= 0 &&
+      box.bottom <= innerHeight + 1 &&
+      css.outlineStyle !== "none" &&
+      parseFloat(css.outlineWidth) > 0 &&
+      !overlapsTrigger &&
+      points.length > 0 &&
+      points.every((point) => node === point || node.contains(point));
+    return {
+      clear,
+      label: node.textContent,
+      box: box.toJSON(),
+      triggerBox: triggerBox?.toJSON(),
+      points: points.map((point) => point?.outerHTML),
+      outline: css.outlineStyle,
+    };
+  });
+  expect(result.clear, JSON.stringify(result)).toBe(true);
+}
+
+test("mobile menu target keeps its normal size at enlarged text while tablet scaling remains intact", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto("/");
+  const menu = page.getByRole("button", {
+    name: "Menu: navigation and settings",
+    exact: true,
+  });
+  await expect(menu).toBeVisible();
+  await expect.poll(async () => (await menu.boundingBox())?.width).toBe(76);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+  await expect.poll(async () => (await menu.boundingBox())?.width).toBe(76);
+  expect((await menu.boundingBox())!.height).toBeGreaterThanOrEqual(48);
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await expect.poll(async () => (await menu.boundingBox())?.width).toBe(148);
+});
+
+for (const height of [568, 577, 600]) {
+  test(`keyboard focus keeps the long Privacy authority link clear at 320×${height} and 200% text`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height });
+    await page.goto("/privacy");
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole("main").focus();
+    const authority = page.getByRole("link", {
+      name: /Thüringer Landesbeauftragte für den Datenschutz/,
+    });
+    for (let index = 0; index < 40; index++) {
+      await page.keyboard.press("Tab");
+      if (await authority.evaluate((node) => node === document.activeElement))
+        break;
+    }
+    // Includes the entire bounding box, all painted fragments, focus outline,
+    // viewport bounds and the fixed mobile menu's non-overlap.
+    await expectClearFocus(authority);
+  });
+}
+
+for (const viewport of viewports) {
+  for (const textScale of [100, 200]) {
+    test(`${viewport.width}×${viewport.height}, ${textScale}% text: routes, themes, scroll and keyboard`, async ({
+      page,
+    }) => {
+      test.setTimeout(90_000);
+      await page.setViewportSize(viewport);
+      const errors: string[] = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      page.on("console", (message) => {
+        if (message.type() === "error") errors.push(message.text());
+      });
+      await page.goto("/");
+      for (const theme of themes) {
+        await page.evaluate(
+          (value) => localStorage.setItem("theme", value),
+          theme,
+        );
+        for (const route of routes) {
+          await page.goto(route);
+          const menu = page.getByRole("button", {
+            name: "Menu: navigation and settings",
+            exact: true,
+          });
+          await expect(menu).toBeVisible();
+          if (theme === "default")
+            await expect(page.locator("html")).not.toHaveAttribute(
+              "data-theme",
+            );
+          else
+            await expect(page.locator("html")).toHaveAttribute(
+              "data-theme",
+              theme,
+            );
+          // Text-only enlargement: retain the CSS viewport and double rem text/spacing.
+          await page.evaluate(
+            (scale) =>
+              document.documentElement.style.setProperty(
+                "font-size",
+                `${scale}%`,
+              ),
+            textScale,
+          );
+          await page.evaluate(() => document.fonts.ready);
+          await expectDocumentFlow(page);
+
+          await page.keyboard.press("Tab");
+          const identity = page
+            .getByRole("banner")
+            .getByRole("link", { name: "FunkSpace", exact: true });
+          await expectClearFocus(identity);
+          await expect(
+            page.getByRole("link", { name: "Skip to main content" }),
+          ).toHaveCount(0);
+          // The existing route-focus landmark remains programmatically focusable.
+          await page.getByRole("main").focus();
+          await expect(page.getByRole("main")).toBeFocused();
+          // Walk the real tab sequence, including email/footer links; never activate mailto.
+          const focusableCount = await page
+            // Closed dialog/disclosure descendants are not native tab stops.
+            .locator(
+              "main a:visible, footer a:visible, footer button:visible:not(:disabled)",
+            )
+            .count();
+          for (let index = 0; index < focusableCount; index++) {
+            await page.keyboard.press("Tab");
+            const focused = page.locator(":focus");
+            await expectClearFocus(focused);
+          }
+          await page.keyboard.press("End");
+          const footer = page.getByRole("navigation", { name: "Footer" });
+          await expect(footer).toBeInViewport();
+          for (const name of ["Legal notice", "Privacy policy"])
+            await footer
+              .getByRole("link", { name, exact: true })
+              .click({ trial: true });
+
+          await page.keyboard.press("Home");
+          await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+          await page.mouse.move(viewport.width / 2, viewport.height / 2);
+          const max = await page.evaluate(
+            () => document.documentElement.scrollHeight - innerHeight,
+          );
+          await page.mouse.wheel(0, 180);
+          if (max > 0)
+            await expect
+              .poll(() => page.evaluate(() => scrollY))
+              .toBeGreaterThan(0);
+          const before = await page.evaluate(() => scrollY);
+          await page.keyboard.press("PageDown");
+          if (before < max)
+            await expect
+              .poll(() => page.evaluate(() => scrollY))
+              .toBeGreaterThan(before);
+          if (route === "/") {
+            expect(
+              await page
+                .locator("#start > svg")
+                .evaluateAll(
+                  (marks) =>
+                    marks.length === 4 &&
+                    marks.every(
+                      (mark) =>
+                        mark.getAttribute("aria-hidden") === "true" &&
+                        mark.getAttribute("focusable") === "false" &&
+                        getComputedStyle(mark).pointerEvents === "none",
+                    ),
+                ),
+            ).toBe(true);
+            if (viewport.width >= 768) {
+              await page.keyboard.press("End");
+              const shell = page.locator("main").locator("..");
+              if ((await shell.getAttribute("data-sticky-header")) !== null) {
+                // Off/Reduced keep the approved stationary sticky navigation.
+                const moving =
+                  (await shell.getAttribute("data-header-motion")) === "true";
+                if (moving) await expect(menu).not.toBeInViewport();
+                else await expect(menu).toBeInViewport({ ratio: 1 });
+              } else await expect(menu).not.toBeInViewport();
+            }
+          }
+        }
+      }
+      expect(errors).toEqual([]);
+    });
+  }
+}
+
+test.describe("fresh no-JavaScript reading and long-content fixtures", () => {
+  test.use({ javaScriptEnabled: false });
+  for (const viewport of viewports) {
+    test(`${viewport.width}×${viewport.height}: enlarged copy and navigation remain in document flow`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport);
+      for (const route of routes) {
+        await page.goto(route);
+        await page.evaluate(() =>
+          document.documentElement.style.setProperty("font-size", "200%"),
+        );
+        await openFallbackNavigation(page);
+        await expect(
+          page.getByRole("navigation", { name: "Primary" }),
+        ).toBeVisible();
+        await expect(page.getByRole("button", { name: /Menu/ })).toHaveCount(0);
+        // Browser-only stress fixtures; no invented public copy or extra production UI.
+        await page.evaluate(() => {
+          document.querySelector("h1")!.textContent =
+            "LongUnbrokenHeading".repeat(5);
+          const paragraph = document.querySelector("main p")!;
+          paragraph.textContent =
+            `https://example.invalid/${"long-path".repeat(30)} ` +
+            "Long legal text. ".repeat(150);
+          const link =
+            document.querySelector<HTMLAnchorElement>("footer nav a")!;
+          link.querySelector("span")!.textContent =
+            "LongNavigationLabel".repeat(8);
+          const mail =
+            document.querySelector<HTMLAnchorElement>('a[href^="mailto:"]');
+          if (mail)
+            mail.querySelector("span")!.textContent =
+              `${"long-address".repeat(12)}@example.invalid`;
+        });
+        await expectDocumentFlow(page);
+        // The native fallback now opens beside the persistent hex trigger.
+        // Exercise its close action before following links behind that disclosure.
+        const fallback = page.locator('footer details[class*="fallback"]');
+        await fallback.locator(":scope > summary").focus();
+        await page.keyboard.press("Enter");
+        await expect(fallback).not.toHaveAttribute("open");
+        await expect(
+          page.getByRole("navigation", { name: "Primary" }),
+        ).toBeHidden();
+        const privacy = page
+          .getByRole("navigation", { name: "Footer" })
+          .getByRole("link", { name: "Privacy policy", exact: true });
+        await privacy.click();
+        await expect(page).toHaveURL("/privacy");
+        await page
+          .getByRole("navigation", { name: "Footer" })
+          .getByRole("link", { name: "Legal notice", exact: true })
+          .click();
+        await expect(page).toHaveURL("/impressum");
+        const email = page.getByRole("link", {
+          name: "info@funkspace.de",
+          exact: true,
+        });
+        await email.focus();
+        await expect(email).toBeFocused();
+        await expect(email).toBeInViewport();
+      }
+    });
+  }
+});
+
+test("safe-area spacing fixture keeps shell and mobile trigger inside insets", async ({
+  page,
+}) => {
+  for (const viewport of [viewports[0], viewports[2]]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    const menu = page.getByRole("button", {
+      name: "Menu: navigation and settings",
+      exact: true,
+    });
+    await expect(menu).toBeVisible();
+    // Simulated nonzero insets, not evidence from physical notched hardware.
+    await page.locator("main").evaluate((main) => {
+      const shell = main.parentElement!;
+      for (const edge of ["left", "right", "top", "bottom"])
+        shell.style.setProperty(`--shell-safe-${edge}`, "32px");
+    });
+    const section = await page.locator("#start").boundingBox();
+    expect(section!.x).toBeGreaterThanOrEqual(32);
+    expect(section!.x + section!.width).toBeLessThanOrEqual(
+      viewport.width - 32,
+    );
+    const box = await menu.boundingBox();
+    expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width - 32);
+    if (viewport.width < 768)
+      expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height - 32);
+    else expect(box!.y).toBeGreaterThanOrEqual(32);
+    await expectDocumentFlow(page);
+  }
+});
+
+test("emulated touch scroll moves the document and reaches the footer", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    viewport: viewports[0],
+    hasTouch: true,
+    isMobile: true,
+  });
+  const page = await context.newPage();
+  try {
+    await page.goto("/");
+    const session = await context.newCDPSession(page);
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchStart",
+      touchPoints: [{ x: 160, y: 450 }],
+    });
+    for (const y of [390, 330, 270, 210, 150])
+      await session.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x: 160, y }],
+      });
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchEnd",
+      touchPoints: [],
+    });
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
+    const privacy = page
+      .getByRole("navigation", { name: "Footer" })
+      .getByRole("link", { name: "Privacy policy" });
+    await privacy.tap();
+    await expect(page).toHaveURL(/\/privacy$/);
+    await expectDocumentFlow(page);
+  } finally {
+    await context.close();
+  }
+});

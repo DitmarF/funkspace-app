@@ -51,7 +51,7 @@ export class AnimationOrchestratorImpl implements AnimationOrchestrator {
 
     // ===== logoMark Animation =====
     const logoMarkPath = root.querySelector(
-      "#logo-path-1",
+      '[data-logo-part="logo-path-1"]',
     ) as SVGPolygonElement | null;
 
     if (logoMarkPath) {
@@ -66,7 +66,7 @@ export class AnimationOrchestratorImpl implements AnimationOrchestrator {
 
       for (let i = 1; i <= 9; i++) {
         const circle = root.querySelector(
-          `#lmd-dot-${i}`,
+          `[data-logo-part="lmd-dot-${i}"]`,
         ) as SVGCircleElement | null;
         if (circle) {
           const cx = parseFloat(circle.getAttribute("cx") || "0");
@@ -76,7 +76,7 @@ export class AnimationOrchestratorImpl implements AnimationOrchestrator {
             cx,
             cy,
           );
-          circles.push({ id: `lmd-dot-${i}`, element: circle, distance });
+          circles.push({ id: circle.id, element: circle, distance });
         }
       }
 
@@ -85,7 +85,7 @@ export class AnimationOrchestratorImpl implements AnimationOrchestrator {
 
       // Animate the path stroke
       steps.push({
-        target: "#logo-path-1",
+        target: `#${logoMarkPath.id}`,
         property: "strokeDashoffset",
         from: pathLength,
         to: 0,
@@ -118,8 +118,8 @@ export class AnimationOrchestratorImpl implements AnimationOrchestrator {
     const letterPaths = [7, 8, 9, 10, 2, 3, 4, 5, 6];
 
     letterPaths.forEach((pathId, index) => {
-      const pathSelector = `#logo-path-${pathId}`;
-      const element = root.querySelector(pathSelector) as
+      const partSelector = `[data-logo-part="logo-path-${pathId}"]`;
+      const element = root.querySelector(partSelector) as
         | SVGPathElement
         | SVGPolygonElement
         | null;
@@ -127,11 +127,13 @@ export class AnimationOrchestratorImpl implements AnimationOrchestrator {
       if (!element) {
         if (process.env.NODE_ENV === "development") {
           console.warn(
-            `[AnimationOrchestrator] Path ${pathSelector} not found, skipping`,
+            `[AnimationOrchestrator] Path ${partSelector} not found, skipping`,
           );
         }
         return;
       }
+
+      const pathSelector = `#${element.id}`;
 
       // Get actual path length at runtime
       const pathLength = this.animationPort.getPathLength(element);

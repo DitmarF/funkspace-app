@@ -1,0 +1,103 @@
+.reference {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: var(--fs-space-md);
+  color: var(--fs-color-content-primary);
+  background: var(--fs-color-surface-background);
+  font-family: var(--font-space-grotesk, var(--fs-font-family-base));
+}
+
+.header > div {
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  flex-wrap: wrap;
+  gap: var(--fs-space-md);
+  margin-bottom: var(--fs-space-xl);
+}
+
+.reference h1,
+.reference h2,
+.reference h3 {
+  font-family: var(--font-work-sans, var(--fs-font-family-display));
+  font-weight: var(--fs-font-weight-semibold);
+}
+
+.reference h1 {
+  font-size: calc(var(--fs-font-size-xl) * 1.5);
+}
+.reference h2 {
+  font-size: var(--fs-font-size-xl);
+}
+.reference h3 {
+  font-size: var(--fs-font-size-lg);
+}
+.reference p {
+  margin: var(--fs-space-xs) 0;
+}
+.themeLabel {
+  padding: var(--fs-space-xs) var(--fs-space-sm);
+  border: 1px solid var(--fs-color-border-strong);
+  border-radius: var(--fs-space-2xs);
+}
+.section {
+  margin: var(--fs-space-xl) 0;
+}
+
+.grid,
+.compactGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--fs-space-md);
+  list-style: none;
+  margin: var(--fs-space-md) 0;
+  padding: 0;
+}
+
+.card {
+  min-width: 0;
+  border: 1px solid var(--fs-color-border-strong);
+  border-radius: var(--fs-space-2xs);
+  overflow: hidden;
+}
+.swatch {
+  display: block;
+  height: calc(var(--fs-space-2xl) * 1.5);
+  border-bottom: 1px solid var(--fs-color-border-strong);
+}
+.details {
+  display: grid;
+  gap: var(--fs-space-xs);
+  padding: var(--fs-space-sm);
+  overflow-wrap: anywhere;
+}
+.details p {
+  margin: 0;
+}
+.variable,
+.match {
+  font-size: var(--fs-font-size-sm);
+}
+.comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+  gap: var(--fs-space-lg);
+}
+.themePanel {
+  min-width: 0;
+  padding: var(--fs-space-md);
+  color: var(--fs-color-content-primary);
+  background: var(--fs-color-surface-background);
+  border: 1px solid var(--fs-color-border-strong);
+  border-radius: var(--fs-space-2xs);
+}
+.compactGrid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+}
+.compactGrid .swatch {
+  height: var(--fs-space-2xl);
+}

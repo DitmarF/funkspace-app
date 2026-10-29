@@ -1,0 +1,384 @@
+import { expect, test, type Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import { readFileSync } from "node:fs";
+import { startIntroduction } from "../frontend/data/startContent";
+import { aboutContent } from "../frontend/data/aboutContent";
+
+// Preserve existing copy; Dimi confirmed the canonical public address on 2026-10-29.
+const pages = [
+  {
+    route: "/",
+    title: "FunkSpace",
+    description: aboutContent.description,
+    heading: "Web Aperture",
+  },
+  {
+    route: "/about",
+    title: "About FunkSpace",
+    description: aboutContent.description,
+    heading: "About FunkSpace",
+  },
+  {
+    route: "/impressum",
+    title: "Legal notice | FunkSpace",
+    description:
+      "Operator and contact information for FunkSpace, a personal hobby project by Ditmar Funk.",
+    heading: "Legal notice",
+  },
+  {
+    route: "/privacy",
+    title: "Privacy | FunkSpace",
+    description:
+      "How FunkSpace handles website requests, appearance preferences and email inquiries, and how to exercise your privacy rights.",
+    heading: "Privacy",
+  },
+];
+
+async function expectVisibleBrand(page: Page) {
+  const logo = page.getByRole("banner").locator("[data-funkspace-logo]");
+  await expect(logo).toBeVisible();
+  await expect(logo.locator("path, polygon")).toHaveCount(10);
+  await expect(logo.locator("circle")).toHaveCount(9);
+  expect(
+    await logo.locator("path, polygon, circle").evaluateAll((nodes) =>
+      nodes.every((node) => {
+        const css = getComputedStyle(node);
+        const box = node.getBoundingClientRect();
+        return (
+          css.opacity === "1" &&
+          css.fillOpacity === "1" &&
+          css.display !== "none" &&
+          css.visibility === "visible" &&
+          box.width > 0 &&
+          box.height > 0
+        );
+      }),
+    ),
+  ).toBe(true);
+}
+
+async function expectSemanticsAndInitialFocus(page: Page) {
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  for (const role of ["banner", "main", "contentinfo"] as const)
+    await expect(page.getByRole(role)).toHaveCount(1);
+  const headings = await page
+    .locator("main h1, main h2, main h3, main h4, main h5, main h6")
+    .evaluateAll((nodes) => nodes.map((node) => Number(node.tagName.slice(1))));
+  expect(headings.filter((level) => level === 1)).toHaveLength(1);
+  expect(headings[0]).toBe(1);
+  headings
+    .slice(1)
+    .forEach((level, index) =>
+      expect(level).toBeLessThanOrEqual(headings[index] + 1),
+    );
+  await page.keyboard.press("Tab");
+  const identity = page
+    .getByRole("banner")
+    .getByRole("link", { name: "FunkSpace", exact: true });
+  await expect(identity).toBeFocused();
+  await expect(identity).toBeInViewport();
+  await expect(identity).toHaveCSS("outline-style", "solid");
+  await expect(
+    page.getByRole("link", { name: "Skip to main content" }),
+  ).toHaveCount(0);
+  expect(new URL(page.url()).hash).toBe("");
+}
+
+for (const javaScriptEnabled of [true, false]) {
+  test.describe(`static route contract, JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
+    // Playwright creates a fresh context with this setting BEFORE any navigation.
+    test.use({ javaScriptEnabled, viewport: { width: 390, height: 844 } });
+
+    for (const entry of pages) {
+      test(`${entry.route} supplies metadata, language, visible content and local assets on direct load/refresh`, async ({
+        page,
+        request,
+      }) => {
+        const errors: string[] = [];
+        const badAssets: string[] = [];
+        const fonts = new Set<string>();
+        page.on("pageerror", (error) => errors.push(error.message));
+        page.on("console", (message) => {
+          if (message.type() === "error") errors.push(message.text());
+        });
+        page.on("requestfailed", (req) => {
+          // Chromium reports its disabled-JavaScript preload block as `csp`.
+          // Check those script URLs independently below; reject all other failures.
+          if (
+            !javaScriptEnabled &&
+            req.resourceType() === "script" &&
+            req.failure()?.errorText === "csp"
+          )
+            return;
+          badAssets.push(`${req.failure()?.errorText} ${req.url()}`);
+        });
+        page.on("response", (response) => {
+          if (response.status() >= 400)
+            badAssets.push(`${response.status()} ${response.url()}`);
+          if (response.request().resourceType() === "font")
+            fonts.add(response.url());
+        });
+        const response = await page.goto(entry.route);
+        expect(response?.status()).toBe(200);
+        const html = await response!.text();
+        for (const src of await page
+          .locator("script[src]")
+          .evaluateAll((nodes) =>
+            nodes.map((node) => (node as HTMLScriptElement).src),
+          )) {
+          expect((await request.get(src)).status(), src).toBe(200);
+        }
+        expect(html).not.toMatch(
+          /Create Next App|Generated by create next app/,
+        );
+        expect(html).not.toContain("PNPM workspace");
+        expect(html).toContain(entry.description);
+        await expect(page).toHaveTitle(entry.title);
+        await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+          "content",
+          entry.description,
+        );
+        await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+        await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+          "href",
+          `https://funkspace.de${entry.route === "/" ? "" : entry.route}`,
+        );
+        await expect(
+          page.locator('meta[property="og:url"], meta[property="og:image"]'),
+        ).toHaveCount(0);
+        await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+          entry.heading,
+        );
+        expect(
+          await page
+            .locator("main h1, main h2, main h3, main h4, main h5, main h6")
+            .evaluateAll((headings) =>
+              headings.every((heading) => {
+                const style = getComputedStyle(heading);
+                const family = style
+                  .getPropertyValue("--font-space-grotesk")
+                  .trim()
+                  .replace(/["'\s]/g, "");
+                return (
+                  family.length > 0 &&
+                  style.fontFamily.replace(/["'\s]/g, "").startsWith(family)
+                );
+              }),
+            ),
+        ).toBe(true);
+        await expectVisibleBrand(page);
+        await expectSemanticsAndInitialFocus(page);
+        if (entry.route === "/") {
+          await expect(page.locator("#start")).not.toContainText(
+            startIntroduction,
+          );
+          await expect(page.locator("#about p")).toHaveText([
+            ...aboutContent.preview,
+          ]);
+          await expect(
+            page.locator("#start [data-scene-aperture]"),
+          ).toBeVisible();
+        } else if (entry.route === "/about") {
+          await expect(
+            page.locator("article > p, article > section > p"),
+          ).toHaveText([
+            ...aboutContent.paragraphs,
+            ...aboutContent.sections.flatMap((section) => section.paragraphs),
+          ]);
+          await expect(page.locator("article > p").first()).toBeVisible();
+        } else {
+          const article = page.getByRole("article");
+          await expect(
+            article.getByText("Thuringia, Germany", { exact: false }),
+          ).toBeVisible();
+          await expect(article).toContainText("Ditmar Funk");
+          await expect(
+            article.locator('a[href="mailto:info@funkspace.de"]'),
+          ).toBeVisible();
+          await expect(article.getByText(/Draft —/)).toHaveCount(0);
+        }
+        const icon = page.locator('link[rel="icon"]');
+        await expect(icon).toHaveCount(1);
+        await expect(icon).toHaveAttribute("href", "/svg/fs/FunSpace_logo.svg");
+        const asset = await request.get((await icon.getAttribute("href"))!);
+        expect(asset.status()).toBe(200);
+        expect(await asset.text()).toBe(
+          readFileSync("frontend/public/svg/fs/FunSpace_logo.svg", "utf8"),
+        );
+        await page.evaluate(() => document.fonts.ready);
+        expect(fonts.size).toBe(2);
+        for (const url of fonts) {
+          expect(new URL(url).origin).toBe(new URL(page.url()).origin);
+          expect(new URL(url).pathname).toContain("/_next/static/media/");
+        }
+        await page.reload();
+        await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+          "href",
+          `https://funkspace.de${entry.route === "/" ? "" : entry.route}`,
+        );
+        await expect(page).toHaveTitle(entry.title);
+        await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+        await expectVisibleBrand(page);
+        expect(errors).toEqual([]);
+        expect(badAssets).toEqual([]);
+      });
+    }
+
+    for (const entry of [
+      { route: "/contact", title: "Contact | FunkSpace" },
+      { route: "/animations/aperture", title: "Web Aperture — FunkSpace" },
+    ]) {
+      test(`${entry.route} retains its own public canonical on direct load and refresh`, async ({
+        page,
+      }) => {
+        await page.goto(entry.route);
+        await expect(page).toHaveTitle(entry.title);
+        await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+        await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+          "href",
+          `https://funkspace.de${entry.route}`,
+        );
+        await page.reload();
+        await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+          "href",
+          `https://funkspace.de${entry.route}`,
+        );
+      });
+    }
+
+    test("reading, About, Back and legal email journeys remain native and visible", async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await page
+        .getByRole("link", { name: "More about FunkSpace", exact: true })
+        .click();
+      await expect(page).toHaveURL("/about");
+      await expect(
+        page.getByText(aboutContent.paragraphs[0], { exact: true }),
+      ).toBeVisible();
+      await page.reload();
+      await page.goBack();
+      await expect(page).toHaveURL("/");
+      for (const hash of ["start", "about"]) {
+        await page.goto(`/#${hash}`);
+        await expect(page.locator(`#${hash}`)).toBeInViewport();
+        await expect(page.locator(`#${hash} h1, #${hash} h2`)).toBeVisible();
+      }
+      for (const route of ["/about", "/impressum", "/privacy"]) {
+        await page.goto(route);
+        const footer = page.getByRole("navigation", { name: "Footer" });
+        await footer
+          .getByRole("link", { name: "Legal notice", exact: true })
+          .click();
+        await expect(page).toHaveURL("/impressum");
+        const mail = page
+          .getByRole("article")
+          .getByRole("link", { name: "info@funkspace.de", exact: true });
+        await expect(mail).toBeVisible();
+        await expect(mail).toHaveAttribute("href", "mailto:info@funkspace.de");
+        await mail.click({ trial: true });
+        for (const legal of ["Legal notice", "Privacy policy"]) {
+          await page
+            .getByRole("navigation", { name: "Footer" })
+            .getByRole("link", { name: legal, exact: true })
+            .click();
+          await expect(
+            page.getByRole("heading", {
+              level: 1,
+              name: legal === "Privacy policy" ? "Privacy" : legal,
+            }),
+          ).toBeVisible();
+          await expect(page.getByRole("article")).toContainText("Ditmar Funk");
+          await expect(
+            page.getByRole("article").getByText(/Draft —/),
+          ).toHaveCount(0);
+        }
+      }
+    });
+
+    test("unknown route returns an actual 404 with readable recovery and native initial focus", async ({
+      page,
+    }) => {
+      const errors: string[] = [];
+      const badAssets: string[] = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      page.on("response", (response) => {
+        if (
+          response.status() >= 400 &&
+          !(
+            response.status() === 404 &&
+            response.request().resourceType() === "document" &&
+            new URL(response.url()).pathname === "/missing-fs-2-6-page"
+          )
+        )
+          badAssets.push(`${response.status()} ${response.url()}`);
+      });
+      // A network 404 diagnostic for the requested document is expected, not a hydration error.
+      page.on("console", (message) => {
+        if (
+          message.type() === "error" &&
+          !message.text().includes("404 (Not Found)")
+        )
+          errors.push(message.text());
+      });
+      const response = await page.goto("/missing-fs-2-6-page");
+      expect(response?.status()).toBe(404);
+      expect(await response!.text()).toContain("Page not found");
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Page not found" }),
+      ).toBeVisible();
+      await expect(
+        page.getByText("The page you requested could not be found."),
+      ).toBeVisible();
+      await expectVisibleBrand(page);
+      await expectSemanticsAndInitialFocus(page);
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+        "content",
+        /noindex/,
+      );
+      const recovery = page.getByRole("navigation", { name: "Page recovery" });
+      await recovery.getByRole("link", { name: "Back to FunkSpace" }).click();
+      await expect(page).toHaveURL("/");
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Web Aperture" }),
+      ).toBeVisible();
+      await page.goBack();
+      // Back may restore a client-rendered route after the URL has changed.
+      await expect(page).toHaveURL("/missing-fs-2-6-page");
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Page not found" }),
+      ).toBeVisible();
+      expect((await page.reload())?.status()).toBe(404);
+      await expect(recovery.getByRole("link")).toHaveCount(1);
+      await expect(page.locator('a[href="/#contact"]')).toHaveCount(0);
+      await page
+        .getByRole("navigation", { name: "Footer" })
+        .getByRole("link", { name: "Legal notice", exact: true })
+        .click();
+      await expect(page).toHaveURL("/impressum");
+      await expect(page.getByRole("article").getByRole("link")).toBeVisible();
+      expect(errors).toEqual([]);
+      expect(badAssets).toEqual([]);
+    });
+  });
+}
+
+test("not-found recovery is accessible with enlarged text on a short viewport", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto("/missing-fs-2-6-page");
+  await page.evaluate(() => (document.documentElement.style.fontSize = "200%"));
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page
+    .getByRole("navigation", { name: "Page recovery" })
+    .getByRole("link", { name: "Back to FunkSpace" })
+    .click({ trial: true });
+  const axe = await new AxeBuilder({ page }).analyze();
+  expect(axe.violations, JSON.stringify(axe.violations)).toEqual([]);
+});

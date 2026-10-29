@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { DesignTokenDocBlock } from "storybook-design-token/doc-blocks";
 import React from "react";
+import { ColorReference } from "./ColorReference";
 
 const TokensDocPage = () => (
   <div className="space-y-6">
     <section className="space-y-3">
       <h1 className="text-2xl font-semibold">Design Tokens</h1>
-      <p className="text-base text-[color:var(--fs-color-content-elevation-2)]">
+      <p className="text-base text-[color:var(--fs-color-content-primary)]">
         Color, spacing, and typography primitives sourced from Style Dictionary.
         Updates propagate here after running <code>pnpm build:tokens</code>.
       </p>
@@ -53,10 +54,22 @@ type Story = StoryObj;
 
 export const Overview: Story = {
   name: "Token catalogue",
-  render: () => <></>,
+  render: () => <ColorReference />,
   parameters: {
     docs: {
       disable: true,
     },
   },
+};
+
+export const Palettes: Story = {
+  render: () => <ColorReference view="palette" />,
+};
+
+export const SemanticColors: Story = {
+  render: () => <ColorReference view="semantic" />,
+};
+
+export const ThemeComparison: Story = {
+  render: () => <ColorReference view="comparison" />,
 };

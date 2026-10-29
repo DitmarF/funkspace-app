@@ -1,0 +1,68 @@
+.dialog,
+.dialog button {
+  text-align: left;
+}
+
+.dialog button {
+  justify-content: flex-start;
+}
+
+.dialog[open] {
+  /* Scroll the whole panel: an enlarged header must not consume short screens. */
+  display: block;
+  /* A nested auto scroller with overscroll containment traps wheel/touch input. */
+  --dialog-content-overflow: visible;
+}
+.range {
+  accent-color: var(--fs-color-content-primary);
+  cursor: pointer;
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--fs-space-sm);
+}
+.status {
+  font-size: var(--fs-font-size-sm);
+  color: var(--fs-color-content-primary);
+}
+.settings {
+  display: grid;
+  gap: var(--fs-space-md);
+}
+.settings > div {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  row-gap: var(--fs-space-2xs);
+}
+.settings label {
+  grid-column: 1;
+  grid-row: 1;
+}
+.settings output {
+  grid-column: 2;
+  grid-row: 1;
+  font-variant-numeric: tabular-nums;
+}
+.settings input {
+  grid-column: 1 / -1;
+  min-height: var(--fs-space-xl);
+  padding-block: 0;
+}
+.settings p {
+  grid-column: 1 / -1;
+}
+.toggle {
+  display: grid;
+  gap: var(--fs-space-xs);
+  max-width: 100%;
+}
+.hint {
+  font-size: var(--fs-font-size-sm);
+}
+.triggerStatus {
+  /* Keep the live region mounted without reserving a blank line in the action row. */
+  min-height: 0;
+}

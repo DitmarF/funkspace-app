@@ -1,0 +1,54 @@
+.fixture {
+  padding: var(--fs-space-lg);
+  color: var(--fs-color-content-primary);
+  background: var(--fs-color-surface-background);
+}
+
+.surface {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--fs-color-surface-background);
+}
+
+.compact {
+  max-width: 320px;
+}
+.large {
+  max-width: 1280px;
+}
+.short {
+  aspect-ratio: 4 / 1;
+}
+.runtime {
+  position: absolute;
+  inset: 0;
+}
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fs-space-md);
+  margin-top: var(--fs-space-md);
+}
+.thumbnail {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  overflow: hidden;
+  background: var(--fs-color-surface-background);
+}
+.identity {
+  width: 160px;
+  height: 160px;
+}
+
+.still {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: var(--fs-color-content-primary);
+}

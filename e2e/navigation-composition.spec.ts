@@ -1,0 +1,531 @@
+import { expect, test, type Page } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import {
+  openSettings,
+  openAppearance,
+  renderedPair,
+  themes,
+} from "./helpers/foundation";
+
+async function expectCloseAlignment(page: Page) {
+  const dialog = page.getByRole("dialog");
+  const difference = await dialog
+    .getByRole("button", { name: "Close", exact: true })
+    .evaluate((closeButton) => {
+      // Sample both controls in one layout. Separate browser round trips can
+      // straddle responsive enhancement after crossing the tablet breakpoint.
+      const menuButton = closeButton
+        .closest("dialog")!
+        .querySelector(
+          'button[aria-label="Menu: close navigation and settings"]',
+        )!;
+      const close = closeButton.getBoundingClientRect();
+      const menu = menuButton.getBoundingClientRect();
+      return innerWidth < 768
+        ? Math.abs(close.x + close.width / 2 - menu.x - menu.width / 2)
+        : Math.abs(close.y + close.height / 2 - menu.y - menu.height / 2);
+    });
+  expect(difference).toBeLessThan(0.5);
+}
+
+for (const viewport of [
+  { width: 320, height: 568 },
+  { width: 375, height: 668 },
+  { width: 768, height: 1024 },
+  { width: 1280, height: 720 },
+  { width: 1440, height: 900 },
+]) {
+  test.describe(`FS-3.1 ${viewport.width}`, () => {
+    test.use({ viewport });
+    test("full screen categories, real links, appearance and preview", async ({
+      page,
+    }, info) => {
+      await page.goto("/");
+      const trigger = page.getByRole("button", {
+        name: "Menu: navigation and settings",
+        exact: true,
+      });
+      await expect(trigger).toBeVisible();
+      const triggerBox = await trigger.boundingBox();
+      await expect(trigger).toHaveText("");
+      await expect(trigger).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await openSettings(page);
+      const dialog = page.getByRole("dialog");
+      await expect(dialog).toHaveAccessibleName("Navigation and settings");
+      const title = dialog.getByRole("heading", {
+        name: "Navigation and settings",
+      });
+      await expect(title).toHaveCSS("clip-path", "inset(50%)");
+      await expect(
+        dialog.getByRole("heading", { name: "Navigation", exact: true }),
+      ).toHaveCSS("font-family", /work.?sans/i);
+      const closeButton = dialog.getByRole("button", {
+        name: "Close",
+        exact: true,
+      });
+      await expect(closeButton).toBeFocused();
+      const closeBox = (await closeButton.boundingBox())!;
+      if (viewport.width < 768) {
+        expect(closeBox.y).toBeLessThan(24);
+        expect(closeBox.x).toBeGreaterThan(viewport.width / 2);
+      }
+      await expectCloseAlignment(page);
+      if (viewport.width < 768) {
+        const rightGap = viewport.width - closeBox.x - closeBox.width;
+        expect(Math.abs(closeBox.y - rightGap)).toBeLessThan(0.5);
+      }
+      const heading = (await dialog
+        .getByRole("heading", { name: "Navigation", exact: true })
+        .boundingBox())!;
+      expect(
+        Math.abs(
+          heading.y + heading.height / 2 - (closeBox.y + closeBox.height / 2),
+        ),
+      ).toBeLessThan(0.5);
+      const overlayTrigger = dialog.getByRole("button", {
+        name: "Menu: close navigation and settings",
+        exact: true,
+      });
+      expect(await overlayTrigger.boundingBox()).toEqual(triggerBox);
+      const artworkRight = await overlayTrigger
+        .locator("svg")
+        .first()
+        .locator("path")
+        .evaluate((path: SVGPathElement) => {
+          const bounds = path.getBBox();
+          const matrix = path.getScreenCTM()!;
+          const stroke = Number(
+            getComputedStyle(path).strokeWidth.replace("px", ""),
+          );
+          return (bounds.x + bounds.width + stroke / 2) * matrix.a + matrix.e;
+        });
+      const tree = (await dialog
+        .getByRole("navigation", { name: "Primary" })
+        .boundingBox())!;
+      if (viewport.width < 768)
+        expect(Math.abs(tree.x - (viewport.width - artworkRight))).toBeLessThan(
+          0.5,
+        );
+      else {
+        expect(Math.abs(tree.x - heading.x)).toBeLessThan(0.5);
+        expect(tree.x).toBeGreaterThan(closeBox.x + closeBox.width);
+        expect(tree.x - closeBox.x - closeBox.width).toBeLessThanOrEqual(32);
+      }
+      await page.mouse.move(0, 0);
+      await page.screenshot({
+        path: info.outputPath("navigation-initial.png"),
+      });
+      await expect(overlayTrigger).toHaveText("");
+      const railPositions = await Promise.all(
+        [
+          "Menu: close navigation and settings",
+          "Navigation",
+          "Languages",
+          "Accessibility",
+          "Chat-bot",
+        ].map(async (name) => ({
+          name,
+          y: (await dialog
+            .getByRole("button", { name, exact: true })
+            .boundingBox())!.y,
+        })),
+      );
+      expect(railPositions.sort((a, b) => a.y - b.y)[2].name).toBe("Languages");
+      for (const button of await dialog
+        .getByRole("group", { name: "Settings categories" })
+        .getByRole("button")
+        .all()) {
+        const box = await button.boundingBox();
+        expect(box!.width).toBe(triggerBox!.width);
+        expect(box!.height).toBe(triggerBox!.height);
+        expect(box!.x).toBe(triggerBox!.x);
+      }
+      await expect(
+        dialog.getByRole("button", { name: "Home", exact: true }),
+      ).toHaveCSS("font-size", "24px");
+      expect(
+        await dialog
+          .getByRole("button", { name: "Home", exact: true })
+          .evaluate((node) => (node as HTMLElement).offsetHeight),
+      ).toBeGreaterThanOrEqual(72);
+      expect(await dialog.boundingBox()).toEqual({ x: 0, y: 0, ...viewport });
+      await expect(
+        dialog.getByRole("button", { name: "Navigation", exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+      const navigationIcon = dialog
+        .getByRole("button", { name: "Navigation", exact: true })
+        .locator("svg")
+        .last();
+      await expect(navigationIcon).toHaveAttribute("viewBox", "0 0 48 48");
+      await expect(navigationIcon).toHaveCSS("width", "48px");
+      await expect(navigationIcon).toHaveCSS("height", "48px");
+      for (const name of ["Chat-bot", "Languages"])
+        await expect(
+          dialog.getByRole("button", { name, exact: true }),
+        ).toBeDisabled();
+      await expect(dialog.getByRole("link")).toHaveCount(2);
+      await expect(
+        dialog.getByRole("button", { name: "Home", exact: true }),
+      ).toBeDisabled();
+      await expect(
+        dialog.getByRole("link", { name: "About", exact: true }),
+      ).toHaveAttribute("href", "/about");
+      await expect(
+        dialog.getByRole("link", { name: "Contact", exact: true }),
+      ).toHaveAttribute("href", "/contact");
+      await dialog.getByText("Privacy", { exact: true }).click();
+      await expect(
+        dialog.getByRole("link", { name: "Privacy policy" }),
+      ).toHaveAttribute("href", "/privacy");
+      await expect(
+        dialog.getByRole("link", { name: "Legal notice" }),
+      ).toHaveAttribute("href", "/impressum");
+      for (const group of ["Animations", "Games"])
+        await dialog.getByText(group, { exact: true }).click();
+      await expect(
+        dialog.getByText("Coming soon", { exact: true }),
+      ).toHaveCount(1);
+      await expect(
+        dialog.getByText("Second animation", { exact: true }),
+      ).toHaveCount(0);
+      await expect(
+        dialog.getByText("Second game", { exact: true }),
+      ).toHaveCount(0);
+      await expect(dialog.getByRole("link")).toHaveCount(5);
+      await expect(dialog.getByRole("menu")).toHaveCount(0);
+      await page.mouse.move(0, 0);
+      await page.screenshot({ path: info.outputPath("navigation.png") });
+      await openAppearance(page);
+      await expect(
+        dialog.getByRole("heading", { name: "Accessibility", exact: true }),
+      ).toHaveCSS("font-family", /work.?sans/i);
+      await expect(
+        dialog.getByRole("heading", { name: "Accessibility", exact: true }),
+      ).toHaveCSS("font-size", viewport.width < 768 ? "30px" : "40px");
+      for (const legend of await dialog.locator("legend").all()) {
+        await expect(legend.locator("..")).toHaveCSS(
+          "margin-block-start",
+          viewport.width < 768 ? "0px" : "64px",
+        );
+        await expect(legend).toHaveCSS(
+          "font-size",
+          viewport.width < 768 ? "30px" : "36px",
+        );
+      }
+      await expect(dialog.getByRole("status")).toHaveCSS(
+        "position",
+        "absolute",
+      );
+      await expect(dialog.getByRole("status")).toHaveCSS(
+        "clip",
+        "rect(0px, 0px, 0px, 0px)",
+      );
+      await expect(
+        dialog.getByRole("group", { name: "Appearance" }),
+      ).toBeVisible();
+      await expect(
+        dialog.getByRole("group", { name: "Motion", exact: true }),
+      ).toBeVisible();
+      await page.mouse.move(0, 0);
+      await page.screenshot({ path: info.outputPath("accessibility.png") });
+      await expect(
+        dialog.getByRole("button", { name: "High Contrast" }).locator("span"),
+      ).toHaveCSS("text-transform", "lowercase");
+      for (const [theme, label] of [
+        ["default", "Light"],
+        ["dark", "Dark"],
+        ["muted", "Muted"],
+        ["dark-high-contrast", "High Contrast"],
+        ["system", "System"],
+      ]) {
+        await dialog
+          .getByRole("group", { name: "Appearance", exact: true })
+          .getByRole("button", { name: label, exact: true })
+          .click();
+        await expect(
+          dialog
+            .getByRole("group", { name: "Appearance", exact: true })
+            .getByRole("button", { name: label, exact: true }),
+        ).toHaveAttribute("aria-pressed", "true");
+        if (
+          themes.includes(theme as (typeof themes)[number]) &&
+          theme !== "default"
+        )
+          await expect(page.locator("html")).toHaveAttribute(
+            "data-theme",
+            theme,
+          );
+        await page.mouse.move(0, 0);
+        for (const name of ["Appearance", "Motion"]) {
+          const choices = dialog.getByRole("group", { name, exact: true });
+          const selected = choices.locator('button[aria-pressed="true"]');
+          const unselected = choices
+            .locator('button[aria-pressed="false"]')
+            .first();
+          const selectedPair = await renderedPair(selected);
+          const unselectedPair = await renderedPair(unselected);
+          for (const button of [selected, unselected]) {
+            await expect(button).toHaveCSS("min-height", "48px");
+            await expect(button).toHaveCSS("font-size", "24px");
+            await expect(button).toHaveCSS("font-weight", "600");
+            await expect(button).toHaveCSS("border-width", "2px");
+          }
+          // Outlined choices keep a persistent filled selection.
+          expect(selectedPair.foreground).toBe(
+            `rgb(${unselectedPair.background.join(", ")})`,
+          );
+          expect(unselectedPair.foreground).toBe(
+            `rgb(${selectedPair.background.join(", ")})`,
+          );
+          expect(selectedPair.ratio).toBeGreaterThanOrEqual(4.5);
+          expect(unselectedPair.ratio).toBeGreaterThanOrEqual(4.5);
+          await unselected.hover();
+          const hoverPair = await renderedPair(unselected);
+          const sharedHover = await unselected.evaluate((node) =>
+            (
+              getComputedStyle(node)
+                .getPropertyValue("--fs-color-action-hover")
+                .match(/[\d.]+/g) ?? []
+            )
+              .slice(0, 3)
+              .map(Number),
+          );
+          expect(hoverPair.foreground).toBe(unselectedPair.foreground);
+          await expect(unselected).toHaveCSS(
+            "border-top-color",
+            `rgb(${sharedHover.join(", ")})`,
+          );
+          expect(hoverPair.background).toEqual(unselectedPair.background);
+          // Preserve the stricter existing settings-text gate; accent remains
+          // a border cue. Shared non-settings button treatments are unchanged.
+          expect(hoverPair.ratio).toBeGreaterThanOrEqual(4.5);
+          await selected.hover();
+          expect((await renderedPair(selected)).background).toEqual(
+            selectedPair.background,
+          );
+          await selected.focus();
+          await expect(selected).toBeFocused();
+          await page.mouse.move(0, 0);
+        }
+        await page.screenshot({
+          path: info.outputPath(`accessibility-${theme}.png`),
+        });
+        expect((await new AxeBuilder({ page }).analyze()).violations).toEqual(
+          [],
+        );
+      }
+      await dialog.getByRole("button", { name: "Close", exact: true }).click();
+      await openSettings(page);
+      await expect(
+        dialog.getByRole("button", { name: "Navigation", exact: true }),
+      ).toHaveAttribute("aria-pressed", "true");
+    });
+
+    test("long labels and 200% text keep legal links, settings and Close reachable", async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await page.addStyleTag({ content: "html { font-size: 200%; }" });
+      await openSettings(page);
+      const dialog = page.getByRole("dialog");
+      await expectCloseAlignment(page);
+      // Browser stress fixture, not publication copy or production destinations.
+      await dialog
+        .getByRole("link", { name: "About", exact: true })
+        .evaluate((node) => {
+          node.querySelector("span")!.textContent =
+            "More about FunkSpace and the ideas behind this collection of creative experiments";
+        });
+      await dialog.getByText("Privacy", { exact: true }).click();
+      const privacy = dialog.getByRole("link", {
+        name: "Privacy policy",
+        exact: true,
+      });
+      await privacy.focus();
+      await expect(privacy).toBeInViewport();
+      await expectCloseAlignment(page);
+      await openAppearance(page);
+      await dialog.getByRole("button", { name: "High Contrast" }).click();
+      expect(
+        await dialog.evaluate((node) => node.scrollWidth <= node.clientWidth),
+      ).toBe(true);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await dialog.getByRole("button", { name: "Close", exact: true }).click();
+      await expect(dialog).toHaveCount(0);
+    });
+  });
+}
+
+test("trigger alignment survives a scrolled header and a resize across breakpoints", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/");
+  const trigger = page.getByRole("button", {
+    name: "Menu: navigation and settings",
+    exact: true,
+  });
+  await expect(trigger).toBeVisible();
+  await page.evaluate(() => window.scrollTo({ top: 20, behavior: "instant" }));
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(20);
+  const before = await trigger.boundingBox();
+  await openSettings(page, { preserveScroll: true });
+  const close = page.getByRole("button", {
+    name: "Menu: close navigation and settings",
+    exact: true,
+  });
+  expect(await close.boundingBox()).toEqual(before);
+  await expectCloseAlignment(page);
+  await page.setViewportSize({ width: 320, height: 568 });
+  // Shared coordinates settle after viewport layout and the lock's resize event.
+  await expect(async () => {
+    expect(await close.boundingBox()).toEqual(await trigger.boundingBox());
+  }).toPass({ timeout: 2000 });
+  await expectCloseAlignment(page);
+  await page.setViewportSize({ width: 768, height: 1024 });
+  // Shared coordinates settle after viewport layout and the lock's resize event.
+  await expect(async () => {
+    expect(await close.boundingBox()).toEqual(await trigger.boundingBox());
+  }).toPass({ timeout: 2000 });
+  await expectCloseAlignment(page);
+  await close.click();
+  await expect(trigger).toBeFocused();
+});
+
+test("short mobile screen with enlarged text keeps both categories and dismissal usable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 320 });
+  await page.goto("/");
+  await page.addStyleTag({ content: "html { font-size: 200%; }" });
+  await openSettings(page);
+  const dialog = page.getByRole("dialog");
+  await dialog
+    .getByRole("button", { name: "Accessibility", exact: true })
+    .click();
+  await dialog.getByRole("button", { name: "Dark", exact: true }).click();
+  await dialog.getByRole("button", { name: "Navigation", exact: true }).click();
+  await dialog.getByText("Privacy", { exact: true }).click();
+  const privacy = dialog.getByRole("link", {
+    name: "Privacy policy",
+    exact: true,
+  });
+  await privacy.focus();
+  await expect(privacy).toBeInViewport();
+  const cornerClose = dialog.getByRole("button", {
+    name: "Close",
+    exact: true,
+  });
+  await expect(cornerClose).toBeInViewport();
+  await cornerClose.click();
+  await expect(dialog).toHaveCount(0);
+  await openSettings(page);
+  const close = dialog.getByRole("button", {
+    name: "Menu: close navigation and settings",
+    exact: true,
+  });
+  await expect(close).toBeInViewport();
+  await close.click();
+  await expect(dialog).toHaveCount(0);
+});
+
+for (const viewport of [
+  { width: 320, height: 320 },
+  { width: 320, height: 481 },
+  { width: 320, height: 568 },
+  { width: 1280, height: 320 },
+  { width: 320, height: 577 },
+]) {
+  test(`short enlarged-text rail exposes the complete keyboard-focused category at ${viewport.width}x${viewport.height}`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    await page.addStyleTag({ content: "html { font-size: 200%; }" });
+    await openSettings(page);
+    const dialog = page.getByRole("dialog");
+    for (const name of ["Navigation", "Accessibility"]) {
+      const category = dialog.getByRole("button", { name, exact: true });
+      for (let tab = 0; tab < 15; tab++) {
+        if (await category.evaluate((node) => node === document.activeElement))
+          break;
+        await page.keyboard.press("Tab");
+      }
+      await expect(category).toBeFocused();
+      const geometry = await category.evaluate((node) => {
+        const box = node.getBoundingClientRect();
+        const clip = node.parentElement!.getBoundingClientRect();
+        const style = getComputedStyle(node);
+        const ring =
+          parseFloat(style.outlineWidth) + parseFloat(style.outlineOffset);
+        return {
+          height: box.height,
+          topClearance: box.top - Math.max(0, clip.top),
+          bottomClearance: Math.min(innerHeight, clip.bottom) - box.bottom,
+          ring,
+          uncovered: [0.05, 0.5, 0.95].every((fraction) =>
+            node.contains(
+              document.elementFromPoint(
+                box.x + box.width / 2,
+                box.y + box.height * fraction,
+              ),
+            ),
+          ),
+        };
+      });
+      expect(geometry.height).toBeGreaterThanOrEqual(76);
+      expect(geometry.topClearance).toBeGreaterThanOrEqual(geometry.ring);
+      expect(geometry.bottomClearance).toBeGreaterThanOrEqual(geometry.ring);
+      expect(geometry.uncovered).toBe(true);
+      await page.screenshot({
+        path: info.outputPath(`short-focused-${name}.png`),
+      });
+    }
+  });
+}
+
+test("keyboard scrolling keeps the full navigation row below fixed Close", async ({
+  page,
+}, info) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto("/");
+  await page.addStyleTag({ content: "html { font-size: 200%; }" });
+  await openSettings(page);
+  const dialog = page.getByRole("dialog");
+  const navigation = dialog.getByRole("navigation", { name: "Primary" });
+  for (const name of ["Animations", "Games", "Privacy"])
+    await navigation.locator("summary").filter({ hasText: name }).click();
+  await navigation
+    .getByRole("link", { name: "Legal notice", exact: true })
+    .focus();
+  const home = navigation.getByRole("link", { name: "About", exact: true });
+  for (let tab = 0; tab < 10; tab++) {
+    if (await home.evaluate((node) => node === document.activeElement)) break;
+    await page.keyboard.press("Shift+Tab");
+  }
+  await expect(home).toBeFocused();
+  const geometry = await home.evaluate((node) => {
+    const box = node.getBoundingClientRect();
+    const cover = node
+      .closest("dialog")!
+      .firstElementChild!.getBoundingClientRect();
+    const style = getComputedStyle(node);
+    const ring =
+      parseFloat(style.outlineWidth) + parseFloat(style.outlineOffset);
+    const label = node.querySelector("span")!.getBoundingClientRect();
+    return {
+      clearance: box.top - cover.bottom,
+      ring,
+      uncovered: node.contains(
+        document.elementFromPoint(label.x + 4, label.y + label.height / 2),
+      ),
+    };
+  });
+  expect(geometry.clearance).toBeGreaterThanOrEqual(geometry.ring);
+  expect(geometry.uncovered).toBe(true);
+  await page.screenshot({ path: info.outputPath("desktop-focused-Home.png") });
+});

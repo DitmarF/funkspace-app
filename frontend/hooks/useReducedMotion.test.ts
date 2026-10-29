@@ -22,6 +22,7 @@ describe("useReducedMotion", () => {
     });
 
     Object.defineProperty(window, "matchMedia", {
+      configurable: true,
       writable: true,
       value: mockMatchMedia,
     });
@@ -30,6 +31,35 @@ describe("useReducedMotion", () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
+
+  it.each(["missing", "call", "access"])(
+    "falls back without crashing when media access fails: %s",
+    (fault) => {
+      Object.defineProperty(
+        window,
+        "matchMedia",
+        fault === "access"
+          ? {
+              configurable: true,
+              get() {
+                throw new Error("Blocked media access");
+              },
+            }
+          : {
+              configurable: true,
+              writable: true,
+              value:
+                fault === "missing"
+                  ? undefined
+                  : () => {
+                      throw new Error("Blocked media call");
+                    },
+            },
+      );
+      const { result } = renderHook(() => useReducedMotion());
+      expect(result.current).toBe(true);
+    },
+  );
 
   it("should return false when prefers-reduced-motion is not set", () => {
     mockMatchMedia = vi.fn(() => ({

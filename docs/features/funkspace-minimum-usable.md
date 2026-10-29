@@ -2,15 +2,26 @@
 
 ## Plan metadata
 
-- **Status:** Authoritative feature plan — both supplied sources reconciled; FS-0.4 documentation complete. FS-G0 APPROVED by Dimi on 2026-09-12 for the reviewed candidate/patch; [actual decision](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12). FS-1.1 is next; EPIC 1 implementation has not started.
+- **Status:** Authoritative feature plan — EPICs 1–5, FS-G1 and FS-G2 are complete; EPIC 6 is in progress; Dimi closed EPIC 3 on 2026-09-27. The [closure and final re-review](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) and [EPIC 4 API handoff](../tasks/fs-3.6-integrated-validation.md#epic-4-implementation-handoff) remain the foundation. EPIC 4 has an accepted [FS-4.1 contract](../tasks/fs-4.1-scene-contract.md), reviewed FS-4.2–FS-4.4 renderer/aperture and FS-4.5 homepage integration, and [FS-4.6 C7 / R19 technical PASS](../tasks/fs-4.6-customization-overlay.md#codex-r2-closure-and-authorized-delivery--2026-09-30). **Dimi closed FS-4.7 on 2026-10-13** and authorized commit/push of all pending changes; the [closure and delivery record](../tasks/fs-4.7-scene-performance-review.md#fs-47-closure-and-authorized-delivery--2026-10-13) is the current continuation entry point. A1–A5 corrections pass review; Dimi reports all smartphone/Safari/Firefox manual tests PASS. Missing measurement details remain disclosed limitations, not new numerical PASS results or an open FS-4.7 task. **Dimi accepted `a43bbf0` and explicitly closed FS-4.8 and EPIC 4 on 2026-10-13.** The [closure record](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) owns the accepted configuration/aperture, final checks and disclosed measurement limits; those limits are not open task status or fabricated numeric PASS. Content/legal/public-release limitations remain separate. Subsequent navigation maintenance is tracked below and does not reopen historical gate decisions.
 - **Owner/current writer:** Codex; product owner/final acceptance: Dimi. Sites supplies read-only counterpart review and later owns its assigned implementation tasks.
 - **Related epic/task:** Portfolio EPICs 0–6; publication task [FS-0.4](../tasks/fs-0.4-authoritative-feature-plan.md).
 - **Decision entry point:** [Authoritative decision register](#pending-decisions-and-latest-needed-points); [FS-0.5 technical rationale and answer provenance](../tasks/fs-0.5-product-and-technical-decisions.md). Dimi leads/approves FS-0.5; Codex is its designated documentation writer.
-- **Target release:** Minimum Usable Experience, before separate Wave Survivor EPIC 7; no portfolio release date assigned.
-- **Last updated:** 2026-09-12.
+- **Target release:** Public, tested and usable by Thursday evening, 29 October 2026, ahead of the Friday 30 October, 06:00 presentation (Europe/Berlin); Wave Survivor EPIC 7 remains separate.
+- **Last updated:** 2026-10-28.
+- **EPIC 6 progress — 2026-10-28:** The [release-candidate report](../tasks/fs-6.1-release-candidate-review.md), [human acceptance record](../tasks/fs-6.2-human-acceptance.md) and [correction register](../tasks/fs-6.3-acceptance-findings.md) record current source and evidence. Dimi accepted the targeted current-candidate phone and agent checks, and a separate gate review supports **READY FOR FS-6.4**. TOOL-05 is an owned follow-up deferred to 2 November; hosted CI, production rollout, FS-G3 and game continuation remain separate. This is not release authorization.
+- **Latest device correction — 2026-10-28:** Dimi reports device testing and requests four UI changes before continuing FS-6.2. The [bounded correction record](../tasks/fs-6.3b-device-ui-corrections.md) owns evidence: WEB below 640px uses 0.1× speed / 5.0× reach, other scene values and tablet/desktop defaults remain accepted; mobile tree typography/artwork matches desktop; Contact submits use secondary buttons; the shell skip link is removed by explicit product decision while the main landmark/route-focus target remains. Dimi also requested removal of the second animation and second game placeholders; Web Aperture and the pending Wave Survivor remain. Earlier dated acceptance entries remain historical; these corrections do not close FS-6.2 or release acceptance.
+- **Latest contact acceptance — 2026-10-27: COMPLETE.** Dimi confirmed Workspace receipt, verified sender/Reply-To and instructed EPIC 5 closure. With fresh explicit authorization, the earlier enabled `6N37` / `4twqcqhug` deployment was deleted; cookie-free GETs to `/contact` and `/api/contact` both return `404 DEPLOYMENT_NOT_FOUND`. The delivery-off Preview `BJwbeuR6NUejxG3GDpq3QQHj337q` (host identifier `h9uharydb`) remains Ready; the stable Contact page again shows its off notice, disabled Send button and email fallback. FS-5.6/EPIC 5 are complete and FS-G2 is satisfied alongside the closed EPIC 4 scene. Provider acceptance and recipient receipt remain separate evidence. At the 27 October checkpoint, EPIC 6 had not started; Production `main` at `31abe42` and unpublished DMARC were the last recorded state.
 - **Related ADRs:** [001](../decisions/ADR-001-monorepo-strategy.md), [002](../decisions/ADR-002-design-token-source-of-truth.md), [003](../decisions/ADR-003-interactive-experience-boundary.md), [004](../decisions/ADR-004-game-development-architecture.md).
 
 ### Authority and source provenance
+
+Current EPIC 4 handoff: [FS-4.8/EPIC 4 closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13)
+records Dimi’s accepted `a43bbf0` candidate and explicit completion decision.
+No source/configuration change followed review. The missing raw phone timing
+packet remains a disclosed evidence limit; FS-4.7, FS-4.8 and EPIC 4 are complete.
+The preceding EPIC 4 documentation commit/push authorization is historical and
+does not extend to this FS-5.1 session. EPIC 5 contact acceptance is the next
+milestone work; FS-G2, FS-G3, launch and game integration stay separate.
 
 This feature plan owns milestone scope and current milestone status. The [consolidated baseline](../tasks/fs-0.1-inventory-real-starting-point.md) owns inspection evidence and links its dated [tooling/command follow-up](../tasks/fs-0.2-tooling-baseline.md). Substantial [task records](../templates/task.md) own execution, reviews and handoffs; the [branch decision](../tasks/fs-0.3-branch-integration-decision.md) owns integration/approval provenance. Link those records rather than copying their logs or treating their dated pre-execution statuses as current milestone state. The [AI workflow](../development/ai-workflow.md) and [feature template](../templates/feature-plan.md) remain unchanged; the task breakdown below extends the template for this multi-epic milestone.
 
@@ -22,11 +33,95 @@ This feature plan owns milestone scope and current milestone status. The [consol
 - **Approval limit:** Dimi explicitly approved option A, the portfolio branch name and FS-G0, then the particular Vercel corrections/production game-baseline merge. Those approvals do not complete FS-0.4/0.5, approve new services or contact delivery, or authorize later portfolio publication. Documentation drafting alone proves no implementation or human acceptance.
 - **Current gate decision (2026-09-12):** after preservation/source reconciliation and independent review, Dimi explicitly approved FS-G0 and the six-file patch based on `156c28c8486352328a184d587a6540eee42b8bc1`, SHA-256 `677b435d304376692d2e32c47aac19072e06e86c7dc9d8ebab68816b94f874d8`. The [decision record](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12) preserves the actual answer and separate commit/push authorization. Earlier approval/review stages remain historical evidence.
 
+## Latest EPIC 4 functional handoff — 2026-10-05
+
+The [pending-candidate review](../tasks/fs-4.7-scene-performance-review.md#pending-candidate-review-and-authorized-delivery--2026-10-05)
+returns **PASS for all 76 reviewed pending files**, covering current WEB defaults
+and aperture, scene controls, playback icons, button typography and responsive
+navigation/accessibility settings. Fresh validation passes 1,850 unit/integration
+tests, 224 browser checks, configured coverage, types/lint, both flag builds and
+Storybook. Dimi explicitly authorized documentation, commit and push after review.
+This is a functional handoff; required FS-4.7 device/performance evidence and
+FS-4.8 human acceptance remain open. Earlier candidate measurements are not
+transferred to these changes, and publication is not authorized by this handoff.
+
+## Section presentation and Contact deferral — 2026-10-12
+
+Dimi requested two shared section appearances: SVG corners for control-rich
+experiences such as WEB/Start, and plain sections for static content such as
+About. The existing `PortfolioSection` owns both variants, with identical token
+spacing and native semantics. See the [implementation and validation record](../tasks/maintenance-section-variants.md).
+
+The homepage section gap and trailing section padding use `--fs-space-3xl`
+below `48rem` and `1.5 × --fs-space-3xl` at tablet/desktop widths (`48rem` and
+above), following Dimi's spacing refinement on the same date.
+
+The homepage Contact section and its navigation/footer/recovery entry points are
+removed at Dimi's request. The new contact concept belongs to EPIC 5; its design
+is not implied by this change. Legal pages retain the supplied email address.
+Earlier Contact-section and Contact-last navigation descriptions below are
+historical contracts, superseded for the current page by this amendment. EPIC 3
+closure is unchanged; EPIC 5 must establish the replacement entry point rather
+than assuming the old Contact shell exists.
+
+## Header navigation refinement — 2026-10-12
+
+Dimi requested persistent Home, About and Contact controls in the header, using
+the tree's borderless icon-left styling. Home and About retain `/` and `/about`;
+Contact is a disabled button in both the header and the tree, with no route or
+homepage section restored. This supersedes the Contact navigation-row removal
+above while preserving its EPIC 5 deferral. Header links sit beside the desktop
+settings hex and at the top right on mobile, where the hex stays at bottom right.
+The subsequent refinement uses 24px header icons (desktop tree icons stay 36px)
+and doubles the inter-button gap to `2 × --fs-space-md` from `48rem` upward.
+On mobile, the buttons stack vertically to the right of the logo, with the logo
+vertically centered beside the stack, as explicitly clarified by Dimi.
+See the [implementation and validation record](../tasks/maintenance-main-navigation.md).
+
+Dimi's subsequent current-page amendment disables the matching page item in
+both header and tree and colors its icon with the existing hover token. Exact
+pathname matching includes query/fragment variants of the same page. This
+supersedes earlier current-page reselection and self-link query-removal UI
+contracts; shared handoff behavior for other navigation remains intact. Contact
+stays separately disabled without a destination. See the [active-state record](../tasks/maintenance-active-navigation.md).
+
+The tree also opens the current page's ancestor groups on entry, including when
+Home's More link leads to the animation detail page. Native manual toggling is
+preserved; pathname changes reveal the new current page. This behavior applies
+to direct visits, server rendering and the no-JavaScript fallback.
+
+## Smart sticky header amendment — 2026-10-12
+
+Dimi selected hide-on-scroll-down and reveal-on-scroll-up for tablet/desktop.
+The header and settings launcher now share that behavior from `48rem`, with
+keyboard focus/open navigation pinning and a stationary sticky fallback for
+reduced or unavailable motion. Mobile and native no-JS behavior remain unchanged.
+This supersedes only FS-2.5's desktop launcher scrolling away with the initial
+header; it does not reopen that completed task. See the
+[implementation and validation record](../tasks/maintenance-smart-sticky-header.md).
+The initial-fragment clearance regression was corrected and accepted by Dimi on
+2026-10-12. Commit/push of this maintenance candidate is authorized; FS-4.7/4.8
+review and the recorded validation follow-ups remain separate.
+
+## Web Aperture details presentation amendment — 2026-10-12
+
+The Web Aperture details/customization presentation is refined under
+[this maintenance task](../tasks/maintenance-aperture-details.md): the opening
+matches the homepage with Customize instead of More, a separate short guide
+explains the scene and controls, and the dialog uses concise labels and values.
+Follow-up refinements add short slider hints (including live particle width),
+Canvas/SVG explanations, closer hint spacing and About-matched typography.
+The final review found no actionable issues: 1,897 unit tests and 35 production
+browser checks passed. Dimi authorized documentation, commit and push on
+2026-10-12; FS-4.7/4.8 and broader EPIC acceptance remain separate.
+This supersedes older dialog-instruction placement, preserving the completed
+FS-4.6 scene and overlay contracts.
+
 ## Goal
 
-Deliver an animation-led, mobile-first website with Start, About, and Contact/footer sections, normal scrolling, the existing FunkSpace logo and semantic design foundations, one customizable Canvas scene behind a replaceable SVG aperture, usable navigation/settings, real contact delivery, and completed secondary pages. End when the portfolio is ready to host game integration. Do not implement game integration in this milestone.
+Deliver an animation-led, mobile-first website with Start and About sections, a legal-link footer, normal scrolling, the existing FunkSpace logo and semantic design foundations, one customizable Canvas scene behind a replaceable SVG aperture, usable navigation/settings, real contact delivery through EPIC 5's new concept, and completed secondary pages. End when the portfolio is ready to host game integration. Do not implement game integration in this milestone.
 
-Approved routes: `/`, `/about`, `/impressum`, `/privacy`. Dimi selected English first; German and other languages are possible later, without adding multilingual implementation to this milestone. Preserve `/play/wave-survivor` as the following game milestone's route, not a link to an unfinished page.
+Approved routes: `/`, `/about`, `/impressum`, `/privacy`, plus future `/animations/aperture` under the accepted FS-4.1 amendment. Dimi selected English first; German and other languages are possible later, without adding multilingual implementation to this milestone. Preserve `/play/wave-survivor` as the following game milestone's route, not a link to an unfinished page.
 
 In scope: the essential Standard/Hexagonal button matrix; your available icons and named temporary substitutes; shared form/dialog primitives; theme and motion controls; a deliberate static scene alternative; testing, documentation, and a deployable candidate.
 
@@ -50,7 +145,17 @@ Reachable real content, usable static fallbacks, approved scene/controls, verifi
 
 ## Current problem
 
-The current home route is a heading plus theme switcher, with demonstrations and reusable foundations elsewhere. Working standalone gameplay is retained, but the proposed three-section portfolio, shared decorative preference, integrated Canvas scene and real contact journey are not delivered. See the baseline's [reuse map](../tasks/fs-0.1-inventory-real-starting-point.md#reuse-map) for paths/contracts and limitations; a story or particle placeholder is not integrated behavior.
+EPICs 1–3 deliver the shared controls, portfolio routes/shell, navigation/settings and focus lifecycle, service-backed appearance, one shared decorative-motion preference, and production logo/settings consumption. [FS-3.3](../tasks/fs-3.3-appearance-integration.md#dimi-acceptance-and-completion--2026-09-27) corrected stale-storage replacement of live theme choices; [FS-3.4](../tasks/fs-3.4-motion-policy-implementation.md) and [FS-3.5](../tasks/fs-3.5-motion-settings-and-logo.md) implement the policy and its current consumers. [FS-3.6](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) records EPIC 3/FS-G1 completion. These are delivered foundations, not work to recreate for the next epic.
+
+EPIC 4’s integrated Canvas scene, WEB aperture and customization are accepted
+and complete on `a43bbf0` by Dimi’s [explicit closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13).
+Final LCP/CLS checks pass; the On score warning and missing detailed phone timing
+evidence remain disclosed limits. Dimi has accepted the controlled EPIC 5 contact
+journey, including Workspace receipt and sender/Reply-To. Authorized deletion and
+verified retirement of the earlier enabled Preview complete FS-5.6/EPIC 5 and
+satisfy FS-G2. The replacement Preview remains delivery-off with verified
+disabled/fallback presentation. EPIC 6 is in progress; whole-site evidence,
+production rollout and gameplay remain separate.
 
 The earlier layout plan mandates snapping and fullscreen panels, conflicting with this milestone's ordinary scrolling. Without one scope entry point, a fresh agent could implement those historical proposals or repeat already completed tooling work. The narrow documentation reconciliation is recorded in FS-0.4; unrelated architecture migration remains deferred.
 
@@ -59,24 +164,29 @@ The earlier layout plan mandates snapping and fullscreen panels, conflicting wit
 ### User flow or behavior
 
 1. Load the static Start section with existing logo geometry and reserved scene space.
-2. Scroll naturally through About and Contact; follow ordinary route/anchor links.
+2. Scroll naturally through Start and About; follow ordinary route/anchor links. Contact's replacement entry point belongs to EPIC 5.
 3. Open shared navigation/settings, choose appearance and decorative-motion settings, and dismiss or navigate with correct focus behavior.
 4. Enhance the reserved space with one bounded Canvas scene and trusted replaceable SVG aperture; customize or pause it without changing gameplay time.
-5. Use email fallback, then the validated provider-backed form when its separate contract and server work are complete.
+5. Use the email links retained on legal pages, then EPIC 5's contact experience when its separate concept, contract and server work are complete.
 
 ### Key implementation decisions
 
-Reuse ThemeService, Standard Button, Logo/LogoMotion, AnimationOrchestrator, existing CSS motion helpers and suitable pure common motion. Legacy logo manifest exports throw; `pathCount` does not currently constrain the manifest. Logo static reset and failed-storage theme consistency remain assigned consumer corrections. No duplicate manifest builder, theme authority, overlay system or general engine is authorized.
+Reuse the implemented ThemeService, Standard/Hex buttons, Dialog, Logo/LogoMotion, AnimationOrchestrator and suitable pure common motion. FS-3.3 preserves live theme choices after denied writes while keeping `getStoredTheme()` an explicit storage query; selected and resolved themes remain distinct. FS-3.5 supplies policy-guarded logo methods and complete denied/error/static artwork. Its `pathCount` prop is compatibility-only; the existing manifest contains the complete logo. Those corrections are complete. No duplicate manifest builder, theme authority, overlay system or general engine is authorized.
 
-The shared decorative preference is **planned FS-3.4 work**, consumed by logo in FS-3.5 and scene in FS-4.5. The current reduced-motion hook/animation service does not establish that policy. Renderer and service decisions still need their assigned reviews. FS-0.4 creates no API, UI, token or configuration implementation.
+The shared decorative preference and production logo/settings consumption are complete in **FS-3.4/FS-3.5**. Reuse the provider-owned authority and pure permission resolver through the [implemented API handoff](../tasks/fs-3.6-integrated-validation.md#epic-4-implementation-handoff): Follow system, On, Reduced and Off remain separate from availability, readiness, visibility and each consumer's local Pause/playback history. Only the nominated top-left homepage logo animates; Reduced has its approved whole-logo fade and Off remains static. The future scene consumer belongs to FS-4.5 and must prove its own runtime lifecycle. The legacy reduced-motion hook/animation service is not a second preference authority.
 
 ### Delivery sequence
 
-Use the epic order and gates below. Each task also inherits its epic prerequisites. Do not skip unresolved content, asset, architecture or acceptance inputs merely because FS-G0 is recorded as approved.
+Use the epic order and gates below. EPICs 1–4, FS-G1 and FS-4.7/4.8 are complete.
+The [EPIC 4 closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) owns the accepted candidate and retained evidence
+limits. Preserve dated task-stage statuses as history, not new assignments.
+EPIC 5 contact acceptance and test-target retirement are complete; FS-G2 is
+satisfied. Do not restart delivered scene or EPIC 3 implementation, or begin
+EPIC 6 without its next task instruction.
 
 ### Rollout and rollback
 
-- **Feature flag:** retain `NEXT_PUBLIC_ANIMATIONS_ENABLED`, default off for consumers that use its default; explicit logo overrides exist. FS-3.4 defines the future policy interaction. Flag-off, Reduced and Off require a complete static alternative.
+- **Feature flag:** retain `NEXT_PUBLIC_ANIMATIONS_ENABLED` and the provider's separate readonly availability. FS-3.5 already reconciles logo overrides with the policy; controlled fixtures cannot bypass preference, local Pause or readiness. Pending/denied/failed and flag-off/Off states retain complete static artwork. Explicit Reduced permits the implemented logo fade; future consumers remain static unless they implement and declare an approved reduced alternative. On overrides only the OS preference, not the other gates.
 - **Rollout:** existing Vercel hosting and the production game-baseline merge are evidenced in FS-0.3. The future completed portfolio candidate/target is a separate FS-6.4/6.5 decision, with separately authorized deployment and live email tests.
 - **Rollback:** prepare the exact known-good revision and deployment recovery in FS-6.4; retain static scene and honest email fallback. Do not invent a tested rollback from this plan or invoke one under documentation authorization.
 
@@ -84,11 +194,15 @@ Use the epic order and gates below. Each task also inherits its epic prerequisit
 
 Preserve `Presentation → Application → Domain ← Infrastructure`. Pure rules/configuration validation belong in Domain; orchestration and preference policy in Application; Canvas, clocks, DOM, storage, and mail-provider effects in Infrastructure; page rendering/controls in Presentation. Construct cross-layer dependencies at the appropriate composition root. Static content does not need invented services or domain models.
 
-Reuse ThemeService, existing Button/logo foundations, common pure motion where useful, and the public game boundary. One shared dialog has two planned consumers (navigation and customization, FS-1.6); one motion preference has two planned consumers (logo and scene, FS-3.4). The [baseline reuse map](../tasks/fs-0.1-inventory-real-starting-point.md#reuse-map) records the dialog as missing and the policy as planned, not working integrated systems. Those are concrete planned reuse cases, not permission to build generic managers.
+Reuse ThemeService, existing Button/logo foundations, common pure motion where useful, and the public game boundary. The shared Dialog already serves navigation; customization is its future consumer. The provider-owned motion authority already serves settings and the logo; the scene is its future consumer. The [baseline reuse map](../tasks/fs-0.1-inventory-real-starting-point.md#reuse-map) describes the earlier inspection, when the dialog was missing and policy only planned. It is historical evidence, not the current implementation status or permission to build replacement managers.
 
 The particle scene owns a bounded runtime; it does not import Wave Survivor or place per-frame positions in React state. The new motion preference controls decorative presentation, not gameplay time. SVG aperture geometry remains independent of particle rules. Only trusted repository SVG assets are supported.
 
+Production particle fields and connection graphs must not become dense SVG/DOM markup, including hidden trees or static/error previews. Keep an eligible ready Canvas frozen; use lightweight solid WEB when preparation is denied/unavailable. Small SVG artwork and aperture masks remain appropriate. Follow the [particle rendering and fallback cost rule](../architecture.md#particle-rendering-and-fallback-cost); diagnostic particle SVGs are not production fallbacks.
+
 Use source tokens, regenerate CSS and TypeScript artifacts, and inspect effects across existing themes and the game. No unrelated palette/engine/framework migration is required. Existing debt touched by the requested integration can receive a narrow tested correction; unrelated debt stays recorded.
+
+The layer map below describes responsibilities across the milestone, including completed foundations; it is not a list of undelivered work.
 
 | Layer or concern          | Planned change                                                           | Boundary or contract                                                    | Why it belongs here              |
 | ------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------- | -------------------------------- |
@@ -104,6 +218,8 @@ Use source tokens, regenerate CSS and TypeScript artifacts, and inspect effects 
 These are design constraints to verify in each implementation, not checked-off implementation results: Domain stays pure; Application depends on Domain abstractions; Presentation introduces no direct Infrastructure imports; composition stays in the composition root; experiences remain isolated under ADR-003; any new boundary/exception is reviewed before implementation. The game engine stays private and independently runnable. No new ADR is created speculatively by this plan.
 
 ## Files affected
+
+The following table preserves the FS-0.4 planning inventory. Its partial/proposed statuses are historical; use the current summary and [implementation handoff](#implementation-handoff) for completed work and continuation APIs.
 
 | Path                                                                                                                                                     | Inspected status                                                              | Later change/consumer                                                              |
 | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
@@ -127,7 +243,7 @@ Use the baseline reuse map and assigned task graph. FS-0.2 establishes Node 22.2
 
 ### External dependencies
 
-No new package/service is selected here. Existing Vercel hosting is recorded in FS-0.3; mail provider/transport, abuse-protection deployment model, cost and data-processing choices remain FS-5.1/5.3 decisions. Choose the smallest approved server path in the existing Next.js deployment; no parallel backend, editor or game framework is introduced.
+Dimi's FS-5.1 request selects Resend over HTTPS in the existing Next.js/Vercel deployment; no new package or separate backend is added. The [EPIC 5 detailed plan](FunkSpace_EPIC_5_Detailed_Plan.md) freezes the accepted contract and separates verified public documentation from pending actual account, sender verification, protection, terms and legal review. Dimi separately authorized the FS-5.1 documentation/contract commit and push at closure; no paid plan, provider/platform change or live delivery is authorized here.
 
 ### Environment and coordination
 
@@ -135,7 +251,7 @@ Do not record secret values. Future environment variable names, sender/recipient
 
 ### Responsibilities
 
-**FS-3.3 coordination:** Sites retains the source task lead. The baseline assigns the bounded FS01-S03 ThemeService persistence correction to Codex; arrange an explicit current-writer handoff for that correction, then return ownership for Sites' integration. See [owner consistency](../tasks/fs-0.4-authoritative-feature-plan.md#assumptions-and-open-decisions). This does not authorize simultaneous edits or change the preserved task contract.
+**Theme correction ownership:** FS-3.3's Sites-owned bounded service correction is complete and independently reviewed; [acceptance and evidence](../tasks/fs-3.3-appearance-integration.md#dimi-acceptance-and-completion--2026-09-27) supersede the baseline's proposed future handoff. Do not repeat that correction from the historical FS01-S03 assignment. New findings require a bounded task and one designated current writer.
 
 | Participant   | Primary responsibility                                                                                                                                                                                                                 | Not their default responsibility                                                                                                                       |
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -157,31 +273,31 @@ These are project assignments, not claims that either product is technically lim
 
 This is the single authoritative FS-0.5 decision/input register, expanded from the existing table. The [task record](../tasks/fs-0.5-product-and-technical-decisions.md) owns evidence and technical tradeoffs, not a second status register. Originally prepared at `65eefa1db2656e78b169882414dfedb4715aa408`; now reconciled against `156c28c8486352328a184d587a6540eee42b8bc1` plus the six-file source/readiness documentation diff. Approved means an actual Dimi answer or a linked recorded approval; provisional means a reversible proposal, not implementation authorization. Pending rows name the owner and the latest task that needs the answer. The original task contracts below remain unchanged.
 
-| Decision/input                                            | Status                                                   | Actual answer/default                                                                                                                            | Owner                                                                                     | Evidence/rationale                                                                                                                                         | Latest-needed task                                                                      | Impact                                                                                         | Safe work while pending                                           |
-| --------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Integration, branch and FS-G0                             | Approved; integration executed/validated                 | Option A; `feature/funkspace-minimum-usable`; validated base `9f3f01d8e2745408a8523c07198aec0e73eed52b`                                          | Dimi approval; Codex evidence                                                             | [FS-0.3](../tasks/fs-0.3-branch-integration-decision.md); no new gate vote inferred                                                                        | FS-0.3 / FS-G0, recorded                                                                | Portfolio inherits accepted game baseline                                                      | Current task remains documentation-only                           |
-| Initial language                                          | Approved                                                 | English first; German/others possible later                                                                                                      | Dimi                                                                                      | Actual FS-0.5 answer 1 in [provenance](../tasks/fs-0.5-product-and-technical-decisions.md#recorded-product-answers)                                        | FS-0.5; FS-2 content                                                                    | English content; no new localization scope                                                     | English content planning                                          |
-| Structure, routes and navigation scope                    | Approved scope; routes expressly confirmed               | Start, About, Contact/footer; `/`, `/about`, `/impressum`, `/privacy`; ordinary scrolling; no unfinished game destination                        | Dimi; Sites consumes                                                                      | Existing requested milestone scope and answer 2; scope is not implementation evidence                                                                      | FS-0.5; FS-2.1                                                                          | Stable page/navigation contract                                                                | Route/content planning within existing gates                      |
-| Completed portfolio target                                | Approved scope; deployment pending                       | Separately authorized public release; verified preview may establish readiness                                                                   | Dimi                                                                                      | Answer 3; previous game-baseline deployment approval is separate                                                                                           | FS-0.5; exact candidate/action FS-6.4/6.5                                               | Preview still requires real contact delivery; no public rollout permission here                | Local work and preview planning                                   |
-| Representative devices                                    | Approved selection; testing pending                      | Sony Xperia XQ-CC54, Android 14; MacBook Pro with Safari, Chrome, Firefox                                                                        | Dimi supplies access; Codex/Sites record tests                                            | Answer 4; no physical-device results supplied                                                                                                              | FS-4.7 and FS-6.2                                                                       | Named real-device/browser coverage                                                             | Honest emulated/local checks                                      |
-| Mobile browser and exact test versions                    | Pending                                                  | Mobile browser, macOS and browser versions not supplied; record versions at testing time                                                         | Dimi selects phone browser; testing owner records versions                                | Device answer did not name phone browser or versions                                                                                                       | Before FS-4.7 evidence; refresh FS-6.2                                                  | Prevents unsupported claims of device coverage                                                 | Desktop/automated checks with actual versions                     |
-| Original icon SVGs, editable sources and substitutes      | Pending                                                  | Existing original logo verified; custom icon set/editable files unconfirmed; approve named substitutes only for missing icons                    | Dimi supplies/approves; Sites inventories                                                 | Baseline reuse map; screenshots do not establish SVG assets                                                                                                | FS-1.1 inventory; FS-1.3/1.4 finalization                                               | Blocks affected visual finalization, not unrelated foundations                                 | Existing logo and component API review                            |
-| Minimal Standard/Hexagonal control matrix                 | Provisional; final choices pending                       | Minimum milestone states; 48-pixel target is a proposal until FS-1.1 agreement                                                                   | Sites proposes; Dimi approves; Codex reviews contracts                                    | Existing Button reuse; [technical rationale](../tasks/fs-0.5-product-and-technical-decisions.md#trusted-svg-and-control-inputs)                            | FS-1.1; FS-1.3/1.4 finalization                                                         | Avoids speculative variants and duplicate controls                                             | Review actual Button API/stories                                  |
-| About copy and public contact address                     | Pending                                                  | No approved final copy/address supplied; public address need not equal delivery recipient                                                        | Dimi                                                                                      | Sites checklist; no biography/address inferred                                                                                                             | FS-2.3/2.4 completion                                                                   | Required for truthful public content and email fallback                                        | Clearly temporary development copy/layout                         |
-| Operator and legal/privacy facts                          | Pending                                                  | Actual operator details and real processing facts required; no invented legal content                                                            | Dimi facts/acceptance; Codex technical flow; Sites pages                                  | Sites checklist; FS-5.5 contract                                                                                                                           | FS-2.4 content requirements; FS-5.5 finalization and public release                     | Blocks claims of complete legal pages/release                                                  | Page structure and inventory of actual data flow                  |
-| Hosting continuity and preview access                     | Provisional recommendation; target configuration pending | Retain existing Vercel/Next deployment; verify preview access/protection and environment before use                                              | Dimi host/config decisions; Codex verifies                                                | [Hosting rationale](../tasks/fs-0.5-product-and-technical-decisions.md#hosting-and-preview); dated FS-0.3 evidence                                         | FS-5.1 runtime choice; before live adapter checks; FS-6.4/6.5 rollout                   | No migration or paid entitlement assumed                                                       | Existing local build workflow and mocked tests                    |
-| Semantic themes and motion foundations                    | Approved existing boundary; consumer details pending     | ThemeService remains sole theme authority; source tokens/generated output; reuse orchestrator, CSS helpers and pure runtime vocabulary           | Codex boundary review; Sites consumer work                                                | AGENTS/ADRs and baseline; bounded corrections remain assigned                                                                                              | FS-1.2, FS-3.3, FS-4.5                                                                  | No parallel theme/token/manifest system; gameplay isolated                                     | Inspect consumers and plan source-token changes in assigned tasks |
-| Shared decorative-motion policy                           | Provisional Codex proposal; reviews/approval pending     | One preference for logo/scene; Follow System, Reduced, Off; static unresolved/reduced/off; explicit scene Pause survives environmental resume    | Codex proposes; Sites reviews consumer contract; Dimi approves                            | [Policy proposal](../tasks/fs-0.5-product-and-technical-decisions.md#semantic-theme-and-motion-reuse); no policy service exists yet                        | Before FS-3.4 implementation                                                            | Gates shared policy implementation; never controls gameplay time                               | Contract examples and static UI after its gates                   |
-| One scene and static alternative                          | Approved milestone scope; appearance pending             | One bounded Canvas scene, one trusted replaceable aperture, static alternative; no carousel/editor/multiple scenes                               | Dimi scope/visual acceptance; Sites implementation lead later                             | Existing source/request; no new visual approval                                                                                                            | FS-4.1 specification                                                                    | Keeps scope bounded; placeholder is not working Canvas behavior                                | Static shell and reference preparation                            |
-| Reference behavior and tuning                             | Pending; numeric defaults provisional                    | Dimi reference/description required; density/speed/size/Pause/Reset scope retained; DPR cap 2 and numeric budgets proposed                       | Dimi reference/acceptance; Sites proposal; Codex measurement review                       | Original visual/video sources not inspected                                                                                                                | FS-4.1 budgets; behavior before FS-4.2; controls FS-4.6                                 | No invented appearance, workload or frame-rate approval                                        | Architecture planning; bounded controls proposal                  |
-| Scene renderer boundary                                   | Provisional direction; final proposal/reviews pending    | One Canvas 2D infrastructure adapter with pure rules, shared lifecycle vocabulary and no per-frame React state                                   | Sites proposes; Codex reviews; Dimi approves                                              | [Renderer rationale](../tasks/fs-0.5-product-and-technical-decisions.md#scene-renderer-boundary); existing runtime/ADR-003                                 | Approval at FS-4.1, before FS-4.2 implementation                                        | Gates renderer design; no new engine or game internals                                         | Read-only reuse/performance planning                              |
-| Trusted SVG aperture handling and second vector           | Existing trusted-only scope; second asset pending        | Retain original sources; reviewed repository SVG only; circle proof first; second trusted SVG needed for replacement acceptance                  | Dimi supplies editable/second SVG; Sites export/consumer contract; Codex reviews boundary | [Asset rationale](../tasks/fs-0.5-product-and-technical-decisions.md#trusted-svg-and-control-inputs)                                                       | FS-4.4 acceptance                                                                       | No arbitrary upload or inferred production vectors                                             | Circle proof and export guidance after task gates                 |
-| Contact/server path and consumer contract                 | Provisional Codex proposal; reviews/approval pending     | One proposed `POST /api/contact`, pure validation/use case and narrow server-only provider adapter                                               | Codex proposes; Sites supplies consumer contract; Dimi approves                           | [Contact rationale](../tasks/fs-0.5-product-and-technical-decisions.md#one-contact-path-and-provider-boundary); no handler implemented                     | Approval FS-5.1, before FS-5.2 implementation                                           | Gates server flow; one honest typed request/result contract                                    | Contact layout, contract/error examples and routine mocks         |
-| Contact fields and abuse controls                         | Pending; minimal fields provisional                      | Agree required fields/limits/errors at FS-5.1; deployment-aware abuse controls at FS-5.3; no automatic consent checkbox                          | Codex proposes; Sites consumer contract; Dimi product/privacy choices                     | Source task contract; provider/runtime constraints still pending                                                                                           | FS-5.1 contract; FS-5.3 controls before exposure/live acceptance                        | No excess data collection or false success; no unreviewed service                              | Pure contract/security review; unrelated UI                       |
-| Mail provider, sender, recipient and secure configuration | Pending                                                  | No provider/account/transport selected; recipient/sender/config not supplied; secrets only through approved secure mechanism                     | Dimi decides/configures; Codex verifies compatibility/adapter                             | Provider capabilities, pricing, quotas and data-processing terms unverified until specific option evaluation                                               | Provider choice FS-5.1; actual configuration before FS-5.2 live verification and FS-5.6 | Live adapter verification and FS-5.6 cannot pass without configuration and authorized delivery | Mocked adapter/UI tests; static content                           |
-| Live delivery, external actions and release approval      | Pending per action                                       | Dimi must authorize exact live test and deployment/settings/other external action; provider acceptance and recipient receipt recorded separately | Dimi approves and confirms receipt; Codex executes only authorized action                 | Scope answers are not action permission; [FS-5.1/5.6 rationale](../tasks/fs-0.5-product-and-technical-decisions.md#one-contact-path-and-provider-boundary) | Before each action; FS-5.6 and FS-6.5 acceptance                                        | No automatic mail, accounts, DNS, deployment, commit or push                                   | Reviewable candidates, local checks and operating guide           |
-| Detailed EPIC 0 source/reconciliation                     | Supplied by Dimi; reconciliation complete                | Both original sources archived with provenance; no new scope conflict                                                                            | Dimi supplied; Codex reconciled                                                           | [Complete source mapping](../tasks/fs-0.4-authoritative-feature-plan.md#detailed-source-reconciliation-and-current-readiness--2026-09-12)                  | FS-0.4 source requirement satisfied before refreshed review                             | Resolves missing-source blocker; does not grant gate approval                                  | Readiness review and assigned later preparation                   |
-| Preservation requirements                                 | Confirmed by Dimi, 2026-09-12                            | Preserve known clone/combat files, original assets and unrelated work; no cleanup/disposal authorized                                            | Dimi confirmation; Codex preservation                                                     | [Actual answer and limits](../tasks/fs-0.1-inventory-real-starting-point.md#preservation-confirmation--2026-09-12)                                         | Confirmation received; protect new discoveries before affected edits                    | Resolves missing-confirmation blocker; asset availability remains a separate input             | Continue safe inspection and documentation                        |
+| Decision/input                                            | Status                                                            | Actual answer/default                                                                                                                                                            | Owner                                                                                     | Evidence/rationale                                                                                                                                                                  | Latest-needed task                                                           | Impact                                                                               | Safe work while pending                                           |
+| --------------------------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Integration, branch and FS-G0                             | Approved; integration executed/validated                          | Option A; `feature/funkspace-minimum-usable`; validated base `9f3f01d8e2745408a8523c07198aec0e73eed52b`                                                                          | Dimi approval; Codex evidence                                                             | [FS-0.3](../tasks/fs-0.3-branch-integration-decision.md); no new gate vote inferred                                                                                                 | FS-0.3 / FS-G0, recorded                                                     | Portfolio inherits accepted game baseline                                            | Current task remains documentation-only                           |
+| Initial language                                          | Approved                                                          | English first; German/others possible later                                                                                                                                      | Dimi                                                                                      | Actual FS-0.5 answer 1 in [provenance](../tasks/fs-0.5-product-and-technical-decisions.md#recorded-product-answers)                                                                 | FS-0.5; FS-2 content                                                         | English content; no new localization scope                                           | English content planning                                          |
+| Structure, routes and navigation scope                    | Approved scope; FS-4.1 details-route amendment accepted           | Start, About, Contact/footer; `/`, `/about`, `/impressum`, `/privacy`; approved future `/animations/aperture`; ordinary scrolling; no unfinished game destination                | Dimi; Sites consumes                                                                      | [FS-4.1 acceptance and technical review](../tasks/fs-4.1-scene-contract.md#dimi-acceptance-and-fs-41-completion--2026-09-28); implementation/visual performance proof remains later | FS-0.5; FS-2.1                                                               | Stable page/navigation contract                                                      | Route/content planning within existing gates                      |
+| Completed portfolio target                                | Approved scope; deployment pending                                | Separately authorized public release; verified preview may establish readiness                                                                                                   | Dimi                                                                                      | Answer 3; previous game-baseline deployment approval is separate                                                                                                                    | FS-0.5; exact candidate/action FS-6.4/6.5                                    | Preview still requires real contact delivery; no public rollout permission here      | Local work and preview planning                                   |
+| Representative devices                                    | Approved selection; testing pending                               | Sony Xperia XQ-CC54, Android 14; MacBook Pro with Safari, Chrome, Firefox                                                                                                        | Dimi supplies access; Codex/Sites record tests                                            | Answer 4; no physical-device results supplied                                                                                                                                       | FS-4.7 and FS-6.2                                                            | Named real-device/browser coverage                                                   | Honest emulated/local checks                                      |
+| Mobile browser and exact test versions                    | Pending                                                           | Mobile browser, macOS and browser versions not supplied; record versions at testing time                                                                                         | Dimi selects phone browser; testing owner records versions                                | Device answer did not name phone browser or versions                                                                                                                                | Before FS-4.7 evidence; refresh FS-6.2                                       | Prevents unsupported claims of device coverage                                       | Desktop/automated checks with actual versions                     |
+| Original icon SVGs, editable sources and substitutes      | Pending                                                           | Existing original logo verified; custom icon set/editable files unconfirmed; approve named substitutes only for missing icons                                                    | Dimi supplies/approves; Sites inventories                                                 | Baseline reuse map; screenshots do not establish SVG assets                                                                                                                         | FS-1.1 inventory; FS-1.3/1.4 finalization                                    | Blocks affected visual finalization, not unrelated foundations                       | Existing logo and component API review                            |
+| Minimal Standard/Hexagonal control matrix                 | Provisional; final choices pending                                | Minimum milestone states; 48-pixel target is a proposal until FS-1.1 agreement                                                                                                   | Sites proposes; Dimi approves; Codex reviews contracts                                    | Existing Button reuse; [technical rationale](../tasks/fs-0.5-product-and-technical-decisions.md#trusted-svg-and-control-inputs)                                                     | FS-1.1; FS-1.3/1.4 finalization                                              | Avoids speculative variants and duplicate controls                                   | Review actual Button API/stories                                  |
+| About copy and public contact address                     | About copy supplied and integrated; public email supplied         | Dimi supplied `diamondfunk13@gmail.com` on 2026-09-20; About preview/narrative supplied for integration on 2026-10-05; public address does not decide a backend sender/recipient | Dimi                                                                                      | FS-2.4 user input and task record; no biography/address inferred                                                                                                                    | Supplied About copy integrated; email fallback FS-2.4                        | Required for truthful public content and email fallback                              | Supplied About copy/layout; native email fallback                 |
+| Operator and legal/privacy facts                          | Pending                                                           | Actual operator details and real processing facts required; no invented legal content                                                                                            | Dimi facts/acceptance; Codex technical flow; Sites pages                                  | Sites checklist; FS-5.5 contract                                                                                                                                                    | FS-2.4 content requirements; FS-5.5 finalization and public release          | Blocks claims of complete legal pages/release                                        | Page structure and inventory of actual data flow                  |
+| Hosting continuity and preview access                     | Provisional recommendation; target configuration pending          | Retain existing Vercel/Next deployment; verify preview access/protection and environment before use                                                                              | Dimi host/config decisions; Codex verifies                                                | [Hosting rationale](../tasks/fs-0.5-product-and-technical-decisions.md#hosting-and-preview); dated FS-0.3 evidence                                                                  | FS-5.1 runtime choice; before live adapter checks; FS-6.4/6.5 rollout        | No migration or paid entitlement assumed                                             | Existing local build workflow and mocked tests                    |
+| Semantic themes and motion foundations                    | Approved existing boundary; consumer details pending              | ThemeService remains sole theme authority; source tokens/generated output; reuse orchestrator, CSS helpers and pure runtime vocabulary                                           | Codex boundary review; Sites consumer work                                                | AGENTS/ADRs and baseline; bounded corrections remain assigned                                                                                                                       | FS-1.2, FS-3.3, FS-4.5                                                       | No parallel theme/token/manifest system; gameplay isolated                           | Inspect consumers and plan source-token changes in assigned tasks |
+| Shared decorative-motion policy                           | Dimi approved; implemented API and critical-diff reviews PASS     | One preference for logo/scene; Follow system, Reduced, Off; static unresolved/reduced/off; consumer Pause survives environmental resume                                          | Codex implementation; Sites consuming review; Dimi semantics                              | [FS-3.4 approval and implementation](../tasks/fs-3.4-motion-policy-implementation.md)                                                                                               | Contract gates satisfied on 2026-09-27; production consumption FS-3.5/FS-4.5 | Never controls gameplay time; no scene scheduling claim                              | Real-API fixture; production consumers remain separate tasks      |
+| One scene and static alternative                          | FS-4.1 specification accepted; visual implementation pending      | Aperture: one bounded particle field through SPACE, independent static/error SPACE; circle only fallback/fixture; no carousel/editor                                             | Dimi scope/visual acceptance; Sites implementation lead later                             | [FS-4.1 acceptance and technical review](../tasks/fs-4.1-scene-contract.md#dimi-acceptance-and-fs-41-completion--2026-09-28); implementation/visual performance proof remains later | FS-4.1 complete; implementation in later authorized tasks                    | Written direction accepted; no achieved runtime or physical-device result inferred   | Wait for task authorization; prepare outstanding SVG assets       |
+| Reference behavior and tuning                             | R3 drift/targets accepted; R4 proximity connections requested     | Calm seeded drift, no trails/glow/pointer forces; 120 particles (40–240), speed 0.25–2×, size 0.75–2×. R4 connection styling/density remain provisional                          | Dimi reference/acceptance; Sites proposal; Codex measurement review                       | [FS-4.1 current contract](../tasks/fs-4.1-scene-contract.md); implementation/visual performance proof remains later                                                                 | FS-4.1 R3 complete; current connection amendment recorded in R4              | No unseen-video match or physical-device result inferred                             | Review connection appearance; prepare outstanding SVG assets      |
+| Scene renderer boundary                                   | R2 technical PASS; Dimi accepted specification                    | Lightweight observation before lazy Canvas; pure rules; one frame owner; cancellation rearms with stale-settlement guards; no React frame state                                  | Sites proposes; Codex reviews; Dimi approves                                              | [FS-4.1 acceptance and technical review](../tasks/fs-4.1-scene-contract.md#dimi-acceptance-and-fs-41-completion--2026-09-28); implementation/visual performance proof remains later | FS-4.1 complete; implementation in later authorized tasks                    | Written direction accepted; no achieved runtime or physical-device result inferred   | Wait for task authorization; prepare outstanding SVG assets       |
+| Trusted SVG aperture handling and second vector           | Existing trusted-only scope; second asset pending                 | Retain original sources; reviewed repository SVG only; circle proof first; second trusted SVG needed for replacement acceptance                                                  | Dimi supplies editable/second SVG; Sites export/consumer contract; Codex reviews boundary | [Asset rationale](../tasks/fs-0.5-product-and-technical-decisions.md#trusted-svg-and-control-inputs)                                                                                | FS-4.4 acceptance                                                            | No arbitrary upload or inferred production vectors                                   | Circle proof and export guidance after task gates                 |
+| Contact/server path and consumer contract                 | Accepted; FS-5.1 complete on 2026-10-13                           | One JSON POST /api/contact; pure typed contract; separate server-only composition and existing browser composition                                                               | Codex writes; Sites reviews consumer; Dimi accepts                                        | [FS-5.1 contract/evidence](../tasks/fs-5.1-contact-contract.md); [FS-5.2 local candidate](../tasks/fs-5.2-contact-server.md); live delivery locked off                              | Reviewed FS-5.1 before FS-5.2                                                | One typed request/result; 202 means verified acceptance, not receipt                 | Controlled server/UI candidate; live delivery off                 |
+| Contact fields and abuse controls                         | Fields/limits settled; deployed controls pending                  | Optional Name, required Email/Message; UUID/empty trap; streamed 32 KiB; proposed POST limit five/IP/ten minutes                                                                 | Codex contract/security; Sites UI; Dimi platform approval                                 | [EPIC 5 detail](FunkSpace_EPIC_5_Detailed_Plan.md); availability/alias coverage unverified                                                                                          | FS-5.1 contract; FS-5.3 protection before enabling                           | Exact origins; regional/distributed limits disclosed; sending off without protection | Pure contract and controlled tests after task authorization       |
+| Mail provider, sender, recipient and secure configuration | Provider/recipient settled; verified sender/configuration pending | Resend HTTPS; Gmail recipient/fallback supplied; proposed owned-domain sender after verification; variables without values                                                       | Dimi approves/configures; Codex verifies                                                  | [EPIC 5 prerequisites](FunkSpace_EPIC_5_Detailed_Plan.md#account-settings-and-external-actions-unverified-and-pending)                                                              | Actual terms/setup before live enabling; FS-5.6 authorized receipt           | CONTACT_ENABLED defaults off; no account/DNS/firewall/live-send authorization        | Mocked tests and documentation; no secrets in prompts             |
+| Live delivery, external actions and release approval      | Pending per action                                                | Dimi must authorize exact live test and deployment/settings/other external action; provider acceptance and recipient receipt recorded separately                                 | Dimi approves and confirms receipt; Codex executes only authorized action                 | Scope answers are not action permission; [FS-5.1/5.6 rationale](../tasks/fs-0.5-product-and-technical-decisions.md#one-contact-path-and-provider-boundary)                          | Before each action; FS-5.6 and FS-6.5 acceptance                             | No automatic mail, accounts, DNS, deployment, commit or push                         | Reviewable candidates, local checks and operating guide           |
+| Detailed EPIC 0 source/reconciliation                     | Supplied by Dimi; reconciliation complete                         | Both original sources archived with provenance; no new scope conflict                                                                                                            | Dimi supplied; Codex reconciled                                                           | [Complete source mapping](../tasks/fs-0.4-authoritative-feature-plan.md#detailed-source-reconciliation-and-current-readiness--2026-09-12)                                           | FS-0.4 source requirement satisfied before refreshed review                  | Resolves missing-source blocker; does not grant gate approval                        | Readiness review and assigned later preparation                   |
+| Preservation requirements                                 | Confirmed by Dimi, 2026-09-12                                     | Preserve known clone/combat files, original assets and unrelated work; no cleanup/disposal authorized                                                                            | Dimi confirmation; Codex preservation                                                     | [Actual answer and limits](../tasks/fs-0.1-inventory-real-starting-point.md#preservation-confirmation--2026-09-12)                                                                  | Confirmation received; protect new discoveries before affected edits         | Resolves missing-confirmation blocker; asset availability remains a separate input   | Continue safe inspection and documentation                        |
 
 **FS-G0 decision distinction:** Dimi has now expressly approved the refreshed candidate and review patch, in addition to the earlier historical approval. Preservation and source blockers are resolved. The same answer explicitly authorizes this documentation commit/push; it does not grant later policy, renderer, contact, provider or visual approvals, or authorize merge/deployment/settings/live sending.
 
@@ -258,14 +374,23 @@ These are portfolio gates, independent of the earlier Wave Survivor Gate 1/Gate 
 
 ### Current acceptance status
 
-| Gate  | Current state                | Evidence / remaining boundary                                                                                                                                                                                                                                           |
-| ----- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| FS-G0 | APPROVED by Dimi, 2026-09-12 | Explicit approval of `156c28c…` plus reviewed patch `677b435d…`, following independent readiness review and closure of preservation/source blockers. [Actual answer and full candidate](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12). |
-| FS-G1 | Pending                      | Static-site/navigation/theme/motion acceptance in FS-3.6 not performed.                                                                                                                                                                                                 |
-| FS-G2 | Pending                      | Integrated scene and genuine contact acceptance not performed.                                                                                                                                                                                                          |
-| FS-G3 | Pending                      | Whole portfolio candidate and Dimi acceptance not performed. The game-baseline production release is not this portfolio gate.                                                                                                                                           |
+| Gate  | Current state                | Evidence / remaining boundary                                                                                                                                                                                                                                                                                                                                                                               |
+| ----- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FS-G0 | APPROVED by Dimi, 2026-09-12 | Explicit approval of `156c28c…` plus reviewed patch `677b435d…`, following independent readiness review and closure of preservation/source blockers. [Actual answer and full candidate](../tasks/fs-0.4-authoritative-feature-plan.md#dimi-fs-g0-decision--2026-09-12).                                                                                                                                     |
+| FS-G1 | Pending                      | Dimi confirms EPIC 1 acceptance only and explicitly keeps FS-G1 pending on 2026-09-18. EPIC 2–3 implementation and FS-3.6 static-site/navigation/settings acceptance remain future work.                                                                                                                                                                                                                    |
+| FS-G2 | SATISFIED — 2026-10-27       | EPIC 4 remains closed; Dimi accepted EPIC 5's controlled contact journey, including Workspace receipt and sender/Reply-To. Authorized retirement of earlier enabled `6N37` / `4twqcqhug` is verified by `404 DEPLOYMENT_NOT_FOUND` on both contact paths. The replacement Preview remains delivery-off with verified disabled/fallback presentation. Provider acceptance and receipt are separate evidence. |
+| FS-G3 | Pending                      | Whole portfolio candidate and Dimi acceptance not performed. The game-baseline production release is not this portfolio gate.                                                                                                                                                                                                                                                                               |
 
 The source sequence anticipated all EPIC 0 planning before FS-G0. The first Dimi approval preceded FS-0.4/0.5 completion; those records are now reconciled, independently reviewed and covered by Dimi’s explicit refreshed-candidate approval. Retain both dated decisions and the original prerequisites. Later choices keep their named owners and deadlines.
+
+#### FS-G1 scope clarification — 2026-09-18
+
+After reporting manual/visual PASS and requesting FS-G1 closure, Dimi clarified:
+**“Confirm EPIC 1; keep FS-G1 pending.”** EPIC 1 component acceptance remains
+complete at `37b9554`, as recorded below. FS-G1 requires the real website,
+navigation/settings and FS-3.6 evidence from EPICs 2–3; those tasks are still
+not started in the inspected checkout at `c4baf3f`. No gate closure or further
+implementation is requested by this clarification.
 
 ## Task breakdown and current milestone status
 
@@ -369,6 +494,8 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 ### EPIC 1 — Design assets and essential Storybook components
 
+**Current status:** Complete — Dimi explicitly declares EPIC 1 finished on 2026-09-18. Accepted implementation: `37b955484083ffb232241945a4a4dacd63bb7a13`, including the R3 pending-control correction. The [completion decision and evidence limitations](../tasks/fs-1.7-essential-component-acceptance.md#epic-1-completion-decision--2026-09-18) preserve the review/test history and EPIC 2 handoff. FS-G1 remains the later static-site/navigation/settings gate.
+
 **Goal:** Turn the supplied visual language into a small, reusable, accessible set of production controls.
 
 **Dependencies:** FS-G0 for code changes. Dimi may prepare assets while EPIC 0 runs.
@@ -379,7 +506,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.1 — Prepare the asset and component contract
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Sites recorded Codex's technical review and the inspected 36-unit Menu SVG export in the [asset and component contract](../tasks/fs-1.1-asset-and-component-contract.md). Dimi accepted the recommended treatments, dimensions, control typography and necessary text-only substitutions on 2026-09-15; [actual decision](../tasks/fs-1.1-asset-and-component-contract.md#dimi-contract-decision--2026-09-15). Production export/integration and later visual checks retain their owners. FS-1.2 foundation corrections are also complete and accepted; later component work remains separate.
 
 **Lead:** Dimi
 
@@ -395,7 +522,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.2 — Reconcile required tokens and repair contrast evidence
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Codex implemented the [token and contrast foundations](../tasks/fs-1.2-token-and-contrast-foundations.md), with before/after rendering evidence and unfiltered checks. Sites' separate consumer review passed after the transition-contrast correction, and Dimi accepted all corrections on 2026-09-15; [actual decision and commit/push authorization](../tasks/fs-1.2-token-and-contrast-foundations.md#dimi-acceptance--2026-09-15). The pre-existing E2E type mismatch and future component coverage limits remain recorded. No later component-family implementation is started.
 
 **Lead:** Codex
 
@@ -411,7 +538,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.3 — Extend the Standard Button family
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Dimi confirmed that the Buttons and icon implementations passed manual and visual Storybook tests on 2026-09-15; [implementation, API, validation and acceptance record](../tasks/fs-1.3-standard-button-family.md#final-dimi-acceptance-and-completion--2026-09-15). The accepted scope includes the four-treatment Standard matrix, native outlined navigation, explicit light preview and seven-family icon library. Codex reviews compatibility at FS-1.7. No page/contact or later component-family work is included.
 
 **Lead:** Sites
 
@@ -427,23 +554,23 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.4 — Implement the Hexagonal Button family
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Dimi reports manual and visual tests PASS on 2026-09-16 and authorizes documentation finalization, commit and push. The [FS-1.4 acceptance record](../tasks/fs-1.4-hexagonal-button-family.md#final-dimi-acceptance-and-completion--2026-09-16) covers the full size matrix and icon-only Storybook correction. Codex review remains at FS-1.7.
 
 **Lead:** Sites
 
 **Counterpart:** Codex reviews semantics, focus treatment, and actual reuse of shared styling.
 
-**Dimi:** Check thumb reach and confirm that the custom icon plus visible Menu label is understandable.
+**Dimi:** Check thumb reach and recognition of the custom icon. The 2026-09-24 FS-3.1 instruction supersedes the earlier visible Menu requirement; retain an accessible name.
 
 **Depends on:** `FS-1.2`, `FS-1.3`
 
-**Work:** Build a focused hexagonal presentation with accessible names and selected/disabled treatments. Prefer a generous rectangular control area with the hexagon inside; retain a visible, unclipped focus indicator. Use a proposed 48-pixel mobile target rather than copying the smallest screenshot artwork as the hit area.
+**Work:** Native rectangular target containing the decorative hexagon and custom icon, icon-only by default; visible captions are optional. Dimi's subsequent full-matrix request adds 48/72/96px artwork with 24/36/48px icons; the accepted default Menu remains 72/36px. Storybook Figma Matrix shows all four Standard treatments at every size with unclipped focus. FS-3.1 category selection supplies native `aria-pressed` and the outlined selected treatment; ordinary action buttons have no persistent pressed state.
 
 **Complete when:** Mouse, touch, keyboard, and focus states work without relying only on color. Decorative clipping does not hide focus or unnecessarily shrink the intended touch area.
 
 #### FS-1.5 — Add essential form primitives
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — implementation and automated checks passed; Dimi approved presentation/readability on 2026-09-16 in the [FS-1.5 acceptance record](../tasks/fs-1.5-essential-form-primitives.md#dimi-presentation-acceptance--2026-09-16). Native fields, help/errors and polite inline status are presentation primitives, not a delivery form or FS-5.1 server contract. Codex compatibility review remains at FS-1.7.
 
 **Lead:** Sites
 
@@ -459,7 +586,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.6 — Build one shared dialog primitive
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete. Dimi reports FS-1.6 manual and visual tests PASS on 2026-09-16 and authorizes documentation finalization, commit and push. The accepted implementation includes the Figma Close icon in a secondary HexButton and blue focus styling in every theme. The [final acceptance record](../tasks/fs-1.6-shared-dialog-primitive.md#final-manualvisual-acceptance-and-commit-authorization--2026-09-16) identifies the exact candidate/evidence on base `16cc8b1bcd2e3f338123696e31ce453ca8857675`. Separate FS-1.7 compatibility/component-set review remains pending; no navigation/settings integration is included.
 
 **Lead:** Sites
 
@@ -475,7 +602,9 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-1.7 — Review the complete essential component set
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Latest correction:** Pending Interaction keeps normal height and swaps a right-hand arrow for an ellipsis. The [follow-up record](../tasks/fs-1.7-essential-component-acceptance.md#pending-presentation-correction-requested-by-dimi--2026-09-16) identifies that change and its candidate. The later decision below records Dimi's acceptance.
+
+**Current status:** Complete — Dimi's [explicit EPIC 1 closure](../tasks/fs-1.7-essential-component-acceptance.md#epic-1-completion-decision--2026-09-18) accepts the current component set at `37b955484083ffb232241945a4a4dacd63bb7a13`. The [R3 repair and validation](../tasks/fs-1.7-essential-component-acceptance.md#sites-r3-correction-and-review-handoff--2026-09-18) preserve readable enlarged pending controls and the normal 48px presentation. Earlier review findings/results retain their historical scope; no separate post-R3 Codex review or unreported device evidence is invented. FS-G1 remains open.
 
 **Lead:** Sites
 
@@ -495,6 +624,8 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 ### EPIC 2 — Three-section website, content, and real routes
 
+**Current status:** Complete — Dimi explicitly closed FS-2.6 and EPIC 2 after the integrated technical PASS on 2026-09-20. This accepts the bounded static checkpoint with documented draft/provisional content; final publication copy/metadata and legal facts remain follow-ups. [Review, acceptance and P3 clarification](../tasks/fs-2.6-semantics-metadata-and-static-routes.md#integrated-codex-review-and-dimi-completion--2026-09-20). FS-G1 follows EPIC 3.
+
 **Goal:** Create a useful static website before the signature animation and live form are complete.
 
 **Dependencies:** EPIC 1 essential components; approved content and route decisions from FS-0.5.
@@ -505,7 +636,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-2.1 — Define page structure and shared navigation data
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Codex route/shell technical review passed without actionable findings, then Dimi approved the seven labels/destinations and bounded shell on 2026-09-19 and authorized commit/push. [FS-2.1 acceptance, contract and exact-candidate evidence](../tasks/fs-2.1-page-structure-and-navigation.md#dimi-acceptance-and-commitpush-authorization--2026-09-19). Home and existing Privacy share the opt-in shell. Contact navigation, `/about`, `/impressum` and final content/legal approval remain with their later tasks; FS-G1 is not approved.
 
 **Lead:** Sites
 
@@ -521,7 +652,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-2.2 — Build the static Start section and reuse the logo
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Dimi reports manual/visual tests PASS and explicitly closes FS-2.2 on 2026-09-20 after the Codex logo/static-rendering review PASS. See [review and acceptance](../tasks/fs-2.2-static-start-and-logo.md#codex-review-and-dimi-completion--2026-09-20). The delivered static Start includes the reused logo, responsive scene, asymmetric SVG corners and authorized navigation/theme overlay: bottom-right on mobile, top-right opposite the logo from 768px. README wording remains identified as draft content accepted for this bounded delivery; final publication copy is not inferred. Motion activation remains FS-3.4/FS-3.5 work.
 
 **Lead:** Sites
 
@@ -537,7 +668,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-2.3 — Build About preview and About page
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Dimi accepted the bounded About implementation on 2026-09-20 and supplied the final preview and detailed narrative for integration on 2026-10-05. The [current content amendment](../tasks/fs-2.3-about-preview-and-page.md#supplied-about-copy--2026-10-05) replaces Lorem Ipsum and its draft notice while retaining the native About/Contact journeys. Content integration does not authorize publication or close other editorial/legal work.
 
 **Lead:** Sites
 
@@ -549,11 +680,18 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 **Work:** Adapt the wireframe to a naturally growing section with a descriptive More about FunkSpace link. Create a small complete /about page using the same shell and typography. Avoid forcing long content into a single viewport or an unnecessary nested scroller.
 
-**Complete when:** Both pages use real approved copy, contain no lorem ipsum, and the preview link works with keyboard, direct loading, and browser navigation.
+**Completion decision:** Keyboard/native navigation, direct loading, browser history and static rendering are verified. Dimi's explicit completion decision accepts the bounded draft delivery and supersedes the original requirement to keep FS-2.3 open until Lorem Ipsum is replaced. The later 2026-10-05 explicit supply/integration request provides the short and long copy; it does not rely on the earlier task closure for editorial authorization.
 
 #### FS-2.4 — Build Contact/footer and legal-page structure
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Footer amendment — 2026-10-12:** Dimi requests three centered footer links:
+Legal notice, Privacy policy and an icon-only GitHub project link. The footer
+uses the existing compact navigation styling and icons, wraps on narrow screens
+and preserves native legal navigation. Contact remains deferred to EPIC 5;
+legal-page content/publication blockers are unchanged. See the
+[implementation and validation record](../tasks/maintenance-footer-navigation.md).
+
+**Current status:** Complete — Dimi explicitly accepted the bounded Contact/footer and draft legal structure and authorized documentation closure, commit and push on 2026-09-20. The delivery uses the supplied `diamondfunk13@gmail.com`, only the Contact heading/email, a compact footer and authorized incomplete legal routes grounded in Codex's technical fact sheet. Missing operator, current hosting/mailbox-processing facts and final legal approval remain release blockers; future provider-specific finalization stays FS-5.5. See [FS-2.4 completion, evidence and gap register](../tasks/fs-2.4-contact-footer-and-legal-structure.md#dimi-completion-and-commitpush-authorization--2026-09-20). The routes pass technical usability with authorized readable drafts; Dimi subsequently accepted the bounded EPIC 2 static checkpoint. This does not approve legal completeness or publication.
 
 **Lead:** Sites
 
@@ -569,7 +707,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-2.5 — Complete responsive shell and ordinary scrolling
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Dimi explicitly declared FS-2.5 done and authorized documentation closure, commit and push on 2026-09-20. The accepted delivery includes portfolio-local safe-area gutters, growing shell, narrow enlarged-text padding and native scrolling; desktop Menu scrolls with the opening header, while mobile retains the bottom-right trigger with footer/focus clearance. Final browser checks pass 75/75. See [FS-2.5 completion and evidence](../tasks/fs-2.5-responsive-shell-and-scrolling.md#dimi-completion-and-commitpush-authorization--2026-09-20). Detailed physical-device results are not inferred; integrated FS-2.6 review and earlier draft-copy/legal publication blockers remain separate.
 
 **Lead:** Sites
 
@@ -585,7 +723,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-2.6 — Finish semantic, metadata, and static-route behavior
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — integrated Codex technical review PASS, followed by Dimi's explicit FS-2.6 and EPIC 2 completion and commit/push authorization on 2026-09-20. The P3 documentation clarification separates usable draft routes from legal publication blockers. Final publication titles/descriptions/icon treatment retain their proposal/draft provenance; no additional editorial or device-test result is invented. See [FS-2.6 review and completion](../tasks/fs-2.6-semantics-metadata-and-static-routes.md#integrated-codex-review-and-dimi-completion--2026-09-20). FS-G1 follows EPIC 3; publication remains unapproved.
 
 **Lead:** Sites
 
@@ -605,6 +743,13 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 ### EPIC 3 — Navigation overlay, themes, and one motion policy
 
+**Status: COMPLETE — FS-3.1–FS-3.6 and FS-G1 accepted/closed on 2026-09-27.**
+Dimi confirms all tests are done and requests closure. The [final record](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27)
+reconciles independent review, the approved 5-second LCP budget, the exact
+working-tree candidate and evidence limitations. Earlier stage-local statements
+that later tasks or FS-G1 were pending describe those stages' completion dates;
+this EPIC-level status and FS-3.6's closure supersede them. EPIC 4 is not started.
+
 **Goal:** Deliver a coherent mobile-first control system without duplicating settings authority or modal behavior.
 
 **Dependencies:** EPIC 2 shell/navigation data; FS-1.6 shared dialog. Motion-policy design is approved before its implementation.
@@ -615,23 +760,33 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-3.1 — Compose the combined navigation and settings overlay
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Dimi explicitly gives device acceptance, confirms the two reviewed P2 corrections are applied, closes FS-3.1 and authorizes commit/push on 2026-09-25. The delivered full-screen Navigation/Accessibility overlay reuses Dialog, HexButton, shared destinations and ThemeSwitcher; Chat-bot/Languages remain disabled. The icon-only trigger retains its page position and accessible name. Short-screen controls remain usable with enlarged text, and desktop focus scrolling clears fixed Close. Motion remains a controlled story/test fixture until FS-3.4/3.5. The original review findings, passing correction checks and Dimi's completion decision are distinct; no separate post-correction independent review PASS is invented. See [completion and evidence](../tasks/fs-3.1-navigation-settings-overlay.md#dimi-device-acceptance-and-completion--2026-09-25). Later tasks and EPIC 3 remain open.
 
 **Lead:** Sites
 
 **Counterpart:** Codex reviews the shared data/overlay contract.
 
-**Dimi:** Approve hierarchy and wording, including a visible Menu clue beside the custom icon.
+**Visual maintenance (2026-09-28):** [Spacing and reload correction](../tasks/maintenance-navigation-spacing-reload.md) aligns the first category gap and desktop Close/details column. Dimi accepted the spacing, then reported the fallback label/arrow still flashing. The native fallback now shares Menu's hex artwork and coordinates before hydration, without an interim visible label/marker. The reload follow-up's automated evidence and pending device check remain separate from the earlier EPIC 3 acceptance.
+
+**Active fallback follow-up (2026-09-28):** [Hydration continuity correction](../tasks/maintenance-navigation-hydration-continuity.md) defers enhancement until the native disclosure is closed and focus has left it. Delayed-script tests now distinguish retained interaction/focus from idle no-flash rendering. Sites implementation evidence is recorded; Codex read-only review and new device observations remain separate and pending.
+
+**Latest navigation revision (2026-09-25):** Dimi requested expandable navigation rows with plain text using semantic text/hover colors. Groups use arrow-right-small when closed and arrow-down-small when open, at 16px beside the 24px type icon; direct links have no arrows. The current hierarchy is Home, About (`/about`, not the homepage preview), Animations, Games, Privacy → Privacy policy / Legal notice, then Contact last. Eight newly supplied Figma destination families replace temporary settings-burger artwork and extend Storybook in all three sizes. Legal notice also replaces visible Imprint/Impressum elsewhere in the app; `/impressum` remains unchanged. Dimi explicitly authorized unpublished animation/game entries as disabled “Coming soon” rows without URLs; these reuse their category artwork pending item-specific icons. This supersedes flat outlined navigation details and the earlier restriction on showing those future items; it adds no new route or game integration. See [source and implementation evidence](../tasks/maintenance-navigation-tree-icons.md). This concept and the subsequent P2 layout corrections are included in Dimi's FS-3.1 completion/device acceptance above.
+
+**Dimi:** Approve hierarchy and wording. The 2026-09-24 corrections replace the visible Menu caption with an icon-only, accessibly named Nav/Settings control and remove the visible "Navigation and settings" overlay heading. Retain its accessible dialog name. Close stays at the top right on mobile, sharing the category rail's horizontal center; on tablet/desktop it stays left, sharing Nav/Settings' vertical center. Preserve that alignment during overlay scrolling. No extra HexButton text field or rectangular trigger background is required.
 
 **Depends on:** `FS-2.6`, `FS-1.6`
 
-**Work:** Use separate Navigation, Appearance, and Motion groups, with secondary legal links. Render website navigation as ordinary links, not an application command menu. Reuse the dialog primitive and shared destination data. Show no empty future destinations.
+**Work:** Use separate Navigation, Appearance, and Motion groups, with secondary legal links. Render website navigation as ordinary links, not an application command menu. Reuse the dialog primitive and shared destination data. Show no empty future destinations. All category hex controls match the medium Nav/Settings size. The overlay trigger retains the page trigger's mobile corner or tablet/desktop header position; arrange categories relative to it. Use compact outlined detail controls with wrapping labels and usable touch targets.
 
 **Complete when:** Users can distinguish navigation from settings. All visible actions have meaningful labels and the layout remains readable with larger text.
 
 #### FS-3.2 — Implement navigation lifecycle across mobile and desktop
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Contract stage — 2026-09-27, revision 3:** [Navigation/focus proposal](../tasks/fs-3.2-navigation-focus-contract.md) revised after the second Codex review found that unconditional incoming-main fallback overrides valid fragment focus. The rule now preserves/resolves the actual committed fragment before considering main, with explicit delayed/redirected Contact focus, next-Tab and scroll assertions. The non-displacing lock was addressed at contract level in revision-2 review. Revision 3 subsequently received explicit Codex approval; Dimi supplied device acceptance and implementation authorization. The proposal is based on accepted FS-3.1 commit `c0cdda9`; implementation evidence is recorded below. Dimi’s normal Back/Forward policy and existing shared-consumer defaults are unchanged.
+
+**Current status — 2026-09-27:** Complete — Dimi explicitly closed FS-3.2 after Codex's independent technical approval and manual testing in Firefox 156.0.1 (64-bit) and Safari 27.0 (21625.1.29.18.28), and authorized commit/push of all current changes. The [completion decision](../tasks/fs-3.2-navigation-lifecycle.md#dimi-completion-and-commitpush-authorization--2026-09-27) preserves the reviewed candidate, resolved query-removal P2 and separate evidence: 38 focused tests, 71 Chromium browser cases, four actual Next redirect cases, theme-bootstrap freshness and diff checks. Device/OS/viewport details and individual manual steps remain unspecified; manual Firefox/Safari results are not automated coverage. FS-G1 remains pending. Customization is excluded.
+
+**Repeated Contact follow-up:** The reviewed FS-3.2 implementation restores the repeated Contact target, with real-browser focus/next-Tab/scroll assertions. This evidence is included in the approved FS-3.2 candidate; it is not retroactive FS-3.1 coverage.
 
 **Lead:** Sites
 
@@ -647,7 +802,11 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-3.3 — Connect appearance controls to ThemeService
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Related bounded maintenance:** [Typed inline theme bootstrap](../tasks/maintenance-theme-bootstrap.md) records the extraction and initialization failure correction. The [first-paint correction](../tasks/maintenance-theme-first-paint.md), explicitly authorized by Dimi on 2026-09-24, replaces queued delivery with a native head script while preserving generated ownership and ThemeService. Neither maintenance task itself completed FS-3.3 or changed its ownership/dependencies; runtime persistence consistency was subsequently resolved by FS-3.3 below.
+
+**Current status — 2026-09-27:** Complete — Dimi explicitly accepted and closed FS-3.3 and authorized commit/push of all current changes. The [acceptance and completion record](../tasks/fs-3.3-appearance-integration.md#dimi-acceptance-and-completion--2026-09-27) follows Codex approval with no actionable findings for candidate `6618f93d7cc6…` on FS-3.2 base `354af41`. Independent checks passed: 64 focused/game-reader tests, 27 Chromium T1–T4/bootstrap cases, freshness and diff checks. The record preserves the temporary-build recovery and distinguishes Dimi's acceptance from automated evidence. The accepted service/provider base is ready for FS-3.4's own checkpoints; FS-3.4 is not started and FS-G1 remains unapproved.
+
+**Storage consistency correction:** The stale-storage/remount defect was reproduced with failing tests, then corrected only in ThemeService and approved by Codex. Reopened controls, fresh subscribers, current-theme reads and OS-change decisions use the live selection. `getStoredTheme()` remains an explicit storage query; blocked reload uses persisted data or a safe System fallback. Provider/bootstrap sources and palette values are unchanged.
 
 **Lead:** Sites
 
@@ -663,7 +822,9 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-3.4 — Implement the shared motion-preference and suspension policy
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status: Complete — 2026-09-27.** Dimi explicitly closed FS-3.4 and authorized documentation, commit and push after the independent re-review PASS. See [acceptance and completion](../tasks/fs-3.4-motion-policy-implementation.md#dimi-acceptance-and-completion--2026-09-27). This accepts the bounded policy delivery; production consumption and FS-G1 remain separate.
+
+**Implementation stage — 2026-09-27:** The exact [revision 1 motion-policy contract](../tasks/fs-3.4-motion-policy-contract.md) received a consuming-contract PASS, and Dimi explicitly approved the final proposal and authorized FS-3.4 implementation. The [implementation record](../tasks/fs-3.4-motion-policy-implementation.md) records the reconciled FS-3.3 base, minimal authority/resolver/adapter, provider lifecycle and exact handoff. Initial independent reviews passed after two P2 cleanup fixes. A subsequent independent audit found a P2 subscriber-isolation defect; Codex corrected it with six regressions and independent re-review returned PASS. Current evidence: 1,532 tests, types and lint pass; the earlier 53 production Chromium checks and app/Storybook builds were not rerun for this internal notification correction. Production logo/settings integration remains FS-3.5; no scene scheduling, device acceptance or FS-G1 approval is inferred.
 
 **Lead:** Codex
 
@@ -679,7 +840,13 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-3.5 — Wire motion settings and the existing logo
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Homepage-sequence amendment — 2026-09-27:** Dimi requested logo-first startup, then the menu hex-button fade, then the remaining content fade in normal and Reduced modes, with Off entirely static. The bounded per-homepage handoff preserves no-JS/failure access and skips hiding during fragment/history navigation. See the [implementation amendment](../tasks/fs-3.5-motion-settings-and-logo.md#homepage-sequence-amendment--2026-09-27), its later menu-step update and [Dimi's acceptance](../tasks/fs-3.5-motion-settings-and-logo.md#dimi-acceptance-and-completion--2026-09-27). No fresh independent post-correction PASS is inferred.
+
+**Reduced-logo amendment — 2026-09-27:** Dimi requested a whole-logo fade for explicit Reduced, with the normal introduction's duration. The [bounded amendment](../tasks/fs-3.5-motion-settings-and-logo.md#reduced-logo-fade-amendment--2026-09-27) preserves Off, complete static startup/error fallbacks, other consumers' static defaults, and no automatic replay on mode changes. Prior reviews remain candidate-specific; Dimi's final acceptance is recorded separately below.
+
+**Preference amendment — 2026-09-27:** Dimi requested and approved explicit **On**, overriding the device preference while retaining feature availability and local Pause. Settings now offer Follow system / On / Reduced / Off. The [amendment record](../tasks/fs-3.5-motion-settings-and-logo.md#explicit-on-amendment--2026-09-27) distinguishes new evidence from the earlier three-choice review.
+
+**Current status — 2026-09-27:** Complete by Dimi's explicit decision after reported Safari/Firefox manual testing and the P2 late-startup correction. Versions/devices are unspecified; “salary” is interpreted as Safari in his report. No fresh independent post-correction review PASS is claimed. Live settings and the nominated homepage identity share the accepted policy; the large Start logo stays static. See [Dimi's closure and delivery authorization](../tasks/fs-3.5-motion-settings-and-logo.md#dimi-acceptance-and-completion--2026-09-27), the [historical re-review](../tasks/fs-3.5-motion-settings-and-logo-rereview.md) and [author correction handoff](../tasks/fs-3.5-motion-settings-and-logo.md#late-startup-handoff-correction--2026-09-27). FS-3.6 and FS-G1 have not begun.
 
 **Lead:** Sites
 
@@ -695,7 +862,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-3.6 — Validate the static site and control flows
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-09-27: COMPLETE.** Dimi explicitly confirms all tests are done and requests EPIC 3 closure, following FS-G1 approval and the approved 5-second LCP budget. The [final closure/re-review](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) identifies the accepted working-tree candidate. Independent functional review is PASS; the bounded re-review finds no additional defect and verifies only the approved budget values changed afterward. Both measured flag variants pass the current LCP/CLS limits; flag-on score 0.82 remains a warning. [Device evidence](../tasks/fs-3.6-device-checklist.md) records overall completion without inventing device/version/per-action details. The [EPIC 4 API handoff](../tasks/fs-3.6-integrated-validation.md#epic-4-implementation-handoff) is ready; EPIC 4 is not started. Legal/content/public-release limitations remain separate; no commit, push or deployment is authorized.
 
 **Lead:** Sites
 
@@ -715,6 +882,18 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 ### EPIC 4 — Signature Canvas scene, replaceable SVG aperture, and customization
 
+**Current status — 2026-10-13: COMPLETE.** Dimi accepts `a43bbf0` and explicitly
+closes FS-4.8 and EPIC 4. The [closure and evidence record](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) pins final
+builds, the accepted WEB/settings, technical checks, On score warning and missing
+raw phone measurements as disclosed limits. No source change followed review.
+Earlier dated checkpoint statuses below are historical. At that checkpoint,
+FS-G2 remained pending EPIC 5 contact acceptance. FS-G2 is now satisfied by the
+2026-10-27 contact closure; public release and game integration remain separate.
+
+**Current status — 2026-09-30:** FS-4.1 specification COMPLETE following Codex R2 technical PASS and Dimi’s acceptance of all product proposals. [Accepted contract and evidence](../tasks/fs-4.1-scene-contract.md). FS-4.2–FS-4.4 reached their renderer/aperture checkpoint with FS-4.4B R2 PASS. [FS-4.5 homepage policy/theme integration](../tasks/fs-4.5-scene-policy-and-themes.md) is implemented, and its latest Reduced/reveal correction has Codex R2 PASS (F1 closed). The FS-4.5 candidate was committed/pushed as `01afc3f`. [FS-4.6 details-page customization](../tasks/fs-4.6-customization-overlay.md#codex-r2-closure-and-authorized-delivery--2026-09-30) has C7 / R19 Codex R2 technical PASS with F1–F3 closed and a non-blocking Firefox precision follow-up; [FS-4.7 R3 correction review](../tasks/fs-4.7-scene-performance-review.md#codex-r3--f7-correction-re-review--2026-09-30) closes F1–F7; required Xperia/Safari evidence remains BLOCKED; FS-4.8 remains not started. Final visual/device/performance acceptance is not implied.
+
+**Accepted amendment:** Replace the large Start logo with **Aperture - 1**, a calm seeded particle field visible through the current WEB / Work Sans Black cutout; retain header identity and intro/navigation. Homepage presents the scene, Pause/Resume and “More” linking to `/animations/aperture` (Dimi’s FS-4.6 clarification). That page owns temporary count/speed/size/connection settings, Reset and a transparent WEB switch in a Customize dialog using the existing shared Dialog; R19 removes the thumbnail and retains the ready frozen scene behind it. Coordinate only the navigation/customization pair in that shell. Dimi now authorizes repository-authored SVGs: outlined Work Sans SPACE and the diagnostic diamond are supplied; Illustrator delivery is no longer a prerequisite. Their visual acceptance remains separate. The contract supplies approved limits and the pre-scene baseline; no new performance success is claimed.
+
 **Goal:** Deliver one distinctive animation whose visual mask can change independently of particle simulation.
 
 **Dependencies:** FS-G1; the static Start framing, theme service, motion policy, and dialog are available.
@@ -725,23 +904,23 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-4.1 — Confirm the scene appearance and measurable limits
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-09-28:** COMPLETE as a specification checkpoint. Codex returned technical PASS for R2, then Dimi explicitly stated “I accept all product proposals” and authorized documentation updates, commit and push. [Acceptance/closure](../tasks/fs-4.1-scene-contract.md#dimi-acceptance-and-fs-41-completion--2026-09-28) distinguishes the reviewed candidate, product decision, raw evidence access and future verification.
 
-**Lead:** Sites
+**Lead:** Sites specification; Codex records accepted decisions and this feature-plan amendment.
 
-**Counterpart:** Codex reviews the renderer plan, resource budget, and architecture decision before implementation.
+**Counterpart:** Codex R2 architecture/budget re-review PASS; pre-Canvas visibility and cancellation/rearming findings closed. No scene runtime was implemented or tested by that verdict.
 
-**Dimi:** Provide an accessible reference clip/stills or describe the required motion. Approve trails/connections/pointer behavior explicitly rather than assuming the inaccessible video was inspected.
+**Dimi:** Accepted the written calm-drift candidate, SPACE fit and static/error composition, Aperture name/route, homepage Pause, details Customize dialog and numeric/resource targets. No unseen-video match claimed. Supply initial and second SVG exports for later integration and review actual rendered behavior in later tasks.
 
-**Depends on:** `FS-3.6`, `FS-1.1`
+**Depends on:** `FS-3.6`, `FS-1.1` — accepted foundations retained.
 
-**Work:** Specify one particle behavior, a centered circular aperture, density/speed/size controls, Pause, and Reset. Begin with a proposed DPR cap of 2 and a bounded count. Record device/viewport, frame-work and bundle targets before optimization; all numeric tuning remains a measured project decision.
+**Delivered:** [Scene contract](../tasks/fs-4.1-scene-contract.md), action-ready Illustrator guide, explicit units/ranges/Reset and performance targets, narrow architecture/lifecycle contracts, paired production baseline and review evidence. All code remains unchanged. Local raw evidence is not included in the documentation push and must be transferred or recaptured for reviewers without that environment.
 
-**Complete when:** A visual acceptance description and testable resource limits exist. Unknown reference behavior is resolved or explicitly replaced by a Dimi-approved candidate; no matching-video claim is invented.
+**Completion boundary:** Observable behavior and testable limits are accepted; reference uncertainty is resolved by selection of the written candidate. Export delivery, runtime implementation, measurements and final visual acceptance remain later work. This closure does not authorize starting FS-4.2.
 
 #### FS-4.2 — Implement pure particle state and update rules
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-09-29:** Pure rules are delivered. The combined renderer review found corrections; [Codex R2](../tasks/fs-4.4-svg-aperture.md#codex-r2-closure-and-authorized-delivery--2026-09-29) closes F1–F3 against the exact candidate, including stale rule-test expectations. Current tuning and validation are recorded in the task documents. No task completion or moving-scene acceptance is inferred.
 
 **Lead:** Sites
 
@@ -757,7 +936,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-4.3 — Implement Canvas rendering and lifecycle adapter
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-09-29:** Canvas/controller/binding and the controlled fixture are delivered, including bounded complete proximity connections and the current [single authoring settings source](../tasks/fs-4-particle-settings.md). [Codex R2](../tasks/fs-4.4-svg-aperture.md#codex-r2-closure-and-authorized-delivery--2026-09-29) closes F1–F3 after the combined renderer/aperture checkpoint. No homepage integration, final performance acceptance or Dimi moving-scene acceptance is claimed. Earlier FS-4.3 provisional numeric amendments remain historical provenance.
 
 **Lead:** Sites
 
@@ -773,7 +952,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-4.4 — Implement SVG overlay and prove asset replacement
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-09-29:** [Aperture implementation and R2 closure](../tasks/fs-4.4-svg-aperture.md#codex-r2-closure-and-authorized-delivery--2026-09-29) are delivered in the controlled fixture. Current aperture: repository-authored WEB, Work Sans Black 900; circle/diamond proof is retained and Illustrator delivery is no longer required. Codex PASS closes F1–F3 for the exact correction candidate. Safari, physical-phone, final performance and Dimi visual acceptance remain open. No homepage integration or task/EPIC closure. Dimi authorizes documentation updates and commit/push of this reviewed work.
 
 **Lead:** Sites
 
@@ -783,13 +962,13 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 **Depends on:** `FS-4.1`, `FS-4.3`
 
-**Work:** Place a theme-colored SVG covering layer above Canvas and expose particles through a circle. Define one explicit luminance-mask convention, valid viewBox, scaling/centering, unique mask IDs, and non-intercepting decorative layers. Replace the circle with a trusted second shape without modifying particle rules. Document SVG export constraints.
+**Work:** Place a theme-colored SVG covering layer above Canvas and expose particles through the accepted SPACE artwork. Use the FS-4.1 luminance-mask convention, valid viewBox, scaling/centering, unique mask IDs, and non-intercepting decorative layers. Replace SPACE with Dimi's second original trusted shape without modifying particle rules. Circle remains only a fallback/technical fixture. Follow the recorded Illustrator export guide.
 
 **Complete when:** Two shapes work at narrow/wide aspect ratios and in all themes. Simulation code does not change when the aperture is replaced; IDs do not collide and malformed/missing assets have a deliberate fallback.
 
 #### FS-4.5 — Integrate scene themes, motion policy, and local Pause
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-28:** Implemented and included in the accepted [EPIC 4 scene closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13); the accepted evidence retains its recorded scope.
 
 **Lead:** Sites
 
@@ -805,27 +984,57 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-4.6 — Add the contextual customization overlay
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Naming amendment — 2026-10-12:** Dimi renames **Aperture - 1** to
+**Web Aperture** across visible labels, accessible links and details metadata.
+The existing `/animations/aperture` route and scene identities are unchanged.
+Navigation/settings overlay titles Navigation and Accessibility now use Work Sans.
+This supersedes only the name in the historical R19 record below.
+The WEB navigation row uses the new `s-web` icon alongside the revised Games
+and added GitHub/LinkedIn library artwork. See the
+[implementation, validation and delivery record](../tasks/maintenance-icons-web-social.md).
+
+**Latest amendment — 2026-09-30 (R19):** WEB is named **Aperture - 1** and is the
+first Animations navigation destination at the existing details URL. The dialog
+starts with Reset and transparent-overlay controls, omits the duplicate artwork,
+and retains a ready paused Canvas behind it. Explicit Off is authorized to prepare
+one still Canvas through the scene's opt-in resolver capability; it never enables
+playback. Unavailable/failure/no-JS retain solid WEB. Appearance/motion display
+labels become Light/System without changing persisted values. See the current
+[contract](../tasks/fs-4.1-scene-contract.md) and
+[C6 evidence](../tasks/fs-4.6-customization-overlay.md); these later decisions
+supersede older thumbnail and Off-Canvas-denial paragraphs.
+
+**Current amendment — 2026-09-30:** Dimi expands density to 10–1000, speed to
+0.1–2× and size to 0.1–4×, adds maximum connections per particle (1–100) and
+connection-distance multiplier (1–10×), and requests a transparent WEB overlay
+switch. These supersede the earlier three-control scope below. Values remain
+temporary and details-only, Reset restores all defaults/opaque WEB, and existing
+absolute rendering budgets remain in force. [R18](../tasks/fs-4.1-scene-contract.md#r18--expanded-customization--2026-09-30) and [C4 evidence](../tasks/fs-4.6-customization-overlay.md#c4--expanded-customization--2026-09-30).
+
+**Current status — 2026-09-30:** C7 / contract R19 has Codex R2 technical PASS; F1–F3 are closed. [Review closure and evidence](../tasks/fs-4.6-customization-overlay.md#codex-r2-closure-and-authorized-delivery--2026-09-30). Homepage has only the new More link alongside its existing Pause/Resume; settings live on the details page. Three Firefox subpixel assertions remain a non-blocking test-portability follow-up. FS-4.7 performance and FS-4.8 Dimi acceptance remain open.
 
 **Lead:** Sites
 
 **Counterpart:** Codex reviews configuration validation and ensures no second overlay/settings system is added.
 
-**Dimi:** Approve slider ranges, reset behavior, labels, and the live/static preview experience.
+**Dimi:** Validate the implemented labels and live/static preview experience against the FS-4.1-approved ranges and Reset behavior; record any requested amendment explicitly.
 
 **Depends on:** `FS-4.5`, `FS-1.6`, `FS-3.2`
 
-**Work:** Reuse the shared dialog for density, speed, size, and Reset. Keep values local to the scene and temporary. Apply configuration without destroying/recreating the runtime on each input. Under Reduced/Off/Pause, changes may redraw a static preview but never silently start continuous motion.
+**Work:** On `/animations/aperture`, reuse the shared Dialog, beginning with Reset and the transparent WEB switch, followed by count, speed, size, maximum connections per particle and connection-distance ranges with explanations. No thumbnail or second simulation is created. The ready scene remains frozen behind the dialog and eligible edits may redraw that same Canvas. Homepage keeps presentation, Pause/Resume and the details link. Coordinate only this shell's navigation/customization pair, preserving focus/release and failed-open behavior. Keep values local to the scene and temporary. Apply configuration without destroying/recreating the runtime on each input. Under Reduced/Off/Pause, changes never silently start continuous motion; denied/unavailable preparation retains lightweight solid WEB.
 
-**Complete when:** Controls are keyboard-operable, constrained to safe ranges, visibly update the permitted preview, and do not conflict with the main menu. No arbitrary SVG/color upload or persisted preset editor is added.
+**Complete when:** Controls are keyboard-operable, constrained to safe ranges, update the retained permitted scene without resuming restricted motion, and do not conflict with the main menu. No arbitrary SVG/color upload or persisted preset editor is added.
 
 #### FS-4.7 — Review performance, failure paths, and lifecycle
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-13: COMPLETE by Dimi’s explicit closure.**
+The [FS-4.7 closure record](../tasks/fs-4.7-scene-performance-review.md#fs-47-closure-and-authorized-delivery--2026-10-13)
+retains A1–A5 PASS, manual-result provenance and measurement limits. Delivery is
+`a43bbf0`; [FS-4.8 and EPIC 4 are now also closed](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13).
 
 **Lead:** Codex
 
-**Counterpart:** Sites owns targeted visual/runtime corrections identified by the review; it does not edit the same files concurrently.
+**Counterpart:** Sites owns targeted visual/runtime/test corrections identified by the review; shared-foundation test owners retain their boundaries. No concurrent source repair by Codex.
 
 **Dimi:** Provide observations from the nominated real phone and report heat, stutter, input delay, or discomfort.
 
@@ -837,7 +1046,11 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-4.8 — Approve the signature experience
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-13: COMPLETE.** Dimi explicitly accepts `a43bbf0`
+and closes FS-4.8 and EPIC 4. The [substantive acceptance record](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) pins
+the selected configuration/aperture, builds, actual decision, final revalidation
+and evidence limits. No deferred visual polish is nominated. Commit/push of
+pending documentation is authorized; merge, deployment and later gates are not.
 
 **Lead:** Dimi
 
@@ -859,15 +1072,31 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 **Goal:** Provide an honest, secure contact journey that sends real messages without building an unnecessary backend platform.
 
-**Dependencies:** FS-0.5 operating decisions; EPIC 1 fields; EPIC 2 Contact shell. Can run alongside EPIC 4 when files/contracts are isolated.
+**Detailed plan / current contract — 2026-10-13:** [Preserved EPIC 5 plan](FunkSpace_EPIC_5_Detailed_Plan.md), [pure typed contract](../../frontend/domain/contact/ContactContract.ts), and [FS-5.1 evidence/handoff](../tasks/fs-5.1-contact-contract.md). Dimi selected a plain dedicated `/contact` page using the existing shell, optional Name and required Email/Message, general inquiries in English, Resend HTTPS, the supplied Gmail recipient/fallback and proposed verified-domain sender. One JSON POST `/api/contact` and its exact envelopes/limits/retry rules are accepted. The read-only Sites consumer review found one pending-announcement conflict; Dimi resolved it by excluding `Button.pending` and `InlineStatus` from contact, accepted the remaining consuming contract, explicitly closed FS-5.1 and authorized this task's commit/push. Sending guards and plain field/result feedback remain required. No new counterpart PASS, visual/device acceptance or independent security approval is inferred. FS-5.2 now implements the validation/use case/server adapter/route under its own local-only request, with delivery locked off; see the implementation amendment below. Form/browser wiring, deployment/settings and live acceptance remain later tasks.
+
+**Dependencies:** FS-0.5 operating decisions; completed EPIC 1 fields and FS-2.4 foundations; dedicated-page replacement for the removed homepage Contact. EPIC 4 is complete and remains protected.
 
 **Affected areas:** Frontend contact UI; pure validation; application contact use case; server-only mail adapter/composition; one route handler (proposed /api/contact); legal copy and operational documentation.
+
+**FS-5.2 implementation amendment — 2026-10-13:** Under its separate local-only
+request, shared validation, the contact use case/delivery port, server-only
+Resend adapter/composition and Node `/api/contact` now exist. The
+[candidate/check handoff](../tasks/fs-5.2-contact-server.md) supersedes the
+earlier no-handler statement above and proposed route status. Production
+composition remains locked off; `/contact`, browser wiring and actual deployed
+protection are later tasks. Dimi separately authorized documentation updates
+and commit/push of all FS-5.2 changes on 2026-10-13; the
+[delivery record](../tasks/fs-5.2-contact-server.md#documentation-finalization-and-authorized-git-delivery--2026-10-13)
+preserves that scope. Codex then returned technical PASS at `6147688` and Dimi
+explicitly closed FS-5.2; its [closure record](../tasks/fs-5.2-contact-server.md#technical-review-and-dimi-closure--2026-10-13)
+separates that decision from unverified external gates. FS-5.3 now prepares
+local diagnostics and operations under its own request; live delivery stays off.
 
 **Protected scope:** No accounts, message dashboard, attachments, database-backed inbox, unnecessary analytics/CAPTCHA, or fake success. No secrets in source, fixtures, or chat.
 
 #### FS-5.1 — Choose delivery infrastructure and freeze the UI/server contract
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — Dimi accepted the consuming contract and explicitly closed FS-5.1 on 2026-10-13. The [review, presentation amendment and closure](../tasks/fs-5.1-contact-contract.md#consumer-review-dimi-amendment-and-fs-51-closure--2026-10-13) preserve the one finding and its resolution. Commit/push of this bounded task is authorized; actual account/settings/terms/legal checks remain external prerequisites before live enabling.
 
 **Lead:** Codex
 
@@ -877,13 +1106,13 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 **Depends on:** `FS-0.5`, `FS-1.5`, `FS-2.4`
 
-**Work:** Propose one server-handled path within the existing Next.js deployment. Define name/email/message inputs, required fields (proposed: email/message), limits, accepted/error/rate-limited outcomes, timeout behavior, and user-facing wording. Choose one transport, not both route handlers and server actions. Document the server-only composition and provider boundary.
+**Work:** Preserve/link the detailed plan and freeze the selected JSON POST `/api/contact`, optional Name and required Email/Message plus submission ID/empty spam trap. Define exact limits, typed errors, provider/browser deadlines, acceptance and in-memory manual retry semantics. Document server-only composition, Resend HTTPS and named external prerequisites; no delivery or form implementation in FS-5.1.
 
 **Complete when:** The approved contract supports UI work with a fake adapter while real-provider configuration proceeds. Missing credentials are a visible delivery blocker, not a reason to simulate successful sending.
 
 #### FS-5.2 — Implement validation, contact use case, and mail adapter
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Complete — read-only Codex technical review PASS at `6147688241fa6737de561840ba149c57ea32abb7`, followed by Dimi's explicit FS-5.2 closure on 2026-10-13. [FS-5.2 evidence and closure](../tasks/fs-5.2-contact-server.md#technical-review-and-dimi-closure--2026-10-13) preserves the controlled checks and delivery handoff. No separate Sites review result is inferred. Live delivery remains locked off; external account/legal/protection/preview gates remain pending.
 
 **Lead:** Codex
 
@@ -899,7 +1128,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-5.3 — Add abuse controls and privacy-conscious operations
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status:** Local preparation complete from base `6147688241fa6737de561840ba149c57ea32abb7`; Dimi separately authorized documentation finalization and commit/push of all 13 FS-5.3 files on 2026-10-13. The containing Git commit identifies the delivered revision. Existing origin/JSON/trap protections are retained, minimal runtime-allowlisted diagnostics added, and the exact WAF rule/coverage register/quota-disable procedures documented. [FS-5.3 evidence and delivery handoff](../tasks/fs-5.3-contact-protection.md) owns actual check results; [operations](../development/contact-operations.md) separates public platform facts from unverified account/preview/alias settings. External configuration and deployed acceptance remain blocked/pending; delivery stays off. No firewall change, paid upgrade, deployment or automatic next task is authorized.
 
 **Lead:** Codex
 
@@ -915,7 +1144,18 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-5.4 — Implement the live contact-form interface
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Manual testing follow-up — 2026-10-14:** The [safe preview record](../tasks/fs-5.4-manual-preview.md)
+corrects Storybook contact discovery/alias setup and provides controlled states,
+real browser timeouts and retry expiry for local phone testing. [Instructions and
+local links](../development/contact-manual-preview.md) distinguish simulated form
+checks from the actual disabled page. Dimi subsequently reported successful phone/
+accessibility manual testing and authorized documentation, commit and push; the
+[dated acceptance record](../tasks/fs-5.4-manual-preview.md#dimi-manual-acceptance-and-git-authorization--2026-10-14)
+retains the exact report and unspecified device/per-check details. That preview
+delivery did not start FS-5.5/5.6 or enable sending; the subsequent technical-only
+FS-5.5 preparation is recorded below. External gates remain pending.
+
+**Current status:** Codex technical review PASS with F1 closed; original FS-5.4 Git delivery is at `fd46474a1420d614dbb31c48fb16d9d6779d471e`. The subsequent safe-preview follow-up has Dimi's phone/accessibility manual acceptance and documentation/commit/push authorization on 2026-10-14. [FS-5.4 evidence/handoff](../tasks/fs-5.4-contact-page.md) and [manual-preview acceptance/delivery](../tasks/fs-5.4-manual-preview.md) own the exact checks, user report and revision verification; device/per-check and separate design/wording details are unspecified. `/contact` retains the shell/navigation, visible disabled fields, availability text and email fallback, including no JavaScript. Delivery stays locked off. F1 preserves blocked-edit guidance and retry rules; ordinary Button/plain focused feedback remains. Legal/external/live gates are pending; no publication, merge or next task authorized.
 
 **Lead:** Sites
 
@@ -925,13 +1165,26 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 **Depends on:** `FS-5.1`, `FS-1.5`, `FS-2.4`
 
-**Work:** Build idle, invalid, pending, accepted, rate-limited, timeout, and failure states against the contract. Preserve user input on failure, prevent repeated pending submissions, associate errors with fields, announce status, and retain the email fallback. Wire the real endpoint only after the server tasks are validated.
+**Work:** Build idle, invalid, accepted, rate-limited, unavailable, uncertain/timeout and failure outcomes against the accepted contract. Submitting is internal only: ordinary Button without `pending`, no `InlineStatus`, spinner or pending live-status presentation. Preserve input, guard duplicate submissions synchronously and keep fields read-only while submitting. Associate field errors and focus the first invalid field, or focus plain result text after other outcomes; retain the email fallback. Wire the real endpoint only after the server tasks are validated.
 
 **Complete when:** Component tests cover all states with controlled responses. Production never reports success from a timer or mock, and the form remains usable with narrow/short viewports and accessible error feedback.
 
 #### FS-5.5 — Finalize legal content and the contact operating guide
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-15:** Complete — Dimi accepted the current legal
+notice, Privacy/contact copy, public `info@funkspace.de` alias and operating
+documentation, explicitly closed FS-5.5 and authorized commit/push of all current
+changes. The [closure and delivery record](../tasks/fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15)
+retains base `fe2d0746c83486ee8d0d145fb00367868ae88f5a`, the containing delivery
+revision and validation: types/lint, 41 component/Node tests, both builds,
+49 Chromium checks and documentation checks PASS. The chosen address-free
+notice is an operator content decision, not legal certification; later TLM,
+storage/access and actual-account follow-up remains separate. At that closure the server
+recipient stayed Gmail; Dimi subsequently approved `info@funkspace.de` on
+2026-10-27 in the [dated EPIC 5 amendment](FunkSpace_EPIC_5_Detailed_Plan.md#fs-56-recipient-and-setup-amendment--2026-10-27). The deployed `b829447` candidate remains source-locked off; the later approved local configuration-gate/Privacy change is recorded under FS-5.6 below.
+DMARC remains unpublished. External activation prerequisites and EPIC 5/FS-G2
+remain open; FS-5.6 local preparation is now recorded below. No merge, deployment, external settings or
+live send is included in the authorized Git delivery.
 
 **Lead:** Dimi
 
@@ -947,7 +1200,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-5.6 — Verify end-to-end delivery and failure recovery
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-27: COMPLETE.** Dimi confirmed Workspace receipt, verified sender/Reply-To and instructed EPIC 5 closure. The [FS-5.6 evidence/handoff](../tasks/fs-5.6-contact-acceptance.md) records provider acceptance separately from receipt, exact targets and observed protection scope. After fresh explicit deletion authorization, Vercel returned to the overview and cookie-free GETs to earlier enabled `6N37` / `4twqcqhug` `/contact` and `/api/contact` both returned `404 DEPLOYMENT_NOT_FOUND`. Retirement is verified. The replacement delivery-off Preview `BJwbeuR6NUejxG3GDpq3QQHj337q` (host identifier `h9uharydb`) remains Ready; its stable Contact page was reloaded with the off notice, disabled Send button and email fallback. Earlier immutable-URL off-state evidence remains recorded. FS-5.6/EPIC 5 are complete and FS-G2 is satisfied alongside EPIC 4. Repository base is `36407f6a790a8d9787bdc3123041e24e181bdfee`; prior checks and evidence limitations remain disclosed. No provider call, further message, key revocation or DMARC action occurred during retirement. Production `main` at `31abe42` is unchanged, EPIC 6 has not started, and this documentation closure grants no new Git delivery or public activation authority.
 
 **Lead:** Codex
 
@@ -967,6 +1220,8 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 ### EPIC 6 — Integrated quality gates, controlled rollout, and game handoff
 
+**Planning entry point — 2026-10-27:** Read the [consolidated EPIC 6 planning handoff](../development/epic-6-planning-handoff.md) with the linked source records. It gathers the accepted decisions, exact repository/runtime/deployment identities, safe validation setup, evidence limits and Codex/Sites planning prompts. Planning baseline is `07a75a713242a0b6b4d8fde336856b13a8033e44`; verify newer HEAD/diff and actual access. No EPIC 6 implementation, fresh quality-gate result or rollout is authorized by this packet.
+
 **Goal:** Certify the complete minimum website and preserve a clear, low-risk route back to Wave Survivor EPIC 7.
 
 **Dependencies:** EPIC 4 scene acceptance and EPIC 5 live contact acceptance; all required content supplied.
@@ -977,7 +1232,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-6.1 — Run the complete automated and architecture review
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-28:** The [candidate review](../tasks/fs-6.1-release-candidate-review.md#fs-63-consolidation--28-october-2026) records scoped automated and independent evidence, later corrections and remaining warnings. It is not full current-candidate certification or release approval.
 
 **Lead:** Codex
 
@@ -993,7 +1248,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-6.2 — Complete the human acceptance matrix
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-28:** The [human acceptance record](../tasks/fs-6.2-human-acceptance.md#controlled-state-clarification--28-october-2026) preserves Dimi’s aggregate checklist and simulated error-case PASS, Safari recovery and confirmed desktop fault states. Dimi accepted the contact agent checks and the later [current-candidate targeted acceptance](../tasks/fs-6.2-human-acceptance.md#current-candidate-targeted-acceptance--28-october-2026); the earlier tested application candidate remains unidentified; H11/H12 remain FS-6.5.
 
 **Lead:** Dimi
 
@@ -1009,7 +1264,7 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 #### FS-6.3 — Resolve bounded acceptance findings
 
-**Current status:** Not started in this portfolio milestone; no implementation or human acceptance inferred from existing foundations.
+**Current status — 2026-10-28:** The [findings register](../tasks/fs-6.3-acceptance-findings.md#current-candidate-acceptance-and-fs-64-gate--28-october-2026) records the current-candidate acceptance and independent gate review. READY FOR FS-6.4; TOOL-05 is deferred to Codex through 2 November and the hosted CI, release and FS-6.5 gates remain separate.
 
 **Lead:** Codex
 
@@ -1034,6 +1289,8 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 **Dimi:** Approve the preview/public target and enter environment secrets via the provider interface; authorize external configuration changes individually.
 
 **Depends on:** `FS-6.3`
+
+**Hosted CI gate:** After separately authorized PR creation, require and inspect the final `CI / Isolated release checks` run for the current head/base and tested merge-result tree before merge or release. The [CI-01/CI-02 handoff](../tasks/fs-6.3-acceptance-findings.md#hosted-ci-handoff-for-ci-01-and-ci-02--28-october-2026) records required phases, retained evidence and separate release prerequisites. Hosted execution is pending; this does not change protection settings or grant merge/deployment authority.
 
 **Work:** Prepare repeatable installation/build steps, deployment-dependent URLs and identity, environment-variable documentation, and the required preview protections. Verify that the animation can fall back statically and a mail outage can fall back honestly to contact-by-email. Document rollback to the previous known-good build.
 
@@ -1077,11 +1334,23 @@ All task IDs below are new portfolio IDs. Dependencies indicate required inputs;
 
 ## Implementation handoff
 
-- **Recommended first step:** read this plan, its decision register and linked baseline/task records; verify `156c28c8486352328a184d587a6540eee42b8bc1` plus the complete six-file patch from FS-0.4 before consuming the handoff. Earlier input SHAs are dated provenance, not current candidate claims.
-- **Codex next action:** complete the explicitly authorized documentation commit/push, then support the Dimi-led FS-1.1 handoff when that task starts. The exact FS-G0 decision is recorded; no additional gate vote or source/preservation confirmation is requested.
-- **Sites handoff:** consume the approved candidate and resulting documentation commit, reuse map and command evidence; identify any environment gap honestly. Prepare FS-1.1 actual-asset inventory and minimal control matrix with Dimi. Counterpart sufficiency is not Dimi visual acceptance.
-- **Dimi next action:** lead FS-1.1 asset/control inputs with Sites: actual original SVG/editable sources, essential variants and named substitutes. Later content/provider/mobile-browser details remain scheduled in the [decision register](#pending-decisions-and-latest-needed-points). No secret submission is needed here.
-- **Do not change:** accepted gameplay/public contracts, original assets, independent clone/untracked work, generated token outputs by hand, or later milestone scope. No commit, push, PR, merge, settings, deployment, branch deletion or live email is authorized by this documentation task.
-- **Completion summary expected:** task ID, qualified revision/worktree and accessible diff, actual files, contract changes (none for FS-0.4), checks/outcomes and limits, owned blockers, counterpart findings and Dimi's next action.
+- **EPIC 6 planning reference:** Consult the [shared planning packet](../development/epic-6-planning-handoff.md) and actual repository/branch/HEAD/status access. Reuse the completed EPIC 4/5 evidence and existing task IDs; do not treat older pending-task paragraphs as current assignments. The packet contains the source reading order and separate Codex/Sites planning briefs.
+
+- **Completed reference work:** The [Storybook color reference](../tasks/storybook-color-reference.md) presents the current palettes and semantic roles without changing tokens. Implementation and validation are complete; Dimi authorized documentation finalization, commit and push on 2026-09-16. FS-1.3 remains complete. FS-1.4 implementation and validation are now recorded separately.
+
+- **Recommended first step:** read this current summary, the [FS-3.6 closure](../tasks/fs-3.6-integrated-validation.md#epic-3-closure-and-final-re-review--2026-09-27) and [EPIC 4 API handoff](../tasks/fs-3.6-integrated-validation.md#epic-4-implementation-handoff), then inspect the actual code, branch, HEAD and accessible diff for the next authorized task. Reuse the accepted control contracts as needed. Earlier SHAs and dated pending-task statements are historical provenance, not reset targets or instructions to repeat completed work.
+- **Detailed EPIC 6 planning reference:** The [supplied detailed plan](FunkSpace_EPIC_6_Detailed_Plan.md) and its linked prompts are preserved byte-for-byte; their dated planning status, historical SHA and embedded prompts are context, not current status, a reset target or authorization.
+- **Current implementation:** EPICs 1–5, FS-G1 and FS-G2 are complete. The [EPIC 4 closure](../tasks/fs-4.8-scene-acceptance.md#fs-48-and-epic-4-closure--2026-10-13) retains its accepted scene and evidence limits; the [FS-5.6 contact record](../tasks/fs-5.6-contact-acceptance.md) records provider acceptance separately from Dimi's Workspace receipt/sender/Reply-To acceptance and verified authorized retirement of the old enabled deployment. The last recorded Ready Preview was delivery-off with verified disabled/fallback presentation. EPIC 6 is in progress: use the FS-6.1–6.3 records above for current evidence and open findings. Production `main` at `31abe42` and unpublished DMARC are historical observations; FS-G3, public rollout and game integration remain separate.
+- **Consumer handoff:** reuse ThemeService's selected/resolved live state, the provider-owned `motionPolicy` and pure `resolveMotionPermission`, and Dialog's dismissal/navigation handoff extension. Keep each consumer's Pause, visibility, runtime readiness and playback history independent. The logo's guarded imperative API and static/failure paths are implemented; future Canvas consumers must prove their own scheduling and teardown rather than treating logo/fake-consumer tests as scene evidence.
+- **Latest navigation maintenance:** the spacing/reload fix is committed in `602f8c3`. The subsequent [active-fallback correction](../tasks/maintenance-navigation-hydration-continuity.md) received independent read-only PASS in this session on 2026-09-28 for the 10-file candidate on that base, patch SHA-256 `52f682a4a5a36410ce6a7917ec5e40b17c695e62def9911ff4915682d3ac0bde`: 28 focused tests, 51 production Chromium checks and two supplementary Contact probes passed. This summary refresh changes documentation only; the reviewed runtime files remain unchanged. Dimi authorized commit/push of the correction and documentation refresh; the containing Git commit records delivery. New device acceptance is not inferred.
+- **Codex follow-up:** preserve exact-candidate review provenance and reuse completed tooling/service corrections. For EPIC 1, no separate post-R3 Codex review is recorded; Dimi's explicit completion decision closes that epic without inventing evidence. EPIC 2 has its own integrated review in FS-2.6; EPIC 3 has its closure and API handoff in FS-3.6.
+- **Sites handoff:** FS-1.3 is complete; implementation, source assets, native API examples, pending/focus policy, checks and manual/visual acceptance are recorded in the [Standard Button task](../tasks/fs-1.3-standard-button-family.md#final-dimi-acceptance-and-completion--2026-09-15).
+- **FS-1.4 handoff:** implementation, full Figma matrix, icon-only Storybook samples, native behavior and validation are complete and manually/visually accepted; see the [Hexagonal Button task](../tasks/fs-1.4-hexagonal-button-family.md).
+- **FS-1.5 handoff:** native fields, associations, controlled fixtures and status presentation are complete and accepted; see the [task record](../tasks/fs-1.5-essential-form-primitives.md#final-manualvisual-acceptance-and-commit-authorization--2026-09-16). Complete-set compatibility evidence is retained in FS-1.7.
+- **FS-1.6 handoff:** complete and accepted, with both triggers, secondary hexagonal Close, Escape, blue focus, focus fallback/override and owned scroll cleanup. Complete-set dialog checks and their actual outcomes are retained in FS-1.7.
+- **FS-1.7 handoff:** complete at accepted implementation `37b9554`, including the R3 correction. The existing task record provides the EPIC 2 control/API/import inventory, approved substitutes, validation history and limitations; production APIs and architecture are unchanged.
+- **Dimi decision:** EPIC 1 is finished; FS-2.1 labels/destinations and bounded shell are approved; FS-2.2–FS-2.6 and EPIC 2 are explicitly complete. FS-2.3 retains authorized drafts pending final publication copy; FS-2.4's accepted draft structure retains legal publication blockers. FS-3.1 is explicitly complete with device acceptance on 2026-09-25 after both P2 corrections were applied; no separate post-correction independent review PASS is inferred. FS-3.2 is explicitly complete on 2026-09-27 after Codex approval and manual Firefox 156.0.1 (64-bit) / Safari 27.0 (21625.1.29.18.28) testing. FS-3.3 is explicitly accepted and complete on 2026-09-27 after Codex technical approval, with no additional manual test details inferred. FS-3.4 is explicitly complete after its independent correction PASS. FS-3.5 is explicitly complete on 2026-09-27 after reported Safari/Firefox manual testing (versions/devices unspecified; “salary” interpreted as Safari), with no fresh independent post-correction review recorded. Dimi explicitly approves FS-G1 on 2026-09-27 and reports Firefox/WebKit testing complete; exact device/OS, versions, per-action results and tested candidate are unspecified. Dimi's later explicit “all tests are done” and EPIC 3 closure instruction completes FS-3.6/EPIC 3/FS-G1; the omitted test-detail fields remain unspecified. Other device/browser details and the [assistive-technology spot-check](../tasks/fs-1.7-essential-component-acceptance.md#dimi-phonedesktop-checklist--pending-for-this-candidate) outcome remain unspecified; no device results are invented from these approvals.
+- **Do not change:** accepted gameplay/public contracts, original assets, unrelated work, generated outputs by hand, or later milestone scope. Finding 2 authorized the feature-plan summary/handoff refresh; Dimi subsequently authorized commit/push of that refresh and the independently reviewed navigation correction on 2026-09-28. Preserve dated task logs and earlier failures. This bounded delivery authorization does not extend to new application changes, next-epic work, merge, deployment or live email. The approved LCP budget and remaining evidence/release limitations stay recorded in FS-3.6.
+- **Completion summary expected:** task ID, qualified revision and accessible diff, actual files, contract changes, checks/outcomes and limits, owned follow-ups, counterpart findings and Dimi's recorded acceptance.
 
 Game continuation is the separate [Wave Survivor EPIC 7](wave-survivor-implementation-plan.md#epic-7--portfolio-play-shell-and-accessible-application-ui) after portfolio FS-6.6/FS-G3. `/play/wave-survivor` remains future integration work. Do not apply homepage particle/global-control or ordinary-scroll layout choices to the portrait game arena.

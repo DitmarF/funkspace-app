@@ -1,0 +1,175 @@
+import { expect, test, type Page } from "@playwright/test";
+import { openSettings } from "./helpers/foundation";
+
+async function captureArtwork(
+  page: Page,
+  clip: { x: number; y: number; width: number; height: number },
+) {
+  const session = await page.context().newCDPSession(page);
+  try {
+    const image = await session.send("Page.captureScreenshot", {
+      format: "png",
+      clip: { ...clip, scale: 1 },
+      captureBeyondViewport: false,
+    });
+    return Buffer.from(image.data, "base64");
+  } finally {
+    await session.detach();
+  }
+}
+
+for (const width of [320, 375, 768, 1254, 1454, 2365]) {
+  test(`navigation spacing stays consistent at ${width}px`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/about");
+    await openSettings(page);
+    const dialog = page.getByRole("dialog");
+    const buttons = await Promise.all(
+      [
+        "Menu: close navigation and settings",
+        "Navigation",
+        "Languages",
+        "Accessibility",
+        "Chat-bot",
+      ].map(
+        async (name) =>
+          (await dialog
+            .getByRole("button", { name, exact: true })
+            .boundingBox())!,
+      ),
+    );
+    const positions = buttons.sort((a, b) => a.y - b.y);
+    const gaps = positions
+      .slice(1)
+      .map(
+        (box, index) => box.y - positions[index].y - positions[index].height,
+      );
+    expect(Math.max(...gaps) - Math.min(...gaps)).toBeLessThan(0.5);
+    const title = (await dialog
+      .getByRole("heading", { name: "Navigation", exact: true })
+      .boundingBox())!;
+    const tree = (await dialog
+      .getByRole("navigation", { name: "Primary" })
+      .boundingBox())!;
+    expect(Math.abs(tree.x - title.x)).toBeLessThan(0.5);
+    if (width >= 768) {
+      const close = (await dialog
+        .getByRole("button", { name: "Close", exact: true })
+        .boundingBox())!;
+      expect(title.x - (close.x + close.width)).toBeGreaterThan(0);
+      expect(title.x - (close.x + close.width)).toBeLessThanOrEqual(32);
+      expect(
+        Math.abs(title.y + title.height / 2 - close.y - close.height / 2),
+      ).toBeLessThan(0.5);
+    }
+    await page.screenshot({ path: info.outputPath(`navigation-${width}.png`) });
+  });
+}
+
+for (const route of ["/about", "/privacy", "/impressum"]) {
+  for (const width of [375, 1280]) {
+    test(`${route} at ${width}px: reload keeps the same hex trigger without fallback text or arrow`, async ({
+      page,
+    }, info) => {
+      const errors: string[] = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      page.on("console", (message) => {
+        if (message.type() === "error") errors.push(message.text());
+      });
+      await page.setViewportSize({ width, height: 720 });
+      await page.addInitScript(
+        (theme) => localStorage.setItem("theme", theme),
+        width < 768 ? "default" : "dark",
+      );
+      for (const reload of [false, true]) {
+        let release!: () => void;
+        let heldRequests = 0;
+        const held = new Promise<void>((resolve) => {
+          release = resolve;
+        });
+        await page.route("**/_next/static/**/*.js", async (request) => {
+          heldRequests++;
+          await held;
+          await request.continue();
+        });
+        try {
+          if (reload) await page.reload({ waitUntil: "commit" });
+          else await page.goto(route, { waitUntil: "commit" });
+          const tree = page.locator('footer nav[aria-label="Primary"]');
+          await expect(tree).toBeAttached();
+          await expect(tree).toBeHidden();
+          await expect.poll(() => heldRequests).toBeGreaterThan(0);
+          await expect(
+            page.getByRole("button", {
+              name: "Menu: navigation and settings",
+              exact: true,
+            }),
+          ).toHaveCount(0);
+          // Keep this case idle to verify the unchanged pre/post-hydration paint.
+          // Active keyboard continuity is covered in navigation-hydration.spec.ts.
+          const fallback = page.locator("footer details").first();
+          const summary = fallback.locator(":scope > summary");
+          await expect(summary).toHaveAccessibleName("Navigation");
+          expect(await summary.textContent()).toBe("");
+          expect(
+            await summary.evaluate(
+              (node) => getComputedStyle(node).listStyleType,
+            ),
+          ).toBe("none");
+          const initialBox = (await summary.boundingBox())!;
+          expect(initialBox.height).toBeGreaterThanOrEqual(44);
+          const viewport = () =>
+            page.evaluate(() => ({ width: innerWidth, height: innerHeight }));
+          expect(await viewport()).toEqual({ width, height: 720 });
+          // This trigger is SVG-only. Playwright's screenshot waits for all
+          // document fonts, which can wait on the scripts intentionally held
+          // here during reload. Capture the actual pixels without changing
+          // device metrics, then verify the viewport and exact PNG both sides.
+          const initialArtwork = await captureArtwork(page, initialBox);
+          expect(await viewport()).toEqual({ width, height: 720 });
+          if (route === "/about") {
+            const current = tree.getByRole("button", {
+              name: "About",
+              exact: true,
+              includeHidden: true,
+            });
+            await expect(current).toBeDisabled();
+            await expect(current).toHaveAttribute("aria-current", "page");
+          } else
+            await expect(
+              tree.getByRole("link", {
+                name: "About",
+                exact: true,
+                includeHidden: true,
+              }),
+            ).toHaveAttribute("href", "/about");
+          release();
+          const menu = page.getByRole("button", {
+            name: "Menu: navigation and settings",
+            exact: true,
+          });
+          await expect(menu).toBeVisible();
+          expect(await viewport()).toEqual({ width, height: 720 });
+          expect(await menu.boundingBox()).toEqual(initialBox);
+          const enhancedArtwork = await captureArtwork(page, initialBox);
+          expect(await viewport()).toEqual({ width, height: 720 });
+          expect(enhancedArtwork).toEqual(initialArtwork);
+          await info.attach(`identical-trigger-${reload ? "reload" : "load"}`, {
+            body: initialArtwork,
+            contentType: "image/png",
+          });
+          await expect(
+            page.locator('footer details[class*="fallback"]'),
+          ).toHaveCount(0);
+          await expect(tree).toBeHidden();
+          expect(errors).toEqual([]);
+        } finally {
+          release();
+          await page.unrouteAll({ behavior: "wait" });
+        }
+      }
+    });
+  }
+}

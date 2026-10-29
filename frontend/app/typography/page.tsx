@@ -2,8 +2,8 @@ export default function TypographyPage() {
   const weights = [100, 200, 300, 400, 500, 600, 700, 800, 900] as const;
   return (
     <main className="mx-auto max-w-3xl p-6">
-      <h1 className="font-display text-5xl">Work Sans — Display</h1>
-      <h2 className="mt-2 font-display text-3xl">Heading Level 2</h2>
+      <h1 className="font-sans text-5xl">Space Grotesk — Headings</h1>
+      <h2 className="mt-2 font-sans text-3xl">Heading Level 2</h2>
       <p className="mt-4 font-sans text-base leading-7">
         Space Grotesk — body text paragraph for verification.
       </p>

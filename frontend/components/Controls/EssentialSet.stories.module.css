@@ -1,0 +1,42 @@
+.fixture {
+  display: grid;
+  gap: var(--fs-space-lg);
+  width: 100%;
+  max-width: 52rem;
+  margin-inline: auto;
+  padding: var(--fs-space-md);
+  font-family: var(--font-space-grotesk, var(--fs-font-family-base));
+  font-size: var(--fs-font-size-md);
+  line-height: var(--fs-line-height-normal);
+  overflow-wrap: anywhere;
+}
+
+.heading,
+.subheading {
+  font-family: var(--font-work-sans, var(--fs-font-family-display));
+  font-size: var(--fs-font-size-xl);
+  font-weight: var(--fs-font-weight-semibold);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fs-space-md);
+  min-width: 0;
+}
+
+.fields {
+  display: grid;
+  gap: var(--fs-space-md);
+  min-width: 0;
+}
+
+.spacer {
+  min-height: 60vh;
+}
+
+.destination {
+  margin-top: 80vh;
+  margin-bottom: 30vh;
+}

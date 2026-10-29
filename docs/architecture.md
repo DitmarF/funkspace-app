@@ -43,6 +43,98 @@ common/
 
 ## Dependency Rules
 
+### Decorative-motion policy
+
+FS-3.4 adds a provider-owned `MotionPolicyService` beside animation orchestration.
+The pure domain resolver combines its immutable preference/environment snapshot
+with each consumer's independent availability, opt-in, visibility, Pause and
+runtime readiness. Permission never commands playback or resets local history.
+`BrowserMotionEnvironment` owns media/document listeners and attaches them only
+during provider lifecycle setup. The existing storage port persists one validated
+preference best-effort; live intent remains authoritative after failed writes.
+Consumers receive only snapshot/subscription/update methods and unsubscribe on
+unmount. Provider cleanup releases its activation without terminal disposal so
+Strict Mode can restart it. No motion registry, global scheduler or game-clock
+dependency is introduced. See the [FS-3.4 record](tasks/fs-3.4-motion-policy-implementation.md)
+for approved semantics, implementation evidence and later consumer boundaries.
+
+FS-3.5 connects Motion settings and the existing logo to that same authority.
+The subsequent homepage sequence uses a per-shell `HomeIntroBinding` and an
+optional `LogoMotion.onPlaybackState` lifecycle callback; there is no global
+animation coordinator. A route-local parser script serializes the same pure
+policy resolver/validator for one-time startup eligibility. It reads the existing
+key without writing or becoming a live authority. Browser effects and the
+bounded fail-open timer belong to infrastructure; `HomeIntroScript` is the
+startup composition boundary. The live logo controller drives completion or
+static fallback. A fallback before playback starts retains a per-shell
+cancellation latch and delivers it to the current logo even after late hydration.
+`LogoMotionRef.cancelIntroduction()` retires automatic playback for that mount;
+it preserves local Pause, shared preference and explicit permitted playback.
+The logo's existing history retains this latch across Strict Mode setup. The
+binding owns one cancellation subscriber with identity-guarded cleanup; detached
+shell cleanup removes it. A new page mount has independent history. CSS uses the existing 400 ms token for the menu hex-button
+fade, then the 800 ms token for the remaining content. The existing binding advances on actual
+animation-end events. The launcher and footer links are separate targets within
+the same footer; no second navigation owner or modal is introduced.
+The shell's tablet/desktop sticky-header enhancement uses a per-mount
+`StickyHeaderBinding`, constructed by `createServices` and released by the shell.
+It owns passive document scroll, header measurement and focus/disclosure observation
+in Infrastructure; React has no scroll-frame state. Shared motion policy and
+`resolveMotionPermission` decide whether directional transitions may run. Static
+sticky presentation is retained when permission is denied. Mobile, missing browser
+measurement and very short viewports retain native document positioning. See the
+[maintenance contract](tasks/maintenance-smart-sticky-header.md).
+
+The shell preserves server-rendered children and native links; no-JS/blocked
+inline script keeps them visible. No theme-bootstrap source or pipeline changes.
+FS-4.5 adds an optional content-readiness callback to that same intro binding.
+It observes the existing root state (including parser fail-open), without a new
+timer. A per-shell presentation context forwards actual reveal readiness and
+navigation occlusion to Start's service-created particle controller. Dialog
+release clears occlusion; Dialog still owns focus and scroll behavior. The
+controller consumes the provider's motion policy/resolver and exposes its
+blockers for accessible local Pause/Resume explanations. No consumer initializes
+or disposes shared services. Start reuses the trusted aperture's solid WEB
+silhouette when Canvas preparation is denied or fails; a ready locally paused
+Canvas retains its frame. The pure-data particle SVG preview remains fixture-only.
+The infrastructure binding caches validated, immutable semantic palette values;
+theme events recolor the existing runtime without changing particles or intent.
+See the [FS-4.5 record](tasks/fs-4.5-scene-policy-and-themes.md).
+
+The homepage and Aperture details page also have a scene-local parser/CSR startup boundary,
+`SceneStartupScript`, composed from the infrastructure `SceneStartup` adapter.
+It serializes the existing pure motion resolver for a one-time eligibility read;
+it does not store preferences or schedule particle frames. Eligible pending WEB
+artwork is concealed with opacity while its rectangle stays measurable. Actual
+frame/static readiness releases the startup observer and deadline. A 5 s
+fail-open deadline retains visible solid artwork through late hydration without
+hiding or fading it again. No-JS, denied policy and unavailable startup retain
+static artwork. This does not sequence or delay the header/navigation. Details
+scene readiness distinguishes the initial navigation handover from later modal
+occlusion/failure so the startup gate cannot prematurely latch the fallback.
+The Reduced-logo amendment adds an optional `supportsReducedMotion` capability
+to the pure resolver; existing consumers default to static under Reduced. The
+logo alone supplies the implemented whole-artwork fade. Its binding accepts
+`prepare("draw" | "fade")`, deriving fade duration from the existing manifest
+and reusing one timeline. The renderer's `:scope` target addresses the owned SVG
+root for uniform opacity; geometry and per-part drawing remain unchanged.
+`LogoMotion` retains React ownership and an instance-local playback history;
+the application `LogoMotionController` combines intent with the pure resolver.
+The browser-free `LogoMotionPort` separates it from `NativeLogoMotionBinding`,
+which owns that SVG's observer, style changes and existing timeline. Composition
+injects the existing orchestrator's manifest builder; no second manifest or
+scheduler is introduced. The provider exposes a per-instance binding factory,
+and each logo releases only its own resources. Only the homepage identity opts
+in. Complete artwork is the initial and denied/error result; permission never
+replays a completed introduction. See the [FS-3.5 handoff](tasks/fs-3.5-motion-settings-and-logo.md)
+for public-method compatibility and outstanding human acceptance.
+
+The approved FS-3.5 On amendment extends the same preference union/key with
+`on`. Only this explicit choice bypasses device-preference restrictions;
+Follow system remains conservative when the signal is unavailable. Policy
+readiness, availability, opt-in, visibility, runtime readiness and local Pause
+remain independent restrictions. No new preference authority is introduced.
+
 ### Dependency Direction
 
 The dependency rule states that **dependencies point inward**:
@@ -136,6 +228,149 @@ import { useTheme } from "@/hooks/useTheme";
   - Next.js pages
 - **No**: Business logic, direct infrastructure access
 
+### Contact composition — FS-5.1
+
+The [EPIC 5 plan](features/FunkSpace_EPIC_5_Detailed_Plan.md) freezes a single
+JSON `POST /api/contact` in the existing Next.js deployment. Accepted
+`domain/contact/ContactContract.ts` types/limits are unchanged. FS-5.2 adds
+pure shared validation, `ContactDeliveryPort`, `ContactUseCase` and the typed
+`ContactResult` status/envelope pairing; Application imports only Domain.
+
+The server composition root is
+`infrastructure/services/createContactServerServices.ts`, guarded by
+`server-only`, constructing configuration, a Resend HTTPS adapter and the use
+case through Domain ports. The thin Route Handler and server contact page are
+permitted server composition entry points. This bounded decision is documented
+by the FS-5.1 request and accepted by Dimi at task closure on 2026-10-13 after
+the recorded consumer review and presentation amendment. FS-5.2 implements it
+and the thin Node-runtime Route Handler. Configuration/adapters have the same
+`server-only` marker, handled internally by Next. Vitest's empty server-layer
+alias is test-only and does not change production client-import rejection.
+
+`ContactRequestHandler` consumes a Domain submission function rather than a
+concrete application class. It applies method/exact-origin/media checks, counts
+actual streamed bytes and decodes UTF-8 fatally before delegating unknown JSON
+to the use case. `BoundedJson` has two real consumers: request parsing and
+provider-response reading. Readers release locks and cancel unfinished bodies
+without awaiting an untrusted cancellation callback.
+
+The Resend adapter uses one injected/native fetch, fixed configured identities
+and subject, structured Reply-To, deterministic plain text and
+`contact/<submissionId>`. Its eight-second deadline includes body reading and
+parsing. Ambiguous transport, malformed evidence and idempotency conflicts
+never imply acceptance or confirmed non-delivery. Timers/controllers are
+released on every settled outcome; there is no automatic retry or process-local
+production limiter.
+
+Server composition defaults delivery off and requires exact
+`CONTACT_ENABLED=true` plus valid origins, credential and fixed identities to
+construct delivery. Credential/identity getters are not read while off or when
+origins are invalid. Missing/invalid configuration fails closed; origin and
+validation rejections retain their precedence. Dimi approved applying this
+bounded source change during FS-5.6; it was delivered in `36407f6`. The older
+`b829447` retained `CONTACT_DELIVERY_RELEASED = false`; the delivered candidate
+uses the exact configuration gate. The controlled protected-Preview test below
+does not enable Production or authorize further live submissions.
+See [server setup](development/contact-server.md)
+and the historical [FS-5.2 evidence](tasks/fs-5.2-contact-server.md).
+
+FS-5.3 retains the established origin/media/trap rejection path and adds only
+server-boundary diagnostics. `ContactDiagnostics` projects a typed response
+onto runtime-allowlisted HTTP/outcome/code categories; it receives no Request.
+The boundary injects a writer, production composition writes a JSON line, and
+writer failures cannot alter delivery or trigger retries. No identifiers,
+content, credentials or raw errors enter these application events. Platform
+logs are separate and require actual account retention/access review.
+The [operating guide](development/contact-operations.md) records the proposed
+edge WAF rule and pending preview/alias coverage; there is no local production
+counter or claimed deployed protection at that task's closure. Its source lock
+remained in place until the later approved FS-5.6 local candidate below.
+
+FS-5.4 implements browser submission through the existing `createServices` and
+`ServiceProvider` controlled-fixture convention, exposing only the application
+submission boundary. Presentation must not import a concrete browser adapter.
+Provider code, credentials and server configuration never enter that client
+graph; the server page exposes only safe availability. There is no Server
+Action, separate backend or global draft store. Draft/key state is page memory
+only. Domain remains framework-free and Application depends on Domain ports.
+
+`ContactSubmissionPort` is the narrow browser boundary; native fetch, UUIDs and
+conservative elapsed time are implemented by `BrowserContactSubmission`. Wall and
+monotonic intervals count device sleep; clock rollback retires existing retries.
+Wake/focus rechecks expiry, and the whole-exchange deadline checks elapsed time
+before returning a result. Pure
+`ContactBrowserResponse` validates exact transport/envelope/identity pairing.
+`features/contact/ContactForm` owns its page-memory UI/draft state, uses shared
+Domain validation and injected submission behavior, and never imports concrete
+adapters. The server `/contact` page imports permitted server composition only
+to expose safe availability. SSR/prehydration/delivery-off retain visible disabled
+fields, a disabled non-submit button, a clear availability message and email fallback.
+The accepted ordinary-Button/plain-feedback amendment remains; disabled controls,
+synchronous guards, read-only snapshots and focused error/result text model the
+workflow. No new scene, navigation manager, persistence or server behavior exists.
+See [UI checks and phone checklist](development/contact-ui.md).
+
+The [FS-5.4 manual preview](development/contact-manual-preview.md) exists only in
+Storybook. Its stable injected port wraps the actual browser adapter with fake
+fetch, page-memory request counts/IDs and a fixture-only retry-clock offset.
+There is no production flag/route/global fetch replacement. Static local serving
+has no API/provider path; fixture imports and controls are checked absent from
+production bundles. Real no-JavaScript/navigation checks use a separate explicitly
+disabled, credential-free, fetch-denied Next preview.
+
+FS-5.5's [processing/storage facts](development/contact-processing-facts.md) and
+[operating guide](development/contact-operations.md) document the current disabled
+journey, implemented gated delivery path, both appearance keys, categorical app
+diagnostics versus platform/provider logs and pending account/legal prerequisites.
+The later FS-5.5 presentation replaces legal placeholders and uses the tested
+public Workspace alias; Dimi accepted that copy and explicitly closed FS-5.5 on
+2026-10-15. The [closure/handoff](tasks/fs-5.5-legal-presentation.md#dimi-acceptance-and-fs-55-closure--2026-10-15)
+preserves operator approval separately from legal certification and live
+acceptance. No storage or architecture boundary changes; at that closure delivery
+stayed source-locked off. External activation prerequisites remain separate.
+
+FS-5.6 adds a mocked cross-layer contact journey and availability-consistent
+contact/conditional processing disclosures. It adds no runtime service, storage,
+retry mechanism or dependency. Initial local preparation delivered at `b829447`
+retained the false source release lock.
+[FS-5.6 evidence](tasks/fs-5.6-contact-acceptance.md) and the
+[controlled acceptance procedure](development/contact-acceptance.md) distinguish
+local checks, deployed protection, provider acceptance and actual receipt.
+
+The later FS-5.6 [protected-Preview follow-up](tasks/fs-5.6-contact-acceptance.md#protected-preview-and-provider-approval--2026-10-27)
+records narrow deployed limiter/recovery evidence, provider approval and the
+bounded source/public-copy change delivered at
+`36407f6a790a8d9787bdc3123041e24e181bdfee`. It removes the temporary source lock
+while preserving exact enabled/configuration gates and conditional
+Privacy wording. Test isolation uses an off switch, blank credentials, an
+environment-free snapshot and verified egress preloader. No port, service,
+dependency or public contract is added.
+
+On 27 October the controlled protected Preview at deployment `6N37XmGQ3`
+produced a matching accepted browser result and a categorical HTTP 202 accepted
+event at 16:10:07.70 CET. Dimi separately confirmed receipt through
+`info@funkspace.de` in Workspace, the sender and working Reply-To, and requested
+closure of EPIC 5. The earlier 16:01:14.02 CET immutable-origin request returned
+`403/origin_rejected` before delivery; the successful form submission used the
+configured stable branch origin. No wildcard or Host exception was introduced,
+and no further live submission is authorized by recording this evidence.
+
+The scoped `CONTACT_ENABLED=false` setting was saved and separately verified.
+The fresh off deployment `BJwbeuR6NUejxG3GDpq3QQHj337q`, host identifier
+`h9uharydb`, was Ready at 16:18 CET on the same `36407f6` source. The stable and
+new immutable Contact pages showed disabled controls, the availability notice
+and email fallback. Dimi explicitly authorized deleting the earlier enabled
+`6N37XmGQ3` deployment, host identifier `4twqcqhug`; Vercel confirmed deletion.
+At 15:31:02 UTC, cookie-free GET checks of that old host's `/contact` and
+`/api/contact` both returned 404 `DEPLOYMENT_NOT_FOUND`. The stable Contact page
+was reloaded and remained disabled with its email fallback. Provider acceptance,
+Dimi's receipt/header confirmation and this bounded shutdown complete FS-5.6,
+EPIC 5 and FS-G2 on 27 October. This is retirement of the recorded test target,
+not a global deployment inventory or universal shutdown claim. Production
+`main` at `31abe42` and DMARC are unchanged; EPIC 6 has not begun.
+Regional/distributed-abuse and wider alias/logging evidence limits remain
+operating/release follow-up, without reopening accepted FS-5.5 or EPIC 4.
+
 ## Service Injection
 
 Services are injected via React Context:
@@ -150,6 +385,159 @@ Services are injected via React Context:
 // Presentation consumes via hooks
 const { themeService } = useServices();
 ```
+
+### Shared dialog binding
+
+`Controls/Dialog` uses the thin `useDialog` hook and the existing provider's
+`bindDialog` factory. The factory creates one native binding per mounted dialog;
+it has no global open state or overlay stack. `createServices` injects
+`NativeDialogBinding`, which owns modal operations, focus, document scroll/style
+ownership and cleanup. Presentation never imports the concrete adapter.
+
+`DialogBindingPort<TDialog, TFocus>` contains only generic handles, callbacks and
+lifecycle methods. DOM types are supplied at the provider/adapter boundary, not
+imported or constrained in Domain. ThemeService/bootstrap and game boundaries
+remain unchanged. The [FS-1.6 record](tasks/fs-1.6-shared-dialog-primitive.md)
+contains the reviewed consumer contract, lifecycle policy and browser evidence.
+
+The FS-3.2 navigation consumer opts into `navigation` cleanup and the existing
+binding's `document-overflow` strategy. Other consumers retain fixed-body locking
+and dismissal restoration. Navigation suppresses all custom return targets and
+saved-scroll replay; explicit release acknowledgment runs after owned cleanup.
+A single `PortfolioNavigationHandoffPort` receipt in the existing provider bridges
+outgoing/incoming portfolio owners. It retains Next/native routing and history,
+resolves actual committed fragments, and schedules only bounded focus correction.
+It is neither another modal manager nor an every-route focus framework. Root
+cleanup cancels work; each owner removes its own browser listeners. See the
+[FS-3.2 record](tasks/fs-3.2-navigation-lifecycle.md) for the measured changed-hash
+ordering refinement, approved contract and validation limits.
+
+### Trusted scene aperture
+
+FS-4.4 keeps the SVG cover in Presentation. Its full-rectangle luminance mask
+uses independently fitted native SVG images, with stable React instance IDs.
+The existing composition root supplies the small, stateless `ApertureAssets`
+port: browser infrastructure validates repository exports, loads the exact
+validated bytes, and performs a bounded mask pixel probe. Cancellable operations
+own no scene clock, persistent settings or shared-service lifecycle. The existing
+particle controller receives only `coverReady`; geometry and asset selection
+never enter particle state or Canvas drawing. The existing mask-independent Work Sans Black WEB silhouette covers failed masking for that selection;
+the circle remains the load fallback and other diagnostic selections' static art.
+Dimi authorized repository-authored SVGs; Illustrator delivery is no longer required. See [FS-4.4](tasks/fs-4.4-svg-aperture.md) for the
+strict export profile, replacement proof and outstanding browser/asset acceptance.
+
+Under Dimi's [R15 amendment](tasks/fs-4.1-scene-contract.md#r15--lightweight-homepage-fallback--2026-09-29),
+Start also selects that solid WEB silhouette during SSR/no-JS, pending, denied
+or failed runtime states. The aperture's `showStatic` presentation input never
+changes its mask-capability readiness report, preventing preparation deadlock.
+Only a valid permitted live/locally paused Canvas frame exposes the aperture.
+Details customization may make this existing cover transparent over that ready
+frame, exposing the full field. This is local presentation state; neither mask
+visibility nor geometry enters the particle rules. Domain effective configuration
+now also includes maximum endpoint degree and a connection-distance multiplier.
+The pure sampler enforces both endpoint caps with shortest-pair selection within
+the existing absolute candidate/line budgets; changing those controls invalidates
+the same Canvas for a permitted redraw, without recreating or reseeding it.
+Start imports no particle SVG preview; the pure-data `ParticleStill` remains
+available to the diagnostic fixture. R15 itself changed no controller, permission or frame owner.
+
+Under [R16](tasks/fs-4.1-scene-contract.md#r16--reduced-still-canvas-and-web-readiness-reveal--2026-09-29),
+the particle controller declares the existing resolver’s reduced capability for
+an explicit Reduced **still**: prepare once, keep the runtime paused, and allow
+only visible dirty redraws. It exposes Reduced separately from local Pause;
+shared policy/resolver and the Canvas frame owner stay unchanged. Start reveals
+the WEB scene once after a valid frame, retaining observable reserved geometry
+and the original intro/navigation handoff. The infrastructure binding bounds
+optional module loading to 5 s, clears its deadline on settlement/destroy and
+ignores late completion; timeout is a failure fallback, never a reveal clock.
+The controller also exposes `paletteUnavailable` when measured positive geometry
+has no validated palette. Start settles to independent solid WEB for this case,
+while the existing resolver gate still denies Canvas preparation. Unmeasured or
+temporarily hidden geometry alone does not settle the initial reveal. Valid
+palette recovery uses the existing binding observation and never replays the fade.
+
+### Icon delivery
+
+Control artwork stays inline, including its existing two-tone paint checks.
+The existing Icon component keeps its name/size/label contract and native SVG
+frame. Eleven category/social families become a generated same-origin SVG sprite; client
+components reference its groups instead of importing the entire path registry.
+Original Figma exports and `spriteIconArtwork.tsx` remain the geometry sources. The
+sprite has no script, browser service, runtime preference or scheduling owner.
+Native no-JS references work; explicit icon-only labels preserve control meaning
+if the asset is unavailable. Build generation and lint/test freshness checks
+prevent stale artwork. This changes delivery, not approved icon geometry.
+
+### Details-only particle customization
+
+The WEB scene is named **Web Aperture** (Dimi's 2026-10-12 naming amendment).
+R19 adds its existing details route as
+the first Animations navigation link. Customization starts with Reset and the
+overlay switch, without a duplicate artwork preview. A ready Canvas stays visible
+behind the modal with continuous playback paused; edits may request coalesced
+still redraws. Modal occlusion blocks initial preparation and playback, but no
+longer replaces an already valid frame with solid WEB.
+
+The pure resolver's optional `supportsOffStill` capability defaults false. Only
+the particle controller/startup gate opts in: Off permits preparation of a still
+under all existing availability, readiness and environment guards and always
+returns `mayRun: false`. Its ready presentation is `hold-frame`. Other motion
+consumers retain their existing Off behavior. Reduced retains its current scene
+still behavior. This supersedes earlier Off/static-preview statements below;
+unavailable, failed and no-JS paths keep lightweight solid artwork.
+
+`/animations/aperture` reuses `StartScene` with a details-only customization module. The homepage adds a native More link and keeps Pause/Resume. Native labeled density/speed/size ranges read limits from `ParticleSettings` and render the controller's effective configuration. Input calls the existing handle; Reset restores the current viewport defaults and invokes low-level seeded reset without changing Pause, theme or policy. WEB opts into mobile defaults below its existing 640px breakpoint: speed 0.1× and reach 5.0×, with desktop/tablet retaining 0.2× and 6.0×. Composition observes that breakpoint through the existing DOM adapter and releases its listener with the scene; the controller updates only untouched speed/reach values, preserving explicit customization across resize. Generic particle consumers and explicit fixture configurations do not opt in. Settings belong to that mounted scene, never storage, URL or shared services.
+
+Only the details shell enables `PortfolioOverlayScope`: the two concrete owners are navigation and customization. It retains a closing owner until shared Dialog release, keeps the latest queued request, and cancels it on departure/unmount. It delegates every lock/focus operation to existing Dialog/useDialog. Navigation tickets and native href/history behavior stay in the existing handoff. A shared departure disposition prevents either consumer restoring focus to a departed page. The active native navigation disclosure is preserved until idle; customization remains unavailable during that handover or failed navigation enhancement.
+
+The shell's existing scene-presentation signal treats either modal (and pending native handover) as environmental occlusion. It never changes local Pause. If navigation fails before Canvas is ready, the covered details consumer settles to complete independent WEB artwork instead of waiting indefinitely for a frame. The modal creates no particle graph or Canvas. The customization panel scrolls as a whole so its enlarged heading does not consume the usable area in short viewports. [FS-4.6 evidence and limitations](tasks/fs-4.6-customization-overlay.md).
+
+The 2026-10-12 details-page refinement reuses the homepage `Start` section with
+Customize in place of More. `ApertureDetails` shares the route/Storybook composition:
+one cornered scene section and one plain guide. Usage explanations live in that
+guide; the dialog retains five labeled ranges, compact values and associated
+short hints, a Full field switch, Reset, short visual status and accessible
+state/error feedback. Particle width hints derive from the Domain radius range
+and effective size. The guide reuses About's responsive typography utilities. Domain
+settings and the scene/overlay lifecycle are unchanged. See the
+[maintenance record](tasks/maintenance-aperture-details.md).
+
+### Particle rendering and fallback cost
+
+Dimi's 2026-09-29 rule prohibits large SVG/DOM particle and connection constructs
+on production pages. This includes server HTML, hidden or memoized trees,
+loading/error/static fallbacks and future customization previews. Hiding nodes
+does not remove transfer, parsing, hydration or reconciliation cost. Combining
+thousands of particles/segments into one oversized SVG path is not a substitute
+for keeping the representation lightweight.
+
+Use the bounded Canvas adapter for permitted particle rendering. An eligible,
+ready scene can keep its frozen Canvas; explicit Reduced uses the approved
+paused Canvas alternative. Denied/unavailable preparation, no-JS and failures
+use independent, lightweight artwork such as the solid WEB silhouette. Never
+prepare a denied Canvas solely to obtain fallback pixels. Keep small SVG logos,
+icons, silhouettes and the trusted aperture cover/mask: this rule concerns dense
+simulation geometry, not SVG as a format.
+
+The existing `ParticleStill` diagnostic representation remains confined to the
+particle sandbox. Do not import it into Start, shared shell code or production
+customization UI, or preload its graph data with a public page. This documented
+fixture boundary does not approve it as a production fallback or require a new
+preview renderer in the current task.
+
+Reviewers must inspect production HTML size, SVG/DOM node counts, initial bundle
+imports and interaction/reveal behavior when scene representations change.
+Retain Start's server/browser regressions excluding particle circles, connection
+lines and `data-particle-static` while proving complete no-JS/error artwork.
+Check aggregate path/data size too; a low node count alone is insufficient.
+Use repeatable production measurements and the existing performance criteria;
+do not add an arbitrary budget or call a frozen scene free of cost.
+
+The [FS-4.5 solid-fallback measurement](tasks/fs-4.5-scene-policy-and-themes.md#solid-web-homepage-fallback--2026-09-29)
+recorded uncompressed homepage HTML shrinking from 1,957,350 to 63,248 bytes
+after removing 9,570 connection lines and 600 particle circles. That historical
+600-particle comparison motivates the rule; it is not a fresh measurement of
+the current tuning, compressed transfer, or sustained device performance.
 
 ## Testing Strategy
 
@@ -170,8 +558,33 @@ Tests should be colocated with source files (`*.test.tsx` next to source).
 - `components/ThemeSwitcher` delegates theme persistence and application to
   `ThemeService`; it owns only selection UI state.
 
-The pre-hydration script in `app/layout.tsx` performs a one-time application of
-the stored theme to prevent a visual flash. After hydration, `ThemeService` is
+ThemeService seeds its selected theme from validated storage on first
+initialization, unless a user selection already exists. Later initialization,
+subscriptions, current-theme reads and OS-change decisions retain that live
+selection; denied writes cannot replace it with stale persisted data.
+`getStoredTheme()` remains a storage query, including its System fallback for
+missing/invalid/unreadable values. Cleanup releases listeners/subscribers but
+retains the choice for provider effect replay. A new service after a full reload
+reads storage again; persistence is not promised when storage is blocked.
+
+`app/layout.tsx` renders `application/providers/ThemeBootstrapScript.tsx`, a thin
+startup composition boundary alongside ServiceProvider. It imports only trusted
+generated script data, not an executing browser initializer. The maintained
+`infrastructure/theme/themeBootstrap.ts` reuses domain validation/storage key and
+the small existing DOM/storage adapters. `scripts/build-theme-bootstrap.mjs`
+compiles it into the tracked `frontend/generated/theme-bootstrap.ts`; normal
+TypeScript imports do not run startup effects. No service factory, runtime manager
+or new Presentation-to-Infrastructure import pattern is introduced.
+
+The native inline `theme-script` executes once in the root HTML head, before the
+parser reaches visible body content, without waiting for Next bootstrap chunks.
+Storage read/media access failures fall back; normalization writes happen
+independently after application. The generated payload and ownership are unchanged.
+Dimi approved this bounded delivery correction on 2026-09-24; see the
+[first-paint task evidence](tasks/maintenance-theme-first-paint.md). The earlier
+[maintenance record](tasks/maintenance-theme-bootstrap.md) preserves historical
+measurements of the superseded `beforeInteractive` queue and its light flash.
+After hydration, `ThemeService` is
 the sole runtime authority: it validates and persists selections, updates the
 document theme, responds to system preference changes, and owns listener
 cleanup through `ServiceProvider`. Consumers use `ThemeService.subscribe()` to
